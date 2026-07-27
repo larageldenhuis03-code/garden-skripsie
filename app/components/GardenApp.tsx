@@ -116,7 +116,6 @@ function scorePlant(plant: Plant, preferences: Preferences) {
   return {
     score,
     reasons: reasons.slice(0, 3),
-    signalCount: Math.min(6, Math.max(1, reasons.length + matchedGoals.length)),
   };
 }
 
@@ -138,9 +137,9 @@ function PlantPortrait({
       <span className="portrait-leaf leaf-two" aria-hidden="true" />
       <span className="portrait-leaf leaf-three" aria-hidden="true" />
       <div className="portrait-caption">
-        <span>Botanical portrait</span>
+        <span>Botanical photo placeholder</span>
         <strong>{plant.scientificName}</strong>
-        <small>Artwork placeholder · prompt {plant.id}</small>
+        <small>Use image prompt {plant.id}</small>
       </div>
     </div>
   );
@@ -159,30 +158,29 @@ function Header({
     <header className="site-header">
       <button className="wordmark" onClick={() => navigate("home")}>
         <span>Silly Goose</span>
-        <small>MVP · Western Cape</small>
       </button>
       <nav aria-label="Primary navigation">
         <button
           className={view === "finder" ? "is-active" : ""}
           onClick={() => navigate("finder")}
         >
-          Find my plants
+          Plant finder
         </button>
         <button
           className={view === "browse" || view === "results" ? "is-active" : ""}
           onClick={() => navigate("browse")}
         >
-          The collection
+          Plant library
         </button>
         <button
           className={view === "method" ? "is-active" : ""}
           onClick={() => navigate("method")}
         >
-          Our method
+          How it works
         </button>
       </nav>
       <button className="saved-link" onClick={() => navigate("saved")}>
-        Saved garden <span>{String(savedCount).padStart(2, "0")}</span>
+        Saved plants <span>{String(savedCount).padStart(2, "0")}</span>
       </button>
     </header>
   );
@@ -203,34 +201,24 @@ function HomeView({
       <main>
         <section className="hero-section">
           <div className="hero-copy">
-            <p className="eyebrow">A garden guide for the Western Cape</p>
             <h1>
-              Begin with
+              A garden design
               <br />
-              the <em>veld.</em>
+              shaped by <em>place.</em>
             </h1>
             <p className="hero-intro">
-              Find indigenous plants that make sense for your light, space and
-              way of gardening—then understand why each one belongs.
+              Tell us about your part of the Western Cape, the sunlight, the
+              water you can provide and the room you have. We’ll turn those
+              conditions into a suitable plant shortlist.
             </p>
             <div className="hero-actions">
               <button className="button button-dark" onClick={start}>
-                Describe my garden <span>↗</span>
+                Start my garden plan <span>↗</span>
               </button>
               <button className="text-link" onClick={browse}>
-                Browse all 48 plants
+                Browse the plant library
               </button>
             </div>
-            <dl className="hero-facts">
-              <div>
-                <dt>01</dt>
-                <dd>Western Cape native or endemic</dd>
-              </div>
-              <div>
-                <dt>02</dt>
-                <dd>Backed by specimen and trait records</dd>
-              </div>
-            </dl>
           </div>
           <div className="hero-art">
             <div className="hero-placeholder">
@@ -242,31 +230,33 @@ function HomeView({
                 <i />
               </div>
               <div className="portrait-caption">
-                <span>Commissioned artwork placeholder</span>
-                <strong>Four lives of the Cape veld</strong>
-                <small>King protea · buchu · heath · restio</small>
+                <span>Image to be commissioned</span>
+                <strong>King protea, buchu, heath and restio</strong>
+                <small>Use image prompt PROMPT-HERO-01</small>
               </div>
             </div>
-            <p className="vertical-note">
-              Rooted in place. Chosen with evidence. Grown with care.
-            </p>
           </div>
         </section>
 
         <section className="manifesto-band">
-          <p>Not a list of fashionable plants.</p>
-          <h2>A small field guide to what could thrive where you are.</h2>
-          <span>48 researched starting points · one garden at a time</span>
+          <h2>Turn the conditions you have into a garden that can actually work.</h2>
+          <p>
+            This version builds the plant shortlist. Soil, bed dimensions and
+            the measured layout are the next part of the build.
+          </p>
         </section>
 
         <section className="specimen-section">
           <div className="section-heading">
             <div>
-              <p className="eyebrow">Selected specimens · 01–04</p>
-              <h2>Four ways into a Cape garden</h2>
+              <h2>Start with the plant library</h2>
+              <p>
+                Forty-eight indigenous and endemic plants selected from the
+                Western Cape data foundation.
+              </p>
             </div>
             <button className="text-link" onClick={browse}>
-              View the full collection ↗
+              Browse all plants ↗
             </button>
           </div>
           <div className="home-specimen-grid">
@@ -291,33 +281,39 @@ function HomeView({
 
         <section className="how-section">
           <div className="how-title">
-            <p className="eyebrow">How it works</p>
-            <h2>
-              Observation,
-              <br />
-              before recommendation.
-            </h2>
+            <h2>From garden conditions to a planting plan</h2>
+            <p>The first three steps work now. The measured layout is next.</p>
           </div>
           <ol className="how-list">
             <li>
               <span>01</span>
               <div>
-                <strong>Read your site</strong>
-                <p>Tell us what is actually observable: light, water and room.</p>
+                <strong>Describe your garden</strong>
+                <p>Choose the area, sunlight, water and available room.</p>
               </div>
             </li>
             <li>
               <span>02</span>
               <div>
-                <strong>Match the evidence</strong>
-                <p>We rank a reviewed collection and explain every useful signal.</p>
+                <strong>Review suitable plants</strong>
+                <p>See why each plant appears and where the data is still limited.</p>
               </div>
             </li>
             <li>
               <span>03</span>
               <div>
-                <strong>Build a shortlist</strong>
-                <p>Save a considered mix, then verify it with your local nursery.</p>
+                <strong>Save a shortlist</strong>
+                <p>Keep the plants you want to compare in one place.</p>
+              </div>
+            </li>
+            <li>
+              <span>04</span>
+              <div>
+                <strong>Generate the layout</strong>
+                <p>
+                  Next: use bed size and mature canopy to calculate quantities
+                  and placement.
+                </p>
               </div>
             </li>
           </ol>
@@ -366,9 +362,8 @@ function FinderView({
   const [step, setStep] = useState(0);
   const steps = [
     {
-      eyebrow: "Where are you growing?",
-      title: "Place changes the shortlist.",
-      note: "A broad area is enough for this version. We do not request your precise address.",
+      title: "Where is your garden?",
+      note: "Choose the nearest area. We do not need your address.",
       content: (
         <div className="choice-grid two-column">
           {(Object.keys(areaLabels) as Area[]).map((area) => (
@@ -383,9 +378,8 @@ function FinderView({
       ),
     },
     {
-      eyebrow: "How much direct light?",
-      title: "Watch the sun, not the compass.",
-      note: "Choose the condition that describes most of the planting area through the growing season.",
+      title: "How much direct sun does the bed get?",
+      note: "Choose the condition that describes most of the bed during the growing season.",
       content: (
         <div className="choice-grid">
           {(Object.keys(sunLabels) as Sun[]).map((sun) => (
@@ -407,9 +401,8 @@ function FinderView({
       ),
     },
     {
-      eyebrow: "Summer water",
-      title: "How much help can you give?",
-      note: "Established indigenous plants still vary. This is an editorial prototype grouping, not an irrigation prescription.",
+      title: "How much summer water can you provide?",
+      note: "Choose the closest option. This is a broad grouping, not an irrigation schedule.",
       content: (
         <div className="choice-grid">
           {(Object.keys(waterLabels) as Water[]).map((water) => (
@@ -431,9 +424,8 @@ function FinderView({
       ),
     },
     {
-      eyebrow: "Available room",
-      title: "Let the mature plant fit.",
-      note: "We compare your choice with source-derived maximum height. Canopy observations are shown separately.",
+      title: "How much room is available?",
+      note: "We compare this with maximum recorded height. Exact bed measurements come in the next build.",
       content: (
         <div className="choice-grid">
           {(Object.keys(spaceLabels) as Space[]).map((space) => (
@@ -455,9 +447,8 @@ function FinderView({
       ),
     },
     {
-      eyebrow: "Garden intentions",
-      title: "What should this planting do?",
-      note: "Choose as many as matter. Your priorities affect the order, not which plants exist.",
+      title: "What do you want the planting to do?",
+      note: "Choose as many as you need. These choices affect the order of the shortlist.",
       content: (
         <div className="choice-grid two-column">
           {(Object.keys(goalLabels) as Goal[]).map((goal) => {
@@ -488,7 +479,7 @@ function FinderView({
     <main className="finder-shell">
       <div className="finder-progress" aria-label={`Step ${step + 1} of 5`}>
         <span>
-          Garden brief · {String(step + 1).padStart(2, "0")} / 05
+          Step {step + 1} of 5
         </span>
         <div>
           {steps.map((_, index) => (
@@ -498,7 +489,6 @@ function FinderView({
       </div>
       <section className="finder-panel">
         <div className="finder-question">
-          <p className="eyebrow">{current.eyebrow}</p>
           <h1>{current.title}</h1>
           <p>{current.note}</p>
         </div>
@@ -516,7 +506,7 @@ function FinderView({
           disabled={step === 4 && preferences.goals.length === 0}
           onClick={step === 4 ? finish : () => setStep(step + 1)}
         >
-          {step === 4 ? "See my matches" : "Continue"} <span>↗</span>
+          {step === 4 ? "See suitable plants" : "Continue"} <span>↗</span>
         </button>
       </div>
     </main>
@@ -564,12 +554,11 @@ function PlantCard({
       </div>
       {match && (
         <div className="match-reasons">
-          <strong>{match.signalCount}/6 useful signals</strong>
           <p>{match.reasons.join(" · ")}</p>
         </div>
       )}
       <button className="card-link" onClick={open}>
-        Read the specimen note <span>↗</span>
+        View plant details <span>↗</span>
       </button>
     </article>
   );
@@ -622,23 +611,18 @@ function CollectionView({
     <main className="collection-shell">
       <section className="collection-intro">
         <div>
-          <p className="eyebrow">
-            {mode === "results"
-              ? `Your garden brief · ${areaLabels[preferences.area]}`
-              : "The working collection · 48 specimens"}
-          </p>
           <h1>
             {mode === "results" ? (
               <>
-                A shortlist with
+                Plants suited to
                 <br />
-                reasons to <em>believe it.</em>
+                <em>{areaLabels[preferences.area]}.</em>
               </>
             ) : (
               <>
-                Meet the first
+                The first
                 <br />
-                forty-eight.
+                forty-eight plants.
               </>
             )}
           </h1>
@@ -646,8 +630,8 @@ function CollectionView({
         <div className="collection-note">
           <p>
             {mode === "results"
-              ? "Ordered by your observable conditions and intentions. The match is transparent; it is not a guarantee."
-              : "Every plant starts with accepted taxonomy, Western Cape occurrence evidence and a regional trait record."}
+              ? "This is a provisional shortlist based on the answers you gave. It uses an interim heuristic, not the AHP and Goal Programming model described in the research paper."
+              : "Each plant has accepted taxonomy, a Western Cape specimen record and regional trait data. Horticultural fields still need expert review."}
           </p>
           {mode === "results" && (
             <button className="text-link" onClick={restart}>
@@ -691,7 +675,7 @@ function CollectionView({
       <div className="results-count">
         <span>{String(filtered.length).padStart(2, "0")} plants</span>
         <span>
-          {mode === "results" ? "Ranked for this garden" : "Editorial collection"}
+          {mode === "results" ? "Provisional order" : "Working library"}
         </span>
       </div>
 
@@ -710,8 +694,7 @@ function CollectionView({
         </section>
       ) : (
         <section className="empty-state">
-          <p className="eyebrow">No specimens found</p>
-          <h2>Try a broader name or another plant form.</h2>
+          <h2>No plants match these filters.</h2>
           <button
             className="text-link"
             onClick={() => {
@@ -753,15 +736,14 @@ function SavedView({
   return (
     <main className="saved-shell">
       <section className="saved-intro">
-        <p className="eyebrow">Saved on this device</p>
         <h1>
-          Your working
+          Plants you’ve
           <br />
-          garden list.
+          saved.
         </h1>
         <p>
-          A shortlist, not a shopping cart. Compare mature scale and structure
-          before deciding what belongs together.
+          These plants are saved on this device. The next planning stage will
+          test which ones fit together in your measured bed.
         </p>
       </section>
       {savedPlants.length ? (
@@ -792,10 +774,10 @@ function SavedView({
         </>
       ) : (
         <section className="empty-state saved-empty">
-          <p className="eyebrow">The page is still quiet</p>
-          <h2>Save a few plants and begin arranging the conversation.</h2>
+          <h2>You haven’t saved any plants yet.</h2>
+          <p>Browse the library and save the plants you want to compare.</p>
           <button className="button button-dark" onClick={browse}>
-            Browse the collection <span>↗</span>
+            Browse the plant library <span>↗</span>
           </button>
         </section>
       )}
@@ -807,67 +789,65 @@ function MethodView({ start }: { start: () => void }) {
   return (
     <main className="method-shell">
       <section className="method-hero">
-        <p className="eyebrow">Our method · version 0.1</p>
         <h1>
-          Evidence first.
+          What works now.
           <br />
-          Certainty, <em>never performed.</em>
+          What comes <em>next.</em>
         </h1>
         <p>
-          Silly Goose brings accepted names, herbarium occurrence and regional
-          plant traits into one readable starting point. It also tells you where
-          the evidence stops.
+          The current build proves plant discovery, filtering, plant details
+          and a saved shortlist. It does not yet implement the full decision
+          model or generate a measured planting layout.
         </p>
       </section>
       <section className="method-grid">
         <article>
           <span>01</span>
-          <h2>Names & native range</h2>
+          <h2>Plant data</h2>
           <p>
-            SANPC 2026 is the taxonomic backbone. The visible collection is
-            limited to accepted taxa marked native or native-endemic for the
-            Western Cape.
+            In place: SANPC names, Western Cape BODATSA records and BioSCape
+            height, form, flowering and canopy observations.
           </p>
         </article>
         <article>
           <span>02</span>
-          <h2>Occurrence evidence</h2>
+          <h2>Hard feasibility filters</h2>
           <p>
-            BODATSA preserved specimens confirm that a name has a Western Cape
-            record. Collection density helps ordering only slightly; it does not
-            prove garden performance.
+            Partial: native range is checked. Soil, legal exclusions and
+            complete environmental compatibility still need reviewed rules and
+            data.
           </p>
         </article>
         <article>
           <span>03</span>
-          <h2>Form & scale</h2>
+          <h2>AHP and Goal Programming</h2>
           <p>
-            BioSCape provides growth form, maximum height and field canopy
-            observations. Field dimensions are shown as evidence, not nursery
-            promises.
+            Not implemented: expert pairwise comparisons must set consistent
+            weights before the Goal Programming model replaces the current
+            heuristic ranking.
           </p>
         </article>
         <article>
           <span>04</span>
-          <h2>Editorial layer</h2>
+          <h2>Selection and layout</h2>
           <p>
-            Sun, water, broad area affinity and garden uses are prototype
-            editorial groupings. They must be reviewed horticulturally before a
-            public production release.
+            Not implemented: bed dimensions, mature canopy, plant quantities
+            and category balance must feed a knapsack/packing stage and a 2D
+            layout.
           </p>
         </article>
       </section>
       <section className="method-callout">
         <div>
-          <p className="eyebrow">The practical rule</p>
-          <h2>Use the shortlist to ask better questions.</h2>
+          <h2>The next build is the planning engine.</h2>
         </div>
         <p>
-          Confirm the plant’s current name, local provenance, mature dimensions
-          and availability with a reputable indigenous nursery before planting.
+          First complete and review the hard constraints. Then calibrate the
+          weights, implement Goal Programming, select a balanced group and place
+          it inside a measured bed.
         </p>
         <button className="button button-dark" onClick={start}>
-          Make a garden brief <span>↗</span>
+          Try the plant finder <span>↗</span>
         </button>
       </section>
     </main>
@@ -918,7 +898,7 @@ function DetailDrawer({
         </div>
         <PlantPortrait plant={plant} hero />
         <div className="detail-copy">
-          <p className="eyebrow">{plant.commonName}</p>
+          <p className="plant-common-name">{plant.commonName}</p>
           <h2 id="detail-title">{plant.scientificName}</h2>
           <p className="detail-note">{plant.note}</p>
           <button
@@ -959,7 +939,7 @@ function DetailDrawer({
           </dl>
 
           <div className="detail-evidence">
-            <p className="eyebrow">Evidence note</p>
+            <h3>About this information</h3>
             <p>
               {plant.occurrenceCount} Western Cape BODATSA specimen records are
               represented in the processed source summary. Height, growth form
@@ -978,14 +958,13 @@ function Footer({ method }: { method: () => void }) {
     <footer className="site-footer">
       <div className="footer-mark">
         <span>Silly Goose</span>
-        <small>Minimum viable planting</small>
       </div>
       <p>
-        A working Western Cape garden guide built from SANPC, BODATSA and
+        A Western Cape plant-discovery prototype built from SANPC, BODATSA and
         BioSCape data.
       </p>
       <button className="text-link" onClick={method}>
-        Read the methodology ↗
+        See what comes next ↗
       </button>
       <span className="footer-version">MVP · 2026</span>
     </footer>

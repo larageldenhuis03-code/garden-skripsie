@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
+import "@fontsource-variable/instrument-sans";
+import "@fontsource-variable/newsreader";
+import "@fontsource-variable/newsreader/wght-italic.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Silly Goose MVP — A Western Cape garden guide",
+  title: "Silly Goose MVP — Garden planning for the Western Cape",
   description:
-    "Find indigenous Western Cape plants matched to your garden’s light, water, space and intentions.",
+    "Turn your garden’s conditions into a suitable plant shortlist, with a measured planting plan coming next.",
   applicationName: "Silly Goose MVP",
   keywords: [
     "Western Cape",
@@ -15,7 +18,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Silly Goose MVP",
     description:
-      "A considered starting point for an indigenous Western Cape garden.",
+      "A garden design shaped by place.",
     type: "website",
   },
 };
@@ -31,4 +34,3 @@ export default function RootLayout({
     </html>
   );
 }
-

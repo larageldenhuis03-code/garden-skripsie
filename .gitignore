@@ -35,5 +35,6 @@ yarn-error.log*
 /.vercel/
 /outputs/
 /work/
+/tmp/
 next-env.d.ts
 *.tsbuildinfo

@@ -1,12 +1,15 @@
 # Silly Goose MVP
 
-A functional desktop-first indigenous plant recommender for Western Cape home
-gardeners.
+A desktop-first Western Cape plant-discovery prototype and the foundation for
+a measured garden-planning engine.
 
 The product combines an editorial 48-plant starting collection with accepted
 taxonomy, Western Cape occurrence evidence and regional trait data. Users can
-complete a garden brief, receive explained recommendations, browse plant
-profiles and save a shortlist on their device.
+complete a garden brief, receive a provisional plant shortlist, browse plant
+profiles and save plants on their device.
+
+The literature review’s AHP, Goal Programming, multidimensional-knapsack and 2D
+layout stages are not implemented yet. See `docs/implementation-roadmap.md`.
 
 ## Local development
 
@@ -34,4 +37,3 @@ npm test
 
 Start with `docs/product-spec.md` and `docs/design-decisions.md`. Source versions,
 licences and limitations are recorded in `data/sources.json`.
-

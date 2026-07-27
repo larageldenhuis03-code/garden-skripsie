@@ -18,4 +18,16 @@
 - Chose a 48-plant editorial subset to keep recommendations credible and
   profiles coherent.
 - Chose deterministic, explained ranking instead of opaque AI scoring.
-
+- Audited the implementation against pages 16–22 of the literature review.
+- Confirmed that the current score is an interim heuristic and does not
+  implement the paper’s AHP, Goal Programming, knapsack or packing method.
+- Reclassified the current release as a plant-discovery prototype.
+- Made the decision and layout engine the next implementation milestone.
+- Rewrote interface copy in direct, specific language and removed decorative
+  uppercase eyebrow headings.
+- Replaced the green/orange palette with cream, fern, eucalyptus, moss, sage
+  and lichen.
+- Replaced the generic system font stack with bundled Newsreader Variable and
+  Instrument Sans Variable.
+- Kept custom image placeholders and revised their production prompt to use a
+  tonal botanical palette.

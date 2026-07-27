@@ -31,12 +31,13 @@ test("server-renders the Silly Goose product surface", async () => {
   const html = await response.text();
   assert.match(
     html,
-    /<title>Silly Goose MVP — A Western Cape garden guide<\/title>/i,
+    /<title>Silly Goose MVP — Garden planning for the Western Cape<\/title>/i,
   );
-  assert.match(html, /Begin with/);
-  assert.match(html, /the <em>veld\.<\/em>/);
-  assert.match(html, /Describe my garden/);
-  assert.match(html, /Browse all 48 plants/);
+  assert.match(html, /A garden design/);
+  assert.match(html, /shaped by <em>place\.<\/em>/);
+  assert.match(html, /Start my garden plan/);
+  assert.match(html, /Browse the plant library/);
+  assert.doesNotMatch(html, /A garden guide for the Western Cape/);
   assert.doesNotMatch(html, /codex-preview|Your site is taking shape/);
 });
 
@@ -55,4 +56,3 @@ test("removes disposable starter UI and dependencies", async () => {
     access(new URL("../app/_sites-preview/SkeletonPreview.tsx", import.meta.url)),
   );
 });
-

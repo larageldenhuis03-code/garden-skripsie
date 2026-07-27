@@ -1,4 +1,6 @@
-# Silly Goose MVP — data methodology
+# Silly Goose MVP — data and decision methodology
+
+Updated: 2026-07-27
 
 ## Source hierarchy
 
@@ -13,62 +15,103 @@
 
 Full source, DOI, version and licence details are in `data/sources.json`.
 
-## MVP catalogue selection
+## Catalogue selection already implemented
 
-The visible 48 plants are an editorial subset of
+The 48 visible plants are an editorial subset of
 `data/processed/garden_app_seed_catalog.csv`. Every selected taxon:
 
 - is accepted by SANPC;
 - is marked native or native-endemic for the Western Cape;
 - has a canonical-name match in BODATSA;
 - has a BioSCape trait record; and
-- has no machine-detected regulatory-review flag in the current integration
-  seed.
+- has no machine-detected regulatory-review flag in the integration seed.
 
 ## Field provenance
 
-Source-derived:
+Source-derived fields:
 
-- Scientific name and family
-- Maximum height
-- Growth form
-- Flowering period
-- Western Cape occurrence count
-- Measured median canopy axes when available
+- scientific name and family;
+- maximum height;
+- growth form;
+- flowering period;
+- Western Cape occurrence count; and
+- measured median canopy axes when available.
 
-Editorial prototype attributes:
+Editorial prototype fields:
 
-- Sun preference
-- Water grouping
-- Broad site affinity
-- Garden uses
-- Descriptive copy and common-name presentation
+- sun preference;
+- water grouping;
+- broad site affinity;
+- garden uses;
+- common-name presentation; and
+- descriptive copy.
 
-Editorial fields are intentionally labelled in the interface. They are useful
-for testing the recommendation flow but require horticultural review before a
-public production release.
+The editorial fields are useful for interaction testing but require
+horticultural review before they can act as production constraints.
 
-## Ranking approach
+## Audit against the literature-review methodology
 
-The recommendation score is deterministic. It rewards:
+The current `scorePlant` function is a hand-set heuristic. It rewards matching
+sun, water, approximate space, intentions and broad area, with occurrence count
+as a small ordering signal. It was built to prove the interaction.
 
-- compatible sunlight;
-- compatible water availability;
-- size appropriate to the selected space;
-- matching garden intentions;
-- broad area affinity; and
-- stronger occurrence evidence as a small tie-breaker.
+It does **not** implement the mathematical methodology set out on pages 16–22
+of `SKRIPSIE_LIT_REVIEW.pdf`. The earlier documentation overstated the
+relationship between the prototype and the paper; this revision corrects that.
 
-Occurrence count never acts as proof of garden suitability. It contributes
-less than the user’s observable site conditions.
+Current hand-set points:
 
-## Known limitations
+- sunlight match: `+4`, or `+2` for the one partial-light fallback;
+- water match: `+3`, or `+2` for low-water plants under moderate-water input;
+- low-water input against a moderate-water plant: `−1`;
+- approximate size fit: `+3`, otherwise `−3`;
+- each matching garden intention: `+2`;
+- broad-area match: `+2`; and
+- occurrence-count tie-breaker: capped at `+2`.
 
-- Exact canonical-name joins do not resolve every synonym.
-- Herbarium collecting effort is geographically uneven.
-- BioSCape canopy measurements are field observations, not guaranteed nursery
-  mature dimensions.
-- Sun, water and site-affinity fields need expert review.
-- Legal exclusion logic must be reviewed against Gazette text before it can
-  block recommendations in production.
+These values were not derived through stakeholder pairwise comparisons and
+have no AHP consistency result.
 
+The paper specifies this pipeline:
+
+1. **Preserving/reject filters:** remove infeasible plants before
+   optimisation.
+2. **AHP calibration:** derive a weight vector from expert pairwise
+   comparisons on Saaty’s 1–9 scale.
+3. **Consistency gate:** reject an inconsistent comparison matrix before its
+   weights are embedded.
+4. **Goal Programming:** minimise weighted under- and over-achievement:
+   `min Z = Σ(wᵢ⁻sᵢ⁻ + wᵢ⁺sᵢ⁺)`.
+5. **Group selection:** use suitability as value and mature canopy as spatial
+   cost in a multidimensional knapsack formulation.
+6. **Composition constraints:** enforce total coverage, required open space,
+   category minima and category maxima.
+7. **Search and layout:** start with a greedy constructive heuristic, then
+   move to simulated annealing and a genetic algorithm as the dataset scales;
+   place the selected plants in a bounded 2D bed.
+
+The paper also states that the conventional AHP decision score must not rank
+plants directly; AHP only derives the weights used by Goal Programming.
+
+## Data needed before implementing the model
+
+- Reviewed hard/soft classification for every criterion
+- Soil compatibility and tolerance ranges
+- Reviewed sun and water rules
+- Current legal exclusion status and audit date
+- Mature canopy diameter or a defensible imputation rule
+- Plant category used by the composition constraints
+- Style membership and compatible combinations
+- Expert pairwise-comparison matrix and consistency result
+- Target values and penalty direction for each Goal Programming goal
+- Open-space ratio and category minimum/maximum ratios
+- Test cases with horticulturist-approved expected outcomes
+
+## Guardrails
+
+- Occurrence records show evidence of presence, not garden performance.
+- A missing value cannot silently become compatibility.
+- Hard exclusions must be versioned and explainable.
+- Editorial fields must not be presented as source facts.
+- Every recommendation output must state assumptions and data gaps.
+- Legal and horticultural rules require domain review before release.

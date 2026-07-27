@@ -8,34 +8,38 @@ aspect ratio.
 
 Use this foundation for every prompt:
 
-> Create an original editorial botanical portrait for the South African garden
-> website “Silly Goose MVP”. The subject is [PLANT NAME], shown accurately and
-> recognisably. Blend a nineteenth-century botanical plate with contemporary
-> South African editorial art direction: warm uncoated cream paper, deep
-> indigenous green ink, restrained natural flower colour, delicate printed
-> grain, fine scientific observation, generous negative space, quiet confidence
-> and no decorative border. Avoid stock-photo lighting, glossy 3D rendering,
+> Create an original editorial botanical photograph for the South African
+> garden website “Silly Goose MVP”. The subject is [PLANT NAME], shown
+> accurately and recognisably. Photograph it in soft, directional natural light
+> against a matte warm-cream studio ground, with the careful observation and
+> negative space of a nineteenth-century botanical plate. Preserve real leaf,
+> bark and flower texture. Use deep fern, eucalyptus and lichen foliage tones,
+> botanically accurate flower colour, restrained contrast and subtle
+> large-format film grain. No decorative border. Avoid stock-photo lighting,
+> cut-flower catalogue styling, illustration, watercolour, glossy 3D rendering,
 > fantasy foliage, text, labels, logos, pots and hands. The result must feel
-> bespoke, sophisticated and rooted in the Cape rather than generically
+> custom-made, contemporary and rooted in the Cape rather than generically
 > tropical.
 
 ## Hero image — PROMPT-HERO-01
 
 Aspect ratio: 4:5
 
-> Create a complete vertical botanical composition featuring a small,
+> Create a vertical editorial botanical photograph featuring a small,
 > ecologically plausible grouping of King Protea, Cape thatching reed, buchu
 > and fire heath. View the plants as carefully arranged living specimens rather
-> than a bouquet. Warm cream paper, deep ink green, muted coral, ochre and dusty
-> pink accents, subtle aged print texture, precise South African fynbos
-> character, ample breathing room around the plants. No text, border, vase,
-> landscape background or photorealistic studio scene.
+> than a bouquet. Soft natural daylight on a matte warm-cream ground; deep fern,
+> eucalyptus, moss and lichen tones; restrained botanically accurate flower
+> colour; real plant texture; subtle large-format film grain; precise South
+> African fynbos character; ample breathing room. No text, border, vase, pot or
+> landscape background.
 
 ## Plant-card portraits — PROMPT-P01 to PROMPT-P48
 
 Use the shared visual language and replace `[PLANT NAME]` with the corresponding
-scientific name below. Use a 4:5 aspect ratio and depict one complete specimen
-with enough stem and leaf structure to distinguish its growth habit.
+scientific name below. Use a 4:5 aspect ratio. Photograph one complete young
+specimen where scale allows; for trees and large shrubs, show a representative
+branch plus enough structure to communicate the growth habit.
 
 | ID | Plant |
 |---|---|
@@ -87,4 +91,3 @@ with enough stem and leaf structure to distinguish its growth habit.
 | P46 | Felicia filifolia |
 | P47 | Athanasia trifurcata |
 | P48 | Syncarpha vestita |
-
