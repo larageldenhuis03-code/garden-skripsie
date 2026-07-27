@@ -129,133 +129,38 @@ function Header({
 function HomeView({
   start,
   browse,
-  openPlant,
 }: {
   start: () => void;
   browse: () => void;
-  openPlant: (plant: Plant) => void;
 }) {
-  const preview = [plants[1], plants[18], plants[29], plants[36]];
   return (
-    <>
-      <main>
-        <section className="hero-section">
-          <div className="hero-copy">
-            <h1>
-              <span>
-                Describe your <em>garden.</em>
-              </span>
-              <span>
-                Discover the plants that <em>fit.</em>
-              </span>
-            </h1>
-            <p className="hero-intro">
-              Tell us where your garden is, how much sun and water it gets, and
-              the size of your bed. We’ll suggest plants and show you how they
-              could fit.
-            </p>
-            <div className="hero-actions">
-              <button className="button button-dark" onClick={start}>
-                Start my garden plan <span>↗</span>
-              </button>
-              <button className="text-link" onClick={browse}>
-                Browse the plant library
-              </button>
-            </div>
-          </div>
-        </section>
-
-        <section className="manifesto-band">
-          <h2>A garden plan built around the space you actually have.</h2>
-          <p>
-            This first version checks your conditions, suggests plants and
-            works out a simple layout. Some growing details still need to be
-            checked by a local plant expert.
+    <main>
+      <section className="hero-section">
+        <div className="hero-copy">
+          <h1>
+            <span>
+              Describe your <em>garden.</em>
+            </span>
+            <span>
+              Discover the plants that <em>fit.</em>
+            </span>
+          </h1>
+          <p className="hero-intro">
+            Tell us where your garden is, how much sun and water it gets, and
+            the size of your bed. We’ll suggest plants and show you how they
+            could fit.
           </p>
-        </section>
-
-        <section className="specimen-section">
-          <div className="section-heading">
-            <div>
-              <h2>Start with the plant library</h2>
-              <p>
-                A starting collection of 48 local plants, backed by Western
-                Cape records.
-              </p>
-            </div>
+          <div className="hero-actions">
+            <button className="button button-dark" onClick={start}>
+              Start my garden plan <span>↗</span>
+            </button>
             <button className="text-link" onClick={browse}>
-              Browse all plants ↗
+              Browse the plant library
             </button>
           </div>
-          <div className="home-specimen-grid">
-            {preview.map((plant, index) => (
-              <button
-                className="home-specimen"
-                key={plant.id}
-                onClick={() => openPlant(plant)}
-              >
-                <PlantPortrait plant={plant} />
-                <span className="specimen-number">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                <span className="specimen-copy">
-                  <strong>{plant.commonName}</strong>
-                  <em>{plant.scientificName}</em>
-                </span>
-              </button>
-            ))}
-          </div>
-        </section>
-
-        <section className="how-section">
-          <div className="how-title">
-            <h2>How your plan comes together</h2>
-            <p>Four simple steps, with anything uncertain clearly marked.</p>
-          </div>
-          <ol className="how-list">
-            <li>
-              <span>01</span>
-              <div>
-                <strong>Tell us about the space</strong>
-                <p>
-                  Choose your area, soil, drainage, sunlight, water and bed
-                  size.
-                </p>
-              </div>
-            </li>
-            <li>
-              <span>02</span>
-              <div>
-                <strong>See what may work</strong>
-                <p>
-                  We check each plant against your answers and show anything
-                  we’re unsure about.
-                </p>
-              </div>
-            </li>
-            <li>
-              <span>03</span>
-              <div>
-                <strong>Choose a plant mix</strong>
-                <p>
-                  We pick a mix that fits the bed and works towards your goals.
-                </p>
-              </div>
-            </li>
-            <li>
-              <span>04</span>
-              <div>
-                <strong>See the layout</strong>
-                <p>
-                  We arrange the plants inside your bed and show how many you
-                  may need.
-                </p>
-              </div>
-            </li>
-          </ol>
-        </section>
-      </main>
-    </>
+        </div>
+      </section>
+    </main>
   );
 }
 
@@ -1323,7 +1228,6 @@ export function GardenApp() {
         <HomeView
           start={() => navigate("finder")}
           browse={() => navigate("browse")}
-          openPlant={setSelectedPlant}
         />
       )}
       {view === "finder" && (
@@ -1355,7 +1259,7 @@ export function GardenApp() {
       {view === "method" && (
         <MethodView start={() => navigate("finder")} />
       )}
-      <Footer method={() => navigate("method")} />
+      {view !== "home" && <Footer method={() => navigate("method")} />}
       {selectedPlant && (
         <DetailDrawer
           plant={selectedPlant}

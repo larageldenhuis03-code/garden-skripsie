@@ -79,6 +79,7 @@ The product, language and artwork should be recognisably local. Generic
 | Catalogue | 48 curated plants until wider horticultural coverage is reviewed |
 | Primary device | Desktop-first, responsive on smaller screens |
 | Current navigation | One continuous application |
+| Home page | Header and hero only; detailed content begins after an action |
 | Saving | Device-local |
 | Recommendation architecture | Hard filters → Goal Programming → group selection → layout |
 | Calibration | AHP supplies weights; it does not rank plants directly |

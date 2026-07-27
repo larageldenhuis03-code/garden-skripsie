@@ -38,6 +38,10 @@ test("server-renders the Silly Goose product surface", async () => {
   assert.match(html, /suggest plants and show you how they\s+could fit/i);
   assert.match(html, /Start my garden plan/);
   assert.match(html, /Browse the plant library/);
+  assert.doesNotMatch(html, /class="manifesto-band"/);
+  assert.doesNotMatch(html, /class="specimen-section"/);
+  assert.doesNotMatch(html, /class="how-section"/);
+  assert.doesNotMatch(html, /<footer\b/i);
   assert.doesNotMatch(html, /A garden guide for the Western Cape/);
   assert.doesNotMatch(html, /codex-preview|Your site is taking shape/);
 });
@@ -151,6 +155,5 @@ test("keeps the app usable on narrow touch screens", async () => {
   assert.match(css, /touch-action:\s*manipulation/);
   assert.match(mobileCss, /\.hero-copy h1 > span\s*\{[^}]*white-space:\s*normal/s);
   assert.match(mobileCss, /\.saved-label::after\s*\{[^}]*content:\s*"Saved"/s);
-  assert.match(mobileCss, /\.section-heading\s*\{[^}]*flex-direction:\s*column/s);
   assert.match(mobileCss, /\.site-footer\s*\{[^}]*padding:\s*48px 24px/s);
 });
