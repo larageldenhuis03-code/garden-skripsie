@@ -31,3 +31,10 @@
   Instrument Sans Variable.
 - Kept custom image placeholders and revised their production prompt to use a
   tonal botanical palette.
+- Established the “Cape Print Cabinet” visual direction: genuine old
+  cotton-rag paper, Cape botanical chromolithographs, imperfect specimen grids
+  and one rare wandering-goose marginalia motif.
+- Established a user taste gate for generated imagery: approve the hero, paper
+  texture and goose before creating page backgrounds or the full plant set.
+- Assigned image generation to GPT and responsive placement, optimisation and
+  motion integration to the application.

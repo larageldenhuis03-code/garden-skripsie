@@ -152,3 +152,23 @@ the flower colour without forcing a green/orange brand combination.
 
 Consequence: Functional states must remain distinguishable through contrast,
 shape and wording, not hue alone.
+
+## DD-013 — Cape Print Cabinet image system
+
+Decision: Build the visual world from hand-coloured Cape botanical prints on
+genuinely aged cotton-rag paper, arranged in slightly irregular archival grids.
+Use one small wandering-goose marginalia motif as an occasional visual joke.
+
+Rationale: The supplied references combine old botanical catalogues, specimen
+plates and scrapbook walls. Their character comes from material paper,
+imperfect printing and varied composition—not a generic cream background or a
+single “vintage” filter.
+
+Consequence: GPT will generate page-specific image assets from the production
+brief. The user approves the hero, paper texture and goose before the remaining
+set is produced. The application supplies all real typography, responsive
+cropping, accessible contrast and animation.
+
+Motion should imitate physical print behaviour: press wipes, page slides,
+hand-drawn rules, stamp presses and very small paper parallax. Generic
+fade-up-card animation, floating blobs and continuous bouncing are excluded.

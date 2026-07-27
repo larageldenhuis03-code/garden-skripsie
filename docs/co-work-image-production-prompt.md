@@ -15,12 +15,13 @@ Read these files before doing anything:
 - `app/data/plants.ts`
 - `app/globals.css`
 
-The visual system is warm cream paper, deep fern green, eucalyptus, moss, sage
-and lichen. Flower colour should be botanically accurate and restrained. Do not
-introduce an orange/coral brand palette. The images must be original South
-African editorial botanical **photographs** with an archival botanical-plate
-composition. They must not look like stock photography, generic watercolour
-clip art, fantasy plants or glossy AI renders.
+The visual system is genuinely old cotton-rag paper, deep fern green,
+eucalyptus, moss, sage and lichen. Flower colour should be botanically accurate
+and softly faded. The images must be original South African hand-coloured
+botanical **prints**, combining chromolithography, copperplate engraving and a
+slightly eccentric museum catalogue. They must not look like photography,
+modern vector art, generic watercolour clip art, fantasy plants or glossy AI
+renders.
 
 ## Phase 1 — make one approval sample
 
@@ -32,14 +33,15 @@ Requirements:
 - Aspect ratio: 4:5
 - One recognisable complete young specimen
 - Enough stem and leaf structure to identify the growth habit
-- Warm uncoated cream background
-- Soft directional natural light and real leaf texture
-- Deep fern and tonal green foliage
+- Sun-warmed cotton-rag paper with visible fibres
+- Faint foxing near edges, soft plate pressure and tiny ink misregistration
+- Fine engraved linework with hand-coloured tonal green foliage
 - Botanically accurate, restrained King Protea flower colour
-- Subtle large-format film grain and generous negative space
+- Generous negative space and a slightly imperfect archival composition
 - No words, labels, logos, border, pot, vase, hands, landscape or cast shadow
 - No fake Latin text
-- No illustration, watercolour, engraving or 3D-rendered look
+- No photography, modern vector art, glossy 3D rendering, heavy sepia filter,
+  burnt edges or theatrical grunge
 
 Save the original generated file outside the repository first. Then create a
 web-ready copy at:
