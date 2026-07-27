@@ -2,12 +2,13 @@
 
 **Audience:** the user, GPT image generation and implementation work
 
-**Purpose:** the approved visual language and the single active image task
+**Purpose:** the approved visual language and image workflow
 
 **Updated:** 2026-07-27
 
-> **Current asset:** V01 is integrated in the private site and awaits
-> in-context approval. V02 remains blocked.
+> **Current asset:** the public home page uses `hero.png`, optimised as
+> `public/images/editorial/home-hero.jpg`. The earlier V01 botanical cabinet is
+> retained as a reference but is not the active hero.
 
 ## The Cape Print Cabinet
 
@@ -56,15 +57,15 @@ Avoid:
 | Major display headings | Bodoni Moda Variable |
 | Editorial copy and botanical names | Newsreader Variable |
 | Controls and factual metadata | Instrument Sans Variable |
-| Desktop body | 17 px, approximately 155% line height |
+| Desktop body | 16 px, approximately 155% line height |
 | Long-form measure | Approximately 45–90 characters |
 | Paper | `#EFEDE3` |
 | Light paper | `#F7F5ED` |
 | Fern ink | `#173C32` |
-| Eucalyptus | `#4F716C` |
-| Moss | `#607667` |
+| Olive accent | `#687044` |
+| Deep olive | `#555D36` |
+| Soft olive | `#858D5D` |
 | Sage | `#95A79B` |
-| Lichen | `#A6B493` |
 
 Primary page titles may use restrained capitals in the manner of a botanical
 catalogue masthead. Long headings remain mixed case. Use size, weight and
@@ -107,7 +108,7 @@ direction, placement, optimisation, accessibility and motion.
 
 | ID | Status | Asset |
 |---|---|---|
-| V01 | In review | Home botanical cabinet |
+| V01 | Archived reference | Home botanical cabinet |
 | V02 | Blocked | Seamless cotton-rag paper texture |
 | V03 | Blocked | Transparent goose marginalia |
 | V04 | Later | Plant-library herbarium wall |
@@ -120,13 +121,13 @@ Approved editorial assets belong in `public/images/editorial/`. Plant portraits
 belong in `public/images/plants/`. The catalogue in `app/data/plants.ts` is the
 canonical plant manifest; do not duplicate its 48 names here.
 
-The V01 source is retained at
-`assets/source/home-cape-cabinet.png`. The web-ready file is
-`public/images/editorial/home-cape-cabinet.webp`.
+The V01 source is retained at `assets/source/home-cape-cabinet.png`. Its legacy
+web export is `public/images/editorial/home-cape-cabinet.webp`; neither is used
+by the current interface.
 
 ## V01 prompt record
 
-Use this prompt only for a targeted revision of the current hero:
+Use this prompt only if deliberately revisiting the archived V01 direction:
 
 > Using the attached botanical references only as visual direction, create an
 > original vertical botanical cabinet with no rendered words. The subject is
@@ -162,7 +163,7 @@ Use this prompt only for a targeted revision of the current hero:
 
 ## Motion
 
-- Hero: slow print reveal and no more than 4–8 px pointer movement.
+- Hero: keep the botanical background still; no pointer movement or parallax.
 - Finder: lateral page slide, progress rule drawn like ink.
 - Library: half-degree card irregularity; 5 px hover lift.
 - Save: brief stamp press.

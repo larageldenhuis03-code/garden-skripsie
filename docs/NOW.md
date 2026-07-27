@@ -15,6 +15,9 @@ Silly Goose now runs the full planning sequence:
 The result is a working **provisional plan**, not yet reviewed horticultural
 advice. Every unsupported field and model assumption stays visible.
 
+The public MVP is available at
+<https://silly-goose-mvp.nanema.chatgpt.site>.
+
 ## Status
 
 | Area | Status | Meaning |
@@ -93,8 +96,6 @@ constructors with Simulated Annealing or another justified search method.
 
 - Help identify or reach a Western Cape horticultural reviewer.
 - Approve the final garden questions and plan presentation.
-- Choose whether the provisional planner should stay available publicly while
-  calibration is incomplete.
 
 ## Not now
 

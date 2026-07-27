@@ -12,6 +12,7 @@ coordinate layout.
 
 | Question | Document |
 |---|---|
+| What should a new coding agent know first? | [`AGENTS.md`](AGENTS.md) |
 | What works and what remains uncertain? | [`docs/NOW.md`](docs/NOW.md) |
 | What product are we building? | [`docs/PRODUCT.md`](docs/PRODUCT.md) |
 | How do the data and mathematics work? | [`docs/ENGINE.md`](docs/ENGINE.md) |
