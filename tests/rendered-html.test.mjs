@@ -58,6 +58,30 @@ test("removes disposable starter UI and dependencies", async () => {
   );
 });
 
+test("keeps legacy artwork and unused service scaffolding out of the app", async () => {
+  const packageJson = await readFile(
+    new URL("../package.json", import.meta.url),
+    "utf8",
+  );
+  const removedPaths = [
+    "../hero2.png",
+    "../public/images/editorial/home-headline-frame.png",
+    "../public/images/editorial/home-cape-cabinet.webp",
+    "../app/chatgpt-auth.ts",
+    "../db/schema.ts",
+    "../drizzle/meta/_journal.json",
+    "../drizzle.config.ts",
+    "../postcss.config.mjs",
+  ];
+
+  assert.doesNotMatch(packageJson, /drizzle|tailwind|^\s*"next"\s*:/im);
+  await Promise.all(
+    removedPaths.map((path) =>
+      assert.rejects(access(new URL(path, import.meta.url))),
+    ),
+  );
+});
+
 test("keeps plan circles visible and the border lightweight", async () => {
   const [css, border] = await Promise.all([
     readFile(new URL("../app/globals.css", import.meta.url), "utf8"),

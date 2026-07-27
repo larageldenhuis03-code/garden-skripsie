@@ -1,4 +1,3 @@
-import type { Metadata, Viewport } from "next";
 import "@fontsource-variable/bodoni-moda";
 import "@fontsource-variable/bodoni-moda/wght-italic.css";
 import "@fontsource-variable/instrument-sans";
@@ -6,7 +5,7 @@ import "@fontsource-variable/newsreader";
 import "@fontsource-variable/newsreader/wght-italic.css";
 import "./globals.css";
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "Silly Goose MVP — Garden planning for the Western Cape",
   description:
     "Find Western Cape plants that suit your garden, then see a simple planting plan.",
@@ -25,7 +24,7 @@ export const metadata: Metadata = {
   },
 };
 
-export const viewport: Viewport = {
+export const viewport = {
   width: "device-width",
   initialScale: 1,
 };

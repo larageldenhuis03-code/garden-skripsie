@@ -121,9 +121,8 @@ Approved editorial assets belong in `public/images/editorial/`. Plant portraits
 belong in `public/images/plants/`. The catalogue in `app/data/plants.ts` is the
 canonical plant manifest; do not duplicate its 48 names here.
 
-The V01 source is retained at `assets/source/home-cape-cabinet.png`. Its legacy
-web export is `public/images/editorial/home-cape-cabinet.webp`; neither is used
-by the current interface.
+The V01 source is retained at `assets/source/home-cape-cabinet.png`. It is not
+used by the current interface.
 
 ## V01 prompt record
 

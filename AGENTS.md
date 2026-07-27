@@ -152,8 +152,8 @@ Current masters and web assets:
 | Home hero | `hero.png` | `public/images/editorial/home-hero.jpg` |
 | Side columns | `border.jpg` | `public/images/editorial/site-border.jpg` |
 
-`hero2.png`, `home-headline-frame.png` and `home-cape-cabinet.webp` are legacy
-or unused references. Confirm references before deleting them.
+The archived V01 cabinet source remains at
+`assets/source/home-cape-cabinet.png`; it is intentionally not a runtime asset.
 
 ## Important code map
 
@@ -166,7 +166,6 @@ or unused references. Confirm references before deleting them.
 | Planning engine | `app/lib/planning/` |
 | Automated checks | `tests/` |
 | Source data and processing | `data/` |
-| Database schema | `db/` and `drizzle/` |
 
 ## Validation
 
