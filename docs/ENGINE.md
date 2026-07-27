@@ -2,197 +2,223 @@
 
 **Audience:** implementation work and future LLM sessions
 
-**Purpose:** data provenance, model contracts and mathematical guardrails
+**Purpose:** data provenance, runtime contracts and mathematical guardrails
 
 **Updated:** 2026-07-27
 
-> The planning kernel is implemented and tested but not calibrated or connected
-> to the live recommendations.
+## Runtime pipeline
 
-## Pipeline
+`garden brief -> hard checks -> Goal Programming -> binary species selection -> integer quantities -> rectangular placement`
 
-`garden inputs → hard constraints → soft suitability → group selection → quantities → 2D placement`
-
-| Stage | Implemented | Missing before use |
+| Stage | Implementation | Current limitation |
 |---|---|---|
-| Hard constraints | Generic executor, reject/review policy, explanation trace | Reviewed horticultural constraints and fixtures |
-| AHP calibration | Matrix validation, weights, `lambdaMax`, `CI`, `CR` | Expert comparison matrix |
-| Goal Programming | Directional deviations, weights and priority comparison | Reviewed goals, targets and penalties |
-| Group selection | Binary feasibility check and deterministic greedy constructor | Reviewed categories, ratios and canopy areas |
-| Quantities | No | Integer model and spacing assumptions |
-| 2D layout | No | Placement algorithm and geometry validation |
+| Brief | Typed validation for area, soil, drainage, light, water, dimensions, density and goals | Rectangular beds only |
+| Hard checks | `pass`, `fail` or `unknown`; complete reason/evidence trace | Several horticultural fields are editorial or missing |
+| AHP | Reciprocity, weights, `lambdaMax`, `CI` and `CR`; rejects `CR >= 0.10` | Runtime uses an equal-weight baseline |
+| Goal Programming | Directional deviations and pre-emptive priority comparison | Soft targets still need expert review |
+| Group selection | Deterministic phase-one binary constructor with capacity, species limits and provisional layer ratios | Layer ratios need expert review |
+| Quantities | Integer `q_i`; canopy-capacity allocation with diminishing returns | Canopy is a field-measurement proxy |
+| Layout | Deterministic rectangular shelf packer with coordinate and overlap audit | Feasible and conservative, not globally optimal |
 
-Code lives in `app/lib/planning/`. Tests live in
+Code lives in `app/lib/planning/`. Mathematical tests live in
 `tests/planning-engine.test.ts`.
 
 ## Data foundation
 
-| Source | Used for | Important limitation |
+| Source | Runtime use | Limitation |
 |---|---|---|
-| SANPC 2026 | Accepted Western Cape taxonomic backbone | Taxonomy, not garden suitability |
-| BODATSA 2026 | Preserved-specimen occurrence evidence | Presence is not performance |
-| BioSCape GCFR | Height, growth form, phenology and measured canopy observations | Trait coverage varies by taxon |
-| SANBI alien checklist and NEMBA notices | Warning and legal-review evidence | Legal status needs dated human review |
-| 2018 Western Cape vegetation map | Future spatial matching | Not connected to the prototype |
+| SANPC 2026 | Accepted Western Cape taxonomy | Taxonomy is not garden suitability |
+| BODATSA 2026 | Western Cape specimen occurrence count | Presence is not performance |
+| BioSCape GCFR | Height, form, flowering and available canopy values | Field measurements are not nursery spacing |
+| SANBI alien checklist and NEMBA notices | Seed-catalogue warning gate | Current legal enforcement still needs dated human review |
+| Vegetation Map 2018 | Retained for future spatial matching | Not connected to garden locations |
 
-Exact versions, licences and source links are in `data/sources.json`.
-Reproduction and coverage are in `data/README.md` and
-`data/quality_report.md`.
+The processed foundation contains:
 
-The visible 48 plants come from
-`data/processed/garden_app_seed_catalog.csv`. Every selected record is:
+- 13,491 accepted Western Cape SANPC taxa;
+- 17,613 BODATSA taxon summaries;
+- 2,213 BioSCape trait rows; and
+- 1,909 native/native-endemic exact joins in
+  `data/processed/garden_app_seed_catalog.csv`.
 
-- accepted by SANPC;
-- native or native-endemic in the Western Cape seed;
-- matched to BODATSA and BioSCape; and
-- free of a machine-detected regulatory-review flag.
+The app uses a curated 48-plant pilot. `tests/data-foundation.test.ts` proves
+that every visible scientific name, family, height, occurrence count and canopy
+value matches the mined seed catalogue. It also checks native status and the
+machine-detected legal-review flag.
 
-### Field provenance
+### Provenance boundary
 
 Source-derived:
 
 - scientific name and family;
-- maximum height and available canopy observations;
+- maximum height;
+- available field-canopy axis;
 - growth form and flowering period; and
 - Western Cape occurrence count.
 
-Prototype editorial fields:
+Provisional editorial:
 
-- sun and water grouping;
-- broad area affinity;
-- garden uses and common-name presentation; and
-- descriptive copy.
+- common-name presentation and descriptive copy;
+- light and summer-water grouping;
+- broad regional affinity; and
+- garden uses/goals.
 
-Editorial fields cannot become production constraints until reviewed.
+Missing:
 
-## Current heuristic
+- comprehensive plant-level soil compatibility;
+- drainage tolerance;
+- reviewed nursery spacing; and
+- reviewed design-role taxonomy.
 
-`scorePlant` still controls the visible order.
+## Runtime contracts
 
-| Match | Points |
-|---|---:|
-| Sunlight | `+4`; partial fallback `+2` |
-| Water | `+3`; low-water plant under moderate input `+2` |
-| Low-water input against moderate-water plant | `−1` |
-| Approximate size fit | `+3`; otherwise `−3` |
-| Each garden intention | `+2` |
-| Broad area | `+2` |
-| Occurrence tie-breaker | up to `+2` |
+### Garden brief
 
-These numbers are interaction scaffolding. They are not AHP weights and do not
-implement Goal Programming.
+The rectangular bed must have width and length between `0.5 m` and `30 m`.
+At least one soft goal is required. The validated brief is stored on the
+current device.
 
-## Model contracts
+The density choice currently maps to an explicit provisional open-space target:
 
-### 1. Hard constraints
+| Density | Open space | Maximum species |
+|---|---:|---:|
+| Open | 45% | 5 |
+| Balanced | 30% | 7 |
+| Lush | 18% | 9 |
 
-Run before optimisation. Every rule returns `pass`, `fail` or `unknown` plus a
-plain-language reason and optional evidence.
+To stop tiny field-canopy records from generating absurd counts, the prototype
+also caps totals at 3, 5 or 7 plants per square metre for open, balanced or lush
+briefs respectively, with an absolute rendering ceiling of 240. These are
+visible defensive defaults, not horticultural standards.
 
-Unknown evidence follows an explicit policy:
+Field-canopy values below `0.15 m` remain visible recommendations but cannot
+enter quantity or placement calculations. At that scale the current source
+value is not reliable enough to stand in for planting spacing.
 
-- `reject` keeps it out of recommendations; or
-- `review` prevents a feasibility claim and asks for resolution.
+### Hard checks
 
-Unknown never means compatible.
+Every rule returns:
 
-### 2. AHP calibration
+- `pass`, `fail` or `unknown`;
+- a plain-language reason;
+- source;
+- observed and required values; and
+- confidence.
 
-Use expert pairwise comparisons on Saaty's 1–9 scale. Normalise each matrix
-column and average each row to derive the weight vector.
+A failure excludes the plant. Unknown soil, drainage or canopy evidence creates
+a `needs review` status; it never silently becomes compatibility. The
+provisional planner may still model a review-status plant only when it has a
+usable canopy value, and the resulting plan keeps the warning visible.
 
-Calculate the principal eigenvalue, consistency index and ratio:
+### AHP
 
-`CI = (lambdaMax − n) / (n − 1)`
+Normalise each pairwise-comparison matrix column and average each row.
+
+`CI = (lambdaMax - n) / (n - 1)`
 
 `CR = CI / RI`
 
-Accept only `CR < 0.10`. A larger matrix needs an explicitly sourced random
-index; do not extrapolate.
+Accept only `CR < 0.10`. AHP supplies weights only. It does not directly rank
+plants.
 
-| Matrix size | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| Random index | 0 | 0 | 0.58 | 0.90 | 1.12 | 1.24 | 1.32 | 1.41 | 1.45 | 1.51 |
+The runtime baseline uses an all-ones reciprocal matrix, producing equal
+weights and `CR = 0`. Its consistency does not make it expert calibration; the
+interface labels it accordingly.
 
-AHP derives weights only. Do not use the conventional AHP decision score to
-rank plants.
+### Goal Programming
 
-### 3. Goal Programming
+For each selected user goal:
 
-For each soft goal:
-
-`target = actual + underDeviation − overDeviation`
+`target = actual + underDeviation - overDeviation`
 
 Minimise:
 
-`sum(underWeight × underDeviation + overWeight × overDeviation)`
+`sum(underWeight * underDeviation + overWeight * overDeviation)`
 
-All goals can share priority 1 for the weighted model. If pre-emptive
-priorities are used, compare the complete penalty at priority 1 before
-priority 2. Lower-priority gains cannot erase higher-priority damage.
+The pilot uses binary goal achievement (`1` recorded, `0` absent), target `1`,
+no over-achievement penalty and the AHP weight as the under-achievement
+penalty. Suitability is the remaining percentage after the normalised penalty.
 
-### 4. Group selection
+### Binary group selection
 
-The provisional binary model uses:
+Variables:
 
-- `x_i` — whether species `i` is selected;
-- `v_i` — Goal Programming suitability;
-- `a_i` — mature canopy area;
-- `B` — bed area;
-- `rho` — required open-space ratio; and
-- category minimum and maximum area ratios.
+- `x_i` - whether species `i` is selected;
+- `v_i` - Goal Programming suitability;
+- `a_i` - circular canopy-proxy area;
+- `B` - bed area; and
+- `rho` - requested open-space ratio.
 
 Objective:
 
-`max sum(v_i × x_i)`
+`max sum(v_i * x_i)`
 
-Constraints:
+Primary capacity:
 
-- `sum(a_i × x_i) <= B × (1 − rho)`;
-- each category remains within its reviewed minimum and maximum; and
-- `x_i` is binary.
+`sum(a_i * x_i) <= B * (1 - rho)`
 
-The greedy constructor is deterministic and replaceable. Failure means the
-greedy procedure found no solution; it is not proof that none exists.
+The deterministic phase-one constructor orders candidates by suitability,
+favours meaningful canopy coverage when scores tie, respects the species limit
+and retains a full feasibility check. The current provisional composition
+bounds are:
 
-### 5. Quantities and layout
+- upper structure: 8%-45% of bed area;
+- mid layer: 8%-45%;
+- ground layer: at most 35%; and
+- seasonal layer: at most 25%.
 
-Binary `x_i` cannot produce plant counts. The next model needs an integer
-quantity such as `q_i >= 0`, linked to species inclusion and reviewed spacing.
+Failure means the greedy procedure found no solution; it is not proof that no
+solution exists.
 
-Version one then places circular mature-canopy footprints in a rectangular bed
-and returns counts, centre coordinates, spacing, legend, unused area and an
-assumption trace.
+### Integer quantities
+
+`q_i >= 0` is an integer count linked to each selected species.
+
+The allocator:
+
+1. gives every capacity-fitting selected species one plant;
+2. assigns remaining canopy capacity by suitability and canopy coverage;
+3. applies diminishing returns as a species count grows; and
+4. stops at canopy capacity or the explicit density-based count ceiling.
+
+### Rectangular layout
+
+Each plant becomes a circle whose diameter is the sourced field-canopy axis.
+The phase-one shelf packer places larger circles first in boundary-safe rows.
+The layout audit checks:
+
+- every circle remains inside the bed; and
+- every pair of circles is non-overlapping.
+
+If capacity-based quantities do not all fit geometrically, the planner reduces
+the unplaceable count and records the adjustment. The returned coordinates are
+feasible under this proxy model, not claimed optimal.
 
 ## Literature-review corrections
 
-Obvious errors are documented and overridden instead of copied into code.
-
-| Issue in the review | Implementation |
+| Review issue | Implemented correction |
 |---|---|
-| Page 20 shows a malformed group objective | Use `max sum(v_i × x_i)`, matching the surrounding explanation |
-| Binary `x_i` is expected to produce quantities | Label it species-subset selection; add integer `q_i` before promising counts |
-| Page 21 gives `sum(alpha_c) <= 1 − rho` as a consistency condition | Do not enforce it; the global allowance and individual category bounds already express the operative constraints |
+| Page 20 displays a malformed group objective | Use `max sum(v_i * x_i)`, matching the surrounding explanation |
+| Binary `x_i` is expected to produce quantities | Keep `x_i` for species selection and introduce integer `q_i` |
+| Page 21 proposes `sum(alpha_c) <= 1 - rho` as a consistency rule | Do not enforce it; global capacity and individual category bounds are the operative constraints |
+| Page 22 does not specify an implementable layout algorithm | Use a tested conservative rectangle packer and label it phase one |
+| Hard constraints are described as weighted | Reject hard failures before optimisation; weights apply to negotiable goals |
 
-## Required before live integration
+## Required before horticultural release
 
-- Final garden-input schema
-- Reviewed hard/soft classification
-- Soil, sun and water compatibility rules
-- Current legal audit and effective dates
-- Mature canopy or an approved imputation rule
-- Plant categories and design roles
-- Expert AHP comparison matrix
-- Goal targets and directional penalties
-- Open-space and category ratios
-- Horticulturist-reviewed expected outcomes
+- Reviewed soil, drainage, light and water compatibility
+- Current dated legal audit
+- Mature canopy/spacing source or approved imputation rule
+- Plant roles and composition ratios
+- Expert AHP pairwise-comparison matrix
+- Reviewed Goal Programming targets and directional penalties
+- Horticulturist-approved expected outcomes for representative garden cases
 
 ## Non-negotiable guardrails
 
 - Missing data cannot silently become compatibility.
 - Occurrence cannot be presented as evidence that a plant will thrive.
-- Every exclusion and penalty must name its rule and evidence.
+- Every exclusion, unknown and penalty must be reconstructable.
 - Legal rules must be versioned and dated.
-- Model output must expose material assumptions and gaps.
 - No expert weight, spacing rule or horticultural threshold may be invented to
   make the interface appear complete.

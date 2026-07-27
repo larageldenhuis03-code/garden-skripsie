@@ -10,7 +10,7 @@
     "build": "vinext build",
     "start": "vinext start",
     "test": "npm run test:unit && npm run test:render",
-    "test:unit": "node --experimental-strip-types --test tests/planning-engine.test.ts",
+    "test:unit": "node --experimental-strip-types --test tests/planning-engine.test.ts tests/data-foundation.test.ts",
     "test:render": "npm run build && node --test tests/rendered-html.test.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "db:generate": "drizzle-kit generate"

@@ -2,113 +2,108 @@
 
 **Audience:** the user and anyone joining the project
 
-**Purpose:** current status, next work and required input
+**Purpose:** current status, material limitations and next decisions
 
 **Updated:** 2026-07-27
 
 ## The short version
 
-Silly Goose currently helps someone discover and save Western Cape plants. The
-next product milestone is to turn the garden brief into a reviewed planting
-plan—not merely a ranked list.
+Silly Goose now runs the full planning sequence:
 
-The mathematical foundation is built and tested. It remains disconnected from
-the interface because the horticultural rules, expert weights and spacing
-assumptions have not yet been reviewed.
+`garden brief -> feasibility -> AHP weights -> Goal Programming -> species group -> quantities -> rectangular layout`
+
+The result is a working **provisional plan**, not yet reviewed horticultural
+advice. Every unsupported field and model assumption stays visible.
 
 ## Status
 
-| Area | Status | What that means |
+| Area | Status | Meaning |
 |---|---|---|
-| Garden brief | Working | Five broad questions; soil and exact bed dimensions still need to be added |
-| Plant library | Working | 48 curated plants with search, profiles and evidence notes |
-| Recommendations | Provisional | A hand-set heuristic orders plants; it is not the research model |
-| Saved plants | Working | Stored on the current device; no account required |
-| Data foundation | Working | SANPC, BODATSA and BioSCape extracts are reproducible |
-| Hard-constraint engine | Built, not configured | Execution and explanation tracing work; reviewed rules are missing |
-| AHP and Goal Programming | Built, not calibrated | Mathematics and consistency checks work; expert inputs are missing |
-| Group selection | Provisional | Selects a feasible species subset; cannot yet calculate quantities |
-| Quantities and 2D layout | Not built | Requires reviewed canopy, spacing and composition rules |
-| Visual system | In review | V01 is integrated in the private site and awaits the user's in-context approval |
+| Garden brief | Working | Area, soil, drainage, light, water, dimensions, density and goals; stored locally |
+| Plant library | Working | 48 curated plants with search, profiles and source notes |
+| Mined-data link | Tested | All 48 taxonomy, height, occurrence and canopy values are audited against the 1,909-taxon seed catalogue |
+| Feasibility | Working, provisional | Every plant returns pass/fail/unknown with reasons and evidence |
+| AHP | Working, uncalibrated | Matrix audit is live; selected goals currently receive equal weight |
+| Goal Programming | Working, provisional | Directional penalties rank non-excluded plants |
+| Group selection | Working, provisional | Deterministic binary constructor respects area, open space and species limit |
+| Quantities | Working, provisional | Integer counts use field-canopy area as the capacity proxy |
+| 2D layout | Working, provisional | Conservative rectangular packer returns non-overlapping coordinates |
+| Saved plants | Working | Stored on the current device |
+| Visual system | In review | Cape botanical print direction is integrated and still being refined |
 
-## What happens next
+## What is source-backed
 
-### 1. Approve or revise the V01 hero
+- Accepted Western Cape taxonomy from SANPC
+- Western Cape specimen occurrence counts from BODATSA
+- Height, growth form, flowering and available canopy measurements from
+  BioSCape
+- The 48 visible plants' membership in the conservative mined seed catalogue
 
-The user reviews the integrated candidate on desktop and mobile, then approves
-it or requests one focused GPT revision. No second image prompt becomes active
-before that decision.
+An automated test prevents those visible fields from drifting away from the
+processed data. It already found and corrected five rounded canopy values.
 
-**Output:** one approved hero that sets the standard for later artwork.
+The end-to-end regression suite also caught a bad 2 × 5 m result in which tiny
+canopy records produced 26 copies of one geophyte and 99% open space. The
+planner now rejects sub-15 cm values as spacing evidence, selects across
+provisional planting layers and tests that tiny records cannot dominate.
 
-### 2. Define the planning contract
+## What remains provisional
 
-Write the exact garden inputs, plant attributes, hard constraints, soft goals,
-missing-data behaviour and explanation returned by the engine.
+- Plant-level soil and drainage compatibility are missing.
+- Sun, water, area and garden-use labels are editorial pilot fields.
+- Field-canopy medians are not reviewed nursery spacing.
+- Equal AHP weights are not expert priorities.
+- Open-space and maximum-species defaults are interface settings, not
+  horticultural standards.
+- Density-based plant-count ceilings prevent implausible quantities but are not
+  reviewed spacing guidance.
+- The 15 cm spacing-evidence floor and layer ratios are defensive prototype
+  rules, not horticultural thresholds.
+- The greedy selector and shelf packer are deterministic constructors, not
+  global optimisers.
 
-**Output:** a typed schema, data dictionary and reviewed feasible/infeasible
-test cases.
+## Next evidence work
 
-### 3. Review the horticultural data
+### 1. Horticultural enrichment
 
-Populate or explicitly mark unknown:
+For each plant, add sourced soil, drainage, light, water, mature spread and
+spacing values with confidence and review status.
 
-- soil compatibility;
-- sun and water tolerances;
-- mature canopy and spacing;
-- plant category and design role;
-- current legal status; and
-- confidence and provenance for every modelled field.
+### 2. Expert calibration
 
-**Output:** no production rule based on an unexplained editorial guess.
+Collect pairwise comparisons, accept only an AHP matrix with `CR < 0.10`, then
+review the Goal Programming targets and penalties.
 
-### 4. Calibrate recommendations
+### 3. Composition rules
 
-Collect expert pairwise comparisons, accept only a consistent AHP matrix, set
-Goal Programming targets and compare the output with reviewed garden cases.
+Define plant roles, category minimums/maximums, density defaults and expected
+plant combinations with a Western Cape horticultural reviewer.
 
-**Output:** explainable rankings that can replace the current heuristic.
+### 4. Reviewed garden cases
 
-### 5. Generate quantities and a bed plan
+Create feasible, infeasible and missing-evidence fixtures. Compare the app's
+group, quantities and coordinates with expert expectations.
 
-Extend binary species selection to integer quantities, then place circular
-canopy footprints inside a rectangular bed.
+### 5. Algorithm refinement
 
-**Output:** species, counts, coordinates, spacing, legend, unused area and an
-assumption trace.
-
-## What will be true when the MVP is complete
-
-A user can:
-
-1. describe location, soil, light, water and a rectangular bed;
-2. choose practical and visual goals;
-3. receive only plants that pass reviewed hard constraints;
-4. understand why each plant was ranked or rejected;
-5. receive a balanced group with quantities and spacing; and
-6. use a measured 2D plan while seeing material uncertainties.
+Only after reviewed cases exist, compare the current deterministic phase-one
+constructors with Simulated Annealing or another justified search method.
 
 ## Input needed from the user
 
-Now:
-
-- approve or revise the V01 hero after it is shown in the site.
-
-Later:
-
-- help choose or reach a Western Cape horticultural reviewer;
-- approve the final garden questions and result format; and
-- decide how much empty space and visual density should be offered as defaults.
+- Help identify or reach a Western Cape horticultural reviewer.
+- Approve the final garden questions and plan presentation.
+- Choose whether the provisional planner should stay available publicly while
+  calibration is incomplete.
 
 ## Not now
 
 - Accounts or cross-device history
-- Nursery stock, pricing or purchasing
-- Nationwide plant coverage
-- Irregular bed geometry
-- Computer-vision site surveys
-- Garden diaries
-- Forty-eight generated plant portraits
+- Nursery stock, prices or purchasing
+- Nationwide coverage
+- Irregular or multi-bed geometry
+- Computer-vision site measurement
+- Ongoing garden-care diaries
 
-These become relevant only after the recommendation and layout outputs are
-credible.
+These do not improve the credibility of the current plan and remain outside the
+MVP.

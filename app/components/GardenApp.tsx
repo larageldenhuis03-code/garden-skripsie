@@ -1,7 +1,11 @@
 "use client";
 
-import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+  type CSSProperties,
+} from "react";
 import {
   areaLabels,
   goalLabels,
@@ -14,29 +18,26 @@ import {
   type Sun,
   type Water,
 } from "../data/plants";
+import {
+  MAX_BED_DIMENSION_M,
+  MIN_BED_DIMENSION_M,
+  buildGardenPlan,
+  densityLabels,
+  drainageLabels,
+  parseGardenBrief,
+  soilLabels,
+  validateGardenBrief,
+  workingExampleBrief,
+  workingExampleOutput,
+  type GardenBrief,
+  type PlantAssessment,
+} from "../lib/planning";
 
 type View = "home" | "finder" | "results" | "browse" | "saved" | "method";
-type Space = "compact" | "medium" | "generous";
-type Preferences = {
-  area: Area;
-  sun: Sun;
-  water: Water;
-  space: Space;
-  goals: Goal[];
-};
 
-const defaultPreferences: Preferences = {
-  area: "cape-town",
-  sun: "full",
-  water: "low",
-  space: "medium",
-  goals: ["flowers", "pollinators"],
-};
-
-const spaceLabels: Record<Space, string> = {
-  compact: "Courtyard or compact bed",
-  medium: "A typical suburban bed",
-  generous: "Room for large shrubs or trees",
+const defaultBrief: GardenBrief = {
+  ...workingExampleBrief,
+  goals: [...workingExampleBrief.goals],
 };
 
 const formFilters = [
@@ -53,71 +54,6 @@ function formatDimension(value: number | null) {
   if (value < 100) return `${Math.round(value)} cm`;
   const metres = value / 100;
   return `${Number.isInteger(metres) ? metres : metres.toFixed(1)} m`;
-}
-
-function spaceFits(plant: Plant, space: Space) {
-  if (space === "compact") return plant.heightCm <= 120;
-  if (space === "medium") return plant.heightCm <= 400;
-  return true;
-}
-
-function scorePlant(plant: Plant, preferences: Preferences) {
-  let score = 0;
-  const reasons: string[] = [];
-
-  if (plant.sun.includes(preferences.sun)) {
-    score += 4;
-    reasons.push(`Matches ${sunLabels[preferences.sun].toLowerCase()}`);
-  } else if (
-    preferences.sun === "part" &&
-    (plant.sun.includes("full") || plant.sun.includes("sheltered"))
-  ) {
-    score += 2;
-    reasons.push("Flexible with light");
-  }
-
-  if (plant.water === preferences.water) {
-    score += 3;
-    reasons.push(`Fits ${waterLabels[preferences.water].toLowerCase()}`);
-  } else if (preferences.water === "moderate" && plant.water === "low") {
-    score += 2;
-    reasons.push("Comfortable with less water");
-  } else if (preferences.water === "low" && plant.water === "moderate") {
-    score -= 1;
-  }
-
-  if (spaceFits(plant, preferences.space)) {
-    score += 3;
-    reasons.push(
-      preferences.space === "compact"
-        ? "Sized for a smaller bed"
-        : preferences.space === "medium"
-          ? "Fits a typical garden bed"
-          : "Has room to reach its form",
-    );
-  } else {
-    score -= 3;
-  }
-
-  const matchedGoals = preferences.goals.filter((goal) =>
-    plant.goals.includes(goal),
-  );
-  score += matchedGoals.length * 2;
-  if (matchedGoals.length) {
-    reasons.push(goalLabels[matchedGoals[0]]);
-  }
-
-  if (plant.areas.includes(preferences.area)) {
-    score += 2;
-    reasons.push(`Suited to ${areaLabels[preferences.area]}`);
-  }
-
-  score += Math.min(2, Math.log10(plant.occurrenceCount + 1) / 2);
-
-  return {
-    score,
-    reasons: reasons.slice(0, 3),
-  };
 }
 
 function PlantPortrait({
@@ -138,9 +74,9 @@ function PlantPortrait({
       <span className="portrait-leaf leaf-two" aria-hidden="true" />
       <span className="portrait-leaf leaf-three" aria-hidden="true" />
       <div className="portrait-caption">
-        <span>Botanical photo placeholder</span>
+        <span>Botanical image coming soon</span>
         <strong>{plant.scientificName}</strong>
-        <small>Use image prompt {plant.id}</small>
+        <small>Artwork reference {plant.id}</small>
       </div>
     </div>
   );
@@ -203,14 +139,17 @@ function HomeView({
         <section className="hero-section">
           <div className="hero-copy">
             <h1>
-              A garden design
-              <br />
-              shaped by <em>place.</em>
+              <span>
+                Describe your <em>garden.</em>
+              </span>
+              <span>
+                Discover the plants that <em>fit.</em>
+              </span>
             </h1>
             <p className="hero-intro">
-              Tell us about your part of the Western Cape, the sunlight, the
-              water you can provide and the room you have. We’ll turn those
-              conditions into a suitable plant shortlist.
+              Tell us where your garden is, how much sun and water it gets, and
+              the size of your bed. We’ll suggest plants and show you how they
+              could fit.
             </p>
             <div className="hero-actions">
               <button className="button button-dark" onClick={start}>
@@ -221,26 +160,14 @@ function HomeView({
               </button>
             </div>
           </div>
-          <div className="hero-art">
-            <figure className="hero-plate">
-              <Image
-                className="hero-image"
-                src="/images/editorial/home-cape-cabinet.webp"
-                alt="A hand-coloured botanical cabinet of Western Cape plants centred on a King Protea, with a small goose in the lower-right margin."
-                width={1122}
-                height={1402}
-                priority
-                sizes="(max-width: 900px) calc(100vw - 48px), (max-width: 1600px) 42vw, 540px"
-              />
-            </figure>
-          </div>
         </section>
 
         <section className="manifesto-band">
-          <h2>Turn the conditions you have into a garden that can actually work.</h2>
+          <h2>A garden plan built around the space you actually have.</h2>
           <p>
-            This version builds the plant shortlist. Soil, bed dimensions and
-            the measured layout are the next part of the build.
+            This first version checks your conditions, suggests plants and
+            works out a simple layout. Some growing details still need to be
+            checked by a local plant expert.
           </p>
         </section>
 
@@ -249,8 +176,8 @@ function HomeView({
             <div>
               <h2>Start with the plant library</h2>
               <p>
-                Forty-eight indigenous and endemic plants selected from the
-                Western Cape data foundation.
+                A starting collection of 48 local plants, backed by Western
+                Cape records.
               </p>
             </div>
             <button className="text-link" onClick={browse}>
@@ -279,38 +206,46 @@ function HomeView({
 
         <section className="how-section">
           <div className="how-title">
-            <h2>From garden conditions to a planting plan</h2>
-            <p>The first three steps work now. The measured layout is next.</p>
+            <h2>How your plan comes together</h2>
+            <p>Four simple steps, with anything uncertain clearly marked.</p>
           </div>
           <ol className="how-list">
             <li>
               <span>01</span>
               <div>
-                <strong>Describe your garden</strong>
-                <p>Choose the area, sunlight, water and available room.</p>
+                <strong>Tell us about the space</strong>
+                <p>
+                  Choose your area, soil, drainage, sunlight, water and bed
+                  size.
+                </p>
               </div>
             </li>
             <li>
               <span>02</span>
               <div>
-                <strong>Review suitable plants</strong>
-                <p>See why each plant appears and where the data is still limited.</p>
+                <strong>See what may work</strong>
+                <p>
+                  We check each plant against your answers and show anything
+                  we’re unsure about.
+                </p>
               </div>
             </li>
             <li>
               <span>03</span>
               <div>
-                <strong>Save a shortlist</strong>
-                <p>Keep the plants you want to compare in one place.</p>
+                <strong>Choose a plant mix</strong>
+                <p>
+                  We pick a mix that fits the bed and works towards your goals.
+                </p>
               </div>
             </li>
             <li>
               <span>04</span>
               <div>
-                <strong>Generate the layout</strong>
+                <strong>See the layout</strong>
                 <p>
-                  Next: use bed size and mature canopy to calculate quantities
-                  and placement.
+                  We arrange the plants inside your bed and show how many you
+                  may need.
                 </p>
               </div>
             </li>
@@ -347,43 +282,88 @@ function ChoiceButton({
 }
 
 function FinderView({
-  preferences,
-  setPreferences,
+  brief,
+  setBrief,
   finish,
   cancel,
 }: {
-  preferences: Preferences;
-  setPreferences: (value: Preferences) => void;
+  brief: GardenBrief;
+  setBrief: (value: GardenBrief) => void;
   finish: () => void;
   cancel: () => void;
 }) {
   const [step, setStep] = useState(0);
+  const dimensionsValid =
+    Number.isFinite(brief.bedWidthM) &&
+    brief.bedWidthM >= MIN_BED_DIMENSION_M &&
+    brief.bedWidthM <= MAX_BED_DIMENSION_M &&
+    Number.isFinite(brief.bedLengthM) &&
+    brief.bedLengthM >= MIN_BED_DIMENSION_M &&
+    brief.bedLengthM <= MAX_BED_DIMENSION_M;
   const steps = [
     {
       title: "Where is your garden?",
-      note: "Choose the nearest area. We do not need your address.",
+      note: "Choose the nearest pilot area. We do not need your address.",
       content: (
         <div className="choice-grid two-column">
           {(Object.keys(areaLabels) as Area[]).map((area) => (
             <ChoiceButton
               key={area}
-              selected={preferences.area === area}
+              selected={brief.area === area}
               title={areaLabels[area]}
-              onClick={() => setPreferences({ ...preferences, area })}
+              onClick={() => setBrief({ ...brief, area })}
             />
           ))}
         </div>
       ),
     },
     {
+      title: "What is the soil and drainage like?",
+      note: "If you’re not sure, choose “I’m not sure”. We’re still checking which soils suit each plant.",
+      content: (
+        <div className="choice-stack">
+          <fieldset>
+            <legend>Soil</legend>
+            <div className="choice-grid two-column compact-choices">
+              {(
+                Object.keys(soilLabels) as (keyof typeof soilLabels)[]
+              ).map((soil) => (
+                <ChoiceButton
+                  key={soil}
+                  selected={brief.soil === soil}
+                  title={soilLabels[soil]}
+                  onClick={() => setBrief({ ...brief, soil })}
+                />
+              ))}
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>Drainage</legend>
+            <div className="choice-grid two-column compact-choices">
+              {(
+                Object.keys(drainageLabels) as (keyof typeof drainageLabels)[]
+              ).map((drainage) => (
+                <ChoiceButton
+                  key={drainage}
+                  selected={brief.drainage === drainage}
+                  title={drainageLabels[drainage]}
+                  onClick={() => setBrief({ ...brief, drainage })}
+                />
+              ))}
+            </div>
+          </fieldset>
+        </div>
+      ),
+    },
+    {
       title: "How much direct sun does the bed get?",
-      note: "Choose the condition that describes most of the bed during the growing season.",
+      note: "Choose what applies to most of the bed.",
       content: (
         <div className="choice-grid">
           {(Object.keys(sunLabels) as Sun[]).map((sun) => (
             <ChoiceButton
               key={sun}
-              selected={preferences.sun === sun}
+              selected={brief.sun === sun}
               title={sunLabels[sun]}
               copy={
                 sun === "full"
@@ -392,7 +372,7 @@ function FinderView({
                     ? "Three to six hours"
                     : "Bright, protected light"
               }
-              onClick={() => setPreferences({ ...preferences, sun })}
+              onClick={() => setBrief({ ...brief, sun })}
             />
           ))}
         </div>
@@ -400,45 +380,101 @@ function FinderView({
     },
     {
       title: "How much summer water can you provide?",
-      note: "Choose the closest option. This is a broad grouping, not an irrigation schedule.",
+      note: "Choose the closest match. You can change it later.",
       content: (
         <div className="choice-grid">
           {(Object.keys(waterLabels) as Water[]).map((water) => (
             <ChoiceButton
               key={water}
-              selected={preferences.water === water}
+              selected={brief.water === water}
               title={waterLabels[water]}
               copy={
                 water === "low"
-                  ? "Dry once established"
+                  ? "Dry once settled in"
                   : water === "moderate"
-                    ? "A deep drink at intervals"
-                    : "Naturally damp or irrigated"
+                    ? "A good soak now and then"
+                    : "Often damp or watered"
               }
-              onClick={() => setPreferences({ ...preferences, water })}
+              onClick={() => setBrief({ ...brief, water })}
             />
           ))}
         </div>
       ),
     },
     {
-      title: "How much room is available?",
-      note: "We compare this with maximum recorded height. Exact bed measurements come in the next build.",
+      title: "How large is the planting bed?",
+      note: `Measure the bed in metres. The width and length can each be between ${MIN_BED_DIMENSION_M} m and ${MAX_BED_DIMENSION_M} m.`,
+      content: (
+        <div className="dimension-editor">
+          <label>
+            <span>Width</span>
+            <div>
+              <input
+                type="number"
+                min={MIN_BED_DIMENSION_M}
+                max={MAX_BED_DIMENSION_M}
+                step="0.1"
+                value={Number.isFinite(brief.bedWidthM) ? brief.bedWidthM : ""}
+                onChange={(event) =>
+                  setBrief({
+                    ...brief,
+                    bedWidthM: Number(event.target.value),
+                  })
+                }
+              />
+              <em>metres</em>
+            </div>
+          </label>
+          <span aria-hidden="true">×</span>
+          <label>
+            <span>Length</span>
+            <div>
+              <input
+                type="number"
+                min={MIN_BED_DIMENSION_M}
+                max={MAX_BED_DIMENSION_M}
+                step="0.1"
+                value={
+                  Number.isFinite(brief.bedLengthM) ? brief.bedLengthM : ""
+                }
+                onChange={(event) =>
+                  setBrief({
+                    ...brief,
+                    bedLengthM: Number(event.target.value),
+                  })
+                }
+              />
+              <em>metres</em>
+            </div>
+          </label>
+          <p>
+            {dimensionsValid
+              ? `${(brief.bedWidthM * brief.bedLengthM).toFixed(1)} m² total bed area`
+              : `Enter a width and length between ${MIN_BED_DIMENSION_M} m and ${MAX_BED_DIMENSION_M} m`}
+          </p>
+        </div>
+      ),
+    },
+    {
+      title: "How full should the bed feel?",
+      note: "This helps us leave the right amount of open space.",
       content: (
         <div className="choice-grid">
-          {(Object.keys(spaceLabels) as Space[]).map((space) => (
+          {(
+            Object.keys(densityLabels) as (keyof typeof densityLabels)[]
+          ).map((density) => (
             <ChoiceButton
-              key={space}
-              selected={preferences.space === space}
-              title={spaceLabels[space]}
+              key={density}
+              selected={brief.density === density}
+              title={densityLabels[density]}
               copy={
-                space === "compact"
-                  ? "Mostly below 1.2 m"
-                  : space === "medium"
-                    ? "Shrubs up to about 4 m"
-                    : "Trees and large screens welcome"
+                density === "open"
+                  ? "About 45% left open"
+                  : density === "balanced"
+                    ? "About 30% left open"
+                    : "About 18% left open"
               }
-              onClick={() => setPreferences({ ...preferences, space })}
+              onClick={() => setBrief({ ...brief, density })}
             />
           ))}
         </div>
@@ -446,22 +482,22 @@ function FinderView({
     },
     {
       title: "What do you want the planting to do?",
-      note: "Choose as many as you need. These choices affect the order of the shortlist.",
+      note: "Choose as many as you like. For now, every goal counts equally.",
       content: (
         <div className="choice-grid two-column">
           {(Object.keys(goalLabels) as Goal[]).map((goal) => {
-            const selected = preferences.goals.includes(goal);
+            const selected = brief.goals.includes(goal);
             return (
               <ChoiceButton
                 key={goal}
                 selected={selected}
                 title={goalLabels[goal]}
                 onClick={() =>
-                  setPreferences({
-                    ...preferences,
+                  setBrief({
+                    ...brief,
                     goals: selected
-                      ? preferences.goals.filter((item) => item !== goal)
-                      : [...preferences.goals, goal],
+                      ? brief.goals.filter((item) => item !== goal)
+                      : [...brief.goals, goal],
                   })
                 }
               />
@@ -473,11 +509,34 @@ function FinderView({
   ];
 
   const current = steps[step];
+  const finalStep = steps.length - 1;
+  const previewPlan = useMemo(() => {
+    if (!validateGardenBrief(brief).valid) return null;
+    return buildGardenPlan(plants, brief);
+  }, [brief]);
+  const planIsReady =
+    previewPlan?.status === "provisional-plan" &&
+    Boolean(previewPlan.layout?.placements.length);
+  const canContinue =
+    (step !== 4 || dimensionsValid) &&
+    (step !== finalStep ||
+      (validateGardenBrief(brief).valid && planIsReady));
+
+  const loadWorkingExample = () => {
+    setBrief({
+      ...workingExampleBrief,
+      goals: [...workingExampleBrief.goals],
+    });
+  };
+
   return (
     <main className="finder-shell">
-      <div className="finder-progress" aria-label={`Step ${step + 1} of 5`}>
+      <div
+        className="finder-progress"
+        aria-label={`Step ${step + 1} of ${steps.length}`}
+      >
         <span>
-          Step {step + 1} of 5
+          Step {step + 1} of {steps.length}
         </span>
         <div>
           {steps.map((_, index) => (
@@ -485,6 +544,28 @@ function FinderView({
           ))}
         </div>
       </div>
+      {(step === 0 || (step === finalStep && !planIsReady)) && (
+        <aside
+          className={`finder-example${step === finalStep ? " is-warning" : ""}`}
+          aria-live="polite"
+        >
+          <div>
+            <strong>
+              {step === finalStep
+                ? "These answers don’t produce a complete plan yet."
+                : "Want a result you can test against?"}
+            </strong>
+            <p>
+              {step === finalStep
+                ? "Check your measurements and answers. If they’re accurate, keep them—the current library may not have a suitable mix. Use the test garden only to see how the planner works."
+                : `The Garden Route test garden is preloaded: sandy soil, quick drainage, part sun, occasional summer water and a 2 × 3 m bed. It produces ${workingExampleOutput.totalPlants} plants across ${workingExampleOutput.species} species.`}
+            </p>
+          </div>
+          <button className="text-link" onClick={loadWorkingExample}>
+            {step === finalStep ? "Use the test garden" : "Reset the test garden"}
+          </button>
+        </aside>
+      )}
       <section className="finder-panel">
         <div className="finder-question">
           <h1>{current.title}</h1>
@@ -501,10 +582,10 @@ function FinderView({
         </button>
         <button
           className="button button-dark"
-          disabled={step === 4 && preferences.goals.length === 0}
-          onClick={step === 4 ? finish : () => setStep(step + 1)}
+          disabled={!canContinue}
+          onClick={step === finalStep ? finish : () => setStep(step + 1)}
         >
-          {step === 4 ? "See suitable plants" : "Continue"} <span>↗</span>
+          {step === finalStep ? "Build my plan" : "Continue"} <span>↗</span>
         </button>
       </div>
     </main>
@@ -519,13 +600,15 @@ function PlantCard({
   toggleSaved,
 }: {
   plant: Plant;
-  match?: ReturnType<typeof scorePlant>;
+  match?: PlantAssessment;
   saved: boolean;
   open: () => void;
   toggleSaved: () => void;
 }) {
   return (
-    <article className="plant-card">
+    <article
+      className={`plant-card${match ? ` status-${match.status}` : ""}`}
+    >
       <button className="portrait-button" onClick={open}>
         <PlantPortrait plant={plant} />
       </button>
@@ -552,26 +635,214 @@ function PlantCard({
       </div>
       {match && (
         <div className="match-reasons">
+          <div>
+            <span className={`status-label status-${match.status}`}>
+              {match.status === "candidate"
+                ? "Good fit"
+                : match.status === "review"
+                  ? "Check first"
+                  : "Not a fit"}
+            </span>
+            <strong>{Math.round(match.suitability)}% match for your goals</strong>
+          </div>
           <p>{match.reasons.join(" · ")}</p>
+          <details>
+            <summary>Why this result?</summary>
+            <ul>
+              {match.feasibility.trace.map((entry) => (
+                <li key={entry.constraintId}>
+                  <span>
+                    {entry.status === "pass"
+                      ? "Works"
+                      : entry.status === "fail"
+                        ? "Doesn’t fit"
+                        : "Not sure"}
+                  </span>
+                  <p>{entry.reason}</p>
+                </li>
+              ))}
+            </ul>
+          </details>
         </div>
       )}
       <button className="card-link" onClick={open}>
-        View plant details <span>↗</span>
+        View plant <span>↗</span>
       </button>
     </article>
   );
 }
 
+function PlanSummary({
+  plan,
+  openPlant,
+}: {
+  plan: ReturnType<typeof buildGardenPlan>;
+  openPlant: (plant: Plant) => void;
+}) {
+  const plantsById = new Map(plants.map((plant) => [plant.id, plant]));
+
+  if (
+    plan.status === "no-plan" ||
+    !plan.layout ||
+    !plan.quantities ||
+    plan.layout.placements.length === 0
+  ) {
+    return (
+      <section className="plan-output plan-unavailable">
+        <div>
+          <span>Your layout</span>
+          <h2>We couldn’t build a layout for this bed.</h2>
+        </div>
+        <p>
+          Try a larger bed or change one of your answers. We’ll keep the plant
+          checks here so you can see what got in the way.
+        </p>
+      </section>
+    );
+  }
+
+  const layout = plan.layout;
+  const quantities = plan.quantities;
+  const rotated = layout.bedLengthM > layout.bedWidthM;
+  const displayWidthM = rotated ? layout.bedLengthM : layout.bedWidthM;
+  const displayLengthM = rotated ? layout.bedWidthM : layout.bedLengthM;
+
+  return (
+    <section className="plan-output">
+      <div className="plan-output-heading">
+        <div>
+          <span>Your garden plan</span>
+          <h2>
+            {plan.brief.bedWidthM} × {plan.brief.bedLengthM} m bed
+          </h2>
+        </div>
+        <p>
+          {quantities.totalPlants} plants · {quantities.quantities.length}{" "}
+          species · about {Math.round(layout.realisedOpenSpaceRatio * 100)}%
+          open space
+        </p>
+      </div>
+
+      <div className="brief-strip" aria-label="Garden brief summary">
+        <span>{areaLabels[plan.brief.area]}</span>
+        <span>{soilLabels[plan.brief.soil]}</span>
+        <span>{drainageLabels[plan.brief.drainage]}</span>
+        <span>{sunLabels[plan.brief.sun]}</span>
+        <span>{waterLabels[plan.brief.water]}</span>
+        <span>{densityLabels[plan.brief.density]}</span>
+      </div>
+
+      <div className="plan-output-grid">
+        <div className="plan-bed-wrap">
+          <div
+            className="plan-bed"
+            style={{
+              aspectRatio: `${displayWidthM} / ${displayLengthM}`,
+            }}
+            aria-label={`${plan.brief.bedWidthM} by ${plan.brief.bedLengthM} metre planting layout`}
+          >
+            {layout.placements.map((placement) => {
+              const plant = plantsById.get(placement.plantId);
+              if (!plant) return null;
+              const displayX = rotated
+                ? placement.yM
+                : placement.xM;
+              const displayY = rotated
+                ? layout.bedWidthM - placement.xM
+                : placement.yM;
+              const style: CSSProperties = {
+                left: `${((displayX - placement.radiusM) / displayWidthM) * 100}%`,
+                top: `${((displayY - placement.radiusM) / displayLengthM) * 100}%`,
+                width: `${((placement.radiusM * 2) / displayWidthM) * 100}%`,
+                height: `${((placement.radiusM * 2) / displayLengthM) * 100}%`,
+              };
+
+              return (
+                <button
+                  key={placement.instanceId}
+                  className={`plan-marker accent-${plant.accent}`}
+                  style={style}
+                  onClick={() => openPlant(plant)}
+                  aria-label={`${plant.commonName}, plant ${placement.sequence}`}
+                  title={`${plant.commonName} · ${placement.instanceId}`}
+                >
+                  <span>{plant.id}</span>
+                </button>
+              );
+            })}
+          </div>
+          <div className="plan-measure plan-measure-width">
+            {displayWidthM} m
+          </div>
+          <div className="plan-measure plan-measure-length">
+            {displayLengthM} m
+          </div>
+        </div>
+
+        <div className="plan-legend">
+          <div className="plan-legend-heading">
+            <span>Plants</span>
+            <span>Quantity</span>
+          </div>
+          {quantities.quantities.map((quantity) => {
+            const plant = plantsById.get(quantity.id);
+            if (!plant) return null;
+            return (
+              <button
+                key={quantity.id}
+                onClick={() => openPlant(plant)}
+                className="plan-legend-row"
+              >
+                <span className={`legend-dot accent-${plant.accent}`} />
+                <span>
+                  <strong>{plant.commonName}</strong>
+                  <em>{plant.scientificName}</em>
+                </span>
+                <b>× {quantity.quantity}</b>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <details className="plan-assumptions">
+        <summary>
+          How we worked this out
+          <span>View notes</span>
+        </summary>
+        <div>
+          <section>
+            <h3>What we assumed</h3>
+            <ul>
+              {plan.assumptions.map((assumption) => (
+                <li key={assumption}>{assumption}</li>
+              ))}
+            </ul>
+          </section>
+          <section>
+            <h3>Notes for this plan</h3>
+            <ul>
+              {[...new Set(plan.diagnostics)].map((diagnostic) => (
+                <li key={diagnostic}>{diagnostic}</li>
+              ))}
+            </ul>
+          </section>
+        </div>
+      </details>
+    </section>
+  );
+}
+
 function CollectionView({
   mode,
-  preferences,
+  brief,
   saved,
   openPlant,
   toggleSaved,
   restart,
 }: {
   mode: "results" | "browse";
-  preferences: Preferences;
+  brief: GardenBrief;
   saved: string[];
   openPlant: (plant: Plant) => void;
   toggleSaved: (id: string) => void;
@@ -580,19 +851,23 @@ function CollectionView({
   const [query, setQuery] = useState("");
   const [form, setForm] = useState<(typeof formFilters)[number]>("All");
   const [limit, setLimit] = useState(12);
+  const plan = useMemo(() => buildGardenPlan(plants, brief), [brief]);
 
-  const ranked = useMemo(() => {
-    const values = plants.map((plant) => ({
-      plant,
-      match: scorePlant(plant, preferences),
-    }));
-    values.sort((a, b) =>
-      mode === "results"
-        ? b.match.score - a.match.score
-        : b.plant.occurrenceCount - a.plant.occurrenceCount,
-    );
-    return values;
-  }, [mode, preferences]);
+  const ranked = useMemo<
+    { plant: Plant; match?: PlantAssessment }[]
+  >(() => {
+    if (mode === "results") {
+      const plantsById = new Map(plants.map((plant) => [plant.id, plant]));
+      return plan.assessments.flatMap((match) => {
+        const plant = plantsById.get(match.plantId);
+        return plant ? [{ plant, match }] : [];
+      });
+    }
+
+    return [...plants]
+      .sort((left, right) => right.occurrenceCount - left.occurrenceCount)
+      .map((plant) => ({ plant }));
+  }, [mode, plan]);
 
   const filtered = ranked.filter(({ plant }) => {
     const haystack =
@@ -612,15 +887,15 @@ function CollectionView({
           <h1>
             {mode === "results" ? (
               <>
-                Plants suited to
+                Your <em>{brief.bedWidthM} × {brief.bedLengthM} m</em>
                 <br />
-                <em>{areaLabels[preferences.area]}.</em>
+                planting plan.
               </>
             ) : (
               <>
                 The first
                 <br />
-                forty-eight plants.
+                <em>48</em> plants.
               </>
             )}
           </h1>
@@ -628,27 +903,31 @@ function CollectionView({
         <div className="collection-note">
           <p>
             {mode === "results"
-              ? "This is a provisional shortlist based on the answers you gave. It uses an interim heuristic, not the AHP and Goal Programming model described in the research paper."
-              : "Each plant has accepted taxonomy, a Western Cape specimen record and regional trait data. Horticultural fields still need expert review."}
+              ? "We used your answers to check the plants, choose a mix and lay it out in the bed. Anything we’re unsure about is clearly marked."
+              : "These 48 plants are backed by Western Cape records. We’re still checking some practical growing details with plant experts."}
           </p>
           {mode === "results" && (
             <button className="text-link" onClick={restart}>
-              Change my garden brief ↗
+              Change my answers ↗
             </button>
           )}
         </div>
       </section>
 
+      {mode === "results" && (
+        <PlanSummary plan={plan} openPlant={openPlant} />
+      )}
+
       <section className="collection-tools" aria-label="Collection filters">
         <label className="search-field">
-          <span>Search the collection</span>
+          <span>Search plants</span>
           <input
             value={query}
             onChange={(event) => {
               setQuery(event.target.value);
               setLimit(12);
             }}
-            placeholder="Common name, scientific name or family"
+            placeholder="Search by common or scientific name"
           />
         </label>
         <div className="filter-row">
@@ -673,7 +952,9 @@ function CollectionView({
       <div className="results-count">
         <span>{String(filtered.length).padStart(2, "0")} plants</span>
         <span>
-          {mode === "results" ? "Provisional order" : "Working library"}
+          {mode === "results"
+            ? `${plan.counts.excluded} not a fit · ${plan.counts.review} need checking`
+            : "Plant library"}
         </span>
       </div>
 
@@ -740,14 +1021,14 @@ function SavedView({
           saved.
         </h1>
         <p>
-          These plants are saved on this device. The next planning stage will
-          test which ones fit together in your measured bed.
+          These plants are saved on this device. Use this list to compare the
+          ones you like.
         </p>
       </section>
       {savedPlants.length ? (
         <>
           <div className="saved-summary">
-            <span>{savedPlants.length} specimens</span>
+            <span>{savedPlants.length} plants</span>
             <span>
               Tallest ·{" "}
               {formatDimension(
@@ -755,7 +1036,7 @@ function SavedView({
               )}
             </span>
             <span>
-              {new Set(savedPlants.map((plant) => plant.form)).size} growth forms
+              {new Set(savedPlants.map((plant) => plant.form)).size} plant types
             </span>
           </div>
           <section className="plant-grid saved-grid">
@@ -790,59 +1071,56 @@ function MethodView({ start }: { start: () => void }) {
         <h1>
           What works now.
           <br />
-          What comes <em>next.</em>
+          What we’re still <em>checking.</em>
         </h1>
         <p>
-          The current build proves plant discovery, filtering, plant details
-          and a saved shortlist. It does not yet implement the full decision
-          model or generate a measured planting layout.
+          The planner uses your answers to suggest plants, work out quantities
+          and draw a simple bed layout. When information is missing, we say so.
         </p>
       </section>
       <section className="method-grid">
         <article>
           <span>01</span>
-          <h2>Plant data</h2>
+          <h2>Plant records</h2>
           <p>
-            In place: SANPC names, Western Cape BODATSA records and BioSCape
-            height, form, flowering and canopy observations.
+            The 48 plants use names, sizes and Western Cape records from SANPC,
+            BODATSA and BioSCape.
           </p>
         </article>
         <article>
           <span>02</span>
-          <h2>Hard feasibility filters</h2>
+          <h2>Plant checks</h2>
           <p>
-            Partial: native range is checked. Soil, legal exclusions and
-            complete environmental compatibility still need reviewed rules and
-            data.
+            Each plant is checked against your area, light, water and bed size.
+            Soil and drainage still need expert checking.
           </p>
         </article>
         <article>
           <span>03</span>
-          <h2>AHP and Goal Programming</h2>
+          <h2>Your priorities</h2>
           <p>
-            Foundation built: matrix consistency, weights and directional
-            penalties are tested. Expert comparisons and reviewed targets are
-            still required before they replace the heuristic.
+            The planner looks at every goal you choose. For now, each goal
+            counts equally.
           </p>
         </article>
         <article>
           <span>04</span>
-          <h2>Selection and layout</h2>
+          <h2>Plant mix and layout</h2>
           <p>
-            Partial: a provisional binary group selector is tested. Plant
-            quantities, reviewed spacing and the measured 2D layout are not
-            built yet.
+            The planner chooses a mix, works out how many may fit and places
+            them inside the bed. Plant size is an estimate, not nursery spacing
+            advice.
           </p>
         </article>
       </section>
       <section className="method-callout">
         <div>
-          <h2>The next build defines the planning rules.</h2>
+          <h2>The next step is checking the growing advice.</h2>
         </div>
         <p>
-          First define every input, hard constraint and missing-data path. Then
-          review the plant evidence, calibrate the weights and connect the
-          tested engine to real garden cases.
+          A local plant expert still needs to review soil, water, spacing and
+          likely results. Until then, treat the plan as a useful starting
+          point—not a guarantee.
         </p>
         <button className="button button-dark" onClick={start}>
           Try the plant finder <span>↗</span>
@@ -890,7 +1168,7 @@ function DetailDrawer({
       >
         <div className="drawer-toolbar">
           <span>
-            Specimen {plant.id} · {plant.family}
+            Plant {plant.id} · {plant.family}
           </span>
           <button onClick={close}>Close ×</button>
         </div>
@@ -903,7 +1181,7 @@ function DetailDrawer({
             className={`button ${saved ? "button-outline" : "button-dark"}`}
             onClick={toggleSaved}
           >
-            {saved ? "Remove from garden" : "Save to my garden"}{" "}
+            {saved ? "Remove saved plant" : "Save plant"}{" "}
             <span>{saved ? "−" : "+"}</span>
           </button>
 
@@ -917,21 +1195,21 @@ function DetailDrawer({
               <dd>{formatDimension(plant.heightCm)}</dd>
             </div>
             <div>
-              <dt>Field median canopy</dt>
+              <dt>Typical spread</dt>
               <dd>{formatDimension(plant.spreadCm)}</dd>
             </div>
             <div>
-              <dt>Flowering record</dt>
+              <dt>Flowers seen</dt>
               <dd>
                 {plant.flowerStart}–{plant.flowerEnd}
               </dd>
             </div>
             <div>
-              <dt>Light grouping</dt>
+              <dt>Light</dt>
               <dd>{plant.sun.map((item) => sunLabels[item]).join(" · ")}</dd>
             </div>
             <div>
-              <dt>Water grouping</dt>
+              <dt>Water</dt>
               <dd>{waterLabels[plant.water]}</dd>
             </div>
           </dl>
@@ -939,10 +1217,10 @@ function DetailDrawer({
           <div className="detail-evidence">
             <h3>About this information</h3>
             <p>
-              {plant.occurrenceCount} Western Cape BODATSA specimen records are
-              represented in the processed source summary. Height, growth form
-              and flowering fields come from BioSCape. Light, water and use
-              groupings are editorial and await horticultural review.
+              We found {plant.occurrenceCount} Western Cape records for this
+              plant in BODATSA. Height, plant type and flowering time come from
+              BioSCape. We’re still checking the light, water and garden-use
+              advice.
             </p>
           </div>
         </div>
@@ -958,11 +1236,11 @@ function Footer({ method }: { method: () => void }) {
         <span>Silly Goose</span>
       </div>
       <p>
-        A Western Cape plant-discovery prototype built from SANPC, BODATSA and
-        BioSCape data.
+        A Western Cape garden planner built with SANPC, BODATSA and BioSCape
+        plant data.
       </p>
       <button className="text-link" onClick={method}>
-        See what comes next ↗
+        How the planner works ↗
       </button>
       <span className="footer-version">MVP · 2026</span>
     </footer>
@@ -971,21 +1249,33 @@ function Footer({ method }: { method: () => void }) {
 
 export function GardenApp() {
   const [view, setView] = useState<View>("home");
-  const [preferences, setPreferences] =
-    useState<Preferences>(defaultPreferences);
+  const [brief, setBrief] = useState<GardenBrief>(defaultBrief);
   const [saved, setSaved] = useState<string[]>([]);
   const [savedReady, setSavedReady] = useState(false);
+  const [briefReady, setBriefReady] = useState(false);
   const [selectedPlant, setSelectedPlant] = useState<Plant | null>(null);
 
   useEffect(() => {
     queueMicrotask(() => {
       try {
-        const value = window.localStorage.getItem("silly-goose-saved");
-        if (value) setSaved(JSON.parse(value));
+        const savedValue = window.localStorage.getItem("silly-goose-saved");
+        const parsedSaved = savedValue ? JSON.parse(savedValue) : [];
+        setSaved(
+          Array.isArray(parsedSaved)
+            ? parsedSaved.filter((item): item is string => typeof item === "string")
+            : [],
+        );
+
+        const briefValue = window.localStorage.getItem("silly-goose-brief");
+        const parsedBrief = briefValue
+          ? parseGardenBrief(JSON.parse(briefValue))
+          : null;
+        if (parsedBrief) setBrief(parsedBrief);
       } catch {
         setSaved([]);
       } finally {
         setSavedReady(true);
+        setBriefReady(true);
       }
     });
   }, []);
@@ -994,6 +1284,11 @@ export function GardenApp() {
     if (!savedReady) return;
     window.localStorage.setItem("silly-goose-saved", JSON.stringify(saved));
   }, [saved, savedReady]);
+
+  useEffect(() => {
+    if (!briefReady) return;
+    window.localStorage.setItem("silly-goose-brief", JSON.stringify(brief));
+  }, [brief, briefReady]);
 
   const navigate = (nextView: View) => {
     setView(nextView);
@@ -1021,8 +1316,8 @@ export function GardenApp() {
       )}
       {view === "finder" && (
         <FinderView
-          preferences={preferences}
-          setPreferences={setPreferences}
+          brief={brief}
+          setBrief={setBrief}
           finish={() => navigate("results")}
           cancel={() => navigate("home")}
         />
@@ -1030,7 +1325,7 @@ export function GardenApp() {
       {(view === "results" || view === "browse") && (
         <CollectionView
           mode={view}
-          preferences={preferences}
+          brief={brief}
           saved={saved}
           openPlant={setSelectedPlant}
           toggleSaved={toggleSaved}

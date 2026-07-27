@@ -15,6 +15,8 @@ export type GroupSelectionModel = {
   bedArea: number;
   openSpaceRatio: number;
   categoryRules: readonly CategoryAreaRule[];
+  minimumSpecies?: number;
+  maximumSpecies?: number;
 };
 
 export type SelectionViolation = {
@@ -22,6 +24,8 @@ export type SelectionViolation = {
     | "total-area"
     | "category-minimum"
     | "category-maximum"
+    | "species-minimum"
+    | "species-maximum"
     | "unknown-candidate"
     | "duplicate-candidate";
   message: string;
@@ -74,6 +78,25 @@ function validateModel(
   assertRatio(model.openSpaceRatio, "Open-space ratio");
   if (model.openSpaceRatio === 1) {
     throw new Error("Open-space ratio must leave some usable planting area.");
+  }
+  if (
+    model.minimumSpecies !== undefined &&
+    (!Number.isInteger(model.minimumSpecies) || model.minimumSpecies < 1)
+  ) {
+    throw new Error("Minimum species must be a positive integer.");
+  }
+  if (
+    model.maximumSpecies !== undefined &&
+    (!Number.isInteger(model.maximumSpecies) || model.maximumSpecies < 1)
+  ) {
+    throw new Error("Maximum species must be a positive integer.");
+  }
+  if (
+    model.minimumSpecies !== undefined &&
+    model.maximumSpecies !== undefined &&
+    model.minimumSpecies > model.maximumSpecies
+  ) {
+    throw new Error("Minimum species cannot exceed maximum species.");
   }
 
   const candidateIds = new Set<string>();
@@ -182,6 +205,25 @@ export function checkGroupSelection(
   const usableCanopyArea = model.bedArea * (1 - model.openSpaceRatio);
   const categoryAreas = toAreaMap(selected);
 
+  if (
+    model.minimumSpecies !== undefined &&
+    selected.length < model.minimumSpecies
+  ) {
+    violations.push({
+      constraint: "species-minimum",
+      message: `The selection contains ${selected.length} species; at least ${model.minimumSpecies} are required.`,
+    });
+  }
+  if (
+    model.maximumSpecies !== undefined &&
+    selected.length > model.maximumSpecies
+  ) {
+    violations.push({
+      constraint: "species-maximum",
+      message: `The selection contains ${selected.length} species; at most ${model.maximumSpecies} are allowed.`,
+    });
+  }
+
   if (totalCanopyArea > usableCanopyArea + EPSILON) {
     violations.push({
       constraint: "total-area",
@@ -221,18 +263,13 @@ export function checkGroupSelection(
   };
 }
 
-function valueDensity(candidate: GroupCandidate): number {
-  return candidate.suitability / candidate.canopyArea;
-}
-
 function compareCandidates(
   left: GroupCandidate,
   right: GroupCandidate,
 ): number {
   return (
-    valueDensity(right) - valueDensity(left) ||
     right.suitability - left.suitability ||
-    left.canopyArea - right.canopyArea ||
+    right.canopyArea - left.canopyArea ||
     left.id.localeCompare(right.id)
   );
 }
@@ -264,6 +301,16 @@ function checkGroupSelectionWithoutMinimums(
   );
   const categoryAreas = toAreaMap(selected);
   const usableCanopyArea = model.bedArea * (1 - model.openSpaceRatio);
+
+  if (
+    model.maximumSpecies !== undefined &&
+    selected.length > model.maximumSpecies
+  ) {
+    violations.push({
+      constraint: "species-maximum",
+      message: "Adding this candidate would exceed the species limit.",
+    });
+  }
 
   if (totalCanopyArea > usableCanopyArea + EPSILON) {
     violations.push({
@@ -330,7 +377,7 @@ export function selectGroupGreedy(
 
       if (addable.length === 0) {
         diagnostics.push(
-          `The greedy constructor could not reach the "${rule.category}" minimum.`,
+          `We could not add enough plants from the “${rule.category}” group.`,
         );
         const check = checkGroupSelection(
           candidates,
@@ -395,12 +442,12 @@ export function selectGroupGreedy(
 
   if (!check.feasible) {
     diagnostics.push(
-      "The deterministic constructor ended without a feasible subset.",
+      "We could not find a plant mix that met all the current rules.",
     );
   }
 
   diagnostics.push(
-    "This result selects species once each. It does not calculate quantities or coordinates.",
+    "This step chooses the plant mix. Quantities and positions are worked out next.",
   );
 
   return {

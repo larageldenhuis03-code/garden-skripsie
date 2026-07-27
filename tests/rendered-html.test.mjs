@@ -33,8 +33,9 @@ test("server-renders the Silly Goose product surface", async () => {
     html,
     /<title>Silly Goose MVP — Garden planning for the Western Cape<\/title>/i,
   );
-  assert.match(html, /A garden design/);
-  assert.match(html, /shaped by <em>place\.<\/em>/);
+  assert.match(html, /Describe your <em>garden\.<\/em>/);
+  assert.match(html, /Discover the plants that <em>fit\.<\/em>/);
+  assert.match(html, /suggest plants and show you how they\s+could fit/i);
   assert.match(html, /Start my garden plan/);
   assert.match(html, /Browse the plant library/);
   assert.doesNotMatch(html, /A garden guide for the Western Cape/);

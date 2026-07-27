@@ -9,7 +9,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Silly Goose MVP — Garden planning for the Western Cape",
   description:
-    "Turn your garden’s conditions into a suitable plant shortlist, with a measured planting plan coming next.",
+    "Find Western Cape plants that suit your garden, then see a simple planting plan.",
   applicationName: "Silly Goose MVP",
   keywords: [
     "Western Cape",
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Silly Goose MVP",
     description:
-      "A garden design shaped by place.",
+      "Describe your garden. Discover the plants that fit.",
     type: "website",
   },
 };

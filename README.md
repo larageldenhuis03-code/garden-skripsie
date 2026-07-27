@@ -1,35 +1,50 @@
 # Silly Goose
 
-A Western Cape garden planner that turns real site conditions and a measured
-bed into a suitable plant group, quantities and a practical layout.
+A Western Cape garden planner that turns site conditions and a measured
+rectangular bed into a provisional plant group, integer quantities and a
+coordinate layout.
 
-> **Current reality:** the live product is a plant-discovery prototype. The
-> planning mathematics exists and is tested, but it is not yet calibrated or
-> connected to recommendations.
+> **Current reality:** the complete literature-review pipeline now runs in the
+> app. The output remains provisional until horticultural tolerances, spacing,
+> composition rules and expert AHP comparisons are reviewed.
 
 ## Start here
 
-| If you want to know… | Read |
+| Question | Document |
 |---|---|
-| What works, what is next and what needs input | [`docs/NOW.md`](docs/NOW.md) |
-| What product we are building and what is out of scope | [`docs/PRODUCT.md`](docs/PRODUCT.md) |
-| How the data and planning mathematics work | [`docs/ENGINE.md`](docs/ENGINE.md) |
-| What the site should look and sound like | [`docs/VISUAL.md`](docs/VISUAL.md) |
+| What works and what remains uncertain? | [`docs/NOW.md`](docs/NOW.md) |
+| What product are we building? | [`docs/PRODUCT.md`](docs/PRODUCT.md) |
+| How do the data and mathematics work? | [`docs/ENGINE.md`](docs/ENGINE.md) |
+| What should the site look and sound like? | [`docs/VISUAL.md`](docs/VISUAL.md) |
 
-`NOW.md` is the human-facing source of truth for status. The other documents
-are stable references and should change less often.
+`NOW.md` is the concise human-facing status. `ENGINE.md` is the implementation
+reference.
 
-## What already works
+## What works
 
-- Desktop-first garden brief
-- Provisional plant recommendations
-- Searchable 48-plant Western Cape catalogue
-- Plant details, evidence notes and device-local saving
-- Reproducible SANBI-led data foundation
-- Tested AHP, hard-constraint, Goal Programming and group-selection modules
+- Seven-part garden brief with local draft persistence
+- Searchable 48-plant Western Cape pilot catalogue
+- Automated audit against the 1,909-taxon mined seed catalogue
+- Pass/fail/unknown feasibility trace for every plant
+- AHP matrix audit and equal-weight baseline
+- Goal Programming soft-goal penalties
+- Capacity-checked binary species selection
+- Integer plant quantities
+- Boundary-safe rectangular canopy placement
+- Clickable plan legend, assumptions and diagnostics
+- Plant profiles and device-local saved plants
 
-The current recommendations still use a hand-set heuristic. They must not be
-described as scientific optimisation.
+## Important limitations
+
+- Soil and drainage compatibility are absent from the mined datasets.
+- Sun, water, area and garden-use fields are provisional editorial groupings.
+- BioSCape field-canopy measurements are spacing proxies, not nursery guidance.
+- Equal AHP weights are a neutral baseline, not expert calibration.
+- The deterministic group and layout algorithms are feasible constructors, not
+  proofs of a global optimum.
+
+The interface exposes these limitations instead of turning them into silent
+compatibility claims.
 
 ## Local development
 
@@ -50,11 +65,13 @@ npx tsc --noEmit
 
 ## Repository map
 
-- `app/` — interface, current heuristic, catalogue and planning modules
-- `tests/` — mathematical and rendered-page tests
-- `data/` — sources, processing scripts, validated extracts and quality report
-- `docs/` — product, status, engine and visual references
-- `.openai/hosting.json` — private Sites project binding
+- `app/components/` - application interface
+- `app/data/` - 48-plant pilot and labels
+- `app/lib/planning/` - brief, feasibility, AHP, Goal Programming, selection,
+  quantities and layout
+- `tests/` - data-audit, mathematics and rendered-page tests
+- `data/` - sources, processing scripts, validated extracts and quality report
+- `docs/` - product, status, engine and visual references
 
 Dataset versions, licences and limitations are recorded in
 [`data/sources.json`](data/sources.json).
