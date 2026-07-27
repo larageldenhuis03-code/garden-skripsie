@@ -9,7 +9,8 @@ complete a garden brief, receive a provisional plant shortlist, browse plant
 profiles and save plants on their device.
 
 The literature review’s AHP, Goal Programming, multidimensional-knapsack and 2D
-layout stages are not implemented yet. See `docs/implementation-roadmap.md`.
+layout stages are not implemented yet. The exact execution order is in
+`docs/PROJECT.md`.
 
 ## Local development
 
@@ -30,10 +31,13 @@ npm test
 ## Project map
 
 - `app/` — product interface, recommendation logic and MVP catalogue
-- `docs/` — product specification, design decisions, methodology and image prompts
+- `docs/PROJECT.md` — canonical scope, status and next steps
+- `docs/METHODOLOGY.md` — data provenance and target analytical model
+- `docs/VISUAL_SYSTEM.md` — copy, typography, active GPT prompt and motion
+- `docs/DECISIONS.md` — durable decisions and change history
 - `data/processed/` — validated app-oriented source extracts
 - `data/raw/` — locally downloaded source archives; intentionally gitignored
 - `data/scripts/` — reproducible download and processing pipeline
 
-Start with `docs/product-spec.md` and `docs/design-decisions.md`. Source versions,
-licences and limitations are recorded in `data/sources.json`.
+Start with `docs/PROJECT.md`. Source versions, licences and limitations are
+recorded in `data/sources.json`.
