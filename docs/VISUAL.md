@@ -6,8 +6,8 @@
 
 **Updated:** 2026-07-27
 
-> **Current asset:** a V01 hero candidate exists as `hero.png`. It still needs
-> responsive integration and in-context approval. V02 remains blocked.
+> **Current asset:** V01 is integrated in the private site and awaits
+> in-context approval. V02 remains blocked.
 
 ## The Cape Print Cabinet
 
@@ -104,7 +104,7 @@ direction, placement, optimisation, accessibility and motion.
 
 | ID | Status | Asset |
 |---|---|---|
-| V01 | Candidate received | Home botanical cabinet |
+| V01 | In review | Home botanical cabinet |
 | V02 | Blocked | Seamless cotton-rag paper texture |
 | V03 | Blocked | Transparent goose marginalia |
 | V04 | Later | Plant-library herbarium wall |
@@ -116,6 +116,10 @@ direction, placement, optimisation, accessibility and motion.
 Approved editorial assets belong in `public/images/editorial/`. Plant portraits
 belong in `public/images/plants/`. The catalogue in `app/data/plants.ts` is the
 canonical plant manifest; do not duplicate its 48 names here.
+
+The V01 source is retained at
+`assets/source/home-cape-cabinet.png`. The web-ready file is
+`public/images/editorial/home-cape-cabinet.webp`.
 
 ## V01 prompt record
 

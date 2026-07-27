@@ -29,15 +29,15 @@ assumptions have not yet been reviewed.
 | AHP and Goal Programming | Built, not calibrated | Mathematics and consistency checks work; expert inputs are missing |
 | Group selection | Provisional | Selects a feasible species subset; cannot yet calculate quantities |
 | Quantities and 2D layout | Not built | Requires reviewed canopy, spacing and composition rules |
-| Visual system | In progress | A V01 hero candidate exists as `hero.png`; it is not integrated or approved |
+| Visual system | In review | V01 is integrated in the private site and awaits the user's in-context approval |
 
 ## What happens next
 
-### 1. Review the V01 hero in context
+### 1. Approve or revise the V01 hero
 
-Codex integrates the supplied candidate into the home page with responsive
-cropping. The user approves it or requests one focused GPT revision. No second
-image prompt becomes active before that decision.
+The user reviews the integrated candidate on desktop and mobile, then approves
+it or requests one focused GPT revision. No second image prompt becomes active
+before that decision.
 
 **Output:** one approved hero that sets the standard for later artwork.
 

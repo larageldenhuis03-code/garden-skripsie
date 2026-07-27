@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import {
   areaLabels,
@@ -221,20 +222,17 @@ function HomeView({
             </div>
           </div>
           <div className="hero-art">
-            <div className="hero-placeholder">
-              <span className="portrait-index">PROMPT-HERO-01</span>
-              <div className="hero-botanical-mark" aria-hidden="true">
-                <i />
-                <i />
-                <i />
-                <i />
-              </div>
-              <div className="portrait-caption">
-                <span>Image to be commissioned</span>
-                <strong>King protea, buchu, heath and restio</strong>
-                <small>Use image prompt PROMPT-HERO-01</small>
-              </div>
-            </div>
+            <figure className="hero-plate">
+              <Image
+                className="hero-image"
+                src="/images/editorial/home-cape-cabinet.webp"
+                alt="A hand-coloured botanical cabinet of Western Cape plants centred on a King Protea, with a small goose in the lower-right margin."
+                width={1122}
+                height={1402}
+                priority
+                sizes="(max-width: 900px) calc(100vw - 48px), (max-width: 1600px) 42vw, 540px"
+              />
+            </figure>
           </div>
         </section>
 
@@ -822,29 +820,29 @@ function MethodView({ start }: { start: () => void }) {
           <span>03</span>
           <h2>AHP and Goal Programming</h2>
           <p>
-            Not implemented: expert pairwise comparisons must set consistent
-            weights before the Goal Programming model replaces the current
-            heuristic ranking.
+            Foundation built: matrix consistency, weights and directional
+            penalties are tested. Expert comparisons and reviewed targets are
+            still required before they replace the heuristic.
           </p>
         </article>
         <article>
           <span>04</span>
           <h2>Selection and layout</h2>
           <p>
-            Not implemented: bed dimensions, mature canopy, plant quantities
-            and category balance must feed a knapsack/packing stage and a 2D
-            layout.
+            Partial: a provisional binary group selector is tested. Plant
+            quantities, reviewed spacing and the measured 2D layout are not
+            built yet.
           </p>
         </article>
       </section>
       <section className="method-callout">
         <div>
-          <h2>The next build is the planning engine.</h2>
+          <h2>The next build defines the planning rules.</h2>
         </div>
         <p>
-          First complete and review the hard constraints. Then calibrate the
-          weights, implement Goal Programming, select a balanced group and place
-          it inside a measured bed.
+          First define every input, hard constraint and missing-data path. Then
+          review the plant evidence, calibrate the weights and connect the
+          tested engine to real garden cases.
         </p>
         <button className="button button-dark" onClick={start}>
           Try the plant finder <span>↗</span>
