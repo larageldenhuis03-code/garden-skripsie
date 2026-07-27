@@ -32,6 +32,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link
+          rel="preload"
+          href="/images/editorial/home-hero.jpg"
+          as="image"
+          type="image/jpeg"
+          fetchPriority="high"
+        />
+      </head>
       <body>{children}</body>
     </html>
   );

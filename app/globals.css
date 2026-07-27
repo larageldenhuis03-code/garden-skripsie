@@ -279,7 +279,7 @@ button:disabled {
   border-right: 1px solid var(--line-strong);
   border-left: 1px solid var(--line-strong);
   background:
-    var(--paper-light) url("/images/editorial/home-hero.png") center / cover
+    var(--paper-light) url("/images/editorial/home-hero.jpg") center / cover
       no-repeat;
 }
 
