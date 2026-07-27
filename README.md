@@ -1,16 +1,35 @@
-# Silly Goose MVP
+# Silly Goose
 
-A desktop-first Western Cape plant-discovery prototype and the foundation for
-a measured garden-planning engine.
+A Western Cape garden planner that turns real site conditions and a measured
+bed into a suitable plant group, quantities and a practical layout.
 
-The product combines an editorial 48-plant starting collection with accepted
-taxonomy, Western Cape occurrence evidence and regional trait data. Users can
-complete a garden brief, receive a provisional plant shortlist, browse plant
-profiles and save plants on their device.
+> **Current reality:** the live product is a plant-discovery prototype. The
+> planning mathematics exists and is tested, but it is not yet calibrated or
+> connected to recommendations.
 
-The literature review’s AHP, Goal Programming, multidimensional-knapsack and 2D
-layout stages are not implemented yet. The exact execution order is in
-`docs/PROJECT.md`.
+## Start here
+
+| If you want to know… | Read |
+|---|---|
+| What works, what is next and what needs input | [`docs/NOW.md`](docs/NOW.md) |
+| What product we are building and what is out of scope | [`docs/PRODUCT.md`](docs/PRODUCT.md) |
+| How the data and planning mathematics work | [`docs/ENGINE.md`](docs/ENGINE.md) |
+| What the site should look and sound like | [`docs/VISUAL.md`](docs/VISUAL.md) |
+
+`NOW.md` is the human-facing source of truth for status. The other documents
+are stable references and should change less often.
+
+## What already works
+
+- Desktop-first garden brief
+- Provisional plant recommendations
+- Searchable 48-plant Western Cape catalogue
+- Plant details, evidence notes and device-local saving
+- Reproducible SANBI-led data foundation
+- Tested AHP, hard-constraint, Goal Programming and group-selection modules
+
+The current recommendations still use a hand-set heuristic. They must not be
+described as scientific optimisation.
 
 ## Local development
 
@@ -21,23 +40,21 @@ npm install
 npm run dev
 ```
 
-Production validation:
+Full validation:
 
 ```powershell
-npm run build
 npm test
+npm run lint
+npx tsc --noEmit
 ```
 
-## Project map
+## Repository map
 
-- `app/` — product interface, recommendation logic and MVP catalogue
-- `docs/PROJECT.md` — canonical scope, status and next steps
-- `docs/METHODOLOGY.md` — data provenance and target analytical model
-- `docs/VISUAL_SYSTEM.md` — copy, typography, active GPT prompt and motion
-- `docs/DECISIONS.md` — durable decisions and change history
-- `data/processed/` — validated app-oriented source extracts
-- `data/raw/` — locally downloaded source archives; intentionally gitignored
-- `data/scripts/` — reproducible download and processing pipeline
+- `app/` — interface, current heuristic, catalogue and planning modules
+- `tests/` — mathematical and rendered-page tests
+- `data/` — sources, processing scripts, validated extracts and quality report
+- `docs/` — product, status, engine and visual references
+- `.openai/hosting.json` — private Sites project binding
 
-Start with `docs/PROJECT.md`. Source versions, licences and limitations are
-recorded in `data/sources.json`.
+Dataset versions, licences and limitations are recorded in
+[`data/sources.json`](data/sources.json).
