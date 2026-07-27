@@ -1,0 +1,94 @@
+{
+  "generated_at": "2026-07-27",
+  "selection": [
+    {
+      "id": "sanpc-2026",
+      "name": "South African National Plant Checklist",
+      "version": "1.3",
+      "published": "2026-06-08",
+      "doi": "10.15468/e8spft",
+      "license": "CC BY 4.0",
+      "source_page": "https://www.gbif.org/dataset/f5dc22ca-0bb1-4692-8a97-cc7ac54d7ed9",
+      "download_url": "https://ipt.sanbi.org.za/archive.do?r=sanpc2025",
+      "raw_path": "data/raw/sanbi/sanpc-2026/dwca-sanpc-2026-v1.3.zip",
+      "use": "Canonical names, accepted/synonym relationships, province-level distribution, establishment status.",
+      "limitation": "Threat status is sparsely populated; use SANBI Red List separately for conservation decisions."
+    },
+    {
+      "id": "bodatsa-2026",
+      "name": "Botanical Database of Southern Africa (BODATSA): Botanical Collections",
+      "version": "1.32",
+      "published": "2026-06-30",
+      "doi": "10.15468/2aki0q",
+      "license": "CC BY 4.0 on GBIF/IPT; POSA separately displays CC BY-NC-SA 4.0",
+      "source_page": "https://www.gbif.org/dataset/d0963cee-1a29-47a2-b9bf-fb0e7690077c",
+      "download_url": "https://ipt.sanbi.org.za/archive.do?r=brahms_online",
+      "raw_path": "data/raw/sanbi/bodatsa-2026/dwca-bodatsa-v1.32.zip",
+      "use": "Evidence that a taxon has verified herbarium records in the Western Cape; occurrence density and geography.",
+      "limitation": "Occurrence is not garden suitability. The archive contains specimens, not structured light/water/soil or mature-spread traits."
+    },
+    {
+      "id": "sanbi-alien-taxa-2025",
+      "name": "A list of alien taxa for South Africa",
+      "version": "20250520",
+      "published": "2025-05-20",
+      "doi": "10.5281/zenodo.14937470",
+      "license": "CC BY 4.0",
+      "source_page": "https://zenodo.org/records/14937470",
+      "download_url": "https://zenodo.org/api/records/14937470/files/A_checklist_of_alien_taxa_for_South%20Africa_v20250520.xlsx/content",
+      "raw_path": "data/raw/sanbi/alien-species-2025/A_checklist_of_alien_taxa_for_South_Africa_v20250520.xlsx",
+      "use": "Alien/native status, confidence, establishment, pathways, impacts, treatment and regulatory-listing fields.",
+      "limitation": "Research checklist fields do not replace the operative NEMBA notices; legal exclusions must cite the gazetted list."
+    },
+    {
+      "id": "bioscape-gcfr-traits-2026",
+      "name": "Foliar Trait and Spectroscopy Data, Greater Cape Floristic Region, South Africa",
+      "version": "1",
+      "published": "2026-02-17",
+      "doi": "10.3334/ORNLDAAC/2482",
+      "license": "Openly shared without restriction on ORNL DAAC; companion repository is GPL-3.0",
+      "source_page": "https://daacweb-prod.ornl.gov/BIOSCAPE/guides/BioSCape_foliar_trait_spec.html",
+      "download_url": "https://github.com/henryf6/GCFR_Traits/tree/main/Data_Workflow_3_Final_Polishing/Data_Outputs",
+      "raw_path": "data/raw/bioscape-gcfr-2026",
+      "use": "Maximum height, growth form, life history, flowering, flammability and measured height/canopy axes for GCFR plants.",
+      "limitation": "Field measurements are not guaranteed horticultural mature dimensions. Use them with a source label and confidence, not as exact nursery specifications."
+    },
+    {
+      "id": "western-cape-vegetation-map-2018",
+      "name": "SANBI National Vegetation Map 2018 — Western Cape clip",
+      "version": "2018",
+      "published": "2018",
+      "license": "Source/copyright SANBI; BGIS datasets use CC BY-NC-SA 4.0",
+      "source_page": "https://gis.westerncape.gov.za/server2/rest/services/SpatialDataWarehouse/Conservation/MapServer/20",
+      "download_url": "ArcGIS REST query, paginated by data/scripts/download_western_cape_vegmap.py",
+      "raw_path": "data/raw/spatial/western-cape-vegetation-map-2018.geojson",
+      "use": "Map a garden location to vegetation type, biome and bioregion.",
+      "limitation": "This is the public Western Cape 2018 clip. SANBI's 2024 national vegetation map is newer and should replace it when a suitable full download/hosting strategy is chosen."
+    },
+    {
+      "id": "nemba-invasive-list-2020",
+      "name": "NEMBA Alien and Invasive Species List (Government Notice 1003)",
+      "version": "2020 list; commenced 2021-03-01",
+      "license": "Official government publication",
+      "source_page": "https://www.dffe.gov.za/sites/default/files/legislations/nemba_invasivespecieslist_g43726gon1003.pdf",
+      "raw_path": "data/raw/legal",
+      "use": "Authoritative legal reference for prohibited/restricted invasive-species handling.",
+      "limitation": "PDF legal text is retained as evidence. A reviewed, versioned machine-readable legal table should be created before enforcing rules in production."
+    }
+  ],
+  "deferred": [
+    {
+      "name": "PlantZAfrica",
+      "reason": "Excellent curated horticultural profiles, but no official bulk export or clear reusable bulk-data licence was found. Use for reviewed enrichment only."
+    },
+    {
+      "name": "SANBI Red List",
+      "reason": "Use as the conservation-status authority, but no bulk download was found during this pass. Do not infer threat status from occurrence frequency."
+    },
+    {
+      "name": "Soil, light and irrigation tolerances",
+      "reason": "No comprehensive authoritative South African plant-level dataset was found. These fields require curated horticultural enrichment and explicit confidence/provenance."
+    }
+  ]
+}
+
