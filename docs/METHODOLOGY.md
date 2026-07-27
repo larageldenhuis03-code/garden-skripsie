@@ -93,6 +93,27 @@ The literature review, particularly pages 16–22, specifies:
 AHP derives weights only. The conventional AHP decision-score formula must not
 rank the plants directly; Goal Programming performs that function.
 
+## Implemented mathematical foundation
+
+The planning kernel now exists under `app/lib/planning/`, isolated from the
+current discovery UI:
+
+- `ahp.ts` validates reciprocal matrices, derives weights, calculates
+  `lambdaMax`, `CI` and `CR`, and blocks unaccepted calibrations;
+- `feasibility.ts` evaluates hard constraints with a complete explanation
+  trace and an explicit reject-or-review policy for unknown evidence;
+- `goalProgramming.ts` calculates directional under- and over-achievement,
+  weighted penalties and lexicographic priority comparison;
+- `groupSelection.ts` checks the paper's binary area constraints and provides a
+  deterministic, replaceable greedy constructor; and
+- `tests/planning-engine.test.ts` covers consistent and inconsistent AHP
+  matrices, unknown hard evidence, directional penalties, priority ordering,
+  area constraints and honest greedy failure.
+
+This is an engineering foundation, not a calibrated horticultural model. It is
+not connected to the visible plant ordering. No expert weights, soil rules,
+spacing rules or category ratios have been invented.
+
 ## AHP calibration
 
 The expert comparison matrix is normalised by column and reduced to a priority
@@ -104,8 +125,19 @@ Before use, calculate:
 - consistency index `CI`; and
 - consistency ratio `CR`.
 
-The project must define its accepted `CR` threshold before calibration. A
-weight vector that fails the threshold cannot proceed to production ranking.
+The engineering gate uses the literature review's strict `CR < 0.10`
+acceptance rule. A weight vector at or above the threshold cannot proceed to
+production ranking. A stricter threshold may be agreed before expert
+calibration; a looser one requires a documented methodological decision.
+
+The random-index values transcribed from the literature review are:
+
+| Matrix size | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Random index | 0 | 0 | 0.58 | 0.90 | 1.12 | 1.24 | 1.32 | 1.41 | 1.45 | 1.51 |
+
+Larger matrices require an explicitly sourced random index; the code does not
+extrapolate one.
 
 ## Goal Programming
 
@@ -126,6 +158,12 @@ Each goal takes the form:
 
 Hard constraints are not weak penalties. They remove a plant from the candidate
 pool.
+
+All goals may remain at priority 1 for the weighted formulation in the review.
+The kernel also supports pre-emptive priority levels: it compares the penalty
+at priority 1 before priority 2, so an improvement to a lower-priority goal
+cannot conceal damage to a higher-priority goal. Production priorities remain
+unset.
 
 ## Group selection
 
@@ -150,6 +188,57 @@ The first solver should be greedy and replaceable. More complex
 metaheuristics are justified only when the dataset and measured performance
 require them.
 
+## Methodology discrepancy register
+
+Obvious source errors or model gaps are not implemented literally. They are
+recorded here with the engineering interpretation.
+
+### M-001 — malformed group objective
+
+Observed: the displayed objective on page 20 is dimensionally malformed and
+does not clearly index the suitability term. The surrounding prose says the
+group should maximise total Goal Programming suitability.
+
+Override: implement the binary objective as:
+
+`max Z = Σ(vᵢxᵢ)`
+
+Consequence: `groupSelection.ts` sums candidate suitability once for each
+selected species. It does not multiply suitability by canopy area.
+
+### M-002 — binary selection cannot produce quantities
+
+Observed: `xᵢ ∈ {0,1}` records whether species `i` is selected. It cannot state
+that three or twelve plants of that species are required, although the target
+MVP promises plant quantities.
+
+Override: keep the current solver explicitly labelled
+`binary-species-subset`. Do not claim that it produces quantities. The quantity
+phase will use a reviewed integer variable such as `qᵢ ∈ Z≥0`, with:
+
+- total canopy and spacing expressed as functions of `qᵢ`;
+- an optional linking variable to distinguish species inclusion from count;
+- minimum viable planting counts where horticulturally required; and
+- a placement check so numeric quantities and 2D geometry agree.
+
+Consequence: quantity and coordinate generation remain blocked by reviewed
+spacing, mature-canopy and composition rules.
+
+### M-003 — unsupported aggregate category-max inequality
+
+Observed: page 21 gives `Σαc ≤ (1−ρ)` as an internal consistency condition.
+That condition is not required by the stated per-category maxima plus global
+coverage constraint. If categories partition the planting and full usable
+coverage is desired, this direction may make the available category maxima too
+small rather than guarantee feasibility.
+
+Override: enforce the global canopy allowance and each category's individual
+minimum and maximum. Do not enforce the aggregate inequality until its intended
+meaning is clarified.
+
+Consequence: the code preserves the stated operative constraints without
+adding a restriction that can reject otherwise valid groups.
+
 ## Layout
 
 Version one supports a rectangular bed and circular mature-canopy footprints.
@@ -164,7 +253,7 @@ It returns:
 
 Irregular boundaries are deferred until the rectangular model is validated.
 
-## Data required before implementation
+## Data required before production integration
 
 - Reviewed hard/soft classification for every criterion
 - Soil compatibility and tolerance ranges
@@ -190,4 +279,3 @@ Irregular boundaries are deferred until the rectangular model is validated.
 ## Implementation order
 
 The gate sequence and exit criteria are maintained in `PROJECT.md`.
-

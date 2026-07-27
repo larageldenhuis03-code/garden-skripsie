@@ -165,6 +165,33 @@ one another.
 Consequence: Superseded documents are deleted rather than archived. Operational
 dataset notes remain under `data/`.
 
+## D-016 — Isolate the mathematical kernel
+
+Decision: Implement AHP auditing, hard-constraint evaluation, Goal Programming
+and provisional group selection as pure, tested modules before connecting them
+to the interface.
+
+Why: The mathematics can be verified now, while the horticultural rules and
+expert weights cannot be responsibly inferred.
+
+Consequence: The visible heuristic stays in place until reviewed calibration
+and fixtures pass. The new modules expose complete traces and contain no
+fabricated production settings.
+
+## D-017 — Correct obvious methodology errors explicitly
+
+Decision: Preserve a discrepancy register in `METHODOLOGY.md` and implement the
+defensible interpretation when the literature-review notation is malformed or
+cannot deliver the stated product output.
+
+Why: Literal implementation would create false confidence. The current review
+contains a malformed objective, a questionable aggregate category inequality
+and a binary decision variable that cannot produce quantities.
+
+Consequence: The subset objective is `Σ(vᵢxᵢ)`; the unsupported aggregate
+inequality is not enforced; and the binary constructor is labelled
+provisional until an integer quantity model is reviewed.
+
 ## Change history
 
 ### 2026-07-27
@@ -178,4 +205,7 @@ dataset notes remain under `data/`.
 - Established the Cape Print Cabinet direction.
 - Changed image production from batches to one user-approved design at a time.
 - Consolidated nine overlapping documents into four canonical sources.
-
+- Added and tested the planning-mathematics kernel without changing live
+  recommendations.
+- Recorded and overrode three methodology errors or gaps that would make a
+  literal implementation misleading.

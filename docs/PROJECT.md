@@ -26,9 +26,15 @@ research-paper MVP.
 | Device-local saved list | Group selection and plant quantities |
 | Western Cape data foundation | Measured 2D planting layout |
 | Image placeholders | Approved visual asset system |
+| Tested planning-maths kernel | Reviewed rules and live engine integration |
 
 The current ordering is a hand-set heuristic. It must not be described as the
 paper’s AHP or Goal Programming model.
+
+The repository now has a tested, UI-independent kernel for AHP consistency,
+hard-constraint tracing, Goal Programming deviations and provisional binary
+group selection. It is deliberately uncalibrated and does not change visible
+results yet.
 
 ## Primary user
 
@@ -144,6 +150,11 @@ Done when:
 - every missing-value path is explicit; and
 - reviewed test fixtures describe expected feasible and infeasible plants.
 
+Engineering status: the generic constraint executor and missing-evidence
+policy are implemented and tested. The horticultural constraint catalogue,
+input schema and reviewed fixtures are still required, so this gate is not
+complete.
+
 ### Gate 4 — complete and review the data
 
 Owner: Codex with horticultural and legal review
@@ -188,6 +199,11 @@ Owner: Codex with horticultural experts
 Done when reviewed fixtures rank as expected and every contribution can be
 reconstructed from the output.
 
+Engineering status: AHP calculation, strict `CR < 0.10` gating, directional
+Goal Programming penalties and pre-emptive comparison are implemented and
+tested. Expert comparisons, accepted weights, targets and reviewed outcome
+fixtures are still missing. The current UI heuristic remains active.
+
 ### Gate 7 — select the group and generate the layout
 
 Owner: Codex
@@ -202,6 +218,12 @@ Owner: Codex
 
 Done when the numerical feasibility result and rendered plan agree.
 
+Engineering status: the paper's binary area model has a validator and a
+replaceable greedy constructor. It is explicitly provisional: binary species
+selection cannot calculate plant quantities. The required model corrections
+are recorded in `METHODOLOGY.md`; the integer quantity model and 2D placement
+remain to be built after spacing inputs are reviewed.
+
 ### Gate 8 — validate the target MVP
 
 Owner: Codex, user and horticultural reviewers
@@ -215,16 +237,24 @@ Owner: Codex, user and horticultural reviewers
 
 Done when known failure modes have controls and user-facing explanations.
 
-## Immediate next action
+## Immediate next actions
 
-The only action required from the user now is:
+The user can continue the visual lane independently:
 
 > Copy the active `V01` prompt from `VISUAL_SYSTEM.md` into GPT, generate one
 > hero design and attach the full-resolution result in this conversation
 > labelled `V01 hero`.
 
-Codex will assess it, request a targeted revision or integrate it for
-in-context approval. No second prompt is active yet.
+The technical lane now needs, in order:
+
+1. define the complete site and plant input contract;
+2. turn reviewed horticultural knowledge into named hard constraints;
+3. choose a small expert panel and collect the first pairwise matrix;
+4. review spacing and canopy assumptions for an integer quantity model; and
+5. create expected-result fixtures before replacing the UI heuristic.
+
+No second visual prompt is active. Technical foundation work may proceed in
+parallel, but no unreviewed rule or weight may influence visible results.
 
 ## Deliberately deferred
 
@@ -241,7 +271,9 @@ Until the planning engine is credible, do not prioritise:
 
 ## Working rules that prevent drift
 
-- One active gate at a time.
+- One active visual asset at a time.
+- Technical foundation may proceed in parallel when it cannot alter visible
+  recommendations without a completed review gate.
 - One active image prompt and one explicit approval at a time.
 - No visual claim that implies unimplemented mathematics.
 - No data field without source and confidence.
