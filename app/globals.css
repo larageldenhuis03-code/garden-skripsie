@@ -1078,12 +1078,11 @@ button:disabled {
   background:
     linear-gradient(to right, var(--line) 1px, transparent 1px),
     linear-gradient(to bottom, var(--line) 1px, transparent 1px),
-    color-mix(in srgb, var(--sage) 8%, var(--paper-light));
+    color-mix(in srgb, var(--olive-soft) 8%, var(--paper-light));
   background-size: 10% 10%;
 }
 
 .plan-marker {
-  --accent: var(--sage);
   position: absolute;
   display: grid;
   min-width: 12px;
@@ -1091,15 +1090,32 @@ button:disabled {
   padding: 0;
   place-items: center;
   overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--accent) 65%, var(--ink));
+  color: var(--ink-dark);
+  border: 1.5px solid var(--ink);
+  border-color: color-mix(
+    in srgb,
+    var(--accent, var(--olive-soft)) 72%,
+    var(--ink)
+  );
   border-radius: 50%;
+  background: var(--accent, var(--olive-soft));
   background:
     radial-gradient(
       circle at 35% 30%,
-      color-mix(in srgb, var(--accent) 28%, var(--paper-light)),
-      color-mix(in srgb, var(--accent) 68%, var(--paper-light))
+      color-mix(
+        in srgb,
+        var(--accent, var(--olive-soft)) 42%,
+        var(--paper-light)
+      ),
+      color-mix(
+        in srgb,
+        var(--accent, var(--olive-soft)) 82%,
+        var(--paper-light)
+      )
     );
-  box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--paper) 40%, transparent);
+  box-shadow:
+    inset 0 0 0 2px color-mix(in srgb, var(--paper) 52%, transparent),
+    0 1px 2px rgba(11, 41, 34, 0.14);
   transition:
     filter 150ms ease,
     transform 150ms ease;
@@ -1161,12 +1177,11 @@ button:disabled {
 }
 
 .legend-dot {
-  --accent: var(--sage);
   width: 15px;
   height: 15px;
   border: 1px solid var(--ink);
   border-radius: 50%;
-  background: var(--accent);
+  background: var(--accent, var(--olive-soft));
 }
 
 .plan-legend-row > span:nth-child(2) {

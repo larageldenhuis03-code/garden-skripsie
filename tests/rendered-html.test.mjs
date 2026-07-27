@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { access, readFile } from "node:fs/promises";
+import { access, readFile, stat } from "node:fs/promises";
 import test from "node:test";
 
 async function render() {
@@ -55,5 +55,31 @@ test("removes disposable starter UI and dependencies", async () => {
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);
   await assert.rejects(
     access(new URL("../app/_sites-preview/SkeletonPreview.tsx", import.meta.url)),
+  );
+});
+
+test("keeps plan circles visible and the border lightweight", async () => {
+  const [css, border] = await Promise.all([
+    readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
+    stat(
+      new URL(
+        "../public/images/editorial/site-border.jpg",
+        import.meta.url,
+      ),
+    ),
+  ]);
+
+  assert.doesNotMatch(css, /var\(--sage\)/);
+  assert.match(
+    css,
+    /\.plan-marker\s*\{[^}]*background:\s*var\(--accent,\s*var\(--olive-soft\)\)/s,
+  );
+  assert.match(
+    css,
+    /\.legend-dot\s*\{[^}]*background:\s*var\(--accent,\s*var\(--olive-soft\)\)/s,
+  );
+  assert.ok(
+    border.size < 200 * 1024,
+    `Expected site border below 200 KB, received ${border.size} bytes`,
   );
 });
