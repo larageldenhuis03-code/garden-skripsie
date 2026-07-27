@@ -32,6 +32,7 @@ The public MVP is available at
 | Quantities | Working, provisional | Integer counts use field-canopy area as the capacity proxy |
 | 2D layout | Working, provisional | Conservative rectangular packer returns non-overlapping coordinates |
 | Saved plants | Working | Stored on the current device |
+| Responsive layouts | Working | Core flow, plan, library and plant profiles adapt to phone-sized touch screens |
 | Visual system | In review | Cape botanical print direction is integrated and still being refined |
 
 ## What is source-backed

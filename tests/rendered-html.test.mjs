@@ -83,3 +83,27 @@ test("keeps plan circles visible and the border lightweight", async () => {
     `Expected site border below 200 KB, received ${border.size} bytes`,
   );
 });
+
+test("keeps the app usable on narrow touch screens", async () => {
+  const [response, css] = await Promise.all([
+    render(),
+    readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
+  ]);
+  const html = await response.text();
+  const mobileStart = css.indexOf("@media (max-width: 620px)");
+  const mobileEnd = css.indexOf(
+    "@media (prefers-reduced-motion: reduce)",
+    mobileStart,
+  );
+  const mobileCss = css.slice(mobileStart, mobileEnd);
+
+  assert.match(
+    html,
+    /<meta name="viewport" content="width=device-width, initial-scale=1"\/?>/i,
+  );
+  assert.match(css, /touch-action:\s*manipulation/);
+  assert.match(mobileCss, /\.hero-copy h1 > span\s*\{[^}]*white-space:\s*normal/s);
+  assert.match(mobileCss, /\.saved-label::after\s*\{[^}]*content:\s*"Saved"/s);
+  assert.match(mobileCss, /\.section-heading\s*\{[^}]*flex-direction:\s*column/s);
+  assert.match(mobileCss, /\.site-footer\s*\{[^}]*padding:\s*48px 24px/s);
+});

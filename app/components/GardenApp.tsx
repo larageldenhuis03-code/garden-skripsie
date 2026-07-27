@@ -117,7 +117,10 @@ function Header({
         </button>
       </nav>
       <button className="saved-link" onClick={() => navigate("saved")}>
-        Saved plants <span>{String(savedCount).padStart(2, "0")}</span>
+        <span className="saved-label">Saved plants</span>
+        <span className="saved-count">
+          {String(savedCount).padStart(2, "0")}
+        </span>
       </button>
     </header>
   );

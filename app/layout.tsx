@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "@fontsource-variable/bodoni-moda";
 import "@fontsource-variable/bodoni-moda/wght-italic.css";
 import "@fontsource-variable/instrument-sans";
@@ -23,6 +23,11 @@ export const metadata: Metadata = {
       "Describe your garden. Discover the plants that fit.",
     type: "website",
   },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({
