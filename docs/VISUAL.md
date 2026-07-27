@@ -7,8 +7,9 @@
 **Updated:** 2026-07-27
 
 > **Current asset:** the public home page uses `hero.png`, optimised as
-> `public/images/editorial/home-hero.jpg`. The earlier V01 botanical cabinet is
-> retained as a reference but is not the active hero.
+> `public/images/editorial/home-hero.avif` with WebP and JPEG fallbacks. The
+> earlier V01 botanical cabinet is retained as a reference but is not the active
+> hero.
 
 ## The Cape Print Cabinet
 

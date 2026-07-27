@@ -149,7 +149,7 @@ Current masters and web assets:
 
 | Use | Source | Runtime asset |
 |---|---|---|
-| Home hero | `hero.png` | `public/images/editorial/home-hero.jpg` |
+| Home hero | `hero.png` | `public/images/editorial/home-hero.avif` with WebP and JPEG fallbacks |
 | Side columns | `border.jpg` | `public/images/editorial/site-border.jpg` |
 
 The archived V01 cabinet source remains at

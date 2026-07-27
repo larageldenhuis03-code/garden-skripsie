@@ -279,9 +279,16 @@ button:disabled {
   overflow: hidden;
   border-right: 1px solid var(--line-strong);
   border-left: 1px solid var(--line-strong);
-  background:
-    var(--paper-light) url("/images/editorial/home-hero.jpg") center / cover
-      no-repeat;
+  background-color: var(--paper-light);
+  background-image: url("/images/editorial/home-hero.jpg");
+  background-image: image-set(
+    url("/images/editorial/home-hero.avif") type("image/avif"),
+    url("/images/editorial/home-hero.webp") type("image/webp"),
+    url("/images/editorial/home-hero.jpg") type("image/jpeg")
+  );
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 
 .hero-section::before {

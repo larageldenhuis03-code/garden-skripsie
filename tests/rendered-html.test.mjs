@@ -58,6 +58,29 @@ test("removes disposable starter UI and dependencies", async () => {
   );
 });
 
+test("serves the home hero in a high-quality modern format", async () => {
+  const [layout, css, hero] = await Promise.all([
+    readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
+    stat(
+      new URL(
+        "../public/images/editorial/home-hero.avif",
+        import.meta.url,
+      ),
+    ),
+  ]);
+
+  assert.match(layout, /home-hero\.avif/);
+  assert.match(layout, /type="image\/avif"/);
+  assert.match(css, /image-set\([^)]*home-hero\.avif/s);
+  assert.match(css, /home-hero\.webp/);
+  assert.match(css, /home-hero\.jpg/);
+  assert.ok(
+    hero.size < 320 * 1024,
+    `Expected the hero below 320 KB, received ${hero.size} bytes`,
+  );
+});
+
 test("keeps legacy artwork and unused service scaffolding out of the app", async () => {
   const packageJson = await readFile(
     new URL("../package.json", import.meta.url),

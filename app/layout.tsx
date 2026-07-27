@@ -39,9 +39,9 @@ export default function RootLayout({
       <head>
         <link
           rel="preload"
-          href="/images/editorial/home-hero.jpg"
+          href="/images/editorial/home-hero.avif"
           as="image"
-          type="image/jpeg"
+          type="image/avif"
           fetchPriority="high"
         />
       </head>
