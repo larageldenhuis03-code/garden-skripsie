@@ -568,7 +568,16 @@ function FinderView({
       )}
       <section className="finder-panel">
         <div className="finder-question">
-          <h1>{current.title}</h1>
+          <h1 className={step === 0 ? "question-two-lines" : undefined}>
+            {step === 0 ? (
+              <>
+                <span>Where is your</span>
+                <span>garden?</span>
+              </>
+            ) : (
+              current.title
+            )}
+          </h1>
           <p>{current.note}</p>
         </div>
         <div className="finder-choices">{current.content}</div>

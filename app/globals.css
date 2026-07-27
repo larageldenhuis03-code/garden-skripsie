@@ -796,9 +796,20 @@ button:disabled {
 }
 
 .finder-question h1 {
-  font-size: clamp(2.7rem, 4.35vw, 4.9rem);
-  line-height: 0.9;
+  max-width: 560px;
+  font-size: clamp(2rem, 2.7vw, 3.1rem);
+  line-height: 0.98;
   text-transform: none;
+}
+
+.finder-question h1.question-two-lines {
+  font-size: clamp(2rem, 2.7vw, 3.1rem);
+  line-height: 0.98;
+}
+
+.question-two-lines span {
+  display: block;
+  white-space: nowrap;
 }
 
 .finder-question > p:last-child {
@@ -2046,6 +2057,11 @@ button:disabled {
 
   .hero-copy h1 {
     font-size: clamp(1.82rem, 7.4vw, 2.3rem);
+  }
+
+  .finder-question h1,
+  .finder-question h1.question-two-lines {
+    font-size: clamp(2rem, 9vw, 2.8rem);
   }
 
   .collection-intro h1,
