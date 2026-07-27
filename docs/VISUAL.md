@@ -21,7 +21,7 @@ them into a modern garden planner.
 | Plants | Recognisable Western Cape specimens in hand-coloured engravings |
 | Composition | Museum grid with one or two details escaping the rules |
 | Colour | Cream, fern, eucalyptus, moss, sage and real flower colour |
-| Type | Newsreader for display; Instrument Sans for interface text |
+| Type | Bodoni Moda for major headings; Newsreader for editorial copy; Instrument Sans for controls |
 | Personality | One rare, curious goose used as marginalia |
 | Motion | Physical print and paper behaviour, brief and restrained |
 | Voice | Plain, specific and honest about limitations |
@@ -53,8 +53,9 @@ Avoid:
 
 | Role | Value |
 |---|---|
-| Display and botanical names | Newsreader Variable |
-| Body and controls | Instrument Sans Variable |
+| Major display headings | Bodoni Moda Variable |
+| Editorial copy and botanical names | Newsreader Variable |
+| Controls and factual metadata | Instrument Sans Variable |
 | Desktop body | 17 px, approximately 155% line height |
 | Long-form measure | Approximately 45–90 characters |
 | Paper | `#EFEDE3` |
@@ -65,8 +66,10 @@ Avoid:
 | Sage | `#95A79B` |
 | Lichen | `#A6B493` |
 
-Use size, weight and whitespace before tracking or colour. Flower colour comes
-from the specimens rather than an orange brand accent.
+Primary page titles may use restrained capitals in the manner of a botanical
+catalogue masthead. Long headings remain mixed case. Use size, weight and
+whitespace before tracking or colour. Flower colour comes from the specimens
+rather than an orange brand accent.
 
 ## Voice
 

@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import "@fontsource-variable/bodoni-moda";
+import "@fontsource-variable/bodoni-moda/wght-italic.css";
 import "@fontsource-variable/instrument-sans";
 import "@fontsource-variable/newsreader";
 import "@fontsource-variable/newsreader/wght-italic.css";

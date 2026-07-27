@@ -13,6 +13,7 @@
   --sky: #4f716c;
   --lime: #a6b493;
   --sand: #839486;
+  --display: "Bodoni Moda Variable", Didot, "Times New Roman", serif;
   --serif: "Newsreader Variable", Georgia, serif;
   --sans: "Instrument Sans Variable", "Helvetica Neue", Arial, sans-serif;
   --max: 1600px;
@@ -109,10 +110,13 @@ button:disabled {
 }
 
 .wordmark span {
-  font-family: var(--serif);
-  font-size: 1.65rem;
-  font-weight: 520;
-  letter-spacing: -0.04em;
+  font-family: var(--display);
+  font-size: 1.55rem;
+  font-optical-sizing: auto;
+  font-weight: 560;
+  letter-spacing: 0.025em;
+  line-height: 1;
+  text-transform: uppercase;
 }
 
 .site-header nav {
@@ -236,26 +240,28 @@ button:disabled {
 .method-hero h1,
 .finder-question h1 {
   margin: 0;
-  font-family: var(--serif);
-  font-size: clamp(4.2rem, 7vw, 8rem);
+  font-family: var(--display);
+  font-size: clamp(4rem, 6.6vw, 7.5rem);
   font-optical-sizing: auto;
-  font-weight: 430;
-  letter-spacing: -0.055em;
-  line-height: 0.86;
+  font-weight: 520;
+  letter-spacing: -0.018em;
+  line-height: 0.88;
+  text-transform: uppercase;
 }
 
 .hero-copy h1 em,
 .collection-intro h1 em,
 .method-hero h1 em {
   color: var(--sky);
-  font-weight: 400;
+  font-weight: 470;
 }
 
 .hero-intro {
   max-width: 620px;
   margin: clamp(40px, 5vw, 68px) 0 34px;
+  font-family: var(--serif);
   font-size: clamp(1.05rem, 1.3vw, 1.3rem);
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
 .hero-actions {
@@ -386,17 +392,19 @@ button:disabled {
   max-width: 470px;
   margin: 0;
   color: var(--ink-soft);
-  font-size: 1rem;
+  font-family: var(--serif);
+  font-size: 1.06rem;
 }
 
 .manifesto-band h2 {
   max-width: 850px;
   margin: 0;
-  font-family: var(--serif);
+  font-family: var(--display);
   font-size: clamp(2rem, 3.8vw, 4rem);
-  font-weight: 430;
-  letter-spacing: -0.04em;
-  line-height: 1;
+  font-optical-sizing: auto;
+  font-weight: 520;
+  letter-spacing: -0.015em;
+  line-height: 1.02;
 }
 
 .specimen-section,
@@ -421,11 +429,12 @@ button:disabled {
 .method-callout h2,
 .empty-state h2 {
   margin: 0;
-  font-family: var(--serif);
+  font-family: var(--display);
   font-size: clamp(2.2rem, 4vw, 4.8rem);
-  font-weight: 430;
-  letter-spacing: -0.045em;
-  line-height: 1;
+  font-optical-sizing: auto;
+  font-weight: 520;
+  letter-spacing: -0.015em;
+  line-height: 1.02;
 }
 
 .section-heading p,
@@ -433,6 +442,8 @@ button:disabled {
   max-width: 560px;
   margin: 18px 0 0;
   color: var(--ink-soft);
+  font-family: var(--serif);
+  font-size: 1.03rem;
 }
 
 .home-specimen-grid {
@@ -702,13 +713,15 @@ button:disabled {
 .finder-question h1 {
   font-size: clamp(3.3rem, 5.6vw, 7rem);
   line-height: 0.9;
+  text-transform: none;
 }
 
 .finder-question > p:last-child {
   max-width: 480px;
   margin: 36px 0 0;
   color: var(--ink-soft);
-  font-size: 1rem;
+  font-family: var(--serif);
+  font-size: 1.08rem;
 }
 
 .finder-choices {
@@ -806,7 +819,8 @@ button:disabled {
 
 .collection-note p {
   margin: 0 0 28px;
-  font-size: 1rem;
+  font-family: var(--serif);
+  font-size: 1.06rem;
   line-height: 1.55;
 }
 
@@ -1089,16 +1103,19 @@ button:disabled {
 
 .method-grid h2 {
   margin: 100px 0 20px;
-  font-family: var(--serif);
+  font-family: var(--display);
   font-size: 1.6rem;
-  font-weight: 500;
+  font-optical-sizing: auto;
+  font-weight: 560;
+  letter-spacing: -0.01em;
   line-height: 1.05;
 }
 
 .method-grid p {
   margin: 0;
   color: var(--ink-soft);
-  font-size: 0.9rem;
+  font-family: var(--serif);
+  font-size: 0.96rem;
 }
 
 .method-callout {
@@ -1136,8 +1153,12 @@ button:disabled {
 }
 
 .footer-mark span {
-  font-family: var(--serif);
+  font-family: var(--display);
   font-size: 2rem;
+  font-optical-sizing: auto;
+  font-weight: 560;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
 }
 
 .footer-mark small,
