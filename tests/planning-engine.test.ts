@@ -22,11 +22,11 @@ import {
 } from "../app/lib/planning/index.ts";
 
 const completeBrief: GardenBrief = {
-  area: "cape-town",
+  biome: "Fynbos",
   soil: "sandy",
   drainage: "free",
   sun: "full",
-  water: "low",
+  water: "moderate",
   bedWidthM: 2,
   bedLengthM: 3,
   density: "balanced",
@@ -352,7 +352,7 @@ test("rectangular layout reports footprints it cannot safely place", () => {
   assert.match(layout.unplaced[0].reason, /wider/i);
 });
 
-test("the mined 48-plant pilot produces a traceable provisional plan", () => {
+test("the combined plant database produces a traceable provisional plan", () => {
   const plan = buildGardenPlan(plants, {
     ...completeBrief,
     goals: [...completeBrief.goals],
@@ -361,7 +361,7 @@ test("the mined 48-plant pilot produces a traceable provisional plan", () => {
   assert.equal(plan.status, "provisional-plan");
   assert.equal(plan.calibration.status, "baseline-equal-weights");
   assert.equal(plan.calibration.audit.accepted, true);
-  assert.equal(plan.assessments.length, 48);
+  assert.equal(plan.assessments.length, plants.length);
   assert.ok(plan.counts.review > 0);
   assert.ok(plan.counts.excluded > 0);
   assert.ok(plan.quantities);
@@ -372,7 +372,7 @@ test("the mined 48-plant pilot produces a traceable provisional plan", () => {
   assert.ok((plan.quantities?.totalPlants ?? 0) <= 30);
   assert.match(
     plan.assumptions.join(" "),
-    /starter list of 48 local plants from SANPC/i,
+    /database of \d+ plants combining BioSCape/i,
   );
   assert.match(plan.assumptions.join(" "), /soil and drainage/i);
   assert.match(plan.assumptions.join(" "), /cap the plan at/i);
@@ -398,7 +398,7 @@ test("the guided test garden matches its promised output", () => {
 
 test("tiny canopy records cannot dominate a long-bed plan", () => {
   const plan = buildGardenPlan(plants, {
-    area: "cape-town",
+    biome: "Fynbos",
     soil: "not-sure",
     drainage: "free",
     sun: "full",

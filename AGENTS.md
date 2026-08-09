@@ -47,13 +47,21 @@ history.
 
 ## Stable product contract
 
-- Region: Western Cape first.
+- Region: national (South Africa) as of 2026-08-10 — a deliberate, explicit
+  override of the earlier "Western Cape first, no nationwide coverage yet"
+  scope, made once the plant database gained real national biome data. See
+  `docs/NOW.md` for why.
 - Audience: beginner or intermediate home gardeners.
 - Primary surface: desktop; smaller screens must remain usable.
 - Core flow: home -> seven-part garden brief -> provisional plan and plant
   library -> plant details and saved plants.
 - Saved plants and draft answers are device-local.
-- Current catalogue: 48 curated plants.
+- Current catalogue: the combined plant database (`data/processed/plant_database_full.csv`,
+  regenerate via `data/scripts/generate_plants_json.py`) — thousands of
+  species combining BioSCape occurrence records and PlantZAfrica
+  horticultural profiles, not a small hand-curated list. Coverage of
+  sun/water/biome varies by plant; missing fields show as "unknown," never
+  guessed.
 - Current geometry: one rectangular bed.
 - The useful outcome is a plant group, quantities and placement, not merely a
   quiz result or ranked list.
@@ -71,7 +79,7 @@ treatment.
 The guided example in `app/lib/planning/workingExample.ts` is a regression
 contract:
 
-- Garden Route
+- Fynbos biome
 - sandy soil
 - drains quickly
 - part sun
@@ -80,11 +88,14 @@ contract:
 - balanced density
 - flowers and pollinators
 
-Expected summary: **9 plants, 6 species, 34% open space**.
+Expected summary: **3 plants, 3 species, 43% open space**.
 
 Do not change this result silently. If a justified model correction changes it,
 update the fixture and tests and explain the reason in `docs/NOW.md` or
-`docs/ENGINE.md`.
+`docs/ENGINE.md`. (This fixture's numbers were recalculated on 2026-08-10 when
+the plant catalogue moved from 48 hand-curated plants to the full combined
+database — the old fixture used "Garden Route" area, which no longer exists as
+a concept now that matching is biome-based.)
 
 ## Evidence and planning guardrails
 
@@ -115,18 +126,28 @@ test fixture or recommendation claim.
 
 The processed foundation combines:
 
-- SANPC accepted Western Cape taxonomy;
-- BODATSA Western Cape occurrence summaries;
-- BioSCape GCFR traits; and
+- SANPC accepted Western Cape taxonomy, BODATSA occurrence summaries and
+  BioSCape GCFR traits, joined and enriched with a point-in-polygon `biome`
+  (SANBI National Vegetation Map 2018) by `data/scripts/build_bioscape_traits.R`,
+  including an invasive-species exclusion pass (`data/raw/InvasivePlants.txt`);
+- PlantZAfrica (SANBI) horticultural profiles — sun, water, soil, spread,
+  common names and photo URLs — merged in by
+  `data/scripts/combine_plant_database.R`, unioned with the BioSCape set so
+  species with no BioSCape occurrence record still carry a zone-inferred
+  biome (lower confidence, tagged via each plant's `biomeSource`); and
 - legal-review warning sources described in `data/sources.json`.
 
-The canonical mined seed catalogue is
-`data/processed/garden_app_seed_catalog.csv`. The visible catalogue is
-`app/data/plants.ts`. `tests/data-foundation.test.ts` prevents sourced fields
-from drifting.
+The canonical combined catalogue is
+`data/processed/plant_database_full.csv`. `data/scripts/generate_plants_json.py`
+reshapes it into `app/data/plant_database.generated.json`, which
+`app/data/plants.ts` imports and types as the visible catalogue.
+`tests/data-foundation.test.ts` prevents the two from drifting.
 
-Do not hand-edit source-derived taxonomy, height, occurrence or canopy values
-without updating the processing/audit trail.
+Do not hand-edit source-derived taxonomy, height, occurrence, canopy, sun,
+water or biome values without updating the processing/audit trail — regenerate
+via the R and Python scripts above instead. Not every field is populated for
+every plant; missing sun/water/biome must stay `null` (surfaced as "unknown"
+in the planning engine), never guessed.
 
 ## Visual and copy rules
 

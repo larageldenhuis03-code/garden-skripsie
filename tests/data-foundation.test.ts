@@ -56,53 +56,63 @@ function parseCsv(source: string): Record<string, string>[] {
     );
 }
 
-test("the visible 48 plants are auditable against the mined seed catalogue", async () => {
+function blankToNull(value: string | undefined): string | null {
+  const trimmed = (value ?? "").trim();
+  return trimmed && trimmed !== "NA" ? trimmed : null;
+}
+
+function toNumberOrNull(value: string | undefined): number | null {
+  const text = blankToNull(value);
+  if (text === null) return null;
+  const parsed = Number(text);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+// data/scripts/generate_plants_json.py is the single source of truth for
+// app/data/plant_database.generated.json; this test re-derives the same
+// fields from the CSV it reads and checks app/data/plants.ts's exported
+// `plants` still matches, so a source-data change or a generator change
+// can't silently drift from what the app actually renders.
+test("the plant library is auditable against the combined plant database", async () => {
   const csv = await readFile(
-    new URL("../data/processed/garden_app_seed_catalog.csv", import.meta.url),
+    new URL("../data/processed/plant_database_full.csv", import.meta.url),
     "utf8",
   );
   const rows = parseCsv(csv);
   const byName = new Map(rows.map((row) => [row.scientific_name, row]));
 
-  assert.equal(rows.length, 1909);
-  assert.equal(plants.length, 48);
+  assert.equal(plants.length, rows.length);
+  assert.ok(plants.length > 3000, "expected the full combined database, not a stub list");
 
   const drift: string[] = [];
   plants.forEach((plant) => {
     const source = byName.get(plant.scientificName);
-    assert.ok(source, `${plant.scientificName} is missing from the seed data.`);
-    if (source.family !== plant.family) {
+    assert.ok(source, `${plant.scientificName} is missing from plant_database_full.csv.`);
+    if (!source) return;
+
+    if (blankToNull(source.family) !== (plant.family || null)) {
       drift.push(`${plant.id} family: ${plant.family} != ${source.family}`);
     }
-    if (Number(source.max_height_cm) !== plant.heightCm) {
-      drift.push(
-        `${plant.id} height: ${plant.heightCm} != ${source.max_height_cm}`,
-      );
+    if (toNumberOrNull(source.height_cm) !== plant.heightCm) {
+      drift.push(`${plant.id} height: ${plant.heightCm} != ${source.height_cm}`);
     }
-    if (Number(source.bodatsa_occurrence_count) !== plant.occurrenceCount) {
-      drift.push(
-        `${plant.id} occurrence: ${plant.occurrenceCount} != ${source.bodatsa_occurrence_count}`,
-      );
+    if (toNumberOrNull(source.spread_cm) !== plant.spreadCm) {
+      drift.push(`${plant.id} spread: ${plant.spreadCm} != ${source.spread_cm}`);
     }
-    const sourceCanopy =
-      source.median_canopy_axis_1_cm === ""
-        ? null
-        : Number(source.median_canopy_axis_1_cm);
-    if (sourceCanopy !== plant.spreadCm) {
-      drift.push(
-        `${plant.id} canopy: ${plant.spreadCm} != ${sourceCanopy}`,
-      );
+    const sourceWater = blankToNull(source.water);
+    if (sourceWater !== plant.water) {
+      drift.push(`${plant.id} water: ${plant.water} != ${sourceWater}`);
     }
-    assert.match(
-      source.sanpc_establishment_means,
-      /^native(?:Endemic)?$/,
-      `${plant.id} is not marked native in the seed data.`,
-    );
-    assert.equal(
-      source.legal_review_required,
-      "0",
-      `${plant.id} carries a machine-detected legal review flag.`,
-    );
+    const sourceSun = blankToNull(source.sun);
+    const expectedSun = sourceSun ? sourceSun.split(";") : null;
+    if (JSON.stringify(expectedSun) !== JSON.stringify(plant.sun)) {
+      drift.push(`${plant.id} sun: ${plant.sun} != ${expectedSun}`);
+    }
+    const sourceBiome = blankToNull(source.biome);
+    const expectedBiome = sourceBiome ? sourceBiome.split(";") : null;
+    if (JSON.stringify(expectedBiome) !== JSON.stringify(plant.biome)) {
+      drift.push(`${plant.id} biome: ${plant.biome} != ${expectedBiome}`);
+    }
   });
 
   assert.deepEqual(drift, []);

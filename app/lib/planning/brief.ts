@@ -1,8 +1,9 @@
-import type {
-  Area,
-  Goal,
-  Sun,
-  Water,
+import {
+  biomeLabels,
+  type Biome,
+  type Goal,
+  type Sun,
+  type Water,
 } from "../../data/plants.ts";
 
 export type Soil = "sandy" | "loam" | "clay" | "not-sure";
@@ -10,7 +11,7 @@ export type Drainage = "free" | "moderate" | "poor" | "not-sure";
 export type PlantingDensity = "open" | "balanced" | "lush";
 
 export type GardenBrief = {
-  area: Area;
+  biome: Biome;
   soil: Soil;
   drainage: Drainage;
   sun: Sun;
@@ -35,12 +36,7 @@ export type BriefValidation = {
 export const MIN_BED_DIMENSION_M = 0.5;
 export const MAX_BED_DIMENSION_M = 30;
 
-const areas = new Set<Area>([
-  "cape-town",
-  "winelands",
-  "overberg",
-  "garden-route",
-]);
+const biomes = new Set<Biome>(Object.keys(biomeLabels) as Biome[]);
 const soils = new Set<Soil>(["sandy", "loam", "clay", "not-sure"]);
 const drainages = new Set<Drainage>([
   "free",
@@ -73,8 +69,8 @@ function validDimension(value: number): boolean {
 export function validateGardenBrief(brief: GardenBrief): BriefValidation {
   const issues: BriefValidationIssue[] = [];
 
-  if (!areas.has(brief.area)) {
-    issues.push({ field: "area", message: "Choose a supported pilot area." });
+  if (!biomes.has(brief.biome)) {
+    issues.push({ field: "biome", message: "Choose a biome." });
   }
   if (!soils.has(brief.soil)) {
     issues.push({ field: "soil", message: "Choose a soil description." });
@@ -140,7 +136,7 @@ export function parseGardenBrief(value: unknown): GardenBrief | null {
 
   const record = value as Record<string, unknown>;
   if (
-    !areas.has(record.area as Area) ||
+    !biomes.has(record.biome as Biome) ||
     !soils.has(record.soil as Soil) ||
     !drainages.has(record.drainage as Drainage) ||
     !suns.has(record.sun as Sun) ||
@@ -155,7 +151,7 @@ export function parseGardenBrief(value: unknown): GardenBrief | null {
   }
 
   const brief: GardenBrief = {
-    area: record.area as Area,
+    biome: record.biome as Biome,
     soil: record.soil as Soil,
     drainage: record.drainage as Drainage,
     sun: record.sun as Sun,

@@ -1,5 +1,5 @@
 import {
-  areaLabels,
+  biomeLabels,
   goalLabels,
   sunLabels,
   waterLabels,
@@ -113,74 +113,112 @@ function feasibilityConstraints(): HardConstraint<Plant, GardenBrief>[] {
   return [
     {
       id: "catalogue-gate",
-      description: "Included in the Western Cape starter list.",
+      description: "Included in the checked plant database.",
       evaluate: (plant) => ({
         status: "pass",
-        reason: "This plant is in our checked Western Cape starter list.",
+        reason: "This plant is in our checked plant database.",
         evidence: {
-          source: "data/processed/garden_app_seed_catalog.csv",
+          source: "data/processed/plant_database_full.csv",
           observedValue: plant.scientificName,
-          requiredValue: "accepted native/native-endemic Western Cape taxon",
+          requiredValue: "BioSCape occurrence record or PlantZAfrica profile",
           confidence: "high",
         },
       }),
     },
     {
-      id: "regional-affinity",
-      description: "Suggested for this part of the Western Cape.",
-      evaluate: (plant, brief) =>
-        plant.areas.includes(brief.area)
+      id: "biome-affinity",
+      description: "Suggested for this biome.",
+      evaluate: (plant, brief) => {
+        if (plant.biome === null) {
+          return {
+            status: "unknown",
+            reason: "We do not have a resolved biome for this plant yet.",
+            evidence: {
+              source: "data/processed/bioscape_care_traits.csv (point-in-polygon join) / PlantZAfrica horticultural zones",
+              observedValue: null,
+              requiredValue: brief.biome,
+              confidence: "unknown",
+            },
+          };
+        }
+        return plant.biome.includes(brief.biome)
           ? {
               status: "pass",
-              reason: `This plant is currently listed for ${areaLabels[brief.area]}.`,
+              reason: `This plant is recorded in the ${biomeLabels[brief.biome]} biome.`,
               evidence: {
-                source: "Editorial pilot grouping; horticultural review required",
-                observedValue: plant.areas,
-                requiredValue: brief.area,
-                confidence: "low",
+                source: "Occurrence coordinates and/or PlantZAfrica horticultural zones",
+                observedValue: plant.biome,
+                requiredValue: brief.biome,
+                confidence: plant.biomeSource === "occurrence" ? "high" : "medium",
               },
             }
           : {
               status: "fail",
-              reason: `This plant is not currently listed for ${areaLabels[brief.area]}.`,
+              reason: `This plant is not currently recorded in the ${biomeLabels[brief.biome]} biome.`,
               evidence: {
-                source: "Editorial pilot grouping; horticultural review required",
-                observedValue: plant.areas,
-                requiredValue: brief.area,
-                confidence: "low",
+                source: "Occurrence coordinates and/or PlantZAfrica horticultural zones",
+                observedValue: plant.biome,
+                requiredValue: brief.biome,
+                confidence: plant.biomeSource === "occurrence" ? "high" : "medium",
               },
-            },
+            };
+      },
     },
     {
       id: "light",
       description: "The light matches your garden.",
-      evaluate: (plant, brief) =>
-        plant.sun.includes(brief.sun)
+      evaluate: (plant, brief) => {
+        if (plant.sun === null) {
+          return {
+            status: "unknown",
+            reason: "We do not have light guidance for this plant yet.",
+            evidence: {
+              source: "PlantZAfrica horticultural profile",
+              observedValue: null,
+              requiredValue: brief.sun,
+              confidence: "unknown",
+            },
+          };
+        }
+        return plant.sun.includes(brief.sun)
           ? {
               status: "pass",
               reason: `The current guidance includes ${sunLabels[brief.sun].toLowerCase()}.`,
               evidence: {
-                source: "Editorial pilot grouping; horticultural review required",
+                source: "PlantZAfrica horticultural profile",
                 observedValue: plant.sun,
                 requiredValue: brief.sun,
-                confidence: "low",
+                confidence: "medium",
               },
             }
           : {
               status: "fail",
               reason: `The current guidance does not include ${sunLabels[brief.sun].toLowerCase()}.`,
               evidence: {
-                source: "Editorial pilot grouping; horticultural review required",
+                source: "PlantZAfrica horticultural profile",
                 observedValue: plant.sun,
                 requiredValue: brief.sun,
-                confidence: "low",
+                confidence: "medium",
               },
-            },
+            };
+      },
     },
     {
       id: "summer-water",
       description: "Your summer watering should be enough.",
       evaluate: (plant, brief) => {
+        if (plant.water === null) {
+          return {
+            status: "unknown",
+            reason: "We do not have watering guidance for this plant yet.",
+            evidence: {
+              source: "PlantZAfrica horticultural profile",
+              observedValue: null,
+              requiredValue: brief.water,
+              confidence: "unknown",
+            },
+          };
+        }
         const level = { low: 0, moderate: 1, moist: 2 } as const;
         const passes = level[plant.water] <= level[brief.water];
         return passes
@@ -188,20 +226,20 @@ function feasibilityConstraints(): HardConstraint<Plant, GardenBrief>[] {
               status: "pass",
               reason: `${waterLabels[brief.water]} should meet this plant’s needs.`,
               evidence: {
-                source: "Editorial pilot grouping; horticultural review required",
+                source: "PlantZAfrica horticultural profile",
                 observedValue: plant.water,
                 requiredValue: brief.water,
-                confidence: "low",
+                confidence: "medium",
               },
             }
           : {
               status: "fail",
               reason: `${waterLabels[brief.water]} is probably not enough for this plant.`,
               evidence: {
-                source: "Editorial pilot grouping; horticultural review required",
+                source: "PlantZAfrica horticultural profile",
                 observedValue: plant.water,
                 requiredValue: brief.water,
-                confidence: "low",
+                confidence: "medium",
               },
             };
       },
@@ -493,9 +531,9 @@ export function buildGardenPlan(
       assessment.suitability > 0,
   );
   const assumptions = [
-    "This plan uses a starter list of 48 local plants from SANPC, BODATSA and BioSCape.",
-    "The area, light, water and garden-use advice still needs checking by a plant expert.",
-    "We do not yet have reliable soil and drainage guidance for every plant.",
+    `This plan uses a database of ${plants.length} plants combining BioSCape occurrence records and PlantZAfrica horticultural profiles.`,
+    "The biome, light, water and garden-use advice still needs checking by a plant expert.",
+    "We do not yet have reliable soil and drainage guidance for every plant, and light/water guidance is missing for some plants.",
     "Every goal you chose currently counts equally.",
     `Your “${brief.density}” setting leaves about ${Math.round(openSpaceRatio * 100)}% of the bed open.`,
     `We cap the plan at ${densityPlantLimitPerM2[brief.density]} plants per square metre to avoid unrealistic quantities.`,

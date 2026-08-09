@@ -3,16 +3,17 @@
 import {
   useEffect,
   useMemo,
+  useRef,
   useState,
   type CSSProperties,
 } from "react";
 import {
-  areaLabels,
+  biomeLabels,
   goalLabels,
   plants,
   sunLabels,
   waterLabels,
-  type Area,
+  type Biome,
   type Goal,
   type Plant,
   type Sun,
@@ -189,6 +190,103 @@ function ChoiceButton({
   );
 }
 
+function BiomeCombobox({
+  value,
+  onChange,
+}: {
+  value: Biome;
+  onChange: (biome: Biome) => void;
+}) {
+  const options = Object.keys(biomeLabels) as Biome[];
+  const [query, setQuery] = useState(biomeLabels[value]);
+  const [open, setOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [syncedValue, setSyncedValue] = useState(value);
+
+  if (value !== syncedValue) {
+    setSyncedValue(value);
+    setQuery(biomeLabels[value]);
+  }
+
+  useEffect(() => {
+    if (!open) return;
+    function handlePointerDown(event: MouseEvent) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
+        setOpen(false);
+        setQuery(biomeLabels[value]);
+      }
+    }
+    document.addEventListener("mousedown", handlePointerDown);
+    return () => document.removeEventListener("mousedown", handlePointerDown);
+  }, [open, value]);
+
+  const filtered = options.filter((biome) =>
+    biomeLabels[biome].toLowerCase().includes(query.trim().toLowerCase())
+  );
+
+  return (
+    <div className="biome-combobox" ref={containerRef}>
+      <label>
+        <span>Biome</span>
+        <input
+          value={query}
+          onChange={(event) => {
+            setQuery(event.target.value);
+            setOpen(true);
+          }}
+          onFocus={() => setOpen(true)}
+          onKeyDown={(event) => {
+            if (event.key === "Escape") {
+              setOpen(false);
+              setQuery(biomeLabels[value]);
+            }
+          }}
+          placeholder="Search for a biome"
+          role="combobox"
+          aria-expanded={open}
+          aria-controls="biome-combobox-list"
+          aria-autocomplete="list"
+          autoComplete="off"
+        />
+      </label>
+      {open && (
+        <ul
+          className="biome-combobox-list"
+          id="biome-combobox-list"
+          role="listbox"
+        >
+          {filtered.length ? (
+            filtered.map((biome) => (
+              <li key={biome} role="presentation">
+                <button
+                  type="button"
+                  role="option"
+                  aria-selected={value === biome}
+                  className={value === biome ? "is-selected" : ""}
+                  onClick={() => {
+                    onChange(biome);
+                    setQuery(biomeLabels[biome]);
+                    setOpen(false);
+                  }}
+                >
+                  {biomeLabels[biome]}
+                </button>
+              </li>
+            ))
+          ) : (
+            <li className="biome-combobox-empty" role="presentation">
+              No matching biome
+            </li>
+          )}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 function FinderView({
   brief,
   setBrief,
@@ -211,17 +309,13 @@ function FinderView({
   const steps = [
     {
       title: "Where is your garden?",
-      note: "Choose the nearest pilot area. We do not need your address.",
+      note: "Choose the biome closest to your garden. We do not need your address.",
       content: (
-        <div className="choice-grid two-column">
-          {(Object.keys(areaLabels) as Area[]).map((area) => (
-            <ChoiceButton
-              key={area}
-              selected={brief.area === area}
-              title={areaLabels[area]}
-              onClick={() => setBrief({ ...brief, area })}
-            />
-          ))}
+        <div className="choice-stack">
+          <BiomeCombobox
+            value={brief.biome}
+            onChange={(biome) => setBrief({ ...brief, biome })}
+          />
         </div>
       ),
     },
@@ -641,7 +735,7 @@ function PlanSummary({
       </div>
 
       <div className="brief-strip" aria-label="Garden brief summary">
-        <span>{areaLabels[plan.brief.area]}</span>
+        <span>{biomeLabels[plan.brief.biome]}</span>
         <span>{soilLabels[plan.brief.soil]}</span>
         <span>{drainageLabels[plan.brief.drainage]}</span>
         <span>{sunLabels[plan.brief.sun]}</span>
@@ -810,9 +904,9 @@ function CollectionView({
               </>
             ) : (
               <>
-                The first
+                The plant
                 <br />
-                <em>48</em> plants.
+                <em>library.</em>
               </>
             )}
           </h1>
@@ -821,7 +915,7 @@ function CollectionView({
           <p>
             {mode === "results"
               ? "We used your answers to check the plants, choose a mix and lay it out in the bed. Anything we’re unsure about is clearly marked."
-              : "These 48 plants are backed by Western Cape records. We’re still checking some practical growing details with plant experts."}
+              : `${plants.length.toLocaleString()} plants combine BioSCape occurrence records and PlantZAfrica horticultural profiles. Not every plant has light, water or biome guidance yet — we mark what’s still missing.`}
           </p>
           {mode === "results" && (
             <button className="text-link" onClick={restart}>
@@ -949,7 +1043,11 @@ function SavedView({
             <span>
               Tallest ·{" "}
               {formatDimension(
-                Math.max(...savedPlants.map((plant) => plant.heightCm)),
+                savedPlants.reduce<number | null>((tallest, plant) => {
+                  if (plant.heightCm === null) return tallest;
+                  if (tallest === null) return plant.heightCm;
+                  return Math.max(tallest, plant.heightCm);
+                }, null),
               )}
             </span>
             <span>
@@ -1000,16 +1098,17 @@ function MethodView({ start }: { start: () => void }) {
           <span>01</span>
           <h2>Plant records</h2>
           <p>
-            The 48 plants use names, sizes and Western Cape records from SANPC,
-            BODATSA and BioSCape.
+            The plant library combines occurrence and trait records from
+            BioSCape with horticultural profiles from PlantZAfrica (SANBI).
           </p>
         </article>
         <article>
           <span>02</span>
           <h2>Plant checks</h2>
           <p>
-            Each plant is checked against your area, light, water and bed size.
-            Soil and drainage still need expert checking.
+            Each plant is checked against your biome, light, water and bed
+            size where that data exists. Soil, drainage and some plants’
+            light/water still need expert checking.
           </p>
         </article>
         <article>
@@ -1123,11 +1222,15 @@ function DetailDrawer({
             </div>
             <div>
               <dt>Light</dt>
-              <dd>{plant.sun.map((item) => sunLabels[item]).join(" · ")}</dd>
+              <dd>
+                {plant.sun
+                  ? plant.sun.map((item) => sunLabels[item]).join(" · ")
+                  : "Not yet checked"}
+              </dd>
             </div>
             <div>
               <dt>Water</dt>
-              <dd>{waterLabels[plant.water]}</dd>
+              <dd>{plant.water ? waterLabels[plant.water] : "Not yet checked"}</dd>
             </div>
           </dl>
 

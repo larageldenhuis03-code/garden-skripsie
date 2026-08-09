@@ -1,7 +1,7 @@
 import type { GardenBrief } from "./brief.ts";
 
 export const workingExampleBrief: GardenBrief = {
-  area: "garden-route",
+  biome: "Fynbos",
   soil: "sandy",
   drainage: "free",
   sun: "part",
@@ -13,7 +13,7 @@ export const workingExampleBrief: GardenBrief = {
 };
 
 export const workingExampleOutput = {
-  totalPlants: 9,
-  species: 6,
-  openSpacePercent: 34,
+  totalPlants: 3,
+  species: 3,
+  openSpacePercent: 43,
 } as const;

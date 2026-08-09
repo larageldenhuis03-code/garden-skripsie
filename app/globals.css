@@ -711,6 +711,84 @@ button:disabled {
   font-size: 0.78rem;
 }
 
+.biome-combobox {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  justify-self: center;
+}
+
+.biome-combobox label {
+  display: grid;
+  gap: 13px;
+}
+
+.biome-combobox label > span {
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+.biome-combobox input {
+  width: 100%;
+  padding: 8px 0 12px;
+  border: 0;
+  border-bottom: 1px solid var(--ink);
+  border-radius: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 1.3rem;
+}
+
+.biome-combobox input::placeholder {
+  color: var(--ink-soft);
+  opacity: 0.72;
+}
+
+.biome-combobox-list {
+  position: absolute;
+  z-index: 5;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  display: grid;
+  gap: 2px;
+  max-height: 260px;
+  padding: 6px;
+  overflow-y: auto;
+  border: 1px solid var(--line-strong);
+  background: var(--paper-light);
+  box-shadow: 0 14px 30px rgba(23, 60, 50, 0.14);
+}
+
+.biome-combobox-list button {
+  width: 100%;
+  padding: 12px 14px;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+  font-family: var(--serif);
+  font-size: 1rem;
+}
+
+.biome-combobox-list button:hover {
+  background: rgba(104, 112, 68, 0.14);
+}
+
+.biome-combobox-list button.is-selected {
+  background: var(--olive);
+  color: var(--paper-light);
+}
+
+.biome-combobox-empty {
+  padding: 12px 14px;
+  color: var(--ink-soft);
+  font-family: var(--serif);
+  font-size: 0.95rem;
+}
+
 .dimension-editor {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
