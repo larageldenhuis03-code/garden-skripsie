@@ -33,6 +33,7 @@ import {
   type GardenBrief,
   type PlantAssessment,
 } from "../lib/planning";
+import biomeMapData from "../data/biome_map.generated.json" with { type: "json" };
 
 type View = "home" | "finder" | "results" | "browse" | "saved" | "method";
 
@@ -64,6 +65,42 @@ function PlantPortrait({
   plant: Plant;
   hero?: boolean;
 }) {
+  if (plant.photoUrl) {
+    return (
+      <div
+        className={`plant-portrait has-photo accent-${plant.accent}${hero ? " portrait-hero" : ""}`}
+      >
+        <img
+          className="portrait-photo"
+          src={plant.photoUrl}
+          alt={`${plant.commonName} (${plant.scientificName})`}
+          loading="lazy"
+        />
+        <span className="portrait-index">{plant.id}</span>
+        <div className="portrait-caption">
+          <strong>{plant.scientificName}</strong>
+          {plant.photoAttribution && (
+            <small>
+              Photo:{" "}
+              {plant.photoSourceUrl ? (
+                <a
+                  href={plant.photoSourceUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  {plant.photoAttribution}
+                </a>
+              ) : (
+                plant.photoAttribution
+              )}
+            </small>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       className={`plant-portrait accent-${plant.accent}${hero ? " portrait-hero" : ""}`}
@@ -287,6 +324,87 @@ function BiomeCombobox({
   );
 }
 
+const BIOME_SLUGS: Record<Biome, string> = {
+  Fynbos: "fynbos",
+  "Succulent Karoo": "succulent-karoo",
+  "Nama Karoo": "nama-karoo",
+  Grassland: "grassland",
+  Savanna: "savanna",
+  "Albany Thicket": "albany-thicket",
+  "Indian Ocean Coastal Belt": "indian-ocean-coastal-belt",
+  Forest: "forest",
+  Desert: "desert",
+};
+
+const biomeOrder = Object.keys(biomeLabels) as Biome[];
+
+function BiomeMap({
+  value,
+  onChange,
+}: {
+  value: Biome;
+  onChange: (biome: Biome) => void;
+}) {
+  return (
+    <div className="biome-map">
+      <svg
+        className="biome-map-svg"
+        viewBox={biomeMapData.viewBox}
+        role="group"
+        aria-label="Map of South Africa's biomes. Choose the biome closest to your garden."
+      >
+        {biomeMapData.regions.map((region) => {
+          const biome = region.biome as Biome;
+          return (
+            <path
+              key={biome}
+              d={region.path}
+              className={`biome-region biome-${BIOME_SLUGS[biome]}${value === biome ? " is-selected" : ""}`}
+              role="button"
+              tabIndex={0}
+              aria-pressed={value === biome}
+              aria-label={biomeLabels[biome]}
+              onClick={() => onChange(biome)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  onChange(biome);
+                }
+              }}
+            >
+              <title>{biomeLabels[biome]}</title>
+            </path>
+          );
+        })}
+        {biomeMapData.provinceLabels.map((province) => (
+          <text
+            key={province.name}
+            className="biome-map-province-label"
+            x={province.x}
+            y={province.y}
+          >
+            {province.name}
+          </text>
+        ))}
+      </svg>
+      <ul className="biome-map-legend">
+        {biomeOrder.map((biome) => (
+          <li key={biome}>
+            <button
+              type="button"
+              className={value === biome ? "is-selected" : ""}
+              onClick={() => onChange(biome)}
+            >
+              <span className={`biome-swatch biome-${BIOME_SLUGS[biome]}`} aria-hidden="true" />
+              {biomeLabels[biome]}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 function FinderView({
   brief,
   setBrief,
@@ -309,9 +427,13 @@ function FinderView({
   const steps = [
     {
       title: "Where is your garden?",
-      note: "Choose the biome closest to your garden. We do not need your address.",
+      note: "Click your biome on the map, or search for it below. We do not need your address.",
       content: (
         <div className="choice-stack">
+          <BiomeMap
+            value={brief.biome}
+            onChange={(biome) => setBrief({ ...brief, biome })}
+          />
           <BiomeCombobox
             value={brief.biome}
             onChange={(biome) => setBrief({ ...brief, biome })}

@@ -525,6 +525,47 @@ button:disabled {
   border-top: 1px solid var(--line-strong);
 }
 
+.plant-portrait.has-photo {
+  background: var(--paper-deep);
+}
+
+.plant-portrait.has-photo::before {
+  display: none;
+}
+
+.portrait-photo {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.plant-portrait.has-photo .portrait-index {
+  padding: 2px 7px;
+  border-radius: 100px;
+  background: color-mix(in srgb, var(--paper-light) 82%, transparent);
+}
+
+.plant-portrait.has-photo .portrait-caption {
+  z-index: 1;
+  padding: 10px 10px 0;
+  border-top: 0;
+  background: linear-gradient(0deg, color-mix(in srgb, var(--ink) 62%, transparent) 0%, transparent 100%);
+}
+
+.plant-portrait.has-photo .portrait-caption strong,
+.plant-portrait.has-photo .portrait-caption small {
+  color: var(--paper-light);
+}
+
+.plant-portrait.has-photo .portrait-caption small a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .finder-shell {
   display: flex;
   flex-direction: column;
@@ -787,6 +828,129 @@ button:disabled {
   color: var(--ink-soft);
   font-family: var(--serif);
   font-size: 0.95rem;
+}
+
+.biome-map {
+  display: grid;
+  gap: 20px;
+  justify-items: center;
+}
+
+.biome-map-svg {
+  width: 100%;
+  max-width: 480px;
+  aspect-ratio: 1;
+  overflow: visible;
+}
+
+.biome-region {
+  --biome-color: var(--olive-soft);
+  cursor: pointer;
+  fill: color-mix(in srgb, var(--biome-color) 45%, var(--paper-light));
+  stroke: var(--paper-light);
+  stroke-width: 1.5;
+  transition:
+    fill 160ms ease,
+    stroke 160ms ease;
+}
+
+.biome-region:hover {
+  fill: color-mix(in srgb, var(--biome-color) 62%, var(--paper-light));
+}
+
+.biome-region:focus-visible {
+  outline: 3px solid var(--sky);
+  outline-offset: 1px;
+}
+
+.biome-region.is-selected {
+  fill: var(--biome-color);
+  stroke: var(--ink);
+}
+
+.biome-fynbos {
+  --biome-color: var(--olive);
+}
+
+.biome-succulent-karoo {
+  --biome-color: var(--ochre);
+}
+
+.biome-nama-karoo {
+  --biome-color: var(--sand);
+}
+
+.biome-grassland {
+  --biome-color: var(--lime);
+}
+
+.biome-savanna {
+  --biome-color: var(--coral);
+}
+
+.biome-albany-thicket {
+  --biome-color: var(--olive-dark);
+}
+
+.biome-indian-ocean-coastal-belt {
+  --biome-color: var(--sky);
+}
+
+.biome-forest {
+  --biome-color: var(--olive-soft);
+}
+
+.biome-desert {
+  --biome-color: var(--rose);
+}
+
+.biome-map-province-label {
+  pointer-events: none;
+  fill: var(--ink);
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  text-anchor: middle;
+  paint-order: stroke;
+  stroke: var(--paper-light);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+
+.biome-map-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 7px;
+  max-width: 480px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.biome-map-legend button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 13px;
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  background: transparent;
+  font-size: 0.78rem;
+}
+
+.biome-map-legend button.is-selected {
+  border-color: var(--olive);
+  background: var(--olive);
+  color: var(--paper);
+}
+
+.biome-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--biome-color);
 }
 
 .dimension-editor {

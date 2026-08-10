@@ -113,6 +113,21 @@ group, quantities and coordinates with expert expectations.
 Only after reviewed cases exist, compare the current deterministic phase-one
 constructors with Simulated Annealing or another justified search method.
 
+## Technical debt to revisit
+
+- **Client bundle size.** `app/data/plant_database.generated.json` (~2.6 MB)
+  and `app/data/biome_map.generated.json` (~145 KB) both ship to the browser
+  in full via `app/data/plants.ts`/`GardenApp.tsx`, even though most fields
+  (photo URLs, attribution, the `note` description) are only needed once a
+  plant card or detail view actually renders, not for filtering. Splitting
+  this into a lean index (names, biome, sun/water) plus per-plant details
+  fetched on demand would meaningfully shrink the initial load and stop the
+  bundle growing 1:1 with dataset richness. Not done yet — real engineering
+  effort (fetch mechanism, loading states), deferred until it's actually
+  causing a felt problem rather than a theoretical one. `generate_plants_json.py`
+  and `generate_biome_map_svg.py` already write compact (non-pretty-printed)
+  JSON as a smaller, no-risk interim step.
+
 ## Input needed from the user
 
 - Help identify or reach a Western Cape horticultural reviewer.

@@ -18,6 +18,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 SOURCE_CSV = REPO_ROOT / "data" / "processed" / "plant_database_full.csv"
+INATURALIST_CSV = REPO_ROOT / "data" / "processed" / "inaturalist_photos.csv"
 OUTPUT_JSON = REPO_ROOT / "app" / "data" / "plant_database.generated.json"
 
 ACCENTS = ["ochre", "coral", "rose", "sky", "lime", "sand"]
@@ -68,9 +69,30 @@ def build_note(form: str, care_instructions: str | None, special_features: str |
     return " ".join(segments)
 
 
+def load_inaturalist_photos() -> dict[str, dict[str, str | None]]:
+    if not INATURALIST_CSV.exists():
+        return {}
+    with INATURALIST_CSV.open(encoding="utf-8", newline="") as f:
+        by_name = {}
+        for row in csv.DictReader(f):
+            url = blank_to_none(row.get("photo_url"))
+            if url is None:
+                continue  # a fetch attempt that found no photo - not a fallback
+            taxon_id = blank_to_none(row.get("inaturalist_taxon_id"))
+            by_name[row["scientific_name"].strip()] = {
+                "photo_url": url,
+                "photo_attribution": blank_to_none(row.get("photo_attribution")),
+                "photo_source_url": (
+                    f"https://www.inaturalist.org/taxa/{taxon_id}" if taxon_id else None
+                ),
+            }
+        return by_name
+
+
 def main() -> None:
     with SOURCE_CSV.open(encoding="utf-8", newline="") as f:
         rows = list(csv.DictReader(f))
+    inaturalist_photos = load_inaturalist_photos()
 
     plants = []
     bad_biomes: set[str] = set()
@@ -110,6 +132,25 @@ def main() -> None:
         if flower_colour or (flower_begin and flower_end):
             goals.append("flowers")
 
+        pza_photo_url = blank_to_none(row["photo_url"])
+        if pza_photo_url:
+            photo_url = pza_photo_url
+            photo_attribution = "PlantZAfrica (SANBI)"
+            photo_source_url = blank_to_none(row["photo_source_url"])
+            photo_source = "plantzafrica"
+        else:
+            fallback = inaturalist_photos.get(scientific_name)
+            if fallback:
+                photo_url = fallback["photo_url"]
+                photo_attribution = fallback["photo_attribution"] or "iNaturalist contributor"
+                photo_source_url = fallback["photo_source_url"]
+                photo_source = "inaturalist"
+            else:
+                photo_url = None
+                photo_attribution = None
+                photo_source_url = None
+                photo_source = None
+
         plant = {
             "id": f"B{index + 1:04d}",
             "commonName": common_name,
@@ -129,6 +170,10 @@ def main() -> None:
             "note": build_note(form, blank_to_none(row["care_instructions"]), blank_to_none(row["special_features"])),
             "dataSource": row["data_source"],
             "biomeSource": blank_to_none(row["biome_source"]),
+            "photoUrl": photo_url,
+            "photoAttribution": photo_attribution,
+            "photoSourceUrl": photo_source_url,
+            "photoSource": photo_source,
         }
         plants.append(plant)
 
@@ -139,14 +184,23 @@ def main() -> None:
     if bad_water:
         print(f"WARNING: unexpected water value(s) dropped: {sorted(bad_water)}")
 
-    OUTPUT_JSON.write_text(json.dumps(plants, indent=2, ensure_ascii=False), encoding="utf-8")
+    # Compact, not pretty-printed: this file ships to the browser as-is
+    # (see docs/NOW.md's "Next evidence work" for the bigger index/detail
+    # split that would cut this further - not done yet, deliberately).
+    OUTPUT_JSON.write_text(
+        json.dumps(plants, ensure_ascii=False, separators=(",", ":")), encoding="utf-8"
+    )
 
     with_sun = sum(1 for p in plants if p["sun"])
     with_water = sum(1 for p in plants if p["water"])
     with_biome = sum(1 for p in plants if p["biome"])
+    with_photo = sum(1 for p in plants if p["photoUrl"])
+    with_pza_photo = sum(1 for p in plants if p["photoSource"] == "plantzafrica")
+    with_inat_photo = sum(1 for p in plants if p["photoSource"] == "inaturalist")
     print(
         f"Wrote {len(plants)} plants to {OUTPUT_JSON.relative_to(REPO_ROOT)} "
-        f"({with_sun} with sun, {with_water} with water, {with_biome} with biome)."
+        f"({with_sun} with sun, {with_water} with water, {with_biome} with biome, "
+        f"{with_photo} with a photo: {with_pza_photo} PlantZAfrica + {with_inat_photo} iNaturalist)."
     )
 
 

@@ -46,6 +46,16 @@ export type Plant = {
    * inferred from PlantZAfrica's horticultural zone text
    * ("horticultural-zone", lower confidence), both, or null if unresolved. */
   biomeSource: string | null;
+  /** Photo URL, preferring PlantZAfrica's (SANBI) own species photo and
+   * falling back to an iNaturalist match only when no PlantZAfrica photo
+   * exists. Null when neither source has one. */
+  photoUrl: string | null;
+  /** Credit line for `photoUrl` (photographer/attribution + source). */
+  photoAttribution: string | null;
+  /** Page to link the photo credit back to. */
+  photoSourceUrl: string | null;
+  /** Which source `photoUrl` came from: "plantzafrica" or "inaturalist". */
+  photoSource: string | null;
 };
 
 export const plants: Plant[] = generatedPlants as Plant[];
