@@ -10,6 +10,19 @@
   --olive-soft: #858d5d;
   --line: rgba(23, 60, 50, 0.24);
   --line-strong: rgba(23, 60, 50, 0.52);
+  /* The one signal colour in an otherwise green palette: a deep brick red,
+     used ONLY for warnings so it never reads as decoration. Every warning
+     surface draws the same ruled rectangle in it (owner request). */
+  --warning: #8a2a1f;
+  --warning-line: rgba(138, 42, 31, 0.55);
+  --warning-wash: rgba(138, 42, 31, 0.055);
+  /* Measuring grid inside the bed diagram: far lighter than --line so the
+     plant circles, not the ruling, carry the eye. */
+  --grid-line: rgba(23, 60, 50, 0.08);
+  /* The 10% accent: reserved for active and selected states only. Deep
+     olive rather than a new hue - the palette is cream, fern and olive by
+     art direction, and a brand accent colour is explicitly ruled out. */
+  --active: var(--olive-dark);
   --ochre: #607667;
   --coral: #789187;
   --rose: #95a79b;
@@ -21,7 +34,7 @@
   --sans: "Instrument Sans Variable", "Helvetica Neue", Arial, sans-serif;
   --max: 1600px;
   --site-header-height: 88px;
-  --site-border-width: clamp(72px, 8vw, 138px);
+  --site-border-width: 0px;
 }
 
 * {
@@ -90,37 +103,6 @@ button:disabled {
   position: relative;
   min-height: 100vh;
   padding-inline: var(--site-border-width);
-}
-
-.site-shell::before,
-.site-shell::after {
-  position: absolute;
-  z-index: 0;
-  top: var(--site-header-height);
-  bottom: 0;
-  width: var(--site-border-width);
-  content: "";
-  pointer-events: none;
-  background-image: url("/images/editorial/site-border.jpg");
-  background-repeat: repeat-y;
-  background-size: auto 100vh;
-  filter: saturate(0.82) sepia(0.08);
-}
-
-.site-shell::before {
-  left: 0;
-  background-position: 18% top;
-  box-shadow:
-    inset -1px 0 rgba(23, 60, 50, 0.58),
-    3px 0 12px rgba(23, 60, 50, 0.09);
-}
-
-.site-shell::after {
-  right: 0;
-  background-position: 78% top;
-  box-shadow:
-    inset 1px 0 rgba(23, 60, 50, 0.58),
-    -3px 0 12px rgba(23, 60, 50, 0.09);
 }
 
 .site-header {
@@ -265,46 +247,6 @@ button:disabled {
   font-size: 0.88rem;
   font-weight: 620;
   letter-spacing: -0.01em;
-}
-
-.hero-section {
-  position: relative;
-  isolation: isolate;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  width: min(100%, var(--max));
-  min-height: calc(100vh - 88px);
-  margin: 0 auto;
-  overflow: hidden;
-  border-right: 1px solid var(--line-strong);
-  border-left: 1px solid var(--line-strong);
-  background-color: var(--paper-light);
-  background-image: url("/images/editorial/home-hero.jpg");
-  background-image: image-set(
-    url("/images/editorial/home-hero.avif") type("image/avif"),
-    url("/images/editorial/home-hero.webp") type("image/webp"),
-    url("/images/editorial/home-hero.jpg") type("image/jpeg")
-  );
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
-}
-
-.hero-section::before {
-  position: absolute;
-  z-index: 0;
-  inset: 0;
-  content: "";
-  pointer-events: none;
-  background:
-    radial-gradient(
-      ellipse 48% 60% at 40% 48%,
-      rgba(247, 242, 221, 0.88) 0%,
-      rgba(247, 242, 221, 0.66) 47%,
-      rgba(247, 242, 221, 0.12) 78%,
-      rgba(247, 242, 221, 0) 100%
-    );
 }
 
 .hero-copy {
@@ -613,7 +555,13 @@ button:disabled {
 }
 
 .finder-example.is-warning {
-  background: color-mix(in srgb, var(--olive-soft) 19%, var(--paper-light));
+  border: 1.5px solid var(--warning-line);
+  border-bottom-color: var(--warning-line);
+  background: var(--warning-wash);
+}
+
+.finder-example.is-warning strong {
+  color: var(--warning);
 }
 
 .finder-example strong {
@@ -638,6 +586,21 @@ button:disabled {
   display: grid;
   grid-template-columns: 0.84fr 1.16fr;
   flex: 1;
+}
+
+/* The bed step carries a scale drawing, which needs the width more than
+   the question does. */
+.finder-panel.is-wide {
+  grid-template-columns: 0.42fr 1.58fr;
+}
+
+.finder-panel.is-wide .finder-question {
+  padding: clamp(40px, 4vw, 64px) clamp(28px, 2.4vw, 40px);
+}
+
+.finder-panel.is-wide .finder-question h1 {
+  font-size: clamp(1.9rem, 2.6vw, 2.7rem);
+  line-height: 1.02;
 }
 
 .finder-question {
@@ -752,24 +715,24 @@ button:disabled {
   font-size: 0.78rem;
 }
 
-.biome-combobox {
+.bioregion-combobox {
   position: relative;
   width: 100%;
   max-width: 480px;
   justify-self: center;
 }
 
-.biome-combobox label {
+.bioregion-combobox label {
   display: grid;
   gap: 13px;
 }
 
-.biome-combobox label > span {
+.bioregion-combobox label > span {
   font-size: 0.78rem;
   font-weight: 650;
 }
 
-.biome-combobox input {
+.bioregion-combobox input {
   width: 100%;
   padding: 8px 0 12px;
   border: 0;
@@ -782,12 +745,12 @@ button:disabled {
   font-size: 1.3rem;
 }
 
-.biome-combobox input::placeholder {
+.bioregion-combobox input::placeholder {
   color: var(--ink-soft);
   opacity: 0.72;
 }
 
-.biome-combobox-list {
+.bioregion-combobox-list {
   position: absolute;
   z-index: 5;
   top: calc(100% + 8px);
@@ -803,7 +766,7 @@ button:disabled {
   box-shadow: 0 14px 30px rgba(23, 60, 50, 0.14);
 }
 
-.biome-combobox-list button {
+.bioregion-combobox-list button {
   width: 100%;
   padding: 12px 14px;
   border: 0;
@@ -814,39 +777,148 @@ button:disabled {
   font-size: 1rem;
 }
 
-.biome-combobox-list button:hover {
+.bioregion-combobox-list button:hover {
   background: rgba(104, 112, 68, 0.14);
 }
 
-.biome-combobox-list button.is-selected {
+.bioregion-combobox-list button.is-selected {
   background: var(--olive);
   color: var(--paper-light);
 }
 
-.biome-combobox-empty {
+.bioregion-combobox-empty {
   padding: 12px 14px;
   color: var(--ink-soft);
   font-family: var(--serif);
   font-size: 0.95rem;
 }
 
-.biome-map {
+.place-combobox {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  justify-self: center;
+}
+
+.place-combobox label {
+  display: grid;
+  gap: 13px;
+}
+
+.place-combobox label > span {
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+.place-combobox input {
+  width: 100%;
+  padding: 8px 0 12px;
+  border: 0;
+  border-bottom: 1px solid var(--ink);
+  border-radius: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 1.3rem;
+}
+
+.place-combobox input::placeholder {
+  color: var(--ink-soft);
+  opacity: 0.72;
+}
+
+.place-combobox-list {
+  position: absolute;
+  z-index: 5;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  display: grid;
+  gap: 2px;
+  max-height: 260px;
+  padding: 6px;
+  overflow-y: auto;
+  border: 1px solid var(--line-strong);
+  background: var(--paper-light);
+  box-shadow: 0 14px 30px rgba(23, 60, 50, 0.14);
+}
+
+.place-combobox-list button {
+  width: 100%;
+  padding: 12px 14px;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+  font-family: var(--serif);
+  font-size: 1rem;
+  display: grid;
+  gap: 2px;
+}
+
+.place-combobox-list button small {
+  font-family: var(--sans, inherit);
+  font-size: 0.74rem;
+  color: var(--ink-soft);
+}
+
+.place-combobox-category {
+  margin-left: 8px;
+  font-family: var(--sans, inherit);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+  opacity: 0.75;
+}
+
+.place-combobox-list button:hover {
+  background: rgba(104, 112, 68, 0.14);
+}
+
+.place-combobox-empty {
+  padding: 12px 14px;
+  color: var(--ink-soft);
+  font-family: var(--serif);
+  font-size: 0.95rem;
+}
+
+.place-combobox-result {
+  margin-top: 10px;
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+}
+
+.bioregion-map {
   display: grid;
   gap: 20px;
   justify-items: center;
 }
 
-.biome-map-svg {
+.bioregion-map-svg {
   width: 100%;
   max-width: 480px;
   aspect-ratio: 1;
   overflow: visible;
 }
 
-.biome-region {
-  --biome-color: var(--olive-soft);
+/* Backdrop covering the full Western Cape extent, drawn first (underneath
+   the bioregion shapes). About a quarter of the province has no bioregion
+   classification at all (azonal/transformed land - wetlands, estuaries,
+   urban areas, farmland); this reads that real gap as "not classified"
+   rather than a rendering bug, and also quietly covers any hairline seams
+   where two independently-simplified bioregion shapes don't quite meet. */
+.bioregion-outline {
+  fill: var(--paper-deep);
+  stroke: var(--line-strong);
+  stroke-width: 1;
+}
+
+.bioregion-region {
+  --bioregion-color: var(--olive-soft);
   cursor: pointer;
-  fill: color-mix(in srgb, var(--biome-color) 45%, var(--paper-light));
+  fill: color-mix(in srgb, var(--bioregion-color) 45%, var(--paper-light));
   stroke: var(--paper-light);
   stroke-width: 1.5;
   transition:
@@ -854,57 +926,63 @@ button:disabled {
     stroke 160ms ease;
 }
 
-.biome-region:hover {
-  fill: color-mix(in srgb, var(--biome-color) 62%, var(--paper-light));
+.bioregion-region:hover {
+  fill: color-mix(in srgb, var(--bioregion-color) 62%, var(--paper-light));
 }
 
-.biome-region:focus-visible {
+.bioregion-region:focus-visible {
   outline: 3px solid var(--sky);
   outline-offset: 1px;
 }
 
-.biome-region.is-selected {
-  fill: var(--biome-color);
+.bioregion-region.is-selected {
+  fill: var(--bioregion-color);
   stroke: var(--ink);
 }
 
-.biome-fynbos {
-  --biome-color: var(--olive);
+/* 25 bioregions cycle through this 9-tone palette by index (see
+   bioregionColorIndex in GardenApp.tsx) rather than a hand-picked color
+   per name - there are too many bioregions for per-name colors to stay
+   meaningful, and repeats are visually fine since only the clicked shape's
+   own label/selection state matters, not distinguishing every tile from
+   every other by color alone. */
+.bioregion-color-0 {
+  --bioregion-color: var(--olive);
 }
 
-.biome-succulent-karoo {
-  --biome-color: var(--ochre);
+.bioregion-color-1 {
+  --bioregion-color: var(--ochre);
 }
 
-.biome-nama-karoo {
-  --biome-color: var(--sand);
+.bioregion-color-2 {
+  --bioregion-color: var(--sand);
 }
 
-.biome-grassland {
-  --biome-color: var(--lime);
+.bioregion-color-3 {
+  --bioregion-color: var(--lime);
 }
 
-.biome-savanna {
-  --biome-color: var(--coral);
+.bioregion-color-4 {
+  --bioregion-color: var(--coral);
 }
 
-.biome-albany-thicket {
-  --biome-color: var(--olive-dark);
+.bioregion-color-5 {
+  --bioregion-color: var(--olive-dark);
 }
 
-.biome-indian-ocean-coastal-belt {
-  --biome-color: var(--sky);
+.bioregion-color-6 {
+  --bioregion-color: var(--sky);
 }
 
-.biome-forest {
-  --biome-color: var(--olive-soft);
+.bioregion-color-7 {
+  --bioregion-color: var(--olive-soft);
 }
 
-.biome-desert {
-  --biome-color: var(--rose);
+.bioregion-color-8 {
+  --bioregion-color: var(--rose);
 }
 
-.biome-map-province-label {
+.bioregion-map-town-label {
   pointer-events: none;
   fill: var(--ink);
   font-family: var(--sans);
@@ -918,18 +996,18 @@ button:disabled {
   stroke-linejoin: round;
 }
 
-.biome-map-legend {
+.bioregion-map-legend {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 7px;
-  max-width: 480px;
+  max-width: 560px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.biome-map-legend button {
+.bioregion-map-legend button {
   display: inline-flex;
   align-items: center;
   gap: 7px;
@@ -940,31 +1018,37 @@ button:disabled {
   font-size: 0.78rem;
 }
 
-.biome-map-legend button.is-selected {
+.bioregion-map-legend button.is-selected {
   border-color: var(--olive);
   background: var(--olive);
   color: var(--paper);
 }
 
-.biome-swatch {
+.bioregion-swatch {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: var(--biome-color);
+  background: var(--bioregion-color);
 }
 
 .dimension-editor {
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: end;
-  gap: clamp(18px, 3vw, 44px);
+  gap: clamp(10px, 1.4vw, 22px);
 }
 
 .dimension-editor > span {
-  padding-bottom: 26px;
+  padding-bottom: 20px;
   color: var(--ink-soft);
   font-family: var(--display);
-  font-size: 2.5rem;
+  font-size: 1.7rem;
+}
+
+.dimension-editor,
+.dimension-editor label,
+.dimension-editor label > div {
+  min-width: 0;
 }
 
 .dimension-editor label {
@@ -980,19 +1064,28 @@ button:disabled {
 .dimension-editor label > div {
   display: flex;
   align-items: baseline;
+  gap: 8px;
   border-bottom: 1px solid var(--ink);
 }
 
+/* The unit keeps its size; the number takes what is left and never
+   shrinks below a couple of digits. width:100% here let the field
+   collapse to a sliver once the column narrowed. */
+.dimension-editor label > div > span {
+  flex: none;
+}
+
 .dimension-editor input {
-  width: 100%;
-  min-width: 0;
+  flex: 1 1 auto;
+  width: auto;
+  min-width: 2ch;
   padding: 6px 0;
   border: 0;
   outline: 0;
   background: transparent;
   color: var(--ink);
   font-family: var(--display);
-  font-size: clamp(3rem, 5vw, 5.4rem);
+  font-size: clamp(1.9rem, 2.3vw, 2.8rem);
   font-weight: 520;
   line-height: 1;
 }
@@ -1046,18 +1139,63 @@ button:disabled {
 }
 
 .plan-output {
-  padding: clamp(44px, 5vw, 76px) 3.2vw;
+  padding: clamp(16px, 1.6vw, 24px) 3.2vw clamp(44px, 5vw, 76px);
   border-bottom: 1px solid var(--line-strong);
 }
 
-.plan-output-heading {
-  display: grid;
-  grid-template-columns: 1fr minmax(280px, 0.55fr);
-  align-items: end;
-  gap: 50px;
+/* The results page opens on the layout. Everything above it is a single
+   compact band: the title, the standing caveat and the way back. */
+.collection-intro.is-compact {
+  align-items: center;
+  padding: 16px 3.2vw 14px;
 }
 
-.plan-output-heading > div > span,
+.collection-intro.is-compact h1 {
+  font-size: clamp(1.3rem, 1.9vw, 1.75rem);
+  line-height: 1.15;
+}
+
+.collection-intro.is-compact .collection-note {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 18px;
+}
+
+.collection-intro.is-compact .collection-note p {
+  margin: 0;
+  max-width: 44ch;
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.collection-intro.is-compact .collection-note .text-link {
+  flex: none;
+  font-size: 0.8rem;
+}
+
+/* One line: which option this is, and what it adds up to. */
+.plan-output-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.plan-output-heading > span {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.plan-output-heading > p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.84rem;
+}
+
 .plan-unavailable > div > span {
   display: block;
   margin-bottom: 12px;
@@ -1090,13 +1228,13 @@ button:disabled {
   display: flex;
   flex-wrap: wrap;
   gap: 0;
-  margin-top: 38px;
+  margin-top: 10px;
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
 }
 
 .brief-strip span {
-  padding: 12px 18px 12px 0;
+  padding: 7px 16px 7px 0;
   color: var(--ink-soft);
   font-size: 0.7rem;
 }
@@ -1110,8 +1248,8 @@ button:disabled {
   display: grid;
   grid-template-columns: minmax(420px, 1.15fr) minmax(320px, 0.85fr);
   align-items: start;
-  gap: clamp(48px, 7vw, 112px);
-  margin-top: 54px;
+  gap: clamp(32px, 4.5vw, 72px);
+  margin-top: 18px;
 }
 
 .plan-bed-wrap {
@@ -1120,16 +1258,19 @@ button:disabled {
   padding: 0 0 24px 24px;
 }
 
+/* The grid is a measuring aid, not content: it is kept far lighter than
+   the plant circles so they stay the focal point. --line is used for real
+   structural borders elsewhere and is too strong here. */
 .plan-bed {
   position: relative;
   width: 100%;
   min-height: 0;
   overflow: hidden;
-  border: 1px solid var(--ink);
+  border: 1px solid color-mix(in srgb, var(--ink) 45%, transparent);
   background:
-    linear-gradient(to right, var(--line) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--line) 1px, transparent 1px),
-    color-mix(in srgb, var(--olive-soft) 8%, var(--paper-light));
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px),
+    color-mix(in srgb, var(--olive-soft) 5%, var(--paper-light));
   background-size: 10% 10%;
 }
 
@@ -1178,10 +1319,37 @@ button:disabled {
   transform: scale(1.05);
 }
 
-.plan-marker span {
-  font-size: clamp(0.42rem, 0.65vw, 0.7rem);
-  font-weight: 750;
-  line-height: 1;
+/* Name on demand. The layer overlays the bed exactly but is not inside
+   it, so a tooltip near an edge is not clipped; it never takes pointer
+   events, so it cannot block the circle underneath. */
+.plan-tip-layer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 24px;
+  left: 24px;
+  pointer-events: none;
+}
+
+.plan-tip {
+  position: absolute;
+  z-index: 3;
+  transform: translate(-50%, calc(-100% - 8px));
+  max-width: 220px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--ink-dark);
+  color: var(--paper-light);
+  font-family: var(--sans);
+  font-size: 0.74rem;
+  font-weight: 500;
+  line-height: 1.3;
+  /* Wraps rather than running past its own background: the extra facts
+     ("spread estimated") make some of these long. */
+  width: max-content;
+  max-width: 200px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(11, 41, 34, 0.22);
 }
 
 .plan-measure {
@@ -1215,41 +1383,755 @@ button:disabled {
   align-items: center;
   width: 100%;
   gap: 12px;
-  padding: 14px 0;
-  border-bottom: 1px solid var(--line);
   background: transparent;
   text-align: left;
 }
 
 .plan-legend-heading {
   grid-template-columns: 1fr auto;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
   font-size: 0.7rem;
   font-weight: 700;
 }
 
-.legend-dot {
+.filter-reason.is-warning {
+  padding: 11px 14px;
+  border: 1.5px solid var(--warning-line);
+  background: var(--warning-wash);
+  color: var(--ink);
+}
+
+.colour-modes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 10px;
+}
+
+.colour-custom {
+  margin-top: 14px;
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+
+.colour-custom summary {
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 650;
+}
+
+.colour-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.colour-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 7px;
+  padding: 6px 11px;
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  font-size: 0.78rem;
+}
+
+.colour-chip.is-selected {
+  background: var(--olive);
+  border-color: var(--olive);
+  color: var(--paper-light);
+}
+
+.colour-chip span {
+  font-size: 0.68rem;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.75;
+}
+
+.filter-count {
+  margin: 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  font-size: 0.86rem;
+}
+
+.filter-count strong {
+  font-size: 1.05rem;
+  font-weight: 650;
+}
+
+.filter-count.is-warning {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 14px 16px;
+  border: 1.5px solid var(--warning-line);
+  border-top-color: var(--warning-line);
+  background: var(--warning-wash);
+}
+
+.filter-count.is-warning p {
+  margin: 0;
+}
+
+.filter-count.is-warning > p:first-child strong {
+  color: var(--warning);
+}
+
+.filter-reason,
+.filter-tip {
+  color: var(--ink-soft);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.filter-tip {
+  margin: 0;
+  padding: 12px 14px;
+  background: var(--paper-light);
+  border: 1px solid var(--line);
+}
+
+.filter-relax {
+  display: grid;
+  gap: 8px;
+}
+
+.relax-option {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: 2px 14px;
+  padding: 11px 14px;
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.relax-option:hover {
+  background: var(--paper-light);
+}
+
+.relax-option strong {
+  font-size: 0.82rem;
+  font-weight: 650;
+}
+
+.relax-option small {
+  grid-column: 1;
+  color: var(--ink-soft);
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
+.relax-option b {
+  grid-row: 1 / 3;
+  grid-column: 2;
+  align-self: center;
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The bed step is a drawing with its controls beside it: numbers on the
+   left, the plan on the right, so a change is seen as it is typed. */
+.bed-editor {
+  display: grid;
+  grid-template-columns: minmax(300px, 0.78fr) minmax(320px, 1.22fr);
+  align-items: start;
+  gap: clamp(20px, 3vw, 44px);
+}
+
+/* min-width: 0 on the column and its sections: grid items default to
+   min-content, and the number fields' own minimum was pushing the column
+   wider than its track, which spilled the help text under the drawing. */
+.bed-controls,
+.bed-controls > section {
+  min-width: 0;
+}
+
+.bed-controls {
+  display: grid;
+  gap: 22px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  background: var(--paper-light);
+}
+
+.bed-controls h3 {
+  margin: 0 0 12px;
+  font-family: var(--display);
+  font-size: 1.1rem;
+  font-weight: 560;
+}
+
+.bed-controls .field-help {
+  margin: 0 0 12px;
+  color: var(--ink-soft);
+  font-size: 0.74rem;
+  line-height: 1.5;
+}
+
+.bed-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 14px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  color: var(--ink-soft);
+  font-family: var(--sans);
+  font-size: 0.72rem;
+}
+
+.bed-note span {
+  display: grid;
+  place-items: center;
   width: 15px;
   height: 15px;
-  border: 1px solid var(--ink);
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  font-size: 0.6rem;
+  font-style: italic;
+}
+
+/* The plan drawing. */
+.bed-preview {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  background: var(--paper-light);
+}
+
+.bed-preview figcaption {
+  justify-self: start;
+  font-family: var(--display);
+  font-size: 1.1rem;
+  font-weight: 560;
+}
+
+.bed-preview-svg {
+  width: 100%;
+  max-width: 560px;
+  height: auto;
+}
+
+.bed-rect {
+  fill: var(--paper-deep);
+  stroke: var(--ink);
+  stroke-width: 1;
+}
+
+.bed-grid-line {
+  stroke: var(--grid-line);
+  stroke-width: 1;
+}
+
+.bed-compass {
+  fill: var(--ink-soft);
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.bed-compass-mark {
+  fill: var(--ink-soft);
+}
+
+.bed-dimension line {
+  stroke: var(--ink-soft);
+  stroke-width: 0.8;
+}
+
+.bed-dimension text {
+  fill: var(--ink-soft);
+  font-family: var(--sans);
+  font-size: 9.5px;
+}
+
+.bed-figure {
+  color: var(--olive-dark);
+  fill: var(--olive-dark);
+  stroke: var(--olive-dark);
+  stroke-width: 1.2;
+  stroke-linecap: round;
+}
+
+.bed-figure path {
+  fill: none;
+}
+
+.bed-preview-empty {
+  margin: 28px 0;
+  color: var(--ink-soft);
+  font-family: var(--sans);
+  font-size: 0.76rem;
+}
+
+.bed-preview-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  color: var(--ink-soft);
+  font-family: var(--sans);
+  font-size: 0.68rem;
+}
+
+.bed-preview-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bed-preview-legend strong {
+  margin-left: auto;
+  color: var(--ink);
+  font-family: var(--display);
+  font-size: 0.94rem;
+  font-weight: 560;
+  font-variant-numeric: tabular-nums;
+}
+
+.bed-preview-legend i {
+  display: block;
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--line-strong);
+}
+
+.bed-preview-legend .swatch-bed {
+  background: var(--paper-deep);
+}
+
+.bed-preview-legend .swatch-grid {
+  background:
+    linear-gradient(to right, var(--line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--line) 1px, transparent 1px),
+    var(--paper-light);
+  background-size: 5px 5px;
+}
+
+.bed-preview-standing {
+  justify-self: start;
+  margin: 0;
+  color: var(--ink-soft);
+  font-family: var(--sans);
+  font-size: 0.72rem;
+}
+
+.bed-preview-standing strong {
+  color: var(--ink);
+  text-transform: capitalize;
+}
+
+@media (max-width: 760px) {
+  .bed-editor {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+.biome-lead {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.biome-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 10px;
+}
+
+.biome-option {
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  align-items: baseline;
+  gap: 4px 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.biome-option.is-selected {
+  border-color: var(--ink);
+  background: var(--paper-light);
+}
+
+.biome-option strong {
+  font-size: 0.86rem;
+  font-weight: 650;
+}
+
+.biome-option small {
+  grid-column: 2;
+  color: var(--ink-soft);
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
+/* The "not sure" option is a peer of the biome choices, not one of them:
+   dashed so it reads as "no specific answer" at a glance. */
+.biome-option-all {
+  border-style: dashed;
+}
+
+.biome-option-all.is-selected {
+  border-style: solid;
+}
+
+.biome-caveat {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.74rem;
+  font-style: italic;
+}
+
+/* Two short paragraphs answering two halves of one question, side by
+   side instead of stacked down an empty page. */
+.plan-reasoning {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: start;
+  gap: clamp(32px, 5vw, 72px);
+}
+
+@media (max-width: 900px) {
+  .plan-reasoning {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* The care paragraph is the one piece of prose on this page: it gets
+   reading width and the editorial face, not the control face. */
+.care-summary {
+  max-width: 62ch;
+  margin: 0 0 6px;
+  font-family: var(--serif);
+  font-size: 0.96rem;
+  line-height: 1.6;
+}
+
+.care-detail {
+  border-top: 1px solid var(--line);
+}
+
+.care-detail > summary {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 12px 0;
+  cursor: pointer;
+  font-family: var(--sans);
+  font-size: 0.82rem;
+  font-weight: 650;
+  list-style: none;
+}
+
+.care-detail > summary::-webkit-details-marker {
+  display: none;
+}
+
+.care-detail > summary::before {
+  content: "▸";
+  color: var(--active);
+  font-size: 0.78rem;
+  transition: transform 150ms ease;
+}
+
+.care-detail[open] > summary::before {
+  transform: rotate(90deg);
+}
+
+.care-detail > summary small {
+  color: var(--ink-soft);
+  font-weight: 400;
+}
+
+.care-detail > summary:hover {
+  color: var(--active);
+}
+
+/* The budget total stands alone; the nursery-by-nursery tables behind it
+   are reference material and stay shut until asked for. */
+.sourcing-details {
+  margin-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.sourcing-details > summary {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 12px 0;
+  cursor: pointer;
+  font-family: var(--sans);
+  font-size: 0.86rem;
+  font-weight: 650;
+  list-style: none;
+}
+
+.sourcing-details > summary::-webkit-details-marker {
+  display: none;
+}
+
+.sourcing-details > summary::before {
+  content: "▸";
+  color: var(--active);
+  font-size: 0.8rem;
+  transition: transform 150ms ease;
+}
+
+.sourcing-details[open] > summary::before {
+  transform: rotate(90deg);
+}
+
+.sourcing-details > summary small {
+  color: var(--ink-soft);
+  font-weight: 400;
+}
+
+.sourcing-details > summary:hover {
+  color: var(--active);
+}
+
+/* Re-opening a saved garden: the way back, and what you are looking at. */
+.saved-page-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.saved-page-bar span {
+  color: var(--ink-soft);
+  font-family: var(--sans);
+  font-size: 0.76rem;
+}
+
+/* What is still missing on this step, and what it is for. The blocking
+   variant explains a disabled Continue; the plain one is a consequence
+   the user can accept and move on from. */
+.finder-alert {
+  margin-top: 22px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--olive-soft);
+  background: var(--paper-light);
+}
+
+.finder-alert.is-blocking {
+  border: 1.5px solid var(--warning-line);
+  background: var(--warning-wash);
+}
+
+.finder-alert.is-blocking strong {
+  color: var(--warning);
+}
+
+.finder-alert strong {
+  display: block;
+  margin-bottom: 8px;
+  font-family: var(--sans);
+  font-size: 0.82rem;
+  font-weight: 650;
+}
+
+.finder-alert ul {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.finder-alert li {
+  color: var(--ink-soft);
+  font-family: var(--sans);
+  font-size: 0.74rem;
+  line-height: 1.5;
+}
+
+.finder-alert li b {
+  color: var(--ink);
+  font-weight: 650;
+}
+
+/* Which side the gardener stands at. Laid out as a compass so the choice
+   is made against the drawing's own north, not an abstract list. */
+
+
+
+
+.viewing-edge-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-areas:
+    ". north ."
+    "west . east"
+    ". south .";
+  gap: 6px;
+  width: 100%;
+  max-width: 250px;
+}
+
+.viewing-edge-button.is-north { grid-area: north; }
+.viewing-edge-button.is-west { grid-area: west; }
+.viewing-edge-button.is-east { grid-area: east; }
+.viewing-edge-button.is-south { grid-area: south; }
+
+.viewing-edge-button {
+  display: grid;
+  gap: 1px;
+  padding: 8px 6px;
+  border: 1px solid var(--line);
+  background: var(--paper-light);
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+
+.viewing-edge-button:hover {
+  border-color: var(--active);
+}
+
+.viewing-edge-button.is-selected {
+  border-color: var(--active);
+  background: var(--olive);
+  color: var(--paper-light);
+  font-weight: 650;
+}
+
+
+
+/* On the plan, the edge the gardener stands at is named rather than the
+   drawing being rotated: north stays at the top so the plan still matches
+   the real garden. */
+.plan-front-edge {
+  position: absolute;
+  z-index: 2;
+  color: var(--ink-soft);
+  font-family: var(--sans);
+  font-size: 0.64rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.plan-front-edge.is-north { top: -14px; left: 50%; transform: translateX(-50%); }
+.plan-front-edge.is-south { bottom: -15px; left: 50%; transform: translateX(-50%); }
+.plan-front-edge.is-west { top: 50%; left: 4px; transform: translateY(-50%) rotate(-90deg); transform-origin: left center; }
+.plan-front-edge.is-east { top: 50%; right: 4px; transform: translateY(-50%) rotate(90deg); transform-origin: right center; }
+
+/* Local knowledge about the chosen place, shown beside the question it
+   informs. It never changes the answer, so it stays quiet. */
+.field-note {
+  margin: 0 0 0.75rem;
+  padding-left: 0.7rem;
+  border-left: 2px solid var(--olive-soft);
+  color: var(--ink-soft);
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+.biome-count {
+  margin: 0;
+  font-size: 0.86rem;
+}
+
+.biome-count.is-empty {
+  color: var(--ink-soft);
+  font-style: italic;
+}
+
+.biome-count strong {
+  font-size: 1.05rem;
+  font-weight: 650;
+}
+
+/* Each plant is its own card on a solid light ground, so the eye can
+   separate one plant from the next without hunting for the rule between
+   them. Compact: the list sits beside the bed and should not out-shout
+   it, so the whole block runs at about half its former height. */
+.plan-legend-item {
+  margin-bottom: 4px;
+  padding: 1px 9px 5px;
+  border: 1px solid color-mix(in srgb, var(--line) 55%, transparent);
+  border-radius: 8px;
+  background: var(--paper-light);
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+.plan-legend-item:hover,
+.plan-legend-item:focus-within {
+  border-color: var(--active);
+  background: var(--paper);
+}
+
+.plan-legend-row {
+  padding: 6px 0 0;
+  gap: 10px;
+  grid-template-columns: 17px 1fr auto;
+}
+
+.sourcing-note {
+  margin: 4px 0 0;
+  padding-left: 27px;
+  color: var(--ink-soft);
+  font-size: 0.7rem;
+  line-height: 1.45;
+}
+
+/* The link between the list and the map. Same fill (both come from
+   markerBackground) and the same inset highlight as .plan-marker, at a
+   size big enough to read the colour at a glance. */
+.legend-dot {
+  width: 17px;
+  height: 17px;
+  border: 1.5px solid color-mix(in srgb, var(--ink) 55%, transparent);
   border-radius: 50%;
   background: var(--accent, var(--olive-soft));
+  box-shadow:
+    inset 0 0 0 2px color-mix(in srgb, var(--paper) 52%, transparent),
+    0 1px 2px rgba(11, 41, 34, 0.14);
 }
 
 .plan-legend-row > span:nth-child(2) {
   display: grid;
 }
 
+/* Hierarchy: the common name is what people scan for, so it leads on
+   size and weight; the botanical name and measurements sit below it,
+   smaller and lighter. */
 .plan-legend-row strong {
   font-family: var(--serif);
-  font-size: 1rem;
-  font-weight: 560;
+  font-size: 0.92rem;
+  font-weight: 640;
+  line-height: 1.2;
 }
 
 .plan-legend-row em {
   color: var(--ink-soft);
   font-family: var(--serif);
-  font-size: 0.78rem;
+  font-size: 0.68rem;
   font-weight: 400;
+  line-height: 1.25;
 }
 
 .plan-legend-row b {
@@ -1301,11 +2183,55 @@ button:disabled {
   line-height: 1.45;
 }
 
+/* A failed plan is the loudest warning in the app, so it carries the same
+   ruled red rectangle as the smaller ones, inset from the band's padding. */
 .plan-unavailable {
   display: grid;
   grid-template-columns: 1fr 0.65fr;
   align-items: end;
   gap: 50px;
+  margin: 0 0 clamp(20px, 2.4vw, 32px);
+  padding: clamp(22px, 2.4vw, 34px);
+  border: 1.5px solid var(--warning-line);
+  background: var(--warning-wash);
+}
+
+.plan-unavailable > div > span {
+  color: var(--warning);
+}
+
+/* The engine's reasons for failing, spanning both columns under the heading. */
+.plan-failure-reasons {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 18px 0 0;
+  border-top: 1px solid var(--warning-line);
+  list-style: none;
+}
+
+.plan-failure-reasons li {
+  position: relative;
+  padding-left: 18px;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.plan-failure-reasons li::before {
+  position: absolute;
+  left: 0;
+  color: var(--warning);
+  content: "4";
+}
+
+@media (max-width: 860px) {
+  .plan-unavailable {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
 }
 
 .collection-note {
@@ -1898,7 +2824,7 @@ button:disabled {
 
 @media (max-width: 1180px) {
   :root {
-    --site-border-width: clamp(34px, 5vw, 56px);
+    --site-border-width: 0px;
   }
 
   .site-header {
@@ -1945,7 +2871,7 @@ button:disabled {
 @media (max-width: 900px) {
   :root {
     --site-header-height: 112px;
-    --site-border-width: 18px;
+    --site-border-width: 0px;
   }
 
   .site-header {
@@ -2078,7 +3004,7 @@ button:disabled {
 
 @media (max-width: 620px) {
   :root {
-    --site-border-width: 10px;
+    --site-border-width: 0px;
     --site-header-height: 104px;
   }
 
@@ -2271,13 +3197,15 @@ button:disabled {
 
   .text-link,
   .save-button,
+  .exclude-button,
   .drawer-toolbar button {
     display: inline-flex;
     min-height: 44px;
     align-items: center;
   }
 
-  .save-button {
+  .save-button,
+  .exclude-button {
     padding: 2px 0 2px 10px;
   }
 
@@ -2312,4 +3240,864 @@ button:disabled {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
   }
+}
+
+/* ---- Results view (spec 9) ---- */
+
+.variant-tabs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+  margin-bottom: 26px;
+}
+
+.variant-tab {
+  display: grid;
+  gap: 3px;
+  padding: 13px 16px;
+  border: 1px solid var(--line);
+  background: transparent;
+  text-align: left;
+}
+
+/* The option switcher sits directly above the bed, inside the layout
+   column, so switching option shows the change without scrolling. */
+.plan-layout-column {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+}
+
+.plan-layout-column .variant-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  width: min(100%, 680px);
+  margin: 0;
+}
+
+.plan-layout-column .variant-tab {
+  padding: 9px 11px;
+}
+
+.plan-layout-column .variant-tab strong {
+  font-size: 0.8rem;
+}
+
+.plan-layout-column .variant-tab small {
+  font-size: 0.68rem;
+  line-height: 1.3;
+}
+
+/* The view switch moves into a rail on the left of the bed. The bed keeps
+   its own 24px gutter for the length label, so the rail is carved out of
+   the column by shifting the wrap right rather than by re-parenting. */
+.plan-layout-column .plan-bed-wrap {
+  width: min(100% - 96px, 680px);
+  margin-left: 96px;
+}
+
+.plan-layout-column .layout-views {
+  position: absolute;
+  top: 26px;
+  left: -96px;
+  flex-direction: column;
+  width: 84px;
+  margin-bottom: 0;
+}
+
+.plan-layout-column .layout-views button {
+  padding: 8px 10px;
+  text-align: left;
+}
+
+.plan-layout-column .layout-views button + button {
+  border-top: 1px solid var(--line-strong);
+}
+
+@media (max-width: 900px) {
+  /* Too narrow for a rail: the switch goes back above the bed. */
+  .plan-layout-column .plan-bed-wrap {
+    width: min(100%, 680px);
+    margin-left: 0;
+  }
+
+  .plan-layout-column .layout-views {
+    position: static;
+    flex-direction: row;
+    width: auto;
+    margin-bottom: 12px;
+  }
+
+  .plan-layout-column .layout-views button + button {
+    border-top: 0;
+    border-left: 1px solid var(--line-strong);
+  }
+}
+
+/* Which option you are looking at was the weakest signal on the page:
+   a border shade apart from the others. The accent is spent here. */
+.variant-tab.is-selected {
+  border-color: var(--active);
+  border-left-width: 4px;
+  padding-left: 13px;
+  background: var(--paper-light);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--active) 30%, transparent);
+}
+
+.variant-tab strong {
+  font-size: 0.86rem;
+  font-weight: 650;
+}
+
+.variant-tab small {
+  color: var(--ink-soft);
+  font-size: 0.72rem;
+}
+
+.plan-north {
+  font-family: var(--sans);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--ink-soft);
+  margin-bottom: 6px;
+}
+
+/* Markers carry their flower colour as an inline background; these rules
+   only handle the edge, so the tint is never overridden. */
+.plan-marker.is-estimated {
+  border-style: dashed;
+}
+
+.plan-marker.is-unknown-colour {
+  border-style: dashed;
+  opacity: 0.85;
+}
+
+.plan-marker span {
+  overflow: hidden;
+  font-size: 0.52rem;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 0 2px;
+}
+
+.plan-scale {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  font-family: var(--sans);
+  font-size: 0.68rem;
+  color: var(--ink-soft);
+}
+
+.plan-scale-bar {
+  display: block;
+  height: 6px;
+  min-width: 14px;
+  border: 1px solid var(--ink);
+  border-top: 0;
+}
+
+.legend-measure {
+  margin: 1px 0 0;
+  padding-left: 27px;
+  color: var(--ink-soft);
+  font-family: var(--sans);
+  font-size: 0.62rem;
+  letter-spacing: 0.01em;
+  line-height: 1.35;
+}
+
+.plan-caveat {
+  margin: 22px 0 0;
+  padding: 12px 15px;
+  border-left: 3px solid var(--line-strong);
+  background: var(--paper-light);
+  color: var(--ink-soft);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.plan-why,
+.plan-care,
+.plan-plants {
+  margin-top: 40px;
+}
+
+.plan-why h3,
+.plan-care h3,
+.plan-plants h3 {
+  margin: 0 0 12px;
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.plan-why p {
+  margin: 0;
+  max-width: 68ch;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.plan-care ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 10px;
+}
+
+.plan-care li {
+  display: grid;
+  gap: 3px;
+  padding: 11px 14px;
+  border: 1px solid var(--line);
+}
+
+.plan-care strong {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.plan-care span {
+  color: var(--ink-soft);
+  font-family: var(--sans);
+  font-size: 0.72rem;
+}
+
+.plan-plant-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 18px;
+}
+
+.plan-plant-card {
+  display: grid;
+  gap: 5px;
+  align-content: start;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.plant-photo {
+  margin: 0;
+  display: grid;
+  gap: 5px;
+}
+
+.plant-photo img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border: 1px solid var(--line);
+}
+
+.plant-photo figcaption {
+  color: var(--ink-faint, var(--ink-soft));
+  font-family: var(--sans);
+  font-size: 0.62rem;
+  line-height: 1.35;
+}
+
+.plant-photo.is-missing {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 4 / 3;
+  border: 1px dashed var(--line-strong);
+  background: var(--paper-deep);
+  color: var(--ink-soft);
+  font-family: var(--sans);
+  font-size: 0.72rem;
+}
+
+.plan-plant-card h4 {
+  margin: 4px 0 0;
+  font-family: var(--serif);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.plan-plant-card em {
+  color: var(--ink-soft);
+  font-family: var(--serif);
+  font-size: 0.76rem;
+  font-style: normal;
+}
+
+.plan-plant-card dl {
+  display: grid;
+  gap: 2px;
+  margin: 6px 0 0;
+  font-family: var(--sans);
+  font-size: 0.7rem;
+}
+
+.plan-plant-card dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.plan-plant-card dt {
+  color: var(--ink-soft);
+}
+
+.plan-plant-card dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.plan-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 24px;
+  margin-top: 36px;
+}
+
+/* ---- Saved gardens (spec 7, 9) ---- */
+
+.saved-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 26px;
+}
+
+.saved-tab {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 9px;
+  padding: 10px 16px;
+  border: 1px solid var(--line);
+  background: transparent;
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.saved-tab.is-selected {
+  border-color: var(--ink);
+  background: var(--paper-light);
+}
+
+.saved-tab span {
+  font-size: 0.7rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-soft);
+}
+
+.saved-empty p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+
+.saved-layouts {
+  margin-bottom: 48px;
+}
+
+.saved-layouts h2 {
+  margin: 0 0 16px;
+  font-family: var(--display);
+  font-size: 1.6rem;
+  font-weight: 400;
+}
+
+.saved-layout-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.saved-layout-card {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  padding: 16px;
+  border: 1px solid var(--line);
+  background: var(--paper-light);
+}
+
+.saved-layout-card header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.saved-layout-card header strong {
+  font-size: 0.9rem;
+  font-weight: 650;
+}
+
+.saved-layout-card time,
+.saved-layout-card footer {
+  color: var(--ink-soft);
+  font-family: var(--sans);
+  font-size: 0.7rem;
+}
+
+.saved-layout-meta {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: 0.74rem;
+  color: var(--ink-soft);
+}
+
+.saved-layout-card ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 3px;
+  font-size: 0.78rem;
+}
+
+.saved-layout-card footer {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+@media (max-width: 760px) {
+  .plan-plant-grid,
+  .saved-layout-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* ------------------------------------------------------------------ */
+/* Live nursery sourcing panel ("Where to buy")                         */
+/* ------------------------------------------------------------------ */
+.sourcing-panel {
+  margin: 2.5rem 0;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(34, 50, 38, 0.18);
+}
+.sourcing-panel.is-compact { margin: 1.5rem 0 0; }
+.sourcing-heading {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: end;
+  justify-content: space-between;
+}
+.sourcing-heading form { display: flex; gap: 0.75rem; align-items: end; flex-wrap: wrap; }
+.sourcing-heading label { display: grid; gap: 0.25rem; font-size: 0.8rem; }
+.sourcing-heading input {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid rgba(34, 50, 38, 0.3);
+  background: transparent;
+  font: inherit;
+}
+.sourcing-loading, .sourcing-footnote, .sourcing-empty { font-size: 0.85rem; opacity: 0.75; }
+.sourcing-warning {
+  margin: 0.5rem 0;
+  padding: 0.5rem 0.75rem;
+  border: 1.5px solid var(--warning-line);
+  background: var(--warning-wash);
+  font-size: 0.85rem;
+}
+.sourcing-species { margin: 1.5rem 0; }
+.sourcing-species h4 { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: baseline; margin: 0 0 0.5rem; }
+.sourcing-species h4 em { font-weight: 400; opacity: 0.7; }
+.sourcing-table { display: grid; gap: 0; font-size: 0.82rem; overflow-x: auto; }
+.sourcing-row {
+  display: grid;
+  grid-template-columns: repeat(var(--sourcing-columns, 9), minmax(5.5rem, 1fr));
+  gap: 0.5rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid rgba(34, 50, 38, 0.1);
+  min-width: 52rem;
+}
+.sourcing-row small { display: block; opacity: 0.65; }
+.sourcing-head { font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.03em; }
+.match-label { font-size: 0.72rem; padding: 0.05rem 0.4rem; border-radius: 999px; background: rgba(34, 50, 38, 0.08); }
+.match-found { background: rgba(92, 128, 76, 0.18); }
+.match-related, .match-related-plant { background: rgba(181, 146, 58, 0.2); }
+.match-estimated { background: rgba(120, 120, 160, 0.18); }
+.match-not-found { background: rgba(160, 80, 70, 0.15); }
+.sourcing-availability { font-size: 0.8rem; opacity: 0.8; margin: 0.25rem 0; }
+.sourcing-budget { margin: 1.5rem 0; padding: 1rem; background: rgba(34, 50, 38, 0.05); }
+.sourcing-budget h4, .sourcing-walkin h4 { margin: 0 0 0.4rem; }
+.sourcing-budget p { margin: 0.25rem 0; font-size: 0.85rem; }
+.sourcing-walkin ul { margin: 0; padding-left: 1.1rem; font-size: 0.85rem; }
+@media (max-width: 640px) {
+  .sourcing-heading { align-items: start; }
+}
+
+.saved-layout-card .plan-bed-wrap { margin: 0.75rem 0 1.5rem; }
+.saved-layout-budget { font-size: 0.85rem; margin: 0.5rem 0; }
+.saved-layout-budget small { display: block; opacity: 0.7; }
+.saved-layout-note { font-size: 0.8rem; opacity: 0.7; }
+
+
+/* ------------------------------------------------------------------ */
+/* Home page (design: left-aligned reading zone + illustration zone)    */
+/* ------------------------------------------------------------------ */
+.wordmark {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+.wordmark small {
+  font-family: var(--sans);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.home-page {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(32px, 6vw, 96px);
+  width: min(100%, var(--max));
+  min-height: calc(100vh - var(--site-header-height));
+  margin: 0 auto;
+  padding: clamp(40px, 6vw, 96px) clamp(24px, 6vw, 110px);
+}
+.home-copy {
+  max-width: 560px;
+  text-align: left;
+}
+.home-copy h1 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: clamp(2.8rem, 4.6vw, 4.8rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.02;
+}
+.home-copy h1 em {
+  color: var(--olive);
+  font-style: italic;
+  font-weight: 500;
+}
+.home-intro {
+  max-width: 460px;
+  margin: 28px 0 40px;
+  font-family: var(--serif);
+  font-size: clamp(1.05rem, 1.2vw, 1.22rem);
+  line-height: 1.55;
+}
+.home-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px 40px;
+}
+.home-actions .button {
+  min-width: 240px;
+  justify-content: center;
+}
+.home-illustration {
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: clamp(24px, 4vw, 56px);
+  aspect-ratio: 1 / 1;
+  background: color-mix(in srgb, var(--paper-deep) 70%, var(--paper-light));
+}
+.home-illustration img {
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  object-fit: contain;
+}
+@media (max-width: 860px) {
+  .home-page {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+  .home-illustration {
+    order: -1;
+    aspect-ratio: 4 / 3;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Layout views: sketchbook / real-life, and saved-plant badges          */
+/* ------------------------------------------------------------------ */
+.layout-views {
+  display: inline-flex;
+  margin-bottom: 12px;
+  border: 1px solid var(--line-strong);
+}
+.layout-views button {
+  padding: 6px 14px;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.layout-views button[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--paper-light);
+}
+.plan-bed.is-real-life .plan-marker {
+  background: var(--accent, var(--olive-soft));
+}
+.plan-marker .marker-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.plan-marker .saved-badge,
+.legend-saved {
+  position: absolute;
+  z-index: 2;
+  /* Inside the circle: the corner of the marker's box is clipped away. */
+  top: 16%;
+  right: 16%;
+  display: grid;
+  width: clamp(14px, 1.5vw, 20px);
+  height: clamp(14px, 1.5vw, 20px);
+  padding: 3px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--ink);
+  color: #f2b8c0;
+  box-shadow: 0 0 0 1.5px var(--paper-light);
+}
+.plan-marker .marker-photo { z-index: 0; }
+.legend-saved {
+  position: static;
+  display: inline-grid;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+.saved-key {
+  font-size: 0.78rem;
+  opacity: 0.8;
+}
+
+/* Nursery pins on the step 1 map */
+.nursery-pin circle {
+  fill: #b5733a;
+  stroke: var(--paper-light);
+  stroke-width: 2.5;
+}
+.nursery-pin-walk-in circle { fill: #8a5a2b; }
+.nursery-pin-availability circle { fill: #d9a066; }
+.nursery-map-key { max-width: 480px; font-size: 0.8rem; }
+.nursery-map-key p { margin: 0.2rem 0; }
+.nursery-key-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--paper-light);
+  border-radius: 50%;
+  background: #b5733a;
+  vertical-align: middle;
+  box-shadow: 0 0 0 1px #b5733a;
+}
+.nursery-not-mapped { opacity: 0.75; }
+
+/* Plant-type symbols in the sketchbook layout (owner's symbol sheet) */
+/* Capped: the symbol is a mark that says which plant type this is, so it
+   should read the same on a 15 cm groundcover and a 1.2 m shrub. Left
+   uncapped it filled the big circles with one huge outline. */
+.plan-marker .plant-type-symbol {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 0;
+  width: min(80%, 42px);
+  height: min(80%, 42px);
+  transform: translate(-50%, -50%);
+  color: var(--ink-dark);
+  opacity: 0.5;
+  pointer-events: none;
+}
+.symbol-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.78rem;
+}
+.symbol-key li { display: inline-flex; align-items: center; gap: 6px; }
+.symbol-key-mark {
+  position: relative;
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  border: 1.2px solid var(--ink);
+  border-radius: 50%;
+}
+.symbol-key-mark .plant-type-symbol {
+  position: absolute;
+  inset: 8%;
+  width: 84%;
+  height: 84%;
+  color: var(--ink-dark);
+}
+
+/* ---------------------------------------------------------------- Exclusions
+   Plants the gardener has ruled out by hand. The controls stay quiet: this
+   is a deliberate, reversible choice, not a warning, so nothing here uses
+   the alert treatment. Excluded cards are dimmed rather than hidden, so the
+   plant is still readable while the exclusion is in force. */
+
+/* Save and Exclude are the two things you can do to a plant from a card, so
+   they stack together in the card head rather than one of them hiding at the
+   foot. Both use the same quiet treatment: Exclude is a reversible choice,
+   not a warning. */
+.plant-card-buttons {
+  display: grid;
+  gap: 6px;
+  align-self: start;
+  justify-items: end;
+}
+
+.exclude-button {
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+  padding: 2px 0 5px 10px;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink-soft);
+  font-family: var(--sans);
+  font-size: 0.75rem;
+  font-weight: 620;
+}
+
+.exclude-button:hover {
+  color: var(--ink);
+}
+
+.exclude-button.is-excluded {
+  color: var(--olive);
+  border-bottom-color: var(--olive);
+}
+
+.plant-card.is-excluded {
+  opacity: 0.55;
+}
+
+.plant-card.is-excluded:hover,
+.plant-card.is-excluded:focus-within {
+  opacity: 1;
+}
+
+/* The exclude control on the plan legend: it sits inside the measurement
+   line, so it has to read as an action without breaking that line's rhythm. */
+.legend-exclude {
+  margin-left: 8px;
+  padding: 0;
+  background: transparent;
+  color: var(--ink-soft);
+  font-family: var(--sans);
+  font-size: 0.62rem;
+  font-weight: 620;
+  letter-spacing: 0.01em;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.legend-exclude:hover {
+  color: var(--ink);
+}
+
+.detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.detail-excluded {
+  margin-top: 10px;
+  color: var(--olive);
+  font-style: italic;
+}
+
+.excluded-note {
+  margin: 18px 0 0;
+  padding: 14px 18px;
+  border: 1px solid var(--line);
+  background: var(--paper-light);
+}
+
+.excluded-note summary {
+  font-family: var(--sans);
+  font-size: 0.74rem;
+  font-weight: 620;
+  cursor: pointer;
+}
+
+.excluded-note p {
+  margin: 10px 0 0;
+  color: var(--ink-soft);
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
+.excluded-list {
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+
+.excluded-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.excluded-row-main {
+  display: grid;
+  gap: 2px;
+  flex: 1;
+  padding: 0;
+  background: transparent;
+  text-align: left;
+}
+
+.excluded-row-main strong {
+  font-family: var(--serif);
+  font-size: 1rem;
+}
+
+.excluded-row-main em {
+  color: var(--ink-soft);
+  font-family: var(--sans);
+  font-size: 0.72rem;
+}
+
+@media (max-width: 640px) {
+  .excluded-row {
+    flex-wrap: wrap;
+  }
+}
+
+/* The feedback link sits beside "How the planner works" in the footer and
+   matches it exactly - it is an invitation, not a call to action. */
+.footer-feedback {
+  display: inline-block;
 }

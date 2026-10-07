@@ -1,5 +1,25 @@
 
 
+# PARTLY RETIRED - 2026-09-18
+#
+# The species-trait half of this script is superseded. The plant catalogue
+# now comes from FINAL.DATASET.FINAL.xlsx via
+# data/scripts/import_final_dataset.py, not from the BioSCape/PlantZAfrica
+# merge this file feeds (see data/scripts/retired/README.md). Its output
+# data/processed/bioscape_care_traits.csv is no longer read by anything in
+# the live pipeline.
+#
+# It is kept, and must not be deleted, because sections 0 and 0b below are
+# still the ONLY producers of the spatial layers the app depends on:
+#   - data/processed/western_cape_bioregions.geojson
+#   - data/processed/western_cape_outline.geojson
+#   - data/processed/south_africa_biome_regions.geojson
+# consumed by generate_western_cape_map_svg.py, generate_biome_map_svg.py
+# and assign_place_bioregions.R (the location picker).
+#
+# Re-run it only to rebuild those map layers. It will also rewrite
+# bioscape_care_traits.csv, which is harmless - nothing reads it now.
+
 #LIBRARYS NEEDED
 # install.packages("tidyverse")
 # install.packages("sf")
@@ -77,6 +97,97 @@ message(
   " dissolved biome region(s) to data/processed/south_africa_biome_regions.geojson"
 )
 
+# ---- 0b. Western Cape bioregion lookup (finer detail, WC scope only) --
+# The app is scoping back down to the Western Cape, but with real detail:
+# SANBI's own BIOREGION_ field is one level finer than BIOME_18 (e.g.
+# "Southwest Fynbos Bioregion" vs just "Fynbos"). This is a SEPARATE,
+# WC-clipped source (the Western Cape government's own ArcGIS layer, via
+# download_western_cape_vegmap.py) - not a subset of national_vegmap, so
+# occurrences outside the Western Cape (e.g. Baviaanskloof) simply won't
+# match anything here, same "don't guess" rule as the national join.
+wc_vegmap <- st_read(
+  "data/raw/spatial/western-cape-vegetation-map-2018.geojson",
+  quiet = TRUE
+) %>%
+  st_make_valid() %>%
+  select(BIOME_18, BIOREGION_, Name_18) %>%
+  rename(wc_biome_raw = BIOME_18, bioregion = BIOREGION_, vegetation_type = Name_18) %>%
+  mutate(
+    # Same normalisation as the national biome mapping above, so values
+    # here match `biome` exactly for tier-2 comparison in
+    # combine_plant_database.R ("Forests" -> "Forest", "Nama-Karoo" ->
+    # "Nama Karoo"). str_squish first: some BIOME_18 cells are a lone
+    # whitespace character rather than a true empty string, which a plain
+    # `== ""` check silently misses.
+    wc_biome = case_when(
+      str_squish(coalesce(wc_biome_raw, "")) == "Forests" ~ "Forest",
+      str_squish(coalesce(wc_biome_raw, "")) == "Nama-Karoo" ~ "Nama Karoo",
+      str_squish(coalesce(wc_biome_raw, "")) %in% c("Fynbos", "Succulent Karoo", "Albany Thicket", "Grassland") ~ str_squish(wc_biome_raw),
+      TRUE ~ NA_character_  # blank/whitespace-only, <Null>, Azonal Vegetation, etc.
+    ),
+    bioregion = if_else(str_squish(coalesce(bioregion, "")) %in% c("", "<Null>"), NA_character_, bioregion),
+    vegetation_type = if_else(str_squish(coalesce(vegetation_type, "")) %in% c("", "<Null>"), NA_character_, vegetation_type)
+  ) %>%
+  select(-wc_biome_raw)
+
+# The set of biomes actually present in the Western Cape, computed fresh
+# from real data each run (not hardcoded) - this is what tier-2 "compatible
+# elsewhere" matching in combine_plant_database.R filters against.
+western_cape_biomes <- wc_vegmap %>%
+  st_drop_geometry() %>%
+  filter(!is.na(wc_biome), !wc_biome %in% c("", "<Null>", "Azonal Vegetation")) %>%
+  distinct(wc_biome) %>%
+  arrange(wc_biome)
+
+write.csv(western_cape_biomes, "data/processed/western_cape_biomes.csv", row.names = FALSE)
+message(
+  "Western Cape biomes (", nrow(western_cape_biomes), "): ",
+  paste(western_cape_biomes$wc_biome, collapse = ", ")
+)
+
+# Dissolved bioregion shapes for the map UI - same union+simplify pattern
+# as the national biome_regions above, grouped one level finer.
+bioregion_regions <- wc_vegmap %>%
+  filter(!is.na(bioregion)) %>%
+  group_by(bioregion) %>%
+  summarise(geometry = st_union(geometry), .groups = "drop") %>%
+  st_simplify(dTolerance = 0.01, preserveTopology = TRUE)
+
+st_write(
+  bioregion_regions,
+  "data/processed/western_cape_bioregions.geojson",
+  delete_dsn = TRUE,
+  quiet = TRUE
+)
+
+message(
+  "Wrote ", nrow(bioregion_regions),
+  " dissolved bioregion(s) to data/processed/western_cape_bioregions.geojson"
+)
+
+# ---- Whole-extent outline, for a map backdrop -----------------------
+# About a quarter of the Western Cape's polygons have no bioregion at all
+# (SANBI's bioregion scheme only covers natural vegetation zonation, not
+# azonal/transformed land - estuaries, wetlands, urban areas, farmland).
+# Filtering to !is.na(bioregion) above is correct (don't invent a
+# bioregion for land that doesn't have one), but it leaves real gaps in
+# the dissolved shapes that look like a rendering bug on the map. This
+# dissolves EVERY polygon regardless of bioregion, as a single backdrop
+# shape the map renders underneath the bioregion colors, so an
+# unclassified area reads as "not classified" instead of "missing".
+western_cape_outline <- wc_vegmap %>%
+  summarise(geometry = st_union(geometry), .groups = "drop") %>%
+  st_simplify(dTolerance = 0.01, preserveTopology = TRUE)
+
+st_write(
+  western_cape_outline,
+  "data/processed/western_cape_outline.geojson",
+  delete_dsn = TRUE,
+  quiet = TRUE
+)
+
+message("Wrote Western Cape outline backdrop to data/processed/western_cape_outline.geojson")
+
 occurrence_points <- BIOSCAPE_FILTERED_REGION %>%
   mutate(.row_id = row_number()) %>%
   filter(!is.na(latitude), !is.na(longitude)) %>%
@@ -103,9 +214,48 @@ message(
   "only in Azonal Vegetation)."
 )
 
-# ---- Species dedup + biome attach --------------------------------
+# Same majority-vote pattern, against the Western Cape layer this time.
+# Occurrences outside the WC clip (e.g. Baviaanskloof, Eastern Cape) simply
+# won't match - that's expected, not an error; those species fall back to
+# the coarser national `biome` for tier-2 matching downstream.
+occurrence_bioregions <- occurrence_points %>%
+  st_join(wc_vegmap, join = st_intersects, left = TRUE) %>%
+  st_drop_geometry() %>%
+  distinct(.row_id, .keep_all = TRUE) %>%
+  select(scientific_name_original, bioregion, vegetation_type)
+
+species_bioregion <- occurrence_bioregions %>%
+  filter(!is.na(bioregion)) %>%
+  count(scientific_name_original, bioregion, name = "n_occurrences") %>%
+  group_by(scientific_name_original) %>%
+  slice_max(n_occurrences, n = 1, with_ties = FALSE) %>%
+  ungroup() %>%
+  select(scientific_name_original, bioregion, bioregion_occurrence_count = n_occurrences)
+
+# vegetation_type is descriptive only (not used for hard matching) - take
+# it from whichever occurrence row backs the winning bioregion, rather
+# than an independent vote that could disagree with it.
+species_vegetation_type <- occurrence_bioregions %>%
+  filter(!is.na(vegetation_type)) %>%
+  inner_join(
+    species_bioregion %>% select(scientific_name_original, bioregion),
+    by = c("scientific_name_original", "bioregion")
+  ) %>%
+  distinct(scientific_name_original, .keep_all = TRUE) %>%
+  select(scientific_name_original, vegetation_type)
+
+species_bioregion <- species_bioregion %>%
+  left_join(species_vegetation_type, by = "scientific_name_original")
+
+message(
+  nrow(species_bioregion), " species matched a Western Cape bioregion directly ",
+  "(occurrence-level, high confidence)."
+)
+
+# ---- Species dedup + biome/bioregion attach -----------------------
 BIOSCAPE_FILTERED_REGION <- BIOSCAPE_FILTERED_REGION[!duplicated(BIOSCAPE_FILTERED_REGION$scientific_name_original), ] %>%
-  left_join(species_biome, by = "scientific_name_original")
+  left_join(species_biome, by = "scientific_name_original") %>%
+  left_join(species_bioregion, by = "scientific_name_original")
 
 combined_BIOSCAPE <- left_join(BIOSCAPE_FILTERED_REGION,BioSCape_foliar_species_traits, by = "scientific_name_original")
 # View(combined_BIOSCAPE)
@@ -211,7 +361,8 @@ df <- df %>%
 na_threshold <- 0.5
 
 id_cols <- c("unique_ID", "scientific_name", "scientific_name_authorship", "family",
-             "biome", "biome_occurrence_count", "latitude", "longitude")
+             "biome", "biome_occurrence_count", "latitude", "longitude",
+             "bioregion", "bioregion_occurrence_count", "vegetation_type")
 attribute_cols <- setdiff(names(df), id_cols)
 
 df <- df %>%

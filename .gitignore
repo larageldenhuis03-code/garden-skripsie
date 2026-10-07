@@ -38,3 +38,4 @@ yarn-error.log*
 /tmp/
 next-env.d.ts
 *.tsbuildinfo
+.sourcing-cache.json

@@ -1,0 +1,665 @@
+{
+  "versions": {
+    "rulebook": "c7d06d358091",
+    "dataset": "e5d14caf5ca0",
+    "stage4": "dc02b3d2c8a5",
+    "plants": 2843
+  },
+  "t1": {
+    "status": {
+      "SUCCESS": 90,
+      "SUCCESS_DEGRADED": 5,
+      "INFEASIBLE": 5
+    },
+    "feasible": 95,
+    "hardViolations": {
+      "H1": 0,
+      "H2": 0,
+      "H3": 0,
+      "H3b": 0,
+      "H4": 0,
+      "H5": 0
+    },
+    "p1": 0,
+    "p2": 0,
+    "timesMs": {
+      "median": 457.3920999999973,
+      "p95": 831.6205,
+      "max": 1426.8663000000088,
+      "underFiveSecondsPct": 100
+    },
+    "relaxed": {
+      "soil": 0,
+      "water": 0,
+      "sun": 0
+    },
+    "jaccard": {
+      "pairs": 273,
+      "distinct": 236,
+      "mean": 0.39334320819816115,
+      "sameSpeciesDifferentSizes": 4
+    },
+    "goals": {
+      "mean": [
+        0.890482429389169,
+        0.9438596491228071,
+        0.981286549707602,
+        0.9493908337605512,
+        1
+      ],
+      "min": [
+        0.4,
+        0.25,
+        0.4444444444444444,
+        0.39010726775951254,
+        1
+      ]
+    },
+    "tierGap": {
+      "fynbos": 0.2611946532999164,
+      "mediterranean": 0.09233655233655234,
+      "cottage": 0.2899517368632913,
+      "generic": 0.2219768360294676
+    },
+    "repeatability": 10,
+    "medianZ": 0.9335701425604483,
+    "medianPlantsPerSpecies": 3,
+    "allSameSize": 4
+  },
+  "t2": {
+    "checked": 617,
+    "notEligible": 0,
+    "parasitic": 0,
+    "aquatic": 0,
+    "dataIncomplete": 0,
+    "biomeMismatch": 0,
+    "filters": 0
+  },
+  "t3": {
+    "uniqueSpecies": 295,
+    "run": false,
+    "reason": "sourcing is live HTTP; not runnable offline within the politeness budget"
+  },
+  "t4SeedNoise": {
+    "perBrief": [
+      {
+        "id": "S001",
+        "sd": 0.003779118892546488,
+        "mean": 0.9931366675286746
+      },
+      {
+        "id": "S006",
+        "sd": 0.008299588039063192,
+        "mean": 0.995460063635611
+      },
+      {
+        "id": "S011",
+        "sd": 0.016135851448428298,
+        "mean": 0.9794291854380299
+      },
+      {
+        "id": "S016",
+        "sd": 0.0014367975678866137,
+        "mean": 0.4979328910585405
+      },
+      {
+        "id": "S021",
+        "sd": 0.001052809195541175,
+        "mean": 0.9953921052631578
+      },
+      {
+        "id": "S031",
+        "sd": 0.009485245534230354,
+        "mean": 0.9480068421329314
+      },
+      {
+        "id": "S036",
+        "sd": 0.0019291305090090374,
+        "mean": 0.9972249980359177
+      },
+      {
+        "id": "S041",
+        "sd": 0.013937183531742479,
+        "mean": 0.9804377781400893
+      },
+      {
+        "id": "S046",
+        "sd": 0.0007017401119694489,
+        "mean": 0.9986367521367521
+      },
+      {
+        "id": "S051",
+        "sd": 0.003119691119691126,
+        "mean": 0.981953667953668
+      },
+      {
+        "id": "S056",
+        "sd": 0.0033420605348956985,
+        "mean": 0.9918218954248367
+      },
+      {
+        "id": "S061",
+        "sd": 0.0018836691233842346,
+        "mean": 0.9922424242424241
+      },
+      {
+        "id": "S066",
+        "sd": 0.00033609709037287606,
+        "mean": 0.9995004969604512
+      },
+      {
+        "id": "S071",
+        "sd": 0.004851342363673306,
+        "mean": 0.9775743288181633
+      },
+      {
+        "id": "S076",
+        "sd": 0.015711745348350674,
+        "mean": 0.887904961418843
+      },
+      {
+        "id": "S081",
+        "sd": 0.012770232157432651,
+        "mean": 0.9201739356468426
+      },
+      {
+        "id": "S086",
+        "sd": 0.024305906116030253,
+        "mean": 0.9515422708259867
+      },
+      {
+        "id": "S091",
+        "sd": 0.005633955863092042,
+        "mean": 0.9640444179148915
+      },
+      {
+        "id": "S096",
+        "sd": 0.015615681416482884,
+        "mean": 0.9591141034925122
+      }
+    ],
+    "meanSd": 0.007596202419148572
+  },
+  "t4Goals": [
+    {
+      "name": "AHP equal weights (style = extras = colour = 1/3)",
+      "deltas": [
+        -0.015030307957563157,
+        -0.013157894736842105,
+        -0.011695906432748543,
+        -0.02357823029609239,
+        0
+      ]
+    },
+    {
+      "name": "lambda = 0.4",
+      "deltas": [
+        -0.01834675903687104,
+        0,
+        -0.011695906432748543,
+        -0.03665227207709671,
+        0
+      ]
+    },
+    {
+      "name": "lambda = 0.6",
+      "deltas": [
+        -0.006692676152509943,
+        0,
+        -0.005847953216374271,
+        -0.006988762896793493,
+        0
+      ]
+    },
+    {
+      "name": "T0 x 0.5",
+      "deltas": [
+        -0.012556196933629976,
+        0,
+        -0.017543859649122816,
+        -0.001972486309427701,
+        0
+      ]
+    },
+    {
+      "name": "T0 x 2",
+      "deltas": [
+        -0.012531792871128062,
+        0,
+        0,
+        -0.02228315691728602,
+        0
+      ]
+    },
+    {
+      "name": "alpha = 0.998",
+      "deltas": [
+        -0.002502722682435904,
+        -0.013157894736842105,
+        -0.005847953216374271,
+        -0.025678521828556813,
+        0
+      ]
+    },
+    {
+      "name": "delta = 0.10",
+      "deltas": [
+        -0.006201868307131465,
+        0,
+        -0.017543859649122816,
+        -0.022219993850397794,
+        0
+      ]
+    },
+    {
+      "name": "delta = 0.20",
+      "deltas": [
+        0.0026831785345717255,
+        0,
+        0,
+        0.007840842850780058,
+        0
+      ]
+    },
+    {
+      "name": "k_headroom = 1.5",
+      "deltas": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "k_headroom = 2.5",
+      "deltas": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "b_wind -20% (wind scenarios)",
+      "deltas": [
+        -0.004291176659597713,
+        -0.019230769230769232,
+        0,
+        0.01790396878939897,
+        0
+      ]
+    },
+    {
+      "name": "b_wind +20% (wind scenarios)",
+      "deltas": [
+        -0.00585245651035125,
+        0,
+        0,
+        0.017217564053358222,
+        0
+      ]
+    }
+  ],
+  "t4": {
+    "scenarios": [
+      "S001",
+      "S006",
+      "S011",
+      "S016",
+      "S021",
+      "S026",
+      "S031",
+      "S036",
+      "S041",
+      "S046",
+      "S051",
+      "S056",
+      "S061",
+      "S066",
+      "S071",
+      "S076",
+      "S081",
+      "S086",
+      "S091",
+      "S096"
+    ],
+    "variants": {
+      "AHP equal weights (style = extras = colour = 1/3)": {
+        "meanJ": 0.5977515186089691,
+        "atLeast070": 9,
+        "scope": 20,
+        "medianDeltaZ": 0,
+        "feasible": 19,
+        "violations": 0,
+        "worseMoves": 131,
+        "frozenAt": 90,
+        "meanDeltaGoals": [
+          -0.015030307957563157,
+          -0.013157894736842105,
+          -0.011695906432748543,
+          -0.02357823029609239,
+          0
+        ]
+      },
+      "lambda = 0.4": {
+        "meanJ": 0.6154242029221662,
+        "atLeast070": 10,
+        "scope": 20,
+        "medianDeltaZ": -0.0020000000000000018,
+        "feasible": 19,
+        "violations": 0,
+        "worseMoves": 137,
+        "frozenAt": 90,
+        "meanDeltaGoals": [
+          -0.01834675903687104,
+          0,
+          -0.011695906432748543,
+          -0.03665227207709671,
+          0
+        ]
+      },
+      "lambda = 0.6": {
+        "meanJ": 0.6252686670235962,
+        "atLeast070": 11,
+        "scope": 20,
+        "medianDeltaZ": 0.0007899283920089761,
+        "feasible": 19,
+        "violations": 0,
+        "worseMoves": 133,
+        "frozenAt": 90,
+        "meanDeltaGoals": [
+          -0.006692676152509943,
+          0,
+          -0.005847953216374271,
+          -0.006988762896793493,
+          0
+        ]
+      },
+      "T0 x 0.5": {
+        "meanJ": 0.5062016966612046,
+        "atLeast070": 7,
+        "scope": 20,
+        "medianDeltaZ": 0,
+        "feasible": 19,
+        "violations": 0,
+        "worseMoves": 112,
+        "frozenAt": 90,
+        "meanDeltaGoals": [
+          -0.012556196933629976,
+          0,
+          -0.017543859649122816,
+          -0.001972486309427701,
+          0
+        ]
+      },
+      "T0 x 2": {
+        "meanJ": 0.4128486105517795,
+        "atLeast070": 5,
+        "scope": 20,
+        "medianDeltaZ": 0,
+        "feasible": 19,
+        "violations": 0,
+        "worseMoves": 185,
+        "frozenAt": 90,
+        "meanDeltaGoals": [
+          -0.012531792871128062,
+          0,
+          0,
+          -0.02228315691728602,
+          0
+        ]
+      },
+      "alpha = 0.998": {
+        "meanJ": 0.2580928910237594,
+        "atLeast070": 3,
+        "scope": 20,
+        "medianDeltaZ": 0.001052631578947416,
+        "feasible": 19,
+        "violations": 0,
+        "worseMoves": 3860,
+        "frozenAt": 2300,
+        "meanDeltaGoals": [
+          -0.002502722682435904,
+          -0.013157894736842105,
+          -0.005847953216374271,
+          -0.025678521828556813,
+          0
+        ]
+      },
+      "delta = 0.10": {
+        "meanJ": 0.6022703818369454,
+        "atLeast070": 10,
+        "scope": 20,
+        "medianDeltaZ": 0,
+        "feasible": 19,
+        "violations": 0,
+        "worseMoves": 135,
+        "frozenAt": 90,
+        "meanDeltaGoals": [
+          -0.006201868307131465,
+          0,
+          -0.017543859649122816,
+          -0.022219993850397794,
+          0
+        ]
+      },
+      "delta = 0.20": {
+        "meanJ": 0.6711257868378611,
+        "atLeast070": 11,
+        "scope": 20,
+        "medianDeltaZ": 0,
+        "feasible": 19,
+        "violations": 0,
+        "worseMoves": 127,
+        "frozenAt": 90,
+        "meanDeltaGoals": [
+          0.0026831785345717255,
+          0,
+          0,
+          0.007840842850780058,
+          0
+        ]
+      },
+      "k_headroom = 1.5": {
+        "meanJ": 1,
+        "atLeast070": 19,
+        "scope": 20,
+        "medianDeltaZ": 0,
+        "feasible": 19,
+        "violations": 0,
+        "worseMoves": 148,
+        "frozenAt": 90,
+        "meanDeltaGoals": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "k_headroom = 2.5": {
+        "meanJ": 1,
+        "atLeast070": 19,
+        "scope": 20,
+        "medianDeltaZ": 0,
+        "feasible": 19,
+        "violations": 0,
+        "worseMoves": 148,
+        "frozenAt": 90,
+        "meanDeltaGoals": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "b_wind -20% (wind scenarios)": {
+        "meanJ": 0.519380215587646,
+        "atLeast070": 5,
+        "scope": 14,
+        "medianDeltaZ": 0.0007507507507507061,
+        "feasible": 13,
+        "violations": 0,
+        "worseMoves": 103,
+        "frozenAt": 90,
+        "meanDeltaGoals": [
+          -0.004291176659597713,
+          -0.019230769230769232,
+          0,
+          0.01790396878939897,
+          0
+        ]
+      },
+      "b_wind +20% (wind scenarios)": {
+        "meanJ": 0.5419306184012066,
+        "atLeast070": 6,
+        "scope": 14,
+        "medianDeltaZ": 0,
+        "feasible": 13,
+        "violations": 0,
+        "worseMoves": 91,
+        "frozenAt": 90,
+        "meanDeltaGoals": [
+          -0.00585245651035125,
+          0,
+          0,
+          0.017217564053358222,
+          0
+        ]
+      }
+    }
+  },
+  "t5": {
+    "playwright": false,
+    "run": false
+  },
+  "t6": {
+    "unitPass": 104,
+    "unitFail": 0,
+    "typecheck": true,
+    "lint": true
+  },
+  "t7": {
+    "draws": 30,
+    "briefs": [
+      "S001",
+      "S006",
+      "S011",
+      "S016",
+      "S021",
+      "S026",
+      "S031",
+      "S036",
+      "S041",
+      "S046",
+      "S051",
+      "S056",
+      "S061",
+      "S066",
+      "S071",
+      "S076",
+      "S081",
+      "S086",
+      "S091",
+      "S096"
+    ],
+    "runs": 600,
+    "feasible": 571,
+    "factorRange": [
+      0.67,
+      1.5
+    ],
+    "meanDeltaZ": -0.011795884416872906,
+    "p05DeltaZ": -0.06079035199531291,
+    "violations": 0,
+    "perCheck": {
+      "H1": 0,
+      "H2": 0,
+      "H3": 0,
+      "H3b": 0,
+      "H4": 0,
+      "H5": 0,
+      "P1": 0,
+      "P2": 0
+    },
+    "meanJaccard": 0.21834585647263502,
+    "atLeast070": 57,
+    "jaccardCount": 571
+  },
+  "t7b": {
+    "baselines": 19,
+    "draws": 30,
+    "plansChecked": 570,
+    "withOverlap": 541,
+    "meanWorstOverlapM": 0.4097721739307185,
+    "withBreach": 544,
+    "outsideCover": 428,
+    "placedTotal": 13740,
+    "tierChanged": 593,
+    "featureFlips": 0,
+    "speciesChecked": 3240
+  },
+  "t8": {
+    "unique": 295,
+    "eligible": 2343,
+    "slots": 617,
+    "top10Share": 0.1685575364667747,
+    "gini": 0.9247034685891489,
+    "positions": {
+      "n": 617,
+      "mean": 0.47947554603065723,
+      "median": 0.47017318794098784,
+      "ksD": 0.04852428082335736,
+      "p": 0.10627031376833285
+    },
+    "curve": {
+      "100": 295,
+      "200": 389,
+      "500": 545
+    }
+  },
+  "t9": {
+    "readByEngine": false,
+    "statsRun": true,
+    "sheet": "8_Species_Reference",
+    "comboRows": 61,
+    "comboSpecies": 61,
+    "appearing": 14,
+    "meanCombo": 0.49019607843137253,
+    "meanOther": 0.34022988505747126,
+    "plansWithPair": 0,
+    "plans": 95
+  },
+  "t10": {
+    "pools": 432,
+    "biomeSets": 12,
+    "places": 1558,
+    "reachable": 1754,
+    "medianPools": 48,
+    "rare": 0,
+    "onePercent": 5,
+    "relaxedOnly": 0,
+    "briefs": 1000,
+    "runs": 3000,
+    "feasible": 2502,
+    "curve": {
+      "250": 776,
+      "500": 998,
+      "1000": 1223
+    },
+    "neverSelected": 537,
+    "selected": 1223,
+    "meanScoreNever": 0.575791090872423,
+    "meanScoreSelected": 0.686116679355275,
+    "funnel": {
+      "catalogue": 2843,
+      "eligible": 2343,
+      "reachable": 1754,
+      "selectable": 1223,
+      "recommendedT1": 295
+    }
+  }
+}

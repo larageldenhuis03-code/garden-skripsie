@@ -34,10 +34,11 @@ test("server-renders the Silly Goose product surface", async () => {
     /<title>Silly Goose MVP — Garden planning for the Western Cape<\/title>/i,
   );
   assert.match(html, /Describe your <em>garden\.<\/em>/);
-  assert.match(html, /Discover the plants that <em>fit\.<\/em>/);
-  assert.match(html, /suggest plants and show you how they\s+could fit/i);
-  assert.match(html, /Start my garden plan/);
-  assert.match(html, /Browse the plant library/);
+  assert.match(html, /suggest plants that fit/i);
+  assert.match(html, /flowers-sketch\.png/);
+  // Entry-point labels are specified copy (spec 1), not incidental.
+  assert.match(html, /Create my garden/);
+  assert.match(html, /Browse plant library/);
   assert.doesNotMatch(html, /class="manifesto-band"/);
   assert.doesNotMatch(html, /class="specimen-section"/);
   assert.doesNotMatch(html, /class="how-section"/);
@@ -62,27 +63,17 @@ test("removes disposable starter UI and dependencies", async () => {
   );
 });
 
-test("serves the home hero in a high-quality modern format", async () => {
-  const [layout, css, hero] = await Promise.all([
+test("uses the flower sketch as home visual and site icon, with no background art", async () => {
+  const [layout, css, sketch, icon] = await Promise.all([
     readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
-    stat(
-      new URL(
-        "../public/images/editorial/home-hero.avif",
-        import.meta.url,
-      ),
-    ),
+    stat(new URL("../public/images/flowers-sketch.png", import.meta.url)),
+    stat(new URL("../public/favicon.png", import.meta.url)),
   ]);
-
-  assert.match(layout, /home-hero\.avif/);
-  assert.match(layout, /type="image\/avif"/);
-  assert.match(css, /image-set\([^)]*home-hero\.avif/s);
-  assert.match(css, /home-hero\.webp/);
-  assert.match(css, /home-hero\.jpg/);
-  assert.ok(
-    hero.size < 320 * 1024,
-    `Expected the hero below 320 KB, received ${hero.size} bytes`,
-  );
+  assert.match(layout, /rel="icon"[^>]*favicon\.png/);
+  assert.doesNotMatch(layout, /home-hero/);
+  assert.doesNotMatch(css, /home-hero|site-border\.jpg/);
+  assert.ok(sketch.size > 0 && icon.size > 0);
 });
 
 test("keeps legacy artwork and unused service scaffolding out of the app", async () => {
@@ -92,6 +83,11 @@ test("keeps legacy artwork and unused service scaffolding out of the app", async
   );
   const removedPaths = [
     "../hero2.png",
+    "../hero.png",
+    "../border.jpg",
+    "../public/images/editorial/home-hero.avif",
+    "../public/images/editorial/site-border.jpg",
+    "../assets/source/home-cape-cabinet.png",
     "../public/images/editorial/home-headline-frame.png",
     "../public/images/editorial/home-cape-cabinet.webp",
     "../app/chatgpt-auth.ts",
@@ -109,16 +105,8 @@ test("keeps legacy artwork and unused service scaffolding out of the app", async
   );
 });
 
-test("keeps plan circles visible and the border lightweight", async () => {
-  const [css, border] = await Promise.all([
-    readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
-    stat(
-      new URL(
-        "../public/images/editorial/site-border.jpg",
-        import.meta.url,
-      ),
-    ),
-  ]);
+test("keeps plan circles visible", async () => {
+  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
 
   assert.doesNotMatch(css, /var\(--sage\)/);
   assert.match(
@@ -128,10 +116,6 @@ test("keeps plan circles visible and the border lightweight", async () => {
   assert.match(
     css,
     /\.legend-dot\s*\{[^}]*background:\s*var\(--accent,\s*var\(--olive-soft\)\)/s,
-  );
-  assert.ok(
-    border.size < 200 * 1024,
-    `Expected site border below 200 KB, received ${border.size} bytes`,
   );
 });
 

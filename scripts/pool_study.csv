@@ -1,0 +1,40 @@
+part,cut,bed,cases,planned,all_hard_pass,mean_z,min_z,note
+pool-size,10,band 1  3x3,41,41,41,0.4723,0.4506,
+pool-size,10,band 2  6x4,41,41,41,0.4603,0.4218,
+pool-size,10,band 3 10x10,41,27,27,0.4132,0.3709,
+pool-size,15,band 1  3x3,41,41,41,0.4771,0.4414,
+pool-size,15,band 2  6x4,41,41,41,0.4930,0.4452,
+pool-size,15,band 3 10x10,41,41,41,0.4394,0.3986,
+pool-size,20,band 1  3x3,41,41,41,0.4733,0.4414,
+pool-size,20,band 2  6x4,41,41,41,0.4941,0.4543,
+pool-size,20,band 3 10x10,41,41,41,0.4543,0.4314,
+pool-size,30,band 1  3x3,41,41,41,0.4735,0.4414,
+pool-size,30,band 2  6x4,41,41,41,0.4956,0.4559,
+pool-size,30,band 3 10x10,41,41,41,0.4573,0.4314,
+pool-size,full,band 1  3x3,41,41,41,0.4735,0.4414,
+pool-size,full,band 2  6x4,41,41,41,0.4956,0.4559,
+pool-size,full,band 3 10x10,41,41,41,0.4573,0.4314,
+loosening,-,soil,1,1,0,0.4950,-,Fynbos | sheltered/low/clay
+loosening,-,soil,1,1,0,0.4523,0.4980,Fynbos | sheltered/moderate/clay
+loosening,-,soil,1,1,0,0.4996,0.4675,Succulent Karoo | sheltered/low/sandy
+loosening,-,soil,1,1,0,0.4991,0.4496,Succulent Karoo | sheltered/low/loam
+loosening,-,soil,1,1,0,0.4215,-,Succulent Karoo | sheltered/low/clay
+loosening,-,water,1,1,0,0.4823,0.4996,Succulent Karoo | sheltered/low/not-sure
+loosening,-,soil,1,1,0,0.4643,0.4542,Succulent Karoo | sheltered/moderate/clay
+loosening,-,soil,1,1,0,0.4992,-,Fynbos + Succulent Karoo | sheltered/low/clay
+loosening,-,soil,1,1,0,0.4742,0.4962,Fynbos + Succulent Karoo | sheltered/moderate/clay
+loosening,-,soil,1,1,0,0.4950,-,Forest + Fynbos | sheltered/low/clay
+loosening,-,soil,1,1,0,0.4280,0.4992,Forest + Fynbos | sheltered/moderate/clay
+loosening,-,soil,1,1,0,0.4978,-,Albany Thicket + Fynbos | sheltered/low/clay
+loosening,-,soil,1,1,0,0.4801,0.4980,Albany Thicket + Fynbos | sheltered/moderate/clay
+loosening,-,soil,1,1,0,0.4996,0.4661,Albany Thicket + Succulent Karoo | sheltered/low/sandy
+loosening,-,soil,1,1,0,0.4996,0.4325,Albany Thicket + Succulent Karoo | sheltered/low/loam
+loosening,-,soil,1,1,0,0.4215,-,Albany Thicket + Succulent Karoo | sheltered/low/clay
+loosening,-,water,1,1,0,0.4870,0.4996,Albany Thicket + Succulent Karoo | sheltered/low/not-sure
+loosening,-,soil,1,1,0,0.4547,0.4542,Albany Thicket + Succulent Karoo | sheltered/moderate/clay
+loosening,-,soil,1,1,0,0.4970,-,Albany Thicket + Forest + Fynbos | sheltered/low/clay
+loosening,-,soil,1,1,0,0.4969,0.4962,Albany Thicket + Forest + Fynbos | sheltered/moderate/clay
+loosening,-,soil,1,1,0,0.4970,-,Forest + Fynbos + Succulent Karoo | sheltered/low/clay
+loosening,-,soil,1,1,0,0.4992,0.4839,Forest + Fynbos + Succulent Karoo | sheltered/moderate/clay
+loosening,-,water,1,1,0,0.4614,0.4961,Albany Thicket | full/low/sandy
+loosening,-,soil,1,1,0,0.4663,0.4797,Albany Thicket | full/low/loam

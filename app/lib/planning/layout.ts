@@ -1,3 +1,5 @@
+import { RULES } from "./rules.ts";
+
 export type LayoutSpecies = {
   id: string;
   quantity: number;
@@ -191,7 +193,36 @@ export function placeCanopiesInRectangle(
   };
 }
 
-export function auditRectangularLayout(layout: RectangularLayout): string[] {
+/** P2's minimum centre distance, the single definition the whole engine
+ * uses. Rulebook 6_Stage3_4_Rules C15:D15, revised 2026-10-05:
+ *
+ *   d_ij >= r_i + r_j - delta * MIN(r_i, r_j)
+ *
+ * The allowance is a share of the SMALLER plant, not of the combined
+ * radii. Under the previous form, (1 - delta)(r_i + r_j), a big plant
+ * bought its small neighbour a large absolute overlap - the buck-weed
+ * beside the Searsia could lose about 0.55 m of its own spread. The same
+ * pair now gives up about 0.1 m. Equivalently: overlap / MIN(r_i, r_j)
+ * <= delta.
+ *
+ * `delta` is passed rather than read here so that the audit can check a
+ * layout against whatever tolerance built it, and so a study can vary it. */
+export function minCentreDistanceWith(
+  ri: number,
+  rj: number,
+  delta: number,
+): number {
+  return ri + rj - delta * Math.min(ri, rj);
+}
+
+/** Checks P1 (inside the bed) and P2 (overlap), using the definition
+ * above so the audit can never drift from the placement rule. */
+export function auditRectangularLayout(
+  layout: RectangularLayout,
+  // Read at call time for the same reason as minCentreDistance: an
+  // audit must use whatever delta the placement used.
+  overlapTolerance: number = RULES.stage4.overlapDelta,
+): string[] {
   const errors: string[] = [];
 
   layout.placements.forEach((placement) => {
@@ -214,7 +245,10 @@ export function auditRectangularLayout(layout: RectangularLayout): string[] {
       const left = layout.placements[leftIndex];
       const right = layout.placements[rightIndex];
       const distance = Math.hypot(left.xM - right.xM, left.yM - right.yM);
-      if (distance + EPSILON < left.radiusM + right.radiusM) {
+      if (
+        distance + EPSILON <
+        minCentreDistanceWith(left.radiusM, right.radiusM, overlapTolerance)
+      ) {
         errors.push(`${left.instanceId} overlaps ${right.instanceId}.`);
       }
     }

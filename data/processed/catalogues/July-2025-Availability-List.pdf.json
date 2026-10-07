@@ -1,0 +1,3059 @@
+{
+ "fileName": "July-2025-Availability-List.pdf",
+ "layout": "garden-route",
+ "sourceMtimeMs": 1790067614258,
+ "parsedAt": "2026-09-22T10:07:00+00:00",
+ "rows": [
+  {
+   "name": "Asparagus sp.",
+   "sizeText": "6L",
+   "price": 60.0,
+   "qty": 2,
+   "limited": true,
+   "section": "Shade Plants",
+   "page": 1
+  },
+  {
+   "name": "Brillantasia subulgarica",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 8,
+   "limited": true,
+   "section": "Shade Plants",
+   "page": 1
+  },
+  {
+   "name": "Fern ass.",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 11,
+   "limited": false,
+   "section": "Shade Plants",
+   "page": 1
+  },
+  {
+   "name": "Haemanthus albiflos",
+   "sizeText": "4L",
+   "price": 45.0,
+   "qty": 13,
+   "limited": false,
+   "section": "Shade Plants",
+   "page": 1
+  },
+  {
+   "name": "Justicia adhadtoides",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 12,
+   "limited": false,
+   "section": "Shade Plants",
+   "page": 1
+  },
+  {
+   "name": "Justicia capensis",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 12,
+   "limited": false,
+   "section": "Shade Plants",
+   "page": 1
+  },
+  {
+   "name": "Lachenalia sp.",
+   "sizeText": "12cm",
+   "price": 30.0,
+   "qty": 56,
+   "limited": false,
+   "section": "Shade Plants",
+   "page": 1
+  },
+  {
+   "name": "Ledebouria petiolata",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 24,
+   "limited": false,
+   "section": "Shade Plants",
+   "page": 1
+  },
+  {
+   "name": "Ledebouria sp.",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 16,
+   "limited": false,
+   "section": "Shade Plants",
+   "page": 1
+  },
+  {
+   "name": "Mackaya bella",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 11,
+   "limited": false,
+   "section": "Shade Plants",
+   "page": 1
+  },
+  {
+   "name": "Onychium japonicum",
+   "sizeText": "4L",
+   "price": 50.0,
+   "qty": 15,
+   "limited": false,
+   "section": "Shade Plants",
+   "page": 1
+  },
+  {
+   "name": "Phygelius capensis",
+   "sizeText": "6L",
+   "price": 30.0,
+   "qty": 4,
+   "limited": true,
+   "section": "Shade Plants",
+   "page": 1
+  },
+  {
+   "name": "Plectranthus chimanimaniensis",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 7,
+   "limited": true,
+   "section": "Shade Plants",
+   "page": 1
+  },
+  {
+   "name": "Plectranthus cilliatus",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 30,
+   "limited": false,
+   "section": "Shade Plants",
+   "page": 1
+  },
+  {
+   "name": "Plectranthus dentata",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 13,
+   "limited": false,
+   "section": "Shade Plants",
+   "page": 1
+  },
+  {
+   "name": "Plectranthus ecklonii (assorted)",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 12,
+   "limited": false,
+   "section": "Shade Plants",
+   "page": 1
+  },
+  {
+   "name": "Plectranthus grandidentata",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 11,
+   "limited": false,
+   "section": "Shade Plants",
+   "page": 1
+  },
+  {
+   "name": "Plectranthus madagascariensis",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 10,
+   "limited": false,
+   "section": "Shade Plants",
+   "page": 1
+  },
+  {
+   "name": "Plectranthus neochillus",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 12,
+   "limited": false,
+   "section": "Shade Plants",
+   "page": 1
+  },
+  {
+   "name": "Plectranthus oertendahlii",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 4,
+   "limited": true,
+   "section": "Shade Plants",
+   "page": 1
+  },
+  {
+   "name": "Plectranthus verticillatus",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 20,
+   "limited": false,
+   "section": "Shade Plants",
+   "page": 1
+  },
+  {
+   "name": "Plectranthus zuluensis",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 20,
+   "limited": false,
+   "section": "Shade Plants",
+   "page": 1
+  },
+  {
+   "name": "Polyxena ensifolia",
+   "sizeText": "12cm",
+   "price": 30.0,
+   "qty": 30,
+   "limited": false,
+   "section": "Shade Plants",
+   "page": 1
+  },
+  {
+   "name": "Rhoicissus digitata",
+   "sizeText": "4L",
+   "price": 50.0,
+   "qty": 25,
+   "limited": false,
+   "section": "Shade Plants",
+   "page": 1
+  },
+  {
+   "name": "Selaginella kraussiana",
+   "sizeText": "12cm",
+   "price": 25.0,
+   "qty": 18,
+   "limited": false,
+   "section": "Shade Plants",
+   "page": 1
+  },
+  {
+   "name": "Streptocarpus mix",
+   "sizeText": "14cm",
+   "price": 30.0,
+   "qty": 25,
+   "limited": false,
+   "section": "Shade Plants",
+   "page": 1
+  },
+  {
+   "name": "Zantedeschia aethiopica",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 34,
+   "limited": false,
+   "section": "Shade Plants",
+   "page": 1
+  },
+  {
+   "name": "Acacia karoo",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 5,
+   "limited": true,
+   "section": "Trees",
+   "page": 1
+  },
+  {
+   "name": "Acokanthera oppositifolia",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 18,
+   "limited": false,
+   "section": "Trees",
+   "page": 1
+  },
+  {
+   "name": "Afrocanthium gilfillanii",
+   "sizeText": "10L",
+   "price": 120.0,
+   "qty": 12,
+   "limited": false,
+   "section": "Trees",
+   "page": 1
+  },
+  {
+   "name": "Afrocanthium gilfillanii",
+   "sizeText": "20L",
+   "price": 250.0,
+   "qty": 7,
+   "limited": true,
+   "section": "Trees",
+   "page": 1
+  },
+  {
+   "name": "Afrocarpus falcatus",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 7,
+   "limited": true,
+   "section": "Trees",
+   "page": 1
+  },
+  {
+   "name": "Afrocarpus falcatus",
+   "sizeText": "20L",
+   "price": 250.0,
+   "qty": 14,
+   "limited": false,
+   "section": "Trees",
+   "page": 1
+  },
+  {
+   "name": "Apodytes dimidiata",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 9,
+   "limited": true,
+   "section": "Trees",
+   "page": 1
+  },
+  {
+   "name": "Apodytes dimidiata",
+   "sizeText": "20L",
+   "price": 250.0,
+   "qty": 1,
+   "limited": true,
+   "section": "Trees",
+   "page": 1
+  },
+  {
+   "name": "Bauhinia tomentosa",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 13,
+   "limited": false,
+   "section": "Trees",
+   "page": 1
+  },
+  {
+   "name": "Brachylaena discolor",
+   "sizeText": "10L",
+   "price": 120.0,
+   "qty": 7,
+   "limited": true,
+   "section": "Trees",
+   "page": 1
+  },
+  {
+   "name": "Brachylaena discolor",
+   "sizeText": "20L",
+   "price": 250.0,
+   "qty": 2,
+   "limited": true,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Buddleja salvifolia",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 7,
+   "limited": true,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Buddleja salvifolia",
+   "sizeText": "20L",
+   "price": 250.0,
+   "qty": 1,
+   "limited": true,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Burchellia bubalina",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 7,
+   "limited": true,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Calpurnia aurea",
+   "sizeText": "10L",
+   "price": 120.0,
+   "qty": 18,
+   "limited": false,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Calpurnia aurea",
+   "sizeText": "20L",
+   "price": 250.0,
+   "qty": 8,
+   "limited": true,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Caparia sepiara",
+   "sizeText": "10L",
+   "price": 70.0,
+   "qty": 9,
+   "limited": true,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Clutia pulchella",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 4,
+   "limited": true,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Coddia rudis",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 8,
+   "limited": true,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Curtisia dentata",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 15,
+   "limited": false,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Curtisia dentata",
+   "sizeText": "20L",
+   "price": 250.0,
+   "qty": 2,
+   "limited": true,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Dais cotinifolia",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 18,
+   "limited": false,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Diospyros dicrophylla",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 9,
+   "limited": true,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Diospyros glabra",
+   "sizeText": "6L",
+   "price": 90.0,
+   "qty": 10,
+   "limited": false,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Diospyros licioides",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 8,
+   "limited": true,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Diospyros licioides",
+   "sizeText": "20L",
+   "price": 250.0,
+   "qty": 2,
+   "limited": true,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Diospyros whiteana",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 5,
+   "limited": true,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Dodonaea viscosa",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 10,
+   "limited": false,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Dombeya rotundifolia",
+   "sizeText": "20L",
+   "price": 250.0,
+   "qty": 5,
+   "limited": true,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Dovyalis caffra",
+   "sizeText": "20L",
+   "price": 250.0,
+   "qty": 2,
+   "limited": true,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Dovyalis caffra",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 10,
+   "limited": false,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Ekebergia capensis",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 2,
+   "limited": true,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Ekebergia capensis",
+   "sizeText": "20L",
+   "price": 250.0,
+   "qty": 6,
+   "limited": true,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Erythrina caffra",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 8,
+   "limited": true,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Erythrina caffra",
+   "sizeText": "20L",
+   "price": 250.0,
+   "qty": 6,
+   "limited": true,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Fauria macnaughtonii",
+   "sizeText": "20L",
+   "price": 300.0,
+   "qty": 2,
+   "limited": true,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Ficus sur",
+   "sizeText": "20L",
+   "price": 250.0,
+   "qty": 2,
+   "limited": true,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Freylinia lanceolata",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 4,
+   "limited": true,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Gardenia thunbergia",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 17,
+   "limited": false,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Gardenia thunbergia",
+   "sizeText": "25L",
+   "price": 250.0,
+   "qty": 5,
+   "limited": true,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Gonioma kamassi",
+   "sizeText": "20L",
+   "price": 300.0,
+   "qty": 1,
+   "limited": true,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Grewia occidentalis",
+   "sizeText": "20L",
+   "price": 250.0,
+   "qty": 1,
+   "limited": true,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Gymnosporia sp.",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 12,
+   "limited": false,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Halleria lucida",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 9,
+   "limited": true,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Halleria lucida",
+   "sizeText": "20L",
+   "price": 250.0,
+   "qty": 8,
+   "limited": true,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Harpephyllum caffrum",
+   "sizeText": "10L",
+   "price": 120.0,
+   "qty": 12,
+   "limited": false,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Harpephyllum caffrum",
+   "sizeText": "20L",
+   "price": 250.0,
+   "qty": 12,
+   "limited": false,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Illex mitis",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 10,
+   "limited": false,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Illex mitis",
+   "sizeText": "20L",
+   "price": 250.0,
+   "qty": 3,
+   "limited": true,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Indigofera frutescens",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 20,
+   "limited": false,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Kiggelaria africana",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 3,
+   "limited": true,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Loxostylis alata",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 18,
+   "limited": false,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Loxostylis alata",
+   "sizeText": "20L",
+   "price": 250.0,
+   "qty": 3,
+   "limited": true,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Maytenus accuminata",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 21,
+   "limited": false,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Maytenus peduncularis",
+   "sizeText": "20L",
+   "price": 300.0,
+   "qty": 4,
+   "limited": true,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Maytenus procumbens",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 15,
+   "limited": false,
+   "section": "Trees",
+   "page": 2
+  },
+  {
+   "name": "Melianthus major",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 8,
+   "limited": true,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Nuxia floribunda",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 15,
+   "limited": false,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Ochna serrulata",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 15,
+   "limited": false,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Olea capensis subsp. macrocarpa",
+   "sizeText": "20L",
+   "price": 300.0,
+   "qty": 1,
+   "limited": true,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Olea exasperata",
+   "sizeText": "20L",
+   "price": 250.0,
+   "qty": 2,
+   "limited": true,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Pavetta lanceolata",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 19,
+   "limited": false,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Phoenix redicata",
+   "sizeText": "20L",
+   "price": 250.0,
+   "qty": 4,
+   "limited": true,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Pittosporum viridiflorum",
+   "sizeText": "10L",
+   "price": 120.0,
+   "qty": 5,
+   "limited": true,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Podalyria calyptrata",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 9,
+   "limited": true,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Podocarpus henkelii",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 11,
+   "limited": false,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Podocarpus henkelii",
+   "sizeText": "20L",
+   "price": 250.0,
+   "qty": 1,
+   "limited": true,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Podocarpus latifolius",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 4,
+   "limited": true,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Podocarpus latifolius",
+   "sizeText": "20L",
+   "price": 250.0,
+   "qty": 12,
+   "limited": false,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Psoralea pinnata",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 6,
+   "limited": true,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Ptaeroxylon obliquum",
+   "sizeText": "20L",
+   "price": 250.0,
+   "qty": 1,
+   "limited": true,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Rauvolfia caffra",
+   "sizeText": "20L",
+   "price": 250.0,
+   "qty": 6,
+   "limited": true,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Rhamnus prinoides",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 16,
+   "limited": false,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Rothmania globosa",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 14,
+   "limited": false,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Rothmania globosa",
+   "sizeText": "20L",
+   "price": 250.0,
+   "qty": 3,
+   "limited": true,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Schotia brachypetala",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 14,
+   "limited": false,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Schotia brachypetala",
+   "sizeText": "20L",
+   "price": 250.0,
+   "qty": 4,
+   "limited": true,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Scutia myrtina",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 10,
+   "limited": false,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Searsia chirindensis",
+   "sizeText": "20L",
+   "price": 250.0,
+   "qty": 4,
+   "limited": true,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Senegalia galpinii",
+   "sizeText": "20L",
+   "price": 250.0,
+   "qty": 1,
+   "limited": true,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Sideroxylon inerme",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 10,
+   "limited": false,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Sideroxylon inerme",
+   "sizeText": "20L",
+   "price": 250.0,
+   "qty": 2,
+   "limited": true,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Solanum giganteum",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 5,
+   "limited": true,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Sparmannia africana",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 1,
+   "limited": true,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Strelitzia nicolai",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 2,
+   "limited": true,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Strelitzia nicolai",
+   "sizeText": "20L",
+   "price": 250.0,
+   "qty": 2,
+   "limited": true,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Strelitzia reginae",
+   "sizeText": "20L",
+   "price": 250.0,
+   "qty": 7,
+   "limited": true,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Syzygium cordatum",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 14,
+   "limited": false,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Syzygium cordatum",
+   "sizeText": "20L",
+   "price": 250.0,
+   "qty": 6,
+   "limited": true,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Syzygium pondoense",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 1,
+   "limited": true,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Syzygium pondoense",
+   "sizeText": "20L",
+   "price": 250.0,
+   "qty": 2,
+   "limited": true,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Tarchonantus camphoratus",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 4,
+   "limited": true,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Tarchonantus camphoratus",
+   "sizeText": "20L",
+   "price": 250.0,
+   "qty": 1,
+   "limited": true,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Tephrosia grandiflora",
+   "sizeText": "10L",
+   "price": 70.0,
+   "qty": 17,
+   "limited": false,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Trichillia dregeana",
+   "sizeText": "20L",
+   "price": 250.0,
+   "qty": 2,
+   "limited": true,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Trichillia dregeana",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 2,
+   "limited": true,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Vepris lanceolata",
+   "sizeText": "20L",
+   "price": 250.0,
+   "qty": 5,
+   "limited": true,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Virgillia oroboides",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 8,
+   "limited": true,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Widdringtonia nudiflora",
+   "sizeText": "20L",
+   "price": 250.0,
+   "qty": 1,
+   "limited": true,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Widdringtonia nudiflora",
+   "sizeText": "10L",
+   "price": 90.0,
+   "qty": 10,
+   "limited": false,
+   "section": "Trees",
+   "page": 3
+  },
+  {
+   "name": "Acmadenia heterophylla",
+   "sizeText": "4L",
+   "price": 50.0,
+   "qty": 21,
+   "limited": false,
+   "section": "Fynbos",
+   "page": 3
+  },
+  {
+   "name": "Agathosma apiculata",
+   "sizeText": "14cm",
+   "price": 50.0,
+   "qty": 24,
+   "limited": false,
+   "section": "Fynbos",
+   "page": 3
+  },
+  {
+   "name": "Agathosma capensis",
+   "sizeText": "14cm",
+   "price": 50.0,
+   "qty": 10,
+   "limited": false,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Agathosma cilliaris",
+   "sizeText": "14cm",
+   "price": 50.0,
+   "qty": 10,
+   "limited": false,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Agathosma ovata",
+   "sizeText": "14cm",
+   "price": 50.0,
+   "qty": 10,
+   "limited": false,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Agathosma serphellacea",
+   "sizeText": "14cm",
+   "price": 50.0,
+   "qty": 10,
+   "limited": false,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Agathosma sp.",
+   "sizeText": "12cm",
+   "price": 50.0,
+   "qty": 11,
+   "limited": false,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Artemesia schidtiana",
+   "sizeText": "15cm",
+   "price": 50.0,
+   "qty": 5,
+   "limited": true,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Athanasia crithmifolia",
+   "sizeText": "4L",
+   "price": 45.0,
+   "qty": 13,
+   "limited": false,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Berzelia lanuginosa",
+   "sizeText": "4L",
+   "price": 150.0,
+   "qty": 2,
+   "limited": true,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Brunia sp.",
+   "sizeText": "15cm",
+   "price": 50.0,
+   "qty": 6,
+   "limited": true,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Coleonema alba",
+   "sizeText": "12cm",
+   "price": 35.0,
+   "qty": 9,
+   "limited": false,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Coleonema aspalathoides",
+   "sizeText": "12cm",
+   "price": 35.0,
+   "qty": 4,
+   "limited": true,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Coleonema pulchellum",
+   "sizeText": "12cm",
+   "price": 35.0,
+   "qty": 17,
+   "limited": false,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Cyclopia subternata",
+   "sizeText": "4L",
+   "price": 50.0,
+   "qty": 3,
+   "limited": true,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Erica bauerii",
+   "sizeText": "12cm",
+   "price": 50.0,
+   "qty": 23,
+   "limited": false,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Erica discolor",
+   "sizeText": "12cm",
+   "price": 50.0,
+   "qty": 30,
+   "limited": false,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Erica glandulosa",
+   "sizeText": "14cm",
+   "price": 50.0,
+   "qty": 52,
+   "limited": false,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Erica sessiliflora",
+   "sizeText": "14cm",
+   "price": 50.0,
+   "qty": 2,
+   "limited": true,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Erica unicolor",
+   "sizeText": "4L",
+   "price": 50.0,
+   "qty": 10,
+   "limited": false,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Erica versicolor",
+   "sizeText": "14cm",
+   "price": 50.0,
+   "qty": 20,
+   "limited": false,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Erica verticillata",
+   "sizeText": "15cm",
+   "price": 50.0,
+   "qty": 23,
+   "limited": false,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Gnidia oppositifolia",
+   "sizeText": "4L",
+   "price": 50.0,
+   "qty": 1,
+   "limited": true,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Gnidia squarossa",
+   "sizeText": "14cm",
+   "price": 50.0,
+   "qty": 10,
+   "limited": false,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Leucospermum catherinae",
+   "sizeText": "4L",
+   "price": 160.0,
+   "qty": 2,
+   "limited": true,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Leucospermum cordifolium orange",
+   "sizeText": "16cm",
+   "price": 160.0,
+   "qty": 20,
+   "limited": false,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Leucospermum erubescens",
+   "sizeText": "16cm",
+   "price": 160.0,
+   "qty": 20,
+   "limited": false,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Leucospernum hybrid",
+   "sizeText": "16",
+   "price": 160.0,
+   "qty": 6,
+   "limited": true,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Leucospermum murii",
+   "sizeText": "16cm",
+   "price": 160.0,
+   "qty": 20,
+   "limited": false,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Leucadendron blush",
+   "sizeText": "20cm",
+   "price": 150.0,
+   "qty": 5,
+   "limited": true,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Leucadendron discolor",
+   "sizeText": "20cm",
+   "price": 100.0,
+   "qty": 43,
+   "limited": false,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Leucadendron galpinii",
+   "sizeText": "14cm",
+   "price": 150.0,
+   "qty": 10,
+   "limited": false,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Leucadendron jubilee crown",
+   "sizeText": "20cm",
+   "price": 150.0,
+   "qty": 3,
+   "limited": true,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Leucadendron laureolum",
+   "sizeText": "15cm",
+   "price": 150.0,
+   "qty": 9,
+   "limited": true,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Leucadendron laxum",
+   "sizeText": "20cm",
+   "price": 150.0,
+   "qty": 2,
+   "limited": true,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Leucadendron linifolium (M)",
+   "sizeText": "20cm",
+   "price": 150.0,
+   "qty": 4,
+   "limited": true,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Leucadendron meridianum",
+   "sizeText": "20cm",
+   "price": 150.0,
+   "qty": 10,
+   "limited": false,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Leucadendron modestum",
+   "sizeText": "20cm",
+   "price": 150.0,
+   "qty": 5,
+   "limited": true,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Leucadendron nobile",
+   "sizeText": "20cm",
+   "price": 150.0,
+   "qty": 3,
+   "limited": true,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Leucadendron 'Safari Sunset'",
+   "sizeText": "20cm",
+   "price": 150.0,
+   "qty": 5,
+   "limited": true,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Leucadendron salignum",
+   "sizeText": "16cm",
+   "price": 150.0,
+   "qty": 10,
+   "limited": false,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Leucadendron Sylvan red",
+   "sizeText": "20cm",
+   "price": 150.0,
+   "qty": 1,
+   "limited": true,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Linum africanum",
+   "sizeText": "14cm",
+   "price": 50.0,
+   "qty": 10,
+   "limited": false,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Orphium fritescens",
+   "sizeText": "4L",
+   "price": 50.0,
+   "qty": 10,
+   "limited": false,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Passerina corymbosa",
+   "sizeText": "20cm",
+   "price": 70.0,
+   "qty": 2,
+   "limited": true,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Phylica pubescens",
+   "sizeText": "4L",
+   "price": 150.0,
+   "qty": 1,
+   "limited": true,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Phylica gnidioides (lilac)",
+   "sizeText": "14cm",
+   "price": 50.0,
+   "qty": 27,
+   "limited": false,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Protea cynaroides pink",
+   "sizeText": "20cm",
+   "price": 180.0,
+   "qty": 17,
+   "limited": false,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Protea cynaroides white",
+   "sizeText": "4L",
+   "price": 180.0,
+   "qty": 5,
+   "limited": true,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Protea grandiceps",
+   "sizeText": "4L",
+   "price": 180.0,
+   "qty": 3,
+   "limited": true,
+   "section": "Fynbos",
+   "page": 4
+  },
+  {
+   "name": "Protea hybrid",
+   "sizeText": "4L",
+   "price": 180.0,
+   "qty": 6,
+   "limited": true,
+   "section": "Fynbos",
+   "page": 5
+  },
+  {
+   "name": "Protea lime light",
+   "sizeText": "4L",
+   "price": 180.0,
+   "qty": 10,
+   "limited": false,
+   "section": "Fynbos",
+   "page": 5
+  },
+  {
+   "name": "Protea niobe",
+   "sizeText": "4L",
+   "price": 180.0,
+   "qty": 5,
+   "limited": true,
+   "section": "Fynbos",
+   "page": 5
+  },
+  {
+   "name": "Protea pink ice",
+   "sizeText": "20cm",
+   "price": 180.0,
+   "qty": 9,
+   "limited": true,
+   "section": "Fynbos",
+   "page": 5
+  },
+  {
+   "name": "Protea susarah",
+   "sizeText": "4L",
+   "price": 180.0,
+   "qty": 6,
+   "limited": true,
+   "section": "Fynbos",
+   "page": 5
+  },
+  {
+   "name": "Selago boozie blue",
+   "sizeText": "4L",
+   "price": 50.0,
+   "qty": 8,
+   "limited": true,
+   "section": "Fynbos",
+   "page": 5
+  },
+  {
+   "name": "Selago canescens",
+   "sizeText": "4L",
+   "price": 50.0,
+   "qty": 7,
+   "limited": true,
+   "section": "Fynbos",
+   "page": 5
+  },
+  {
+   "name": "Selago corymbosa",
+   "sizeText": "4L",
+   "price": 50.0,
+   "qty": 15,
+   "limited": false,
+   "section": "Fynbos",
+   "page": 5
+  },
+  {
+   "name": "Stoebe plumosa",
+   "sizeText": "4L",
+   "price": 50.0,
+   "qty": 20,
+   "limited": false,
+   "section": "Fynbos",
+   "page": 5
+  },
+  {
+   "name": "Struthiola dodecandra",
+   "sizeText": "4L",
+   "price": 50.0,
+   "qty": 22,
+   "limited": false,
+   "section": "Fynbos",
+   "page": 5
+  },
+  {
+   "name": "Agapanthus africanus",
+   "sizeText": "6L",
+   "price": 30.0,
+   "qty": 22,
+   "limited": false,
+   "section": "Bulbs",
+   "page": 5
+  },
+  {
+   "name": "Agapanthus praecox blue",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 95,
+   "limited": false,
+   "section": "Bulbs",
+   "page": 5
+  },
+  {
+   "name": "Agapanthus praecox white",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 44,
+   "limited": false,
+   "section": "Bulbs",
+   "page": 5
+  },
+  {
+   "name": "Albuca aurea",
+   "sizeText": "4L",
+   "price": 40.0,
+   "qty": 19,
+   "limited": false,
+   "section": "Bulbs",
+   "page": 5
+  },
+  {
+   "name": "Albuca nelsonii",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 6,
+   "limited": true,
+   "section": "Bulbs",
+   "page": 5
+  },
+  {
+   "name": "Bulbine latifolius",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 7,
+   "limited": false,
+   "section": "Bulbs",
+   "page": 5
+  },
+  {
+   "name": "Chasmanthe sp.",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 27,
+   "limited": false,
+   "section": "Bulbs",
+   "page": 5
+  },
+  {
+   "name": "Clivia caulescens",
+   "sizeText": "6L",
+   "price": 90.0,
+   "qty": 7,
+   "limited": true,
+   "section": "Bulbs",
+   "page": 5
+  },
+  {
+   "name": "Clivia miniata",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 8,
+   "limited": true,
+   "section": "Bulbs",
+   "page": 5
+  },
+  {
+   "name": "Crinum sp.",
+   "sizeText": "6L",
+   "price": 100.0,
+   "qty": 4,
+   "limited": true,
+   "section": "Bulbs",
+   "page": 5
+  },
+  {
+   "name": "Cyrtanthus elatus",
+   "sizeText": "4L",
+   "price": 100.0,
+   "qty": 26,
+   "limited": false,
+   "section": "Bulbs",
+   "page": 5
+  },
+  {
+   "name": "Cyrtanthus mackenii",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 15,
+   "limited": false,
+   "section": "Bulbs",
+   "page": 5
+  },
+  {
+   "name": "Dietes bicolor",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 34,
+   "limited": false,
+   "section": "Bulbs",
+   "page": 5
+  },
+  {
+   "name": "Dietes grandiflora",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 38,
+   "limited": false,
+   "section": "Bulbs",
+   "page": 5
+  },
+  {
+   "name": "Dietes iridioides",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 17,
+   "limited": false,
+   "section": "Bulbs",
+   "page": 5
+  },
+  {
+   "name": "Ferarria crispum",
+   "sizeText": "15cm",
+   "price": 30.0,
+   "qty": 21,
+   "limited": false,
+   "section": "Bulbs",
+   "page": 5
+  },
+  {
+   "name": "Tulbaghia maritana",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 43,
+   "limited": false,
+   "section": "Bulbs",
+   "page": 5
+  },
+  {
+   "name": "Tulbaghia sp.",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 29,
+   "limited": false,
+   "section": "Bulbs",
+   "page": 5
+  },
+  {
+   "name": "Tulbaghia variegated",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 1,
+   "limited": true,
+   "section": "Bulbs",
+   "page": 5
+  },
+  {
+   "name": "Tulbaghia violacea",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 19,
+   "limited": false,
+   "section": "Bulbs",
+   "page": 5
+  },
+  {
+   "name": "Veltheimia bracteata",
+   "sizeText": "4L",
+   "price": 50.0,
+   "qty": 45,
+   "limited": false,
+   "section": "Bulbs",
+   "page": 5
+  },
+  {
+   "name": "Wachendorfia thyrsiflora",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 18,
+   "limited": false,
+   "section": "Bulbs",
+   "page": 5
+  },
+  {
+   "name": "Watsonia mixed",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 44,
+   "limited": false,
+   "section": "Bulbs",
+   "page": 5
+  },
+  {
+   "name": "Arctotis mix",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 18,
+   "limited": false,
+   "section": "Bulbs",
+   "page": 5
+  },
+  {
+   "name": "Arctotis little pink",
+   "sizeText": "14cm",
+   "price": 25.0,
+   "qty": 17,
+   "limited": false,
+   "section": "Bulbs",
+   "page": 5
+  },
+  {
+   "name": "Climatus bracteata",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 13,
+   "limited": false,
+   "section": "Bulbs",
+   "page": 5
+  },
+  {
+   "name": "Delosperma echinatum",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 4,
+   "limited": true,
+   "section": "Bulbs",
+   "page": 5
+  },
+  {
+   "name": "Dyschoriste setigera",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 21,
+   "limited": false,
+   "section": "Bulbs",
+   "page": 5
+  },
+  {
+   "name": "Falkia repens",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 17,
+   "limited": false,
+   "section": "Bulbs",
+   "page": 5
+  },
+  {
+   "name": "Gazania assorted",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 50,
+   "limited": false,
+   "section": "Bulbs",
+   "page": 5
+  },
+  {
+   "name": "Gazania giant mixed",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 10,
+   "limited": false,
+   "section": "Bulbs",
+   "page": 5
+  },
+  {
+   "name": "Geranium incanum",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 30,
+   "limited": false,
+   "section": "Bulbs",
+   "page": 5
+  },
+  {
+   "name": "Helichrysum odoratismum",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 40,
+   "limited": false,
+   "section": "Bulbs",
+   "page": 5
+  },
+  {
+   "name": "Helichrysum teretifolium",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 15,
+   "limited": false,
+   "section": "Bulbs",
+   "page": 5
+  },
+  {
+   "name": "Hypoxis hemerocallidea",
+   "sizeText": "4L",
+   "price": 20.0,
+   "qty": 42,
+   "limited": false,
+   "section": "Bulbs",
+   "page": 5
+  },
+  {
+   "name": "Jaminum multipartitum",
+   "sizeText": "6L",
+   "price": 70.0,
+   "qty": 1,
+   "limited": true,
+   "section": "Bulbs",
+   "page": 5
+  },
+  {
+   "name": "Jordaniella anemoniflora",
+   "sizeText": "15cm",
+   "price": 25.0,
+   "qty": 10,
+   "limited": false,
+   "section": "Bulbs",
+   "page": 5
+  },
+  {
+   "name": "Lampranthus cerise",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 9,
+   "limited": true,
+   "section": "Bulbs",
+   "page": 6
+  },
+  {
+   "name": "Lampranthus sp. (assorted)",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 25,
+   "limited": false,
+   "section": "Bulbs",
+   "page": 6
+  },
+  {
+   "name": "Lampranthus sp. (pink)",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 12,
+   "limited": false,
+   "section": "Bulbs",
+   "page": 6
+  },
+  {
+   "name": "Lampranthus sp. (white)",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 24,
+   "limited": false,
+   "section": "Bulbs",
+   "page": 6
+  },
+  {
+   "name": "Lampranthus sp. (yellow)",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 22,
+   "limited": false,
+   "section": "Bulbs",
+   "page": 6
+  },
+  {
+   "name": "Lampranthus sunshine",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 10,
+   "limited": false,
+   "section": "Bulbs",
+   "page": 6
+  },
+  {
+   "name": "Oscularia deltoides",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 9,
+   "limited": true,
+   "section": "Bulbs",
+   "page": 6
+  },
+  {
+   "name": "Ruschia lineolata",
+   "sizeText": "5L",
+   "price": 25.0,
+   "qty": 10,
+   "limited": false,
+   "section": "Bulbs",
+   "page": 6
+  },
+  {
+   "name": "Senecio ficoides",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 19,
+   "limited": false,
+   "section": "Bulbs",
+   "page": 6
+  },
+  {
+   "name": "Thunbergia alata",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 17,
+   "limited": false,
+   "section": "Bulbs",
+   "page": 6
+  },
+  {
+   "name": "Aloe africana",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 39,
+   "limited": false,
+   "section": "Succulents",
+   "page": 6
+  },
+  {
+   "name": "Aloe ferox hybrid",
+   "sizeText": "4L",
+   "price": 50.0,
+   "qty": 15,
+   "limited": false,
+   "section": "Succulents",
+   "page": 6
+  },
+  {
+   "name": "Aloe arborescens",
+   "sizeText": "4L",
+   "price": 50.0,
+   "qty": 14,
+   "limited": false,
+   "section": "Succulents",
+   "page": 6
+  },
+  {
+   "name": "Aloe castanae",
+   "sizeText": "4L",
+   "price": 50.0,
+   "qty": 2,
+   "limited": true,
+   "section": "Succulents",
+   "page": 6
+  },
+  {
+   "name": "Aloe chabaudii",
+   "sizeText": "4L",
+   "price": 50.0,
+   "qty": 26,
+   "limited": false,
+   "section": "Succulents",
+   "page": 6
+  },
+  {
+   "name": "Aloe cooperii",
+   "sizeText": "4L",
+   "price": 50.0,
+   "qty": 27,
+   "limited": false,
+   "section": "Succulents",
+   "page": 6
+  },
+  {
+   "name": "Aloe ferox",
+   "sizeText": "4L",
+   "price": 50.0,
+   "qty": 21,
+   "limited": false,
+   "section": "Succulents",
+   "page": 6
+  },
+  {
+   "name": "Aloe maculata",
+   "sizeText": "4L",
+   "price": 50.0,
+   "qty": 30,
+   "limited": false,
+   "section": "Succulents",
+   "page": 6
+  },
+  {
+   "name": "Aloe microstigma",
+   "sizeText": "4L",
+   "price": 50.0,
+   "qty": 7,
+   "limited": true,
+   "section": "Succulents",
+   "page": 6
+  },
+  {
+   "name": "Aloe squarrosa",
+   "sizeText": "4L",
+   "price": 50.0,
+   "qty": 35,
+   "limited": false,
+   "section": "Succulents",
+   "page": 6
+  },
+  {
+   "name": "Aloe striata",
+   "sizeText": "4L",
+   "price": 50.0,
+   "qty": 20,
+   "limited": false,
+   "section": "Succulents",
+   "page": 6
+  },
+  {
+   "name": "Aloe teniuor",
+   "sizeText": "4L",
+   "price": 50.0,
+   "qty": 21,
+   "limited": false,
+   "section": "Succulents",
+   "page": 6
+  },
+  {
+   "name": "Aloe thraskii",
+   "sizeText": "4L",
+   "price": 50.0,
+   "qty": 19,
+   "limited": false,
+   "section": "Succulents",
+   "page": 6
+  },
+  {
+   "name": "Aloe vanbaleni",
+   "sizeText": "6L",
+   "price": 50.0,
+   "qty": 23,
+   "limited": false,
+   "section": "Succulents",
+   "page": 6
+  },
+  {
+   "name": "Cotyledon orbiculata",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 16,
+   "limited": false,
+   "section": "Succulents",
+   "page": 6
+  },
+  {
+   "name": "Cotyledon pendens",
+   "sizeText": "12cm",
+   "price": 30.0,
+   "qty": 13,
+   "limited": false,
+   "section": "Succulents",
+   "page": 6
+  },
+  {
+   "name": "Cotyledon sp.",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 20,
+   "limited": false,
+   "section": "Succulents",
+   "page": 6
+  },
+  {
+   "name": "Crassula sp.",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 25,
+   "limited": false,
+   "section": "Succulents",
+   "page": 6
+  },
+  {
+   "name": "Curio sp.",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 7,
+   "limited": true,
+   "section": "Succulents",
+   "page": 6
+  },
+  {
+   "name": "Gasteria bicolor",
+   "sizeText": "12cm",
+   "price": 30.0,
+   "qty": 30,
+   "limited": false,
+   "section": "Succulents",
+   "page": 6
+  },
+  {
+   "name": "Gasteria disticha",
+   "sizeText": "12cm",
+   "price": 30.0,
+   "qty": 40,
+   "limited": false,
+   "section": "Succulents",
+   "page": 6
+  },
+  {
+   "name": "Gasteria glomerata",
+   "sizeText": "12cm",
+   "price": 25.0,
+   "qty": 10,
+   "limited": false,
+   "section": "Succulents",
+   "page": 6
+  },
+  {
+   "name": "Gasteria sp.",
+   "sizeText": "12cm",
+   "price": 50.0,
+   "qty": 10,
+   "limited": false,
+   "section": "Succulents",
+   "page": 6
+  },
+  {
+   "name": "Haworthia attenuata",
+   "sizeText": "12cm",
+   "price": 25.0,
+   "qty": 10,
+   "limited": false,
+   "section": "Succulents",
+   "page": 6
+  },
+  {
+   "name": "Haworthia coarcta",
+   "sizeText": "12cm",
+   "price": 50.0,
+   "qty": 10,
+   "limited": false,
+   "section": "Succulents",
+   "page": 6
+  },
+  {
+   "name": "Haworthia cymbiformis",
+   "sizeText": "12cm",
+   "price": 50.0,
+   "qty": 10,
+   "limited": false,
+   "section": "Succulents",
+   "page": 6
+  },
+  {
+   "name": "Kalanchoe luciae",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 20,
+   "limited": false,
+   "section": "Succulents",
+   "page": 6
+  },
+  {
+   "name": "Kalanchoe sexangularis",
+   "sizeText": "12cm",
+   "price": 50.0,
+   "qty": 8,
+   "limited": true,
+   "section": "Succulents",
+   "page": 6
+  },
+  {
+   "name": "Orbea variegata",
+   "sizeText": "12cm",
+   "price": 30.0,
+   "qty": 30,
+   "limited": false,
+   "section": "Succulents",
+   "page": 6
+  },
+  {
+   "name": "Portulacaria afra",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 30,
+   "limited": false,
+   "section": "Succulents",
+   "page": 6
+  },
+  {
+   "name": "Portulacaria afra aurea",
+   "sizeText": "4L",
+   "price": 45.0,
+   "qty": 10,
+   "limited": false,
+   "section": "Succulents",
+   "page": 6
+  },
+  {
+   "name": "Anisodontea julii",
+   "sizeText": "4L",
+   "price": 40.0,
+   "qty": 9,
+   "limited": true,
+   "section": "Shrubs",
+   "page": 6
+  },
+  {
+   "name": "Anisodontea scabrosa",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 14,
+   "limited": false,
+   "section": "Shrubs",
+   "page": 6
+  },
+  {
+   "name": "Artemesia afra",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 12,
+   "limited": false,
+   "section": "Shrubs",
+   "page": 6
+  },
+  {
+   "name": "Barleria greenii",
+   "sizeText": "15cm",
+   "price": 95.0,
+   "qty": 1,
+   "limited": true,
+   "section": "Shrubs",
+   "page": 6
+  },
+  {
+   "name": "Barleria obtusa",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 47,
+   "limited": false,
+   "section": "Shrubs",
+   "page": 6
+  },
+  {
+   "name": "Barleria purple prince",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 18,
+   "limited": false,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Barleria repens",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 10,
+   "limited": false,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Carissa macrocarpa",
+   "sizeText": "4L",
+   "price": 35.0,
+   "qty": 14,
+   "limited": false,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Carissa macrocarpa",
+   "sizeText": "6L",
+   "price": 70.0,
+   "qty": 13,
+   "limited": false,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Carissa macrocarpa green carpet",
+   "sizeText": "4L",
+   "price": 40.0,
+   "qty": 9,
+   "limited": true,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Cineraria saxifraga",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 30,
+   "limited": false,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Crotolaria capensis",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 40,
+   "limited": false,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Dyschoriste thunbergiiflora",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 11,
+   "limited": false,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Euryops chrysanthemoides",
+   "sizeText": "4L",
+   "price": 40.0,
+   "qty": 23,
+   "limited": false,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Euryops pectinatus",
+   "sizeText": "4L",
+   "price": 50.0,
+   "qty": 30,
+   "limited": false,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Euryops virgineus",
+   "sizeText": "4L",
+   "price": 40.0,
+   "qty": 20,
+   "limited": false,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Felicia amelloides blue",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 15,
+   "limited": false,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Felicia bergeriana blue",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 36,
+   "limited": false,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Felicia echinata",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 33,
+   "limited": false,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Felicia erigeroides",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 10,
+   "limited": false,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Freylinia densiflora",
+   "sizeText": "4L",
+   "price": 35.0,
+   "qty": 29,
+   "limited": false,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Freylinia tropica blue",
+   "sizeText": "4L",
+   "price": 40.0,
+   "qty": 3,
+   "limited": true,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Freylinia tropica white",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 2,
+   "limited": true,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Hebenstretia dura",
+   "sizeText": "4L",
+   "price": 40.0,
+   "qty": 10,
+   "limited": false,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Hibiscus pedunculatus",
+   "sizeText": "4L",
+   "price": 40.0,
+   "qty": 27,
+   "limited": false,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Hypoestes aristata",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 78,
+   "limited": false,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Leonotis leonurus orange",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 22,
+   "limited": false,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Leonotis nepitifolia",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 2,
+   "limited": true,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Lessertia frutescens",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 3,
+   "limited": true,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Nemesia mix",
+   "sizeText": "14cm",
+   "price": 30.0,
+   "qty": 29,
+   "limited": false,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Ocimum labiatum",
+   "sizeText": "4L",
+   "price": 45.0,
+   "qty": 6,
+   "limited": true,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Ortholobium bracteata",
+   "sizeText": "4L",
+   "price": 40.0,
+   "qty": 15,
+   "limited": false,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Pavonia praemorsa",
+   "sizeText": "4L",
+   "price": 40.0,
+   "qty": 19,
+   "limited": false,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Pelargonium assorted",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 22,
+   "limited": false,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Pelargonium citronellum",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 2,
+   "limited": true,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Pelargonium cucullatum",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 20,
+   "limited": false,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Pelargonium denticulatum",
+   "sizeText": "15cm",
+   "price": 70.0,
+   "qty": 1,
+   "limited": true,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Pelargonium fragrans",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 1,
+   "limited": true,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Pelargonium fruticosum",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 25,
+   "limited": false,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Pelargonium graveolens",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 21,
+   "limited": false,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Pelargonium sidoides",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 6,
+   "limited": false,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Pelargonium tomentosa",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 8,
+   "limited": true,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Plumbago auriculata (blue)",
+   "sizeText": "4L",
+   "price": 35.0,
+   "qty": 32,
+   "limited": false,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Plumbago auriculata (white)",
+   "sizeText": "4L",
+   "price": 35.0,
+   "qty": 12,
+   "limited": false,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Podranea ricasoliana",
+   "sizeText": "4L",
+   "price": 40.0,
+   "qty": 10,
+   "limited": false,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Polygala fruticosa",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 1,
+   "limited": true,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Salvia africana caerulea",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 1,
+   "limited": true,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Salvia africana lutea",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 13,
+   "limited": true,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Salvia aurea",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 10,
+   "limited": false,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Salvia chamelaeagnea",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 10,
+   "limited": false,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Salvia lanceolata",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 20,
+   "limited": false,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Salvia scabra",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 28,
+   "limited": false,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Salvia murii",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 10,
+   "limited": false,
+   "section": "Shrubs",
+   "page": 7
+  },
+  {
+   "name": "Salvia St.Pauls",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 3,
+   "limited": true,
+   "section": "Shrubs",
+   "page": 8
+  },
+  {
+   "name": "Selago glomerata white",
+   "sizeText": "4L",
+   "price": 50.0,
+   "qty": 7,
+   "limited": true,
+   "section": "Shrubs",
+   "page": 8
+  },
+  {
+   "name": "Strelitzia reginae",
+   "sizeText": "6L",
+   "price": 50.0,
+   "qty": 13,
+   "limited": false,
+   "section": "Shrubs",
+   "page": 8
+  },
+  {
+   "name": "Tecoma assorted",
+   "sizeText": "10L",
+   "price": 75.0,
+   "qty": 20,
+   "limited": false,
+   "section": "Shrubs",
+   "page": 8
+  },
+  {
+   "name": "Tecoma capensis (assorted)",
+   "sizeText": "4L",
+   "price": 25.0,
+   "qty": 95,
+   "limited": false,
+   "section": "Shrubs",
+   "page": 8
+  },
+  {
+   "name": "Ursinea paleacea",
+   "sizeText": "15cm",
+   "price": 30.0,
+   "qty": 6,
+   "limited": true,
+   "section": "Shrubs",
+   "page": 8
+  },
+  {
+   "name": "Aristida junciformis",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 24,
+   "limited": false,
+   "section": "Grasses",
+   "page": 8
+  },
+  {
+   "name": "Chlorophytum saundersiae",
+   "sizeText": "4L",
+   "price": 30.0,
+   "qty": 4,
+   "limited": true,
+   "section": "Grasses",
+   "page": 8
+  },
+  {
+   "name": "Elegia tectorum",
+   "sizeText": "6L",
+   "price": 90.0,
+   "qty": 6,
+   "limited": true,
+   "section": "Grasses",
+   "page": 8
+  },
+  {
+   "name": "Colour pots",
+   "sizeText": "15cm",
+   "price": 50.0,
+   "qty": 10,
+   "limited": false,
+   "section": "Fertilizer",
+   "page": 8
+  },
+  {
+   "name": "Compost",
+   "sizeText": "25L",
+   "price": 35.0,
+   "qty": null,
+   "limited": false,
+   "section": "Fertilizer",
+   "page": 8
+  },
+  {
+   "name": "Explogrow",
+   "sizeText": "25ml",
+   "price": 55.0,
+   "qty": 11,
+   "limited": false,
+   "section": "Fertilizer",
+   "page": 8
+  },
+  {
+   "name": "Explogrow",
+   "sizeText": "100ml",
+   "price": 150.0,
+   "qty": 11,
+   "limited": false,
+   "section": "Fertilizer",
+   "page": 8
+  },
+  {
+   "name": "Explogrow",
+   "sizeText": "200ml",
+   "price": 260.0,
+   "qty": 5,
+   "limited": true,
+   "section": "Fertilizer",
+   "page": 8
+  },
+  {
+   "name": "Fynbos compost",
+   "sizeText": "25L",
+   "price": 40.0,
+   "qty": null,
+   "limited": false,
+   "section": "Fertilizer",
+   "page": 8
+  },
+  {
+   "name": "Multi-cote",
+   "sizeText": "100g",
+   "price": 25.0,
+   "qty": 9,
+   "limited": false,
+   "section": "Fertilizer",
+   "page": 8
+  },
+  {
+   "name": "Multi-cote",
+   "sizeText": "200g",
+   "price": 50.0,
+   "qty": 10,
+   "limited": false,
+   "section": "Fertilizer",
+   "page": 8
+  },
+  {
+   "name": "Multi-cote",
+   "sizeText": "300g",
+   "price": 70.0,
+   "qty": 10,
+   "limited": false,
+   "section": "Fertilizer",
+   "page": 8
+  },
+  {
+   "name": "Multi-cote",
+   "sizeText": "900g",
+   "price": 150.0,
+   "qty": 12,
+   "limited": false,
+   "section": "Fertilizer",
+   "page": 8
+  },
+  {
+   "name": "Phosguard 150ml",
+   "sizeText": "150ml",
+   "price": 50.0,
+   "qty": 20,
+   "limited": false,
+   "section": "Fertilizer",
+   "page": 8
+  },
+  {
+   "name": "Talbourne organics 4:1:6(11)",
+   "sizeText": "500ml",
+   "price": 100.0,
+   "qty": 1,
+   "limited": true,
+   "section": "Fertilizer",
+   "page": 8
+  }
+ ]
+}

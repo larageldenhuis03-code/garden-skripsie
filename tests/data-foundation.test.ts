@@ -73,16 +73,16 @@ function toNumberOrNull(value: string | undefined): number | null {
 // fields from the CSV it reads and checks app/data/plants.ts's exported
 // `plants` still matches, so a source-data change or a generator change
 // can't silently drift from what the app actually renders.
-test("the plant library is auditable against the combined plant database", async () => {
+test("the plant library is auditable against the Western Cape-filtered database", async () => {
   const csv = await readFile(
-    new URL("../data/processed/plant_database_full.csv", import.meta.url),
+    new URL("../data/processed/plant_database_western_cape.csv", import.meta.url),
     "utf8",
   );
   const rows = parseCsv(csv);
   const byName = new Map(rows.map((row) => [row.scientific_name, row]));
 
   assert.equal(plants.length, rows.length);
-  assert.ok(plants.length > 3000, "expected the full combined database, not a stub list");
+  assert.ok(plants.length > 2500, "expected the Western Cape-filtered database, not a stub list");
 
   const drift: string[] = [];
   plants.forEach((plant) => {
@@ -112,6 +112,10 @@ test("the plant library is auditable against the combined plant database", async
     const expectedBiome = sourceBiome ? sourceBiome.split(";") : null;
     if (JSON.stringify(expectedBiome) !== JSON.stringify(plant.biome)) {
       drift.push(`${plant.id} biome: ${plant.biome} != ${expectedBiome}`);
+    }
+    const sourceBioregion = blankToNull(source.bioregion);
+    if (sourceBioregion !== plant.bioregion) {
+      drift.push(`${plant.id} bioregion: ${plant.bioregion} != ${sourceBioregion}`);
     }
   });
 

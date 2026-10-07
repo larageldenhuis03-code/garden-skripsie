@@ -1,0 +1,108 @@
+Batch verification - 100 scenarios against the live engine
+Run: 2026-10-05T11:10:59.576Z
+Catalogue: 2843 plants | rules from Algorithm_rulebook.xlsx | P2 overlap 0.15
+
+RESULT CODES
+    SUCCESS               83  (83%)
+    SUCCESS_DEGRADED      10  (10%)
+    INFEASIBLE_SPACE       6  (6%)
+    SLOW                   1  (1%)
+
+Feasibility rate: 93/100 (93.0%)
+Run time: median 743 ms | 95th percentile 1931 ms | slowest 4809 ms
+Repeatability: 10 scenarios run twice, 0 mismatches - identical
+
+SUCCESS RATE BY INPUT
+  Sun:
+    full                      39/41  (95%)
+    part                      32/32  (100%)
+    sheltered                 22/27  (81%)
+  Water:
+    low                       21/26  (81%)
+    moderate                  46/48  (96%)
+    moist                     26/26  (100%)
+  Soil:
+    clay                      17/20  (85%)
+    loam                      24/26  (92%)
+    not-sure                  19/19  (100%)
+    sandy                     33/35  (94%)
+  Wind:
+    affected                  33/35  (94%)
+    none                      31/33  (94%)
+    protected                 29/32  (91%)
+  Style:
+    cottage                   24/26  (92%)
+    fynbos                    23/25  (92%)
+    mediterranean             21/24  (88%)
+    undecided                 25/25  (100%)
+  Block:
+    bed-size                  14/16  (88%)
+    site                      68/72  (94%)
+    stress                    11/12  (92%)
+  Location:
+    Aan De Doorns              5/5   (100%)
+    Aan De Wijnlanden Estate   3/3   (100%)
+    Aartappelkop               4/6   (67%)
+    Aasvoëlbos                 5/5   (100%)
+    Abbotsdale                 2/3   (67%)
+    Albertinia                 5/5   (100%)
+    Algeria                    5/6   (83%)
+    Amalienstein               3/3   (100%)
+    Antilles/Cayman Beach      3/3   (100%)
+    Arbeidsgenot               5/5   (100%)
+    Arbeidslus                 4/5   (80%)
+    Baievlei                   4/5   (80%)
+    Barendskraal               6/6   (100%)
+    Beeldhouersfontein         2/3   (67%)
+    Biesiesfontein B           5/5   (100%)
+    Birkenhead                 5/5   (100%)
+    Bitterwater                5/5   (100%)
+    Boesmanpad                 5/5   (100%)
+    Clanwilliam                5/5   (100%)
+    Concordia                  4/4   (100%)
+    Covie                      3/3   (100%)
+    Gordons Bay                5/5   (100%)
+
+OPTION VARIETY (reported, not a rule breach)
+    Options sharing every species, differing only in quantities: 12
+    Options above 0.6 species similarity: 29
+    S002 full sun / low water / loam (pass 1) (4x2 m) - similarity 0.8
+    S003 full sun / low water / clay (pass 1) (6x4 m) - similarity 0.714
+    S007 full sun / moderate water / clay (pass 1) (2x3 m) - similarity 0.75
+    S009 full sun / moist water / sandy (pass 1) (6x4 m) - similarity 0.667
+    S012 full sun / moist water / not-sure (pass 1) (12x8 m) - similarity 0.667
+    S015 part sun / low water / clay (pass 1) (6x4 m) - similarity 0.667
+    S022 part sun / moist water / loam (pass 1) (8x5 m) - similarity 0.667
+    S023 part sun / moist water / clay (pass 1) (3x3 m) - similarity 1
+    S028 sheltered sun / low water / not-sure (pass 1) (8x5 m) - similarity 1
+    S030 sheltered sun / moderate water / loam (pass 1) (12x8 m) - similarity 0.667
+    S031 sheltered sun / moderate water / clay (pass 1) (2x3 m) - similarity 1
+    S032 sheltered sun / moderate water / not-sure (pass 1) (4x2 m) - similarity 1
+    S034 sheltered sun / moist water / loam (pass 1) (8x5 m) - similarity 0.667
+    S035 sheltered sun / moist water / clay (pass 1) (3x3 m) - similarity 1
+    S038 full sun / low water / loam (pass 2) (4x2 m) - similarity 1
+    S047 full sun / moist water / clay (pass 2) (3x3 m) - similarity 1
+    S049 part sun / low water / sandy (pass 2) (2x3 m) - similarity 1
+    S051 part sun / low water / clay (pass 2) (6x4 m) - similarity 1
+    S064 sheltered sun / low water / not-sure (pass 2) (8x5 m) - similarity 0.714
+    S065 sheltered sun / moderate water / sandy (pass 2) (3x3 m) - similarity 1
+    S067 sheltered sun / moderate water / clay (pass 2) (2x3 m) - similarity 0.75
+    S071 sheltered sun / moist water / clay (pass 2) (3x3 m) - similarity 1
+    S072 sheltered sun / moist water / not-sure (pass 2) (12x8 m) - similarity 0.667
+    S075 30 x 0.5 m - maximum width, minimum length (30x0.5 m) - similarity 0.714
+    S080 0.8 x 12 m - narrow border, under one row deep (0.8x12 m) - similarity 1
+    S086 25 x 4 m - long boundary bed (25x4 m) - similarity 0.615
+    S089 deep shade on wet clay (8x5 m) - similarity 0.714
+    S093 two rare colours (4x2 m) - similarity 0.75
+    S097 soil not sure, water not certain, sheltered (12x8 m) - similarity 0.818
+
+FAILURES AND NOTES (0)
+    none
+
+NO-PLAN DIAGNOSTICS
+    S026 [INFEASIBLE_SPACE] sheltered sun / low water / loam (pass 1) (4x2 m) - No feasible mix: only 0 species fit together, and this bed size needs at least 3; no hedge or tall species fits to form the windward row.
+    S027 [INFEASIBLE_SPACE] sheltered sun / low water / clay (pass 1) (6x4 m) - No feasible mix: only 0 species fit together, and this bed size needs at least 5.
+    S062 [INFEASIBLE_SPACE] sheltered sun / low water / loam (pass 2) (4x2 m) - No feasible mix: only 0 species fit together, and this bed size needs at least 3; no hedge or tall species fits to form the windward row.
+    S063 [INFEASIBLE_SPACE] sheltered sun / low water / clay (pass 2) (6x4 m) - No feasible mix: only 0 species fit together, and this bed size needs at least 5.
+    S073 [INFEASIBLE_SPACE] 0.5 x 0.5 m - smallest allowed bed (0.5x0.5 m) - B0098 could not be placed (failure 1). | Retrying at no more than 72% cover. | B1284 could not be placed (failure 1). | Retrying at no more than 63% cover. | No feasible mix: only 0 species fit together, and this bed size needs at least 3.
+    S090 [INFEASIBLE_SPACE] deep shade, low water, clay - contradictory site (3x3 m) - No feasible mix: only 0 species fit together, and this bed size needs at least 3; no hedge or tall species fits to form the windward row.

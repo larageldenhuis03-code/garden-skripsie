@@ -1,45 +1,8 @@
 {
   "generated_at": "2026-07-27",
+  "reviewed_at": "2026-09-24",
+  "review_note": "Reconciled against data/raw and the live scripts. Entries for datasets that were selected on paper but never downloaded or read were moved to evaluated_not_used. PlantZAfrica moved from deferred to selection: it is now a primary source for 1,774 of 2,843 species, and its licensing is an open legal-review item rather than a settled permission.",
   "selection": [
-    {
-      "id": "sanpc-2026",
-      "name": "South African National Plant Checklist",
-      "version": "1.3",
-      "published": "2026-06-08",
-      "doi": "10.15468/e8spft",
-      "license": "CC BY 4.0",
-      "source_page": "https://www.gbif.org/dataset/f5dc22ca-0bb1-4692-8a97-cc7ac54d7ed9",
-      "download_url": "https://ipt.sanbi.org.za/archive.do?r=sanpc2025",
-      "raw_path": "data/raw/sanbi/sanpc-2026/dwca-sanpc-2026-v1.3.zip",
-      "use": "Canonical names, accepted/synonym relationships, province-level distribution, establishment status.",
-      "limitation": "Threat status is sparsely populated; use SANBI Red List separately for conservation decisions."
-    },
-    {
-      "id": "bodatsa-2026",
-      "name": "Botanical Database of Southern Africa (BODATSA): Botanical Collections",
-      "version": "1.32",
-      "published": "2026-06-30",
-      "doi": "10.15468/2aki0q",
-      "license": "CC BY 4.0 on GBIF/IPT; POSA separately displays CC BY-NC-SA 4.0",
-      "source_page": "https://www.gbif.org/dataset/d0963cee-1a29-47a2-b9bf-fb0e7690077c",
-      "download_url": "https://ipt.sanbi.org.za/archive.do?r=brahms_online",
-      "raw_path": "data/raw/sanbi/bodatsa-2026/dwca-bodatsa-v1.32.zip",
-      "use": "Evidence that a taxon has verified herbarium records in the Western Cape; occurrence density and geography.",
-      "limitation": "Occurrence is not garden suitability. The archive contains specimens, not structured light/water/soil or mature-spread traits."
-    },
-    {
-      "id": "sanbi-alien-taxa-2025",
-      "name": "A list of alien taxa for South Africa",
-      "version": "20250520",
-      "published": "2025-05-20",
-      "doi": "10.5281/zenodo.14937470",
-      "license": "CC BY 4.0",
-      "source_page": "https://zenodo.org/records/14937470",
-      "download_url": "https://zenodo.org/api/records/14937470/files/A_checklist_of_alien_taxa_for_South%20Africa_v20250520.xlsx/content",
-      "raw_path": "data/raw/sanbi/alien-species-2025/A_checklist_of_alien_taxa_for_South_Africa_v20250520.xlsx",
-      "use": "Alien/native status, confidence, establishment, pathways, impacts, treatment and regulatory-listing fields.",
-      "limitation": "Research checklist fields do not replace the operative NEMBA notices; legal exclusions must cite the gazetted list."
-    },
     {
       "id": "bioscape-gcfr-traits-2026",
       "name": "Foliar Trait and Spectroscopy Data, Greater Cape Floristic Region, South Africa",
@@ -49,21 +12,78 @@
       "license": "Openly shared without restriction on ORNL DAAC; companion repository is GPL-3.0",
       "source_page": "https://daacweb-prod.ornl.gov/BIOSCAPE/guides/BioSCape_foliar_trait_spec.html",
       "download_url": "https://github.com/henryf6/GCFR_Traits/tree/main/Data_Workflow_3_Final_Polishing/Data_Outputs",
-      "raw_path": "data/raw/bioscape-gcfr-2026",
-      "use": "Maximum height, growth form, life history, flowering, flammability and measured height/canopy axes for GCFR plants.",
-      "limitation": "Field measurements are not guaranteed horticultural mature dimensions. Use them with a source label and confidence, not as exact nursery specifications."
+      "raw_path": "data/raw/BioSCape_foliar_species_traits.csv",
+      "read_by": "data/scripts/build_bioscape_traits.R",
+      "use": "Maximum height, growth form, life history, flowering and measured height/canopy axes for GCFR plants.",
+      "limitation": "Field measurements are not horticultural mature dimensions. In the shipped catalogue only 212 of 2,843 spread values are original measurements; the rest are imputed and carry spread_source/spread_confidence."
+    },
+    {
+      "id": "bioscape-gcfr-occurrences",
+      "name": "BioSCape GCFR occurrence records, filtered to the Western Cape",
+      "license": "As bioscape-gcfr-traits-2026",
+      "raw_path": "data/raw/BIOSCAPE.FILTERED.REGION.csv",
+      "read_by": "data/scripts/build_bioscape_traits.R",
+      "use": "Evidence that a taxon is recorded in the Western Cape; occurrence counts and the coordinates used to assign biome and bioregion.",
+      "limitation": "The regional filter was applied before the file entered the repository, so that step is not reproducible from these scripts. Occurrence proves a record, not garden suitability."
+    },
+    {
+      "id": "plantzafrica-profiles",
+      "name": "PlantZAfrica horticultural profiles (SANBI)",
+      "license": "UNRESOLVED - no official bulk export or reusable bulk-data licence has been identified. Treat as a legal-review item before any public release beyond this MVP.",
+      "source_page": "https://pza.sanbi.org/",
+      "raw_path": [
+        "data/raw/plantzafrica_dataset.xlsx",
+        "data/raw/plantzafrica_watering_dataset.csv"
+      ],
+      "use": "Light, water, soil, plant type, flower colour, special features, care notes and photographs. The primary source for 1,774 of 2,843 species; a further 304 combine it with BioSCape.",
+      "limitation": "Profiles are editorial horticultural writing, not a structured trait database: fields were parsed from prose, coverage varies (special features 71%), and absence of a flag is not a negative test. Photographs are hotlinked to pza.sanbi.org with attribution, not redistributed.",
+      "photo_licence_note": "UNVERIFIED: generate_plants_json.py stamps CC BY-NC-SA 4.0 on all 2,066 PlantZAfrica photos, citing this file. That licence is what BGIS applies to its spatial datasets; no PlantZAfrica photo licence has actually been confirmed. Either verify it or stop asserting a specific licence."
+    },
+    {
+      "id": "inaturalist-photos",
+      "name": "iNaturalist observation photographs",
+      "license": "Per contributor, recorded per plant: cc-by-nc (391), cc-by-sa (256), cc-by (35), cc0 (17), cc-by-nc-sa (15), cc-by-nc-nd (5)",
+      "source_page": "https://www.inaturalist.org/",
+      "raw_path": "data/processed/inaturalist_photos.csv",
+      "read_by": "data/scripts/generate_plants_json.py",
+      "use": "Fallback plant photograph for the 762 species with no PlantZAfrica image; 15 species still have none.",
+      "limitation": "Terms differ per photograph, so they cannot be treated as one licence. 396 are non-commercial and 5 are no-derivatives, which constrains reuse of the plan images. Each record carries photo_attribution and photo_license and both must stay displayed."
     },
     {
       "id": "western-cape-vegetation-map-2018",
-      "name": "SANBI National Vegetation Map 2018 — Western Cape clip",
+      "name": "SANBI National Vegetation Map 2018 - Western Cape clip",
       "version": "2018",
       "published": "2018",
       "license": "Source/copyright SANBI; BGIS datasets use CC BY-NC-SA 4.0",
       "source_page": "https://gis.westerncape.gov.za/server2/rest/services/SpatialDataWarehouse/Conservation/MapServer/20",
       "download_url": "ArcGIS REST query, paginated by data/scripts/download_western_cape_vegmap.py",
-      "raw_path": "data/raw/spatial/western-cape-vegetation-map-2018.geojson",
-      "use": "Map a garden location to vegetation type, biome and bioregion.",
-      "limitation": "This is the public Western Cape 2018 clip. SANBI's 2024 national vegetation map is newer and should replace it when a suitable full download/hosting strategy is chosen."
+      "raw_path": [
+        "data/raw/spatial/western-cape-vegetation-map-2018.geojson",
+        "data/raw/spatial/NVM2018_AEA_V22_7_16082019_final.shp"
+      ],
+      "read_by": "data/scripts/build_bioscape_traits.R, data/scripts/assign_place_bioregions.R",
+      "use": "Map a garden location and a plant occurrence to vegetation type, biome and bioregion.",
+      "limitation": "This is the public Western Cape 2018 clip. SANBI's 2024 national vegetation map is newer and should replace it when a suitable full download/hosting strategy is chosen. Only 23% of catalogue species have a bioregion from an occurrence; the rest are matched at biome level."
+    },
+    {
+      "id": "western-cape-places-2018",
+      "name": "Western Cape place names (provincial and national ArcGIS services)",
+      "license": "Provincial/national government spatial services; terms not individually recorded - confirm before redistribution.",
+      "source_page": "https://gis.westerncape.gov.za/server2/rest/services/",
+      "download_url": "ArcGIS REST queries, paginated by data/scripts/download_western_cape_places.py",
+      "raw_path": "data/raw/spatial/western-cape-places-2018.geojson",
+      "read_by": "data/scripts/assign_place_bioregions.R",
+      "use": "The town and suburb list behind the location question: 1,597 places, each carrying its biome and bioregion.",
+      "limitation": "1,669 source rows reduce to 1,597 after non-residential names and duplicates are removed. Places on or outside a bioregion boundary are assigned by majority or nearest polygon and are flagged in bioregion_source."
+    },
+    {
+      "id": "invasive-plants-list",
+      "name": "Alien and invasive taxa list (Darwin Core export)",
+      "license": "Not recorded at import - confirm against its publisher before relying on it legally.",
+      "raw_path": "data/raw/InvasivePlants.txt",
+      "read_by": "data/scripts/retired/combine_plant_database.R (retired), data/scripts/build_bioscape_traits.R",
+      "use": "The anti-join that removed invasive species from the catalogue before it was finalised.",
+      "limitation": "The exclusion is baked into the shipped catalogue and is no longer re-run. The file's exact provenance was not recorded at import; it resembles the SANBI alien-taxa checklist rather than the gazetted NEMBA list."
     },
     {
       "id": "nemba-invasive-list-2020",
@@ -71,24 +91,56 @@
       "version": "2020 list; commenced 2021-03-01",
       "license": "Official government publication",
       "source_page": "https://www.dffe.gov.za/sites/default/files/legislations/nemba_invasivespecieslist_g43726gon1003.pdf",
-      "raw_path": "data/raw/legal",
-      "use": "Authoritative legal reference for prohibited/restricted invasive-species handling.",
-      "limitation": "PDF legal text is retained as evidence. A reviewed, versioned machine-readable legal table should be created before enforcing rules in production."
+      "raw_path": "data/raw/legal (not present in this checkout)",
+      "use": "Authoritative legal reference for the Stage 0 F4 exclusion.",
+      "limitation": "PARTLY CLOSED (2026-09-24): app/data/nemba_exclusions.json is no longer empty - it now holds 1,077 binomials built from invasive-plants-list by data/scripts/build_nemba_exclusions.py, so F4 is a live second check and a test asserts no catalogue species is listed. REMAINING GAP: that is an alien-taxa checklist, not the gazetted notice, so the legal list itself is still not transcribed and the two may differ."
+    },
+    {
+      "id": "final-dataset-workbook",
+      "name": "FINAL.DATASET.FINAL.xlsx (owner-curated catalogue)",
+      "license": "Derived work - inherits the terms of every source above",
+      "raw_path": "kept beside the repository, not in version control; path overridable with FINAL_DATASET_PATH",
+      "read_by": "data/scripts/import_final_dataset.py via data/scripts/sync_dataset.mjs",
+      "use": "The single source of the species catalogue: 2,843 species, 47 columns, imported and hashed on every dev and build.",
+      "limitation": "Not a raw source. It merges the sources above with manual curation and imputation; every derived field carries its own *_source and *_confidence column, and those must stay visible in the interface."
+    }
+  ],
+  "evaluated_not_used": [
+    {
+      "id": "sanpc-2026",
+      "name": "South African National Plant Checklist",
+      "doi": "10.15468/e8spft",
+      "license": "CC BY 4.0",
+      "source_page": "https://www.gbif.org/dataset/f5dc22ca-0bb1-4692-8a97-cc7ac54d7ed9",
+      "reason": "Selected in the July 2026 pass but never downloaded into data/raw, and no live script reads it. Names in the catalogue come from BioSCape and PlantZAfrica as recorded, without checklist reconciliation.",
+      "consequence": "The catalogue has no synonym table, so nursery name matching falls back to cultivar, hybrid and common-name tiers. This is the source to add if synonym handling is needed."
+    },
+    {
+      "id": "bodatsa-2026",
+      "name": "Botanical Database of Southern Africa (BODATSA): Botanical Collections",
+      "doi": "10.15468/2aki0q",
+      "license": "CC BY 4.0 on GBIF/IPT; POSA separately displays CC BY-NC-SA 4.0",
+      "source_page": "https://www.gbif.org/dataset/d0963cee-1a29-47a2-b9bf-fb0e7690077c",
+      "reason": "Selected in the July 2026 pass but never downloaded into data/raw, and no live script reads it. Occurrence counts shown in the app come from bioscape-gcfr-occurrences.",
+      "consequence": "Interface copy that credited BODATSA for occurrence records was corrected on 2026-09-24."
+    },
+    {
+      "id": "sanbi-alien-taxa-2025",
+      "name": "A list of alien taxa for South Africa",
+      "doi": "10.5281/zenodo.14937470",
+      "license": "CC BY 4.0",
+      "reason": "Not present at the recorded raw_path. It may be the origin of data/raw/InvasivePlants.txt, but that was not recorded at import and has not been confirmed.",
+      "consequence": "Confirming this would settle the licence and provenance of the invasive-species exclusion."
     }
   ],
   "deferred": [
-    {
-      "name": "PlantZAfrica",
-      "reason": "Excellent curated horticultural profiles, but no official bulk export or clear reusable bulk-data licence was found. Use for reviewed enrichment only."
-    },
     {
       "name": "SANBI Red List",
       "reason": "Use as the conservation-status authority, but no bulk download was found during this pass. Do not infer threat status from occurrence frequency."
     },
     {
-      "name": "Soil, light and irrigation tolerances",
-      "reason": "No comprehensive authoritative South African plant-level dataset was found. These fields require curated horticultural enrichment and explicit confidence/provenance."
+      "name": "Reviewed horticultural tolerances and nursery spacing",
+      "reason": "PlantZAfrica now supplies light, water and soil for most species, but as parsed editorial text rather than a reviewed trait dataset, and mature spread remains largely imputed. A horticulturist's review is still the outstanding requirement before any claim of growing advice."
     }
   ]
 }
-

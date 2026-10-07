@@ -402,7 +402,37 @@ def column_number(cell_reference: str) -> int:
     return result - 1
 
 
-def xlsx_first_sheet_rows(path: Path):
+def xlsx_sheet_part(archive, name: str) -> str | None:
+    """The worksheet part backing a named sheet, or None if there is no
+    such sheet. Sheet order is not sheet file order, so the name has to be
+    resolved through workbook.xml and its relationships."""
+    import re
+
+    workbook = archive.read("xl/workbook.xml").decode("utf-8", "ignore")
+    match = re.search(
+        r'<sheet[^>]*name="' + re.escape(name) + r'"[^>]*r:id="(rId\d+)"',
+        workbook,
+    )
+    if not match:
+        return None
+    rels = archive.read("xl/_rels/workbook.xml.rels").decode("utf-8", "ignore")
+    target = re.search(
+        r'Id="' + match.group(1) + r'"[^>]*Target="([^"]+)"', rels
+    )
+    if not target:
+        return None
+    path = target.group(1).lstrip("/")
+    return path if path.startswith("xl/") else "xl/" + path
+
+
+def xlsx_first_sheet_rows(path: Path, sheet_name: str | None = None):
+    """Rows from `sheet_name` when given and present, else the first sheet.
+
+    The dataset workbook grew from 3 sheets to 23 on 2026-09-30, and
+    FINAL_DATASET stopped being the first one - reading sheet1.xml then
+    returned the Summary tab and zero species. Naming the sheet makes the
+    import independent of tab order.
+    """
     namespace = {"m": XLSX_MAIN_NS}
     with zipfile.ZipFile(path) as archive:
         shared: list[str] = []
@@ -415,7 +445,10 @@ def xlsx_first_sheet_rows(path: Path):
                         for node in item.iter(f"{{{XLSX_MAIN_NS}}}t")
                     )
                 )
-        sheet = ET.fromstring(archive.read("xl/worksheets/sheet1.xml"))
+        part = xlsx_sheet_part(archive, sheet_name) if sheet_name else None
+        if part is None:
+            part = "xl/worksheets/sheet1.xml"
+        sheet = ET.fromstring(archive.read(part))
         for row in sheet.findall(".//m:sheetData/m:row", namespace):
             values: dict[int, str] = {}
             for cell in row.findall("m:c", namespace):

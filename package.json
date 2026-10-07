@@ -6,12 +6,23 @@
     "node": ">=22.13.0"
   },
   "scripts": {
+    "data:sync": "node data/scripts/sync_dataset.mjs",
+    "predev": "npm run data:sync",
     "dev": "vinext dev",
+    "prebuild": "npm run data:sync",
     "build": "vinext build",
     "start": "vinext start",
     "test": "npm run test:unit && npm run test:render",
-    "test:unit": "node --experimental-strip-types --test tests/planning-engine.test.ts tests/data-foundation.test.ts",
+    "test:unit": "node --experimental-strip-types --test tests/planning-engine.test.ts tests/stage1.test.ts tests/engine.test.ts tests/data-foundation.test.ts tests/sourcing.test.ts",
     "test:render": "npm run build && node --test tests/rendered-html.test.mjs",
+    "test:batch": "node --experimental-strip-types scripts/batch-test/run-batch.ts",
+    "study:nmin": "node --experimental-strip-types scripts/nmin-study.ts",
+    "study:bands": "node --experimental-strip-types scripts/band_eval.ts",
+    "chapter5": "node --experimental-strip-types scripts/chapter5/run-all.ts",
+    "study:pool": "node --experimental-strip-types scripts/pool_study.ts",
+    "study:sensitivity": "node --experimental-strip-types scripts/sensitivity.ts",
+    "study:tiers": "node --experimental-strip-types scripts/tier_reach.ts",
+    "study:capacity": "node --experimental-strip-types scripts/capacity_anneal.ts",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next"
   },
   "dependencies": {

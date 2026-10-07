@@ -1,0 +1,427 @@
+{
+  "source": "Algorithm_rulebook.xlsx",
+  "stage1": {
+    "weights": {
+      "style": 0.637,
+      "colour": 0.105,
+      "extras": 0.258,
+      "saved": 0.105,
+      "wind": 0.637,
+      "shade": 0.105
+    },
+    "windSiteFactor": {
+      "none": 0.0,
+      "protected": 0.5,
+      "affected": 1.0
+    },
+    "lowShrubMaxHeightCm": 100.0,
+    "colourSchemes": {
+      "warm": [
+        "Red",
+        "Orange",
+        "Yellow",
+        "White"
+      ],
+      "cool": [
+        "Blue",
+        "Green",
+        "Purple"
+      ],
+      "neutral": [
+        "Green",
+        "White",
+        "Cream",
+        "Black"
+      ]
+    },
+    "extraTags": {
+      "low-maintenance": [
+        "Drought resistant",
+        "Pioneer plant"
+      ],
+      "privacy": [
+        "Hedge/screen"
+      ],
+      "pollinators": [
+        "Feeds honeybees",
+        "Attracts butterflies"
+      ],
+      "fragrance": [
+        "Fragrant"
+      ],
+      "wildlife": [
+        "Attracts birds"
+      ]
+    }
+  },
+  "styles": {
+    "fynbos": {
+      "label": "Fynbos / Indigenous",
+      "fit": {
+        "active": true,
+        "plantTypes": null,
+        "biomes": [
+          "Fynbos"
+        ]
+      },
+      "coverMin": 0.7,
+      "coverMax": 0.85,
+      "openMin": 0.15,
+      "openMax": 0.3,
+      "tau": {
+        "tall": 0.6,
+        "medium": 0.3,
+        "short": 0.1
+      },
+      "tMin": 3.0,
+      "rMax": 0.15,
+      "structMin": 1.0,
+      "status": "AGREED (all). T_min = variety; struct_min = emergent structure"
+    },
+    "mediterranean": {
+      "label": "Mediterranean",
+      "fit": {
+        "active": true,
+        "plantTypes": [
+          "shrub",
+          "succulent",
+          "tree",
+          "ground cover",
+          "climber"
+        ],
+        "biomes": null
+      },
+      "coverMin": 0.6,
+      "coverMax": 0.8,
+      "openMin": 0.2,
+      "openMax": 0.4,
+      "tau": {
+        "tall": 0.5,
+        "medium": 0.3,
+        "short": 0.2
+      },
+      "tMin": 3.0,
+      "rMax": 0.2,
+      "structMin": 1.0,
+      "status": "AGREED (all). T_min = variety; struct_min = emergent structure"
+    },
+    "cottage": {
+      "label": "Cottage",
+      "fit": {
+        "active": true,
+        "plantTypes": [
+          "perennial",
+          "bi/annual",
+          "bulb",
+          "geophyte",
+          "shrub",
+          "climber",
+          "scrambler"
+        ],
+        "biomes": null
+      },
+      "coverMin": 0.85,
+      "coverMax": 0.9,
+      "openMin": 0.1,
+      "openMax": 0.15,
+      "tau": {
+        "tall": 0.2,
+        "medium": 0.6,
+        "short": 0.2
+      },
+      "tMin": 3.0,
+      "rMax": 0.2,
+      "structMin": 0.0,
+      "status": "AGREED (all). Cottage needs no emergent structure, so struct_min = 0"
+    },
+    "generic": {
+      "label": "Generic (Undecided)",
+      "fit": {
+        "active": false,
+        "plantTypes": null,
+        "biomes": null
+      },
+      "coverMin": 0.75,
+      "coverMax": 0.85,
+      "openMin": 0.15,
+      "openMax": 0.25,
+      "tau": {
+        "tall": 0.5,
+        "medium": 0.3,
+        "short": 0.2
+      },
+      "tMin": 3.0,
+      "rMax": 0.25,
+      "structMin": 1.0,
+      "status": "AGREED (all). T_min = variety; struct_min = emergent structure"
+    }
+  },
+  "stage2": {
+    "lambda": 0.5,
+    "goalWeights": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+    ],
+    "fMin": 3.0,
+    "cMin": 1.0,
+    "nMin": 15.0,
+    "singletonKByBand": [
+      1.0,
+      2.0,
+      4.0
+    ],
+    "minGroupedShare": 0.6,
+    "footprintCap": 0.25,
+    "kHeadroom": 2.0,
+    "featureExemptH5": true,
+    "speciesBands": [
+      {
+        "maxAreaM2": 10.0,
+        "sMin": 3,
+        "sMax": 6
+      },
+      {
+        "maxAreaM2": 50.0,
+        "sMin": 5,
+        "sMax": 12
+      },
+      {
+        "maxAreaM2": 900.0,
+        "sMin": 10,
+        "sMax": 20
+      }
+    ],
+    "groupSizes": [
+      [
+        3,
+        5,
+        7,
+        9,
+        11,
+        15
+      ],
+      [
+        1,
+        3,
+        5,
+        7
+      ],
+      [
+        1,
+        3
+      ]
+    ],
+    "featureList": {
+      "entries": [
+        "Wild Olive (Olea europaea subsp. africana)",
+        "Pom-pom Tree (Dais cotinifolia)",
+        "Silver Tree (Leucadendron argenteum)",
+        "Keurboom (Virgilia oroboides)",
+        "King Protea (Protea cynaroides)",
+        "Silver Stoebe (Seriphium plumosum)",
+        "Chinese Lanterns (Nymania capensis)",
+        "Climbing & Bush Roses",
+        "Bitter Aloe (Aloe ferox)",
+        "Krantz Aloe (Aloe arborescens)",
+        "Star-flower Thick-foot (Pachypodium succulentum)",
+        "Yellow Milk Bush (Euphorbia mauritanica)",
+        "Kerkei (Crassula tetragona)",
+        "Square-stemmed Pelargonium (Pelargonium tetragonum)",
+        "Cycads",
+        "Palms",
+        "Agaves",
+        "Euphorbias",
+        "Thatching Restio (Elegia tectorum)",
+        "Albertinia Restio (Thamnochortus insignis)",
+        "Cushion Restio (Elegia stipularis)"
+      ],
+      "species": [
+        "Olea europaea subsp. africana",
+        "Dais cotinifolia",
+        "Leucadendron argenteum",
+        "Virgilia oroboides",
+        "Protea cynaroides",
+        "Seriphium plumosum",
+        "Nymania capensis",
+        "Aloe ferox",
+        "Aloe arborescens",
+        "Pachypodium succulentum",
+        "Euphorbia mauritanica",
+        "Crassula tetragona",
+        "Pelargonium tetragonum",
+        "Elegia tectorum",
+        "Thamnochortus insignis",
+        "Elegia stipularis"
+      ],
+      "genera": [
+        "Rosa",
+        "Agave",
+        "Euphorbia"
+      ],
+      "families": [
+        "Zamiaceae",
+        "Cycadaceae",
+        "Arecaceae"
+      ]
+    },
+    "featureThreshold": {
+      "minHeightCm": 300.0,
+      "minSpreadCm": 200.0,
+      "text": "height > 300 cm OR spread > 200 cm"
+    },
+    "sizeVarMin": 3
+  },
+  "failRule": {
+    "placementFailLimit": 2,
+    "retryCoverFactor": 0.9
+  },
+  "stage3": {
+    "t0": null,
+    "alpha": 0.95,
+    "iterations": 2000,
+    "heightSwapTolerance": 0.1
+  },
+  "stage4": {
+    "depth": {
+      "L1": 0.8,
+      "L2": null,
+      "L3": null,
+      "L4": 0.5,
+      "L5": 0.35,
+      "L6": 0.2,
+      "L7": null
+    },
+    "depthTol": 0.1,
+    "rowPitchM": 1.2,
+    "placementRestarts": 6,
+    "randomDrawsPerPlant": 60,
+    "randomDrawsSource": "random_draws_per_plant",
+    "overlapDelta": 0.15,
+    "hedgeSpacingFormalCm": [
+      45.0,
+      60.0
+    ],
+    "hedgeSpacingInformalCm": [
+      100.0,
+      120.0
+    ],
+    "windbreakPorosity": {
+      "min": 0.4,
+      "max": 0.6,
+      "target": 0.4
+    },
+    "windbreakMinLengthRatio": 10.0,
+    "windbreakPrefLengthRatio": 24.0,
+    "shelterDepthH": 10.0,
+    "maxWindAngleDev": 30.0,
+    "minGroupWindbreakRow": 5,
+    "shadeOffset": 1.0,
+    "shadeRadius": 1.0
+  },
+  "status": {
+    "w_style": "AGREED",
+    "w_colour": "AGREED",
+    "w_extras": "AGREED",
+    "b_saved": "AGREED",
+    "b_wind": "AGREED",
+    "W_site (No wind)": "AGREED",
+    "W_site (Protected from wind)": "AGREED",
+    "W_site (Affected by wind)": "AGREED",
+    "N_min": "ASSUMPTION (tested)",
+    "F_min": "ASSUMPTION",
+    "C_min": "AGREED",
+    "lambda": "SOURCED (default)",
+    "w1": "SOURCED (default)",
+    "w2": "SOURCED (default)",
+    "w3": "SOURCED (default)",
+    "w4": "SOURCED (default)",
+    "w5": "SOURCED (default)",
+    "P30": "AGREED",
+    "P60": "AGREED",
+    "alpha": "AGREED",
+    "iterations": "AGREED",
+    "S_min (bed-area band 1)": "AGREED",
+    "S_max (bed-area band 1)": "AGREED",
+    "S_min (bed-area band 2)": "AGREED",
+    "S_max (bed-area band 2)": "AGREED",
+    "S_min (bed-area band 3)": "AGREED",
+    "S_max (bed-area band 3)": "AGREED",
+    "n_allowed (spread band 1)": "AGREED",
+    "n_allowed (spread band 2)": "AGREED",
+    "n_allowed (spread band 3)": "AGREED",
+    "feature_list": "SUPERSEDED",
+    "h_lowshrub_max": "AGREED",
+    "hedge_spacing_formal_min": "SOURCED",
+    "hedge_spacing_formal_max": "SOURCED",
+    "hedge_spacing_informal_min": "SOURCED",
+    "hedge_spacing_informal_max": "SOURCED",
+    "windbreak_porosity_min": "SOURCED",
+    "windbreak_porosity_max": "SOURCED",
+    "windbreak_porosity_target": "SOURCED",
+    "windbreak_min_length_ratio": "SOURCED",
+    "windbreak_pref_length_ratio": "SOURCED",
+    "shelter_depth_H": "SOURCED",
+    "max_wind_angle_dev": "SOURCED",
+    "height_swap_tolerance": "SOURCED",
+    "min_group_windbreak_row": "SOURCED",
+    "r_max_effective": "AGREED",
+    "depth_L1": "AGREED",
+    "depth_L2": "AGREED",
+    "depth_L3": "AGREED",
+    "depth_L4": "AGREED",
+    "depth_L5": "AGREED",
+    "depth_L6": "AGREED",
+    "depth_L7": "AGREED",
+    "depth_tol": "AGREED",
+    "layer_order": "AGREED",
+    "band_1_max": "AGREED",
+    "band_2_max": "AGREED",
+    "band_3_max": "AGREED",
+    "k_headroom": "SUPERSEDED",
+    "struct_min": "AGREED",
+    "feature_exempt_H5": "AGREED",
+    "placement_fail_limit": "ASSUMPTION",
+    "retry_cover_factor": "ASSUMPTION",
+    "row_pitch": "ASSUMPTION",
+    "placement_restarts": "ASSUMPTION",
+    "random_draws_per_plant": "ASSUMPTION",
+    "delta (canopy overlap)": "ASSUMPTION",
+    "feature_threshold": "AGREED",
+    "feature_list (revised)": "ASSUMPTION",
+    "k_headroom (revised)": "ASSUMPTION",
+    "size_var_min (D_min)": "AGREED",
+    "k_singleton_band_1": "AGREED",
+    "k_singleton_band_2": "AGREED",
+    "k_singleton_band_3": "AGREED",
+    "min_grouped_share": "AGREED",
+    "spread_P33 (band 1 / 2 boundary)": "DERIVED",
+    "spread_P67 (band 2 / 3 boundary)": "DERIVED",
+    "footprint_cap (φ)": "ASSUMPTION",
+    "viewing_edge": "AGREED",
+    "viewer_option_count": "AGREED",
+    "viewer_depth_set": "AGREED",
+    "viewer_windbreak_edge": "AGREED",
+    "band_min_L1": "SUPERSEDED 2026-09-29",
+    "band_min_L4": "SUPERSEDED 2026-09-29",
+    "band_min_L5": "SUPERSEDED 2026-09-29",
+    "band_min_L6": "SUPERSEDED 2026-09-29",
+    "band_max": "SUPERSEDED 2026-09-29",
+    "fill_target": "SUPERSEDED 2026-09-29",
+    "band_width_Lx": "SUPERSEDED 2026-09-29",
+    "band_position": "SUPERSEDED 2026-09-29",
+    "band_eval": "SUPERSEDED 2026-09-29",
+    "bed": "",
+    "Mediterranean 6 x 3.6": "",
+    "Mediterranean 6 x 6": "",
+    "Mediterranean 10 x 3.6": "",
+    "Cottage 6 x 6": "",
+    "small_spread_max": "ASSUMPTION",
+    "n_ladder_ext": "ASSUMPTION",
+    "n_small_max": "ASSUMPTION",
+    "small_density": "ASSUMPTION",
+    "w_lateral": "ASSUMPTION"
+  }
+}

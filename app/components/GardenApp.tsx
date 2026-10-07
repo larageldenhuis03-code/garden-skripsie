@@ -6,15 +6,16 @@ import {
   useRef,
   useState,
   type CSSProperties,
+  type ReactNode,
 } from "react";
 import {
   biomeLabels,
-  goalLabels,
+  bioregionLabels,
   plants,
   sunLabels,
   waterLabels,
-  type Biome,
-  type Goal,
+  type Bioregion,
+  type NationalBiome,
   type Plant,
   type Sun,
   type Water,
@@ -22,24 +23,70 @@ import {
 import {
   MAX_BED_DIMENSION_M,
   MIN_BED_DIMENSION_M,
+  bedShapeFor,
+  bedShapeLabels,
   buildGardenPlan,
-  densityLabels,
-  drainageLabels,
-  parseGardenBrief,
+  buildGardenPlanVariants,
+  MINIMUM_SCREENING_SPECIES,
+  availableColours,
+  colourSchemeLabels,
+  countScreeningSpecies,
+  extraPreferenceDescriptions,
+  extraPreferenceLabels,
+  hasUnknownColour,
+  colourSchemes,
+  evaluateHardFilters,
+  MINIMUM_VIABLE_POOL,
+  gardenStyleDescriptions,
+  survivesHardFilters,
+  gardenStyleLabels,
+  withRelaxedFilter,
   soilLabels,
+  windDescriptions,
+  windLabels,
   validateGardenBrief,
-  workingExampleBrief,
-  workingExampleOutput,
+  type ColourPreference,
+  type ColourScheme,
+  type ExtraPreference,
   type GardenBrief,
+  type GardenPlan,
+  type GardenStyle,
+  type Wind,
+  type ViewingEdge,
   type PlantAssessment,
 } from "../lib/planning";
-import biomeMapData from "../data/biome_map.generated.json" with { type: "json" };
+import bioregionMapData from "../data/bioregion_map.generated.json" with { type: "json" };
+import { isEstimatedBioregion, places, type Place } from "../data/places";
+import { SourcingPanel } from "./SourcingPanel";
+import { PlantTypeSymbol } from "./PlantTypeSymbol";
+import { isFeaturePlant, roleTypeOf } from "../lib/planning/engineData.ts";
+import { DATASET_VERSION } from "../data/datasetVersion";
+import {
+  createLayoutId,
+  formatSavedDate,
+  loadStore,
+  saveStore,
+  type SavedBudget,
+  type SavedLayout,
+} from "../lib/storage.ts";
 
 type View = "home" | "finder" | "results" | "browse" | "saved" | "method";
 
+/** The answers the finder opens with. Not a test fixture: the engine's
+ * regression briefs live in tests/engine.test.ts. */
 const defaultBrief: GardenBrief = {
-  ...workingExampleBrief,
-  goals: [...workingExampleBrief.goals],
+  biomes: [],
+  bioregion: "Southwest Fynbos Bioregion",
+  soil: "sandy",
+  wind: "none",
+  viewingEdge: "north",
+  sun: "part",
+  water: "moderate",
+  bedWidthM: 2,
+  bedLengthM: 3,
+  style: "undecided",
+  colour: { mode: "none" },
+  extras: [],
 };
 
 const formFilters = [
@@ -65,16 +112,23 @@ function PlantPortrait({
   plant: Plant;
   hero?: boolean;
 }) {
-  if (plant.photoUrl) {
+  // Same retry and the same final fallback as PlantPhoto. Without this a
+  // dead URL rendered a broken-image icon here, which is the one outcome
+  // the drawn placeholder exists to prevent.
+  const { attempt, failed, onError } = usePhotoRetry(plant.photoUrl);
+
+  if (plant.photoUrl && !failed) {
     return (
       <div
         className={`plant-portrait has-photo accent-${plant.accent}${hero ? " portrait-hero" : ""}`}
       >
         <img
+          key={attempt}
           className="portrait-photo"
           src={plant.photoUrl}
           alt={`${plant.commonName} (${plant.scientificName})`}
           loading="lazy"
+          onError={onError}
         />
         <span className="portrait-index">{plant.id}</span>
         <div className="portrait-caption">
@@ -133,13 +187,14 @@ function Header({
     <header className="site-header">
       <button className="wordmark" onClick={() => navigate("home")}>
         <span>Silly Goose</span>
+        <small>Garden planner</small>
       </button>
       <nav aria-label="Primary navigation">
         <button
           className={view === "finder" ? "is-active" : ""}
           onClick={() => navigate("finder")}
         >
-          Plant finder
+          Layout tool
         </button>
         <button
           className={view === "browse" || view === "results" ? "is-active" : ""}
@@ -155,7 +210,7 @@ function Header({
         </button>
       </nav>
       <button className="saved-link" onClick={() => navigate("saved")}>
-        <span className="saved-label">Saved plants</span>
+        <span className="saved-label">Saved</span>
         <span className="saved-count">
           {String(savedCount).padStart(2, "0")}
         </span>
@@ -167,38 +222,680 @@ function Header({
 function HomeView({
   start,
   browse,
+  openSavedGardens,
+  savedLayoutCount,
 }: {
   start: () => void;
   browse: () => void;
+  openSavedGardens: () => void;
+  savedLayoutCount: number;
 }) {
   return (
     <main>
-      <section className="hero-section">
-        <div className="hero-copy">
+      <section className="home-page">
+        <div className="home-copy">
           <h1>
-            <span>
-              Describe your <em>garden.</em>
-            </span>
-            <span>
-              Discover the plants that <em>fit.</em>
-            </span>
+            Describe your <em>garden.</em>
           </h1>
-          <p className="hero-intro">
+          <p className="home-intro">
             Tell us where your garden is, how much sun and water it gets, and
-            the size of your bed. We’ll suggest plants and show you how they
-            could fit.
+            the size of your bed. We’ll suggest plants that fit.
           </p>
-          <div className="hero-actions">
+          <div className="home-actions">
             <button className="button button-dark" onClick={start}>
-              Start my garden plan <span>↗</span>
+              Create my garden
             </button>
             <button className="text-link" onClick={browse}>
-              Browse the plant library
+              Browse plant library →
             </button>
+            {/* Only offered once there is something to open. */}
+            {savedLayoutCount > 0 && (
+              <button className="text-link" onClick={openSavedGardens}>
+                My saved gardens ({savedLayoutCount})
+              </button>
+            )}
           </div>
         </div>
+        <figure className="home-illustration">
+          <img
+            src="/images/flowers-sketch.png"
+            alt="Crayon sketch of three flowers: a red-hot poker, an agapanthus and a crane flower"
+            width={981}
+            height={796}
+          />
+        </figure>
       </section>
     </main>
+  );
+}
+
+/** When the user picks a bioregion straight off the map rather than a
+ * named place, derive its biomes from every place already mapped to that
+ * bioregion. Falls back to Fynbos, which covers most of the province. */
+function biomesForBioregion(bioregion: Bioregion): NationalBiome[] {
+  const found = new Set<NationalBiome>();
+  for (const place of places) {
+    if (place.bioregion === bioregion) {
+      for (const biome of place.biomes) found.add(biome);
+    }
+  }
+  return found.size > 0 ? [...found] : ["Fynbos"];
+}
+
+/** One plain-language line per biome, shown beside each selected
+ * vegetation type so the choice means something to a novice. */
+const biomeDescriptions: Record<NationalBiome, string> = {
+  Fynbos: "Fine-leaved Cape shrubland — proteas, ericas and restios.",
+  "Succulent Karoo": "Dry, winter-rainfall scrub with many succulents.",
+  "Nama Karoo": "Open, arid shrubland with summer rain.",
+  Grassland: "Grass-dominated veld with few shrubs or trees.",
+  Savanna: "Grassy ground layer under scattered trees.",
+  "Albany Thicket": "Dense, spiny, drought-hardy thicket.",
+  "Indian Ocean Coastal Belt": "Warm, humid coastal forest and grassland.",
+  Forest: "Closed-canopy Afrotemperate forest in sheltered ravines.",
+  Desert: "Extremely arid, sparsely vegetated ground.",
+};
+
+
+/** A single optional screen. Every option promotes matching species and
+ * penalises nothing, so this can never shrink the pool (spec 6). */
+function ExtraPreferencesPicker({
+  brief,
+  onChange,
+}: {
+  brief: GardenBrief;
+  onChange: (extras: ExtraPreference[]) => void;
+}) {
+  // Privacy is the thin one - warn from the pool that actually survives
+  // this user's site answers, not from the whole catalogue.
+  const screeningCount = useMemo(() => {
+    const pool = plants.filter(
+      (plant) => !plant.excludedFromLayout && survivesHardFilters(plant, brief),
+    );
+    return countScreeningSpecies(pool);
+  }, [brief]);
+
+  const toggle = (extra: ExtraPreference) =>
+    onChange(
+      brief.extras.includes(extra)
+        ? brief.extras.filter((item) => item !== extra)
+        : [...brief.extras, extra],
+    );
+
+  const privacyThin =
+    brief.extras.includes("privacy") &&
+    screeningCount < MINIMUM_SCREENING_SPECIES;
+
+  return (
+    <div className="choice-stack">
+      <div className="choice-grid two-column">
+        {(Object.keys(extraPreferenceLabels) as ExtraPreference[]).map((extra) => (
+          <ChoiceButton
+            key={extra}
+            selected={brief.extras.includes(extra)}
+            title={extraPreferenceLabels[extra]}
+            copy={extraPreferenceDescriptions[extra]}
+            onClick={() => toggle(extra)}
+          />
+        ))}
+      </div>
+      {privacyThin && (
+        <p className="filter-reason is-warning">
+          Only {screeningCount} plant{screeningCount === 1 ? "" : "s"} suited to
+          your site {screeningCount === 1 ? "is" : "are"} recorded as a hedge or
+          screen, so we cannot build much privacy into this bed. We will still
+          put {screeningCount === 1 ? "it" : "them"} first.
+        </p>
+      )}
+      <p className="filter-reason">
+        Roughly a third of plants carry no recorded features at all. A
+        preference lifts the plants known to match it — it never pushes the
+        rest down.
+      </p>
+    </div>
+  );
+}
+
+/** Colour is optional and skipping it is a first-class choice, shown as
+ * prominently as the two ways of expressing a preference (spec 5.2). */
+function ColourPreferencePicker({
+  brief,
+  value,
+  onChange,
+}: {
+  brief: GardenBrief;
+  value: ColourPreference;
+  onChange: (preference: ColourPreference) => void;
+}) {
+  // Only offer colours the user can actually get: the pool that already
+  // survives their site answers, minus anything never recommended.
+  const offered = useMemo(() => {
+    const pool = plants.filter(
+      (plant) => !plant.excludedFromLayout && survivesHardFilters(plant, brief),
+    );
+    return availableColours(pool);
+  }, [brief]);
+
+  const toggleCustom = (colour: string) => {
+    const current = value.mode === "custom" ? value.colours : [];
+    const next = current.includes(colour)
+      ? current.filter((item) => item !== colour)
+      : [...current, colour];
+    onChange(next.length === 0 ? { mode: "none" } : { mode: "custom", colours: next });
+  };
+
+  return (
+    <fieldset>
+      <legend>Colour (optional)</legend>
+      <div className="colour-modes">
+        <ChoiceButton
+          selected={value.mode === "none"}
+          title="No colour preference"
+          copy="Let variety and site suitability decide."
+          onClick={() => onChange({ mode: "none" })}
+        />
+        {(Object.keys(colourSchemes) as ColourScheme[]).map((scheme) => (
+          <ChoiceButton
+            key={scheme}
+            selected={value.mode === "scheme" && value.scheme === scheme}
+            title={colourSchemeLabels[scheme]}
+            copy={colourSchemes[scheme].join(", ")}
+            onClick={() => onChange({ mode: "scheme", scheme })}
+          />
+        ))}
+      </div>
+
+      <details className="colour-custom">
+        <summary>Or pick exact colours</summary>
+        <div className="colour-chips">
+          {offered.map(({ colour, count }) => {
+            const selected = value.mode === "custom" && value.colours.includes(colour);
+            return (
+              <button
+                key={colour}
+                type="button"
+                className={`colour-chip${selected ? " is-selected" : ""}`}
+                onClick={() => toggleCustom(colour)}
+                aria-pressed={selected}
+              >
+                {colour} <span>{count}</span>
+              </button>
+            );
+          })}
+        </div>
+        {offered.length === 0 && (
+          <p className="filter-reason">
+            None of the plants that suit your site have a recorded flower
+            colour.
+          </p>
+        )}
+      </details>
+    </fieldset>
+  );
+}
+
+/** Live "how many plants can survive here" readout under each site
+ * question, plus the named degradation path when the pool gets too small
+ * to plan from (spec 4, 4.1). */
+function SurvivingCount({
+  brief,
+  setBrief,
+  excluded = [],
+  openExcluded,
+}: {
+  brief: GardenBrief;
+  setBrief: (brief: GardenBrief) => void;
+  /** The user's own exclusions, so a small pool can name them as a cause. */
+  excluded?: string[];
+  openExcluded?: () => void;
+}) {
+  const outcome = useMemo(
+    () => evaluateHardFilters(plants, brief, excluded),
+    [brief, excluded],
+  );
+
+  if (!outcome.belowMinimum) {
+    return (
+      <p className="filter-count">
+        <strong>{outcome.survivingCount.toLocaleString("en-ZA")}</strong> plants
+        can survive here.
+      </p>
+    );
+  }
+
+  const restrictiveLabel = outcome.restrictive
+    .slice(0, 3)
+    .map((filter) =>
+      filter === "soil"
+        ? soilLabels[brief.soil].toLowerCase()
+        : filter === "sun"
+          ? sunLabels[brief.sun].toLowerCase()
+          : waterLabels[brief.water].toLowerCase(),
+    )
+    .join(" + ");
+
+  return (
+    <div className="filter-count is-warning">
+      <p>
+        <strong>{outcome.survivingCount}</strong> plants can survive here — too
+        few to build a plan from. We need at least {MINIMUM_VIABLE_POOL}.
+      </p>
+      {restrictiveLabel && (
+        <p className="filter-reason">
+          {restrictiveLabel} is an uncommon combination in your area.
+        </p>
+      )}
+      {outcome.excludedHere > 0 && (
+        <p className="filter-reason">
+          {outcome.excludedHere === 1
+            ? "One plant that suits these conditions is one you excluded"
+            : `${outcome.excludedHere} plants that suit these conditions are ones you excluded`}
+          , so putting some back is the quickest way to get above the minimum.
+          {openExcluded && (
+            <>
+              {" "}
+              <button type="button" className="text-link" onClick={openExcluded}>
+                Review your excluded plants
+              </button>
+            </>
+          )}
+        </p>
+      )}
+      {outcome.relaxations.length > 0 ? (
+        <div className="filter-relax">
+          <p className="filter-reason">
+            We can widen one answer. Each option below shows what it admits and
+            how many plants you would get back — nothing is changed until you
+            choose.
+          </p>
+          {outcome.relaxations.map((relaxation) => (
+            <button
+              key={relaxation.filter}
+              type="button"
+              className="relax-option"
+              onClick={() => setBrief(withRelaxedFilter(brief, relaxation.filter))}
+            >
+              <strong>{relaxation.label}</strong>
+              <small>{relaxation.detail}</small>
+              <b>{relaxation.recoveredCount.toLocaleString("en-ZA")} plants</b>
+            </button>
+          ))}
+        </div>
+      ) : (
+        <p className="filter-reason">
+          There is nothing left to widen safely. Vegetation type is never
+          relaxed, and full sun and sheltered shade are never bridged. Change an
+          answer above
+          {outcome.excludedHere > 0 ? ", put back some excluded plants," : ""} or
+          come back later: the catalogue only records light, water and soil for
+          some species yet, and this combination will have more plants to choose
+          from as that evidence is filled in.
+        </p>
+      )}
+      {outcome.alreadyRelaxed.length > 0 && (
+        <p className="filter-reason">
+          Already widened:{" "}
+          {outcome.alreadyRelaxed
+            .map((filter) =>
+              filter === "soil" ? "soil" : filter === "sun" ? "light" : "water",
+            )
+            .join(", ")}
+          .
+        </p>
+      )}
+    </div>
+  );
+}
+
+/** Draws the bed the user is actually describing, to scale, as they type.
+ * There is no shape to choose: the shape follows from the numbers, so the
+ * two can never disagree. North is the top edge (spec 3). */
+/**
+ * What each step still needs, and why it matters.
+ *
+ * The validator already knows which fields are unanswered, but the finder
+ * was only using its boolean: Continue greyed out with no explanation.
+ * These say what is missing AND what it is for, because "choose a soil
+ * description" does not tell anyone why they cannot move on.
+ *
+ * The distinction is deliberate: a BLOCKER stops the step, while a NOTE
+ * is a consequence the user should know about but is free to accept.
+ * Only the answers that actually filter plants are ever blockers - style,
+ * colour and the extras rank plants and never remove one, so they stay
+ * optional and are never demanded here.
+ */
+type StepCheck = { label: string; detail: string };
+
+function stepBlockers(
+  step: number,
+  brief: GardenBrief,
+  selectedPlace: Place | null,
+  dimensionsValid: boolean,
+): StepCheck[] {
+  const out: StepCheck[] = [];
+  if (step === 0) {
+    if (selectedPlace === null) {
+      out.push({
+        label: "Your town or suburb",
+        detail:
+          "It decides which plants suit your area, and how far the nearest nurseries are.",
+      });
+    }
+    if (brief.biomes.length === 0) {
+      out.push({
+        label: "At least one vegetation type",
+        detail:
+          "This is the filter that decides which plants can be recommended at all.",
+      });
+    }
+  }
+  if (step === 2 && !dimensionsValid) {
+    out.push({
+      label: "A width and a length",
+      detail: `Each side must be between ${MIN_BED_DIMENSION_M} m and ${MAX_BED_DIMENSION_M} m so the plants can be laid out to scale.`,
+    });
+  }
+  return out;
+}
+
+/** Consequences worth knowing, which never stop the user continuing. */
+function stepNotes(step: number, brief: GardenBrief, survivors: number | null): StepCheck[] {
+  const out: StepCheck[] = [];
+  if (step === 1) {
+    if (brief.soil === "not-sure") {
+      out.push({
+        label: "Soil: not sure",
+        detail:
+          "We will keep plants suited to any soil type rather than filtering on it, so the list is wider and less certain. Answering it narrows the plan.",
+      });
+    }
+    if (survivors !== null && survivors > 0 && survivors < 40) {
+      out.push({
+        label: `Only ${survivors} plants survive these conditions`,
+        detail:
+          "A plan is still possible, but there is little to choose from. Changing the light, water or soil answer opens it up.",
+      });
+    }
+  }
+  if (step === 3 || step === 4) {
+    out.push({
+      label: "These answers are optional",
+      detail:
+        "Style, colour and the extras change the order plants rank in. They never remove a plant, so leaving them unanswered is fine.",
+    });
+  }
+  return out;
+}
+
+function BedPreview({
+  widthM,
+  lengthM,
+  valid,
+  viewingEdge,
+}: {
+  widthM: number;
+  lengthM: number;
+  valid: boolean;
+  /** Which edge the gardener stands at, drawn as a figure on that side. */
+  viewingEdge: ViewingEdge;
+}) {
+  // A scale drawing: the longer side fills the box, so a 30 m bed and a
+  // 1 m bed are both legible and the proportions stay true. Margins leave
+  // room for the compass letters and the dimension lines.
+  const BOX = 300;
+  const M = 68;
+  const longest = Math.max(widthM, lengthM);
+  const scale = valid && longest > 0 ? BOX / longest : 0;
+  const w = Math.max(10, widthM * scale);
+  const h = Math.max(10, lengthM * scale);
+  const x0 = M + (BOX - w) / 2;
+  const y0 = M + (BOX - h) / 2;
+  const total = BOX + M * 2;
+
+  // Grid lines every metre, but thinned on big beds so they stay readable.
+  const step = scale * (longest > 20 ? 5 : 1);
+  const gridStepM = longest > 20 ? 5 : 1;
+  const lines: { x1: number; y1: number; x2: number; y2: number }[] = [];
+  if (valid && step > 3) {
+    for (let x = x0 + step; x < x0 + w - 0.5; x += step) lines.push({ x1: x, y1: y0, x2: x, y2: y0 + h });
+    for (let y = y0 + step; y < y0 + h - 0.5; y += step) lines.push({ x1: x0, y1: y, x2: x0 + w, y2: y });
+  }
+
+  // Where the gardener stands, and which way they face from there.
+  // Kept clear of the dimension lines (14-18px out) and the compass
+  // letters, so the figure never sits on top of a measurement.
+  const figure = {
+    north: { x: x0 + w / 2 + 34, y: y0 - 34, look: "south", dx: 0, dy: 1 },
+    south: { x: x0 + w / 2 + 34, y: y0 + h + 34, look: "north", dx: 0, dy: -1 },
+    east: { x: x0 + w + 36, y: y0 + h / 2, look: "west", dx: -1, dy: 0 },
+    west: { x: x0 - 36, y: y0 + h / 2, look: "east", dx: 1, dy: 0 },
+  }[viewingEdge];
+
+  return (
+    <figure className="bed-preview">
+      <figcaption>Your bed, from above</figcaption>
+      {valid ? (
+        <svg
+          viewBox={`0 0 ${total} ${total}`}
+          className="bed-preview-svg"
+          role="img"
+          aria-label={`${widthM} by ${lengthM} metre bed, north at the top, viewed from the ${viewingEdge} side`}
+        >
+          {/* Compass: north is always the top edge of the drawing. */}
+          <text className="bed-compass" x={total / 2} y={16} textAnchor="middle">N</text>
+          <path className="bed-compass-mark" d={`M${total / 2},20 l-4,7 h8 z`} />
+          <path className="bed-compass-mark" d={`M${total / 2},${total - 20} l-4,-7 h8 z`} />
+          <text className="bed-compass" x={total / 2} y={total - 6} textAnchor="middle">S</text>
+
+          {/* The bed, with a metre grid for scale. */}
+          <rect className="bed-rect" x={x0} y={y0} width={w} height={h} />
+          {lines.map((line, index) => (
+            <line key={index} className="bed-grid-line" {...line} />
+          ))}
+
+          {/* Dimension lines, drawn outside the bed like a plan drawing. */}
+          <g className="bed-dimension">
+            <line x1={x0} y1={y0 - 14} x2={x0 + w} y2={y0 - 14} />
+            <line x1={x0} y1={y0 - 18} x2={x0} y2={y0 - 10} />
+            <line x1={x0 + w} y1={y0 - 18} x2={x0 + w} y2={y0 - 10} />
+            <text x={x0 + w / 2} y={y0 - 18} textAnchor="middle">{widthM} m</text>
+            <line x1={x0 - 14} y1={y0} x2={x0 - 14} y2={y0 + h} />
+            <line x1={x0 - 18} y1={y0} x2={x0 - 10} y2={y0} />
+            <line x1={x0 - 18} y1={y0 + h} x2={x0 - 10} y2={y0 + h} />
+            <text
+              x={x0 - 18}
+              y={y0 + h / 2}
+              textAnchor="middle"
+              transform={`rotate(-90 ${x0 - 18} ${y0 + h / 2})`}
+            >
+              {lengthM} m
+            </text>
+          </g>
+
+          {/* Where you stand, and the way you look into the bed. */}
+          <g className="bed-figure">
+            <circle cx={figure.x} cy={figure.y - 5} r={3.4} />
+            <path d={`M${figure.x},${figure.y - 1} v7 M${figure.x - 4},${figure.y + 1} h8 M${figure.x},${figure.y + 6} l-3,5 M${figure.x},${figure.y + 6} l3,5`} />
+            <path
+              className="bed-figure-look"
+              d={`M${figure.x + figure.dx * 9},${figure.y + figure.dy * 9} l${figure.dx * 12},${figure.dy * 12}`}
+              markerEnd="url(#look)"
+            />
+          </g>
+          <defs>
+            <marker id="look" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+              <path d="M0,0 L6,3 L0,6 z" fill="currentColor" />
+            </marker>
+          </defs>
+        </svg>
+      ) : (
+        <p className="bed-preview-empty">Enter a width and length to see your bed</p>
+      )}
+      {valid && (
+        <div className="bed-preview-legend">
+          <span>
+            <i className="swatch-bed" aria-hidden="true" /> garden bed
+          </span>
+          <span>
+            <i className="swatch-grid" aria-hidden="true" /> {gridStepM} m grid (for scale)
+          </span>
+          <strong>
+            {widthM} m × {lengthM} m · {(widthM * lengthM).toFixed(widthM * lengthM < 10 ? 1 : 0)} m²
+          </strong>
+        </div>
+      )}
+      {valid && (
+        <p className="bed-preview-standing">
+          You are standing on the <strong>{viewingEdge}</strong> side, looking {figure.look}.
+        </p>
+      )}
+    </figure>
+  );
+}
+
+/** Number inputs are held as text while being edited. Binding them
+ * straight to a number means clearing the field yields Number("") === 0,
+ * which writes a real 0 back and leaves a stubborn leading zero in front
+ * of whatever is typed next. */
+function DimensionField({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: number;
+  onChange: (value: number) => void;
+}) {
+  const [text, setText] = useState(
+    Number.isFinite(value) && value > 0 ? String(value) : "",
+  );
+
+  // Follow the brief when it changes from elsewhere (loading the test
+  // garden, say) without fighting what is being typed.
+  //
+  // Object.is, not !==: an empty field reports NaN, and NaN !== NaN is
+  // always true, so a plain comparison re-syncs on every render and spins
+  // into an infinite re-render loop.
+  const [lastValue, setLastValue] = useState(value);
+  if (!Object.is(value, lastValue)) {
+    setLastValue(value);
+    const asNumber = Number(text);
+    if (!Number.isFinite(asNumber) || !Object.is(asNumber, value)) {
+      setText(Number.isFinite(value) && value > 0 ? String(value) : "");
+    }
+  }
+
+  return (
+    <label>
+      <span>{label}</span>
+      <div>
+        <input
+          type="number"
+          inputMode="decimal"
+          min={MIN_BED_DIMENSION_M}
+          max={MAX_BED_DIMENSION_M}
+          step="0.1"
+          value={text}
+          onChange={(event) => {
+            const next = event.target.value;
+            setText(next);
+            // An empty or half-typed field reports NaN rather than 0, so
+            // it reads as "not answered yet" instead of a zero-size bed.
+            const parsed = next.trim() === "" ? Number.NaN : Number(next);
+            onChange(parsed);
+          }}
+          onBlur={() => {
+            // Tidy "2." or "02" once the user moves on.
+            const parsed = Number(text);
+            if (Number.isFinite(parsed) && text.trim() !== "") {
+              setText(String(parsed));
+            }
+          }}
+        />
+        <em>metres</em>
+      </div>
+    </label>
+  );
+}
+
+function BiomeSelection({
+  available,
+  biomes,
+  bioregionSource,
+  onChange,
+}: {
+  /** Every vegetation type in the chosen area - the options on offer,
+   * independent of which the user has ticked. */
+  available: NationalBiome[];
+  biomes: NationalBiome[];
+  bioregionSource: string | null;
+  onChange: (biomes: NationalBiome[]) => void;
+}) {
+  if (available.length === 0) return null;
+
+  // A species is a candidate if any of its biomes is one of these, and it
+  // is not excluded from beds - the same any-match rule the planner uses.
+  const candidateCount = plants.filter(
+    (plant) =>
+      !plant.excludedFromLayout &&
+      plant.biome?.some((biome) => biomes.includes(biome)),
+  ).length;
+
+  // Straight include/exclude. Nothing is pre-ticked, so the user is
+  // choosing what to include rather than removing what they did not ask
+  // for.
+  const toggle = (biome: NationalBiome) =>
+    onChange(
+      biomes.includes(biome)
+        ? biomes.filter((item) => item !== biome)
+        : [...biomes, biome],
+    );
+
+  return (
+    <div className="biome-selection">
+      <p className="biome-lead">
+        {available.length > 1
+          ? "Your area has more than one type of natural vegetation. Choose the ones to include — pick several if your garden spans them, or you are not sure which it sits in."
+          : "This is the natural vegetation of your area. Include it to see plants suited to it."}
+      </p>
+
+      <div className="biome-options">
+        {available.map((biome) => {
+          const selected = biomes.includes(biome);
+          return (
+            <button
+              key={biome}
+              type="button"
+              className={`biome-option${selected ? " is-selected" : ""}`}
+              onClick={() => toggle(biome)}
+              aria-pressed={selected}
+            >
+              <span>{selected ? "☑" : "☐"}</span>
+              <strong>{biomeLabels[biome]}</strong>
+              <small>{biomeDescriptions[biome]}</small>
+            </button>
+          );
+        })}
+      </div>
+
+      {isEstimatedBioregion(bioregionSource) && (
+        <p className="biome-caveat">
+          Estimated from the nearest mapped vegetation — adjust if you know
+          your area.
+        </p>
+      )}
+
+      {biomes.length === 0 ? (
+        <p className="biome-count is-empty">
+          Choose at least one to carry on.
+        </p>
+      ) : (
+        <p className="biome-count">
+          <strong>{candidateCount.toLocaleString("en-ZA")}</strong> plants
+          suited to your area.
+        </p>
+      )}
+    </div>
   );
 }
 
@@ -227,23 +924,34 @@ function ChoiceButton({
   );
 }
 
-function BiomeCombobox({
-  value,
+/** Confirms the selection in terms of vegetation type, which is what
+ * actually filters the plant list - the bioregion behind it is kept on
+ * the record for traceability but is no longer shown here. */
+function placeResultText(place: Place): string {
+  const names = place.biomes.map((biome) => biomeLabels[biome]);
+  const list =
+    names.length === 1
+      ? names[0]
+      : `${names.slice(0, -1).join(", ")} and ${names.at(-1)}`;
+
+  if (isEstimatedBioregion(place.bioregionSource)) {
+    return `${place.name} has no mapped natural vegetation of its own (likely urban or farmland), so we matched it to the nearest: ${list}.`;
+  }
+  if (place.biomes.length > 1) {
+    return `${place.name} spans ${list}.`;
+  }
+  return `${place.name} sits in ${list}.`;
+}
+
+function PlaceCombobox({
   onChange,
 }: {
-  value: Biome;
-  onChange: (biome: Biome) => void;
+  onChange: (place: Place) => void;
 }) {
-  const options = Object.keys(biomeLabels) as Biome[];
-  const [query, setQuery] = useState(biomeLabels[value]);
+  const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
+  const [selected, setSelected] = useState<Place | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [syncedValue, setSyncedValue] = useState(value);
-
-  if (value !== syncedValue) {
-    setSyncedValue(value);
-    setQuery(biomeLabels[value]);
-  }
 
   useEffect(() => {
     if (!open) return;
@@ -253,154 +961,234 @@ function BiomeCombobox({
         !containerRef.current.contains(event.target as Node)
       ) {
         setOpen(false);
-        setQuery(biomeLabels[value]);
       }
     }
     document.addEventListener("mousedown", handlePointerDown);
     return () => document.removeEventListener("mousedown", handlePointerDown);
-  }, [open, value]);
+  }, [open]);
 
-  const filtered = options.filter((biome) =>
-    biomeLabels[biome].toLowerCase().includes(query.trim().toLowerCase())
-  );
+  const trimmed = query.trim().toLowerCase();
+  const filtered =
+    trimmed.length > 0
+      ? places
+          .filter((place) => place.name.toLowerCase().includes(trimmed))
+          .slice(0, 20)
+      : [];
 
   return (
-    <div className="biome-combobox" ref={containerRef}>
+    <div className="place-combobox" ref={containerRef}>
       <label>
-        <span>Biome</span>
+        <span>Town or suburb</span>
         <input
           value={query}
           onChange={(event) => {
             setQuery(event.target.value);
+            setSelected(null);
             setOpen(true);
           }}
           onFocus={() => setOpen(true)}
           onKeyDown={(event) => {
-            if (event.key === "Escape") {
-              setOpen(false);
-              setQuery(biomeLabels[value]);
-            }
+            if (event.key === "Escape") setOpen(false);
           }}
-          placeholder="Search for a biome"
+          placeholder="e.g. Rondebosch, Cederberg, Hermanus"
           role="combobox"
           aria-expanded={open}
-          aria-controls="biome-combobox-list"
+          aria-controls="place-combobox-list"
           aria-autocomplete="list"
           autoComplete="off"
         />
       </label>
-      {open && (
+      {open && trimmed.length > 0 && (
         <ul
-          className="biome-combobox-list"
-          id="biome-combobox-list"
+          className="place-combobox-list"
+          id="place-combobox-list"
           role="listbox"
         >
           {filtered.length ? (
-            filtered.map((biome) => (
-              <li key={biome} role="presentation">
+            filtered.map((place) => (
+              <li key={`${place.name}-${place.category}`} role="presentation">
                 <button
                   type="button"
                   role="option"
-                  aria-selected={value === biome}
-                  className={value === biome ? "is-selected" : ""}
+                  aria-selected={selected?.name === place.name}
                   onClick={() => {
-                    onChange(biome);
-                    setQuery(biomeLabels[biome]);
+                    onChange(place);
+                    setSelected(place);
+                    setQuery(place.name);
                     setOpen(false);
                   }}
                 >
-                  {biomeLabels[biome]}
+                  {place.name}
+                  <span className="place-combobox-category">
+                    {place.category}
+                  </span>
+                  <small>{bioregionLabels[place.bioregion]}</small>
                 </button>
               </li>
             ))
           ) : (
-            <li className="biome-combobox-empty" role="presentation">
-              No matching biome
+            <li className="place-combobox-empty" role="presentation">
+              No matching place — try a nearby town, or use the map below
+              instead.
             </li>
           )}
         </ul>
+      )}
+      {selected && (
+        <p className="place-combobox-result">{placeResultText(selected)}</p>
       )}
     </div>
   );
 }
 
-const BIOME_SLUGS: Record<Biome, string> = {
-  Fynbos: "fynbos",
-  "Succulent Karoo": "succulent-karoo",
-  "Nama Karoo": "nama-karoo",
-  Grassland: "grassland",
-  Savanna: "savanna",
-  "Albany Thicket": "albany-thicket",
-  "Indian Ocean Coastal Belt": "indian-ocean-coastal-belt",
-  Forest: "forest",
-  Desert: "desert",
+// 25 bioregions share a repeating palette (indexed, not named per-region -
+// there are too many for a hand-picked color per name to stay meaningful).
+const BIOREGION_PALETTE_SIZE = 9;
+const bioregionOrder = Object.keys(bioregionLabels) as Bioregion[];
+const bioregionColorIndex = new Map(
+  bioregionOrder.map((bioregion, index) => [bioregion, index % BIOREGION_PALETTE_SIZE]),
+);
+
+/** The map is an equirectangular projection, so x is linear in longitude
+ * and y in latitude. Rather than duplicating the generator's constants, the
+ * two lines are fitted to the map's own labelled towns. */
+const mapProjection = (() => {
+  const fit = (pairs: [number, number][]) => {
+    const n = pairs.length;
+    const mx = pairs.reduce((a, [x]) => a + x, 0) / n;
+    const my = pairs.reduce((a, [, y]) => a + y, 0) / n;
+    const slope =
+      pairs.reduce((a, [x, y]) => a + (x - mx) * (y - my), 0) /
+      pairs.reduce((a, [x]) => a + (x - mx) ** 2, 0);
+    return (value: number) => my + slope * (value - mx);
+  };
+  const towns: Record<string, [number, number]> = {
+    "Cape Town": [-33.9249, 18.4241], Stellenbosch: [-33.9346, 18.86], Worcester: [-33.6464, 19.4485],
+    Hermanus: [-34.4187, 19.2345], Knysna: [-34.0363, 23.0471], Clanwilliam: [-32.1811, 18.8963],
+  };
+  const labelled = bioregionMapData.townLabels.filter((t) => towns[t.name]);
+  const xOf = fit(labelled.map((t) => [towns[t.name][1], t.x]));
+  const yOf = fit(labelled.map((t) => [towns[t.name][0], t.y]));
+  return (lat: number, lon: number) => ({ x: xOf(lon), y: yOf(lat) });
+})();
+
+type NurseryMapData = {
+  pins: { nursery: string; branch: string; town: string; lat: number; lon: number; approximate: boolean; kind: string }[];
+  notMapped: { nursery: string; reason: string }[];
 };
 
-const biomeOrder = Object.keys(biomeLabels) as Biome[];
-
-function BiomeMap({
+function BioregionMap({
   value,
   onChange,
 }: {
-  value: Biome;
-  onChange: (biome: Biome) => void;
+  value: Bioregion;
+  onChange: (bioregion: Bioregion) => void;
 }) {
+  // Nursery branches from the sourcing settings file (2_Branches), geocoded
+  // on the server; fetched once, shown as pins.
+  const [nurseries, setNurseries] = useState<NurseryMapData | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/nurseries")
+      .then((response) => response.json() as Promise<NurseryMapData & { ok: boolean }>)
+      .then((data) => {
+        if (!cancelled && data.ok) setNurseries({ pins: data.pins, notMapped: data.notMapped });
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, []);
   return (
-    <div className="biome-map">
+    <div className="bioregion-map">
       <svg
-        className="biome-map-svg"
-        viewBox={biomeMapData.viewBox}
+        className="bioregion-map-svg"
+        viewBox={bioregionMapData.viewBox}
         role="group"
-        aria-label="Map of South Africa's biomes. Choose the biome closest to your garden."
+        aria-label="Map of the Western Cape's bioregions. Choose the bioregion closest to your garden."
       >
-        {biomeMapData.regions.map((region) => {
-          const biome = region.biome as Biome;
+        <path
+          className="bioregion-outline"
+          d={bioregionMapData.outline}
+          aria-hidden="true"
+        />
+        {bioregionMapData.regions.map((region) => {
+          const bioregion = region.bioregion as Bioregion;
+          const colorIndex = bioregionColorIndex.get(bioregion) ?? 0;
           return (
             <path
-              key={biome}
+              key={bioregion}
               d={region.path}
-              className={`biome-region biome-${BIOME_SLUGS[biome]}${value === biome ? " is-selected" : ""}`}
+              className={`bioregion-region bioregion-color-${colorIndex}${value === bioregion ? " is-selected" : ""}`}
               role="button"
               tabIndex={0}
-              aria-pressed={value === biome}
-              aria-label={biomeLabels[biome]}
-              onClick={() => onChange(biome)}
+              aria-pressed={value === bioregion}
+              aria-label={bioregionLabels[bioregion]}
+              onClick={() => onChange(bioregion)}
               onKeyDown={(event) => {
                 if (event.key === "Enter" || event.key === " ") {
                   event.preventDefault();
-                  onChange(biome);
+                  onChange(bioregion);
                 }
               }}
             >
-              <title>{biomeLabels[biome]}</title>
+              <title>{bioregionLabels[bioregion]}</title>
             </path>
           );
         })}
-        {biomeMapData.provinceLabels.map((province) => (
+        {bioregionMapData.townLabels.map((town) => (
           <text
-            key={province.name}
-            className="biome-map-province-label"
-            x={province.x}
-            y={province.y}
+            key={town.name}
+            className="bioregion-map-town-label"
+            x={town.x}
+            y={town.y}
           >
-            {province.name}
+            {town.name}
           </text>
         ))}
+        {nurseries?.pins.map((pin, _position, all) => {
+          const base = mapProjection(pin.lat, pin.lon);
+          // Several branches at one point (e.g. three at George's town
+          // centre) are fanned out so each pin stays visible.
+          const same = all.filter((other) => {
+            const o = mapProjection(other.lat, other.lon);
+            return Math.hypot(o.x - base.x, o.y - base.y) < 6;
+          });
+          const k = same.indexOf(pin);
+          const spread = same.length > 1 ? 9 : 0;
+          const x = base.x + spread * Math.cos((2 * Math.PI * k) / same.length);
+          const y = base.y + spread * Math.sin((2 * Math.PI * k) / same.length);
+          return (
+            <g key={`${pin.nursery}-${pin.branch}`} className={`nursery-pin nursery-pin-${pin.kind}`} transform={`translate(${x} ${y})`}>
+              <circle r={7} />
+              <title>
+                {`${pin.branch}${pin.approximate ? " (town centre - street address not found)" : ""}${pin.kind === "walk-in" ? " - walk-in only" : pin.kind === "availability" ? " - wholesale availability list" : ""}`}
+              </title>
+            </g>
+          );
+        })}
       </svg>
-      <ul className="biome-map-legend">
-        {biomeOrder.map((biome) => (
-          <li key={biome}>
-            <button
-              type="button"
-              className={value === biome ? "is-selected" : ""}
-              onClick={() => onChange(biome)}
-            >
-              <span className={`biome-swatch biome-${BIOME_SLUGS[biome]}`} aria-hidden="true" />
-              {biomeLabels[biome]}
-            </button>
-          </li>
-        ))}
-      </ul>
+      <div className="nursery-map-key">
+        {nurseries ? (
+          <>
+            <p>
+              <span className="nursery-key-dot" aria-hidden="true" /> {nurseries.pins.length} nursery
+              locations used for plant sourcing
+              {nurseries.pins.some((pin) => pin.approximate)
+                ? ` (${nurseries.pins.filter((pin) => pin.approximate).length} shown at their town centre - street address not found)`
+                : ""}
+            </p>
+            {nurseries.notMapped.length > 0 && (
+              <p className="nursery-not-mapped">
+                Also used, but not on the map:{" "}
+                {nurseries.notMapped.map((n) => `${n.nursery} (${n.reason})`).join("; ")}.
+              </p>
+            )}
+          </>
+        ) : (
+          <p>Loading nursery locations…</p>
+        )}
+      </div>
     </div>
   );
 }
@@ -408,15 +1196,30 @@ function BiomeMap({
 function FinderView({
   brief,
   setBrief,
+  selectedPlace,
+  setSelectedPlace,
+  availableBiomes,
+  setAvailableBiomes,
   finish,
   cancel,
+  excluded,
+  openExcluded,
 }: {
   brief: GardenBrief;
   setBrief: (value: GardenBrief) => void;
+  selectedPlace: Place | null;
+  setSelectedPlace: (place: Place | null) => void;
+  availableBiomes: NationalBiome[];
+  setAvailableBiomes: (biomes: NationalBiome[]) => void;
   finish: () => void;
   cancel: () => void;
+  /** The user's exclusions, so the live survivor count matches the pool the
+   * engine will actually plan from. */
+  excluded: string[];
+  openExcluded: () => void;
 }) {
   const [step, setStep] = useState(0);
+
   const dimensionsValid =
     Number.isFinite(brief.bedWidthM) &&
     brief.bedWidthM >= MIN_BED_DIMENSION_M &&
@@ -427,207 +1230,254 @@ function FinderView({
   const steps = [
     {
       title: "Where is your garden?",
-      note: "Click your biome on the map, or search for it below. We do not need your address.",
+      note: "Type your town or suburb, or click the map. We do not need your address.",
       content: (
         <div className="choice-stack">
-          <BiomeMap
-            value={brief.biome}
-            onChange={(biome) => setBrief({ ...brief, biome })}
+          <PlaceCombobox
+            onChange={(place) => {
+              setSelectedPlace(place);
+              // The area's vegetation types become the options; nothing is
+              // pre-selected, so the user picks what to include.
+              setAvailableBiomes([...place.biomes]);
+              setBrief({ ...brief, biomes: [], bioregion: place.bioregion });
+            }}
           />
-          <BiomeCombobox
-            value={brief.biome}
-            onChange={(biome) => setBrief({ ...brief, biome })}
+          <BioregionMap
+            value={brief.bioregion}
+            onChange={(bioregion) => {
+              setSelectedPlace(null);
+              setAvailableBiomes(biomesForBioregion(bioregion));
+              setBrief({ ...brief, bioregion, biomes: [] });
+            }}
+          />
+          <BiomeSelection
+            available={availableBiomes}
+            biomes={brief.biomes}
+            bioregionSource={selectedPlace?.bioregionSource ?? null}
+            onChange={(biomes) => setBrief({ ...brief, biomes })}
           />
         </div>
       ),
     },
     {
-      title: "What is the soil and drainage like?",
-      note: "If you’re not sure, choose “I’m not sure”. We’re still checking which soils suit each plant.",
+      title: "What are the conditions in this bed?",
+      note: "Four quick answers about the site. Sun, water and soil narrow the plant list; wind shapes how the bed is arranged.",
       content: (
-        <div className="choice-stack">
+        <div className="choice-stack site-conditions">
+          <fieldset>
+            <legend>Sun</legend>
+            <p className="field-help">
+              Full = 6+ hours of direct sun. Part = three to six hours,
+              morning or dappled. Sheltered = less than three hours. Choose
+              what applies to most of the bed — this is the one answer we will
+              not stretch later.
+            </p>
+            <div className="choice-grid">
+              {(Object.keys(sunLabels) as Sun[]).map((sun) => (
+                <ChoiceButton
+                  key={sun}
+                  selected={brief.sun === sun}
+                  title={sunLabels[sun]}
+                  copy={
+                    sun === "full"
+                      ? "Six or more hours"
+                      : sun === "part"
+                        ? "Three to six hours"
+                        : "Less than three hours"
+                  }
+                  onClick={() => setBrief({ ...brief, sun })}
+                />
+              ))}
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Water</legend>
+            <p className="field-help">
+              How often are you realistically going to water this bed? Answer
+              for the habit you will keep, not the one you intend.
+            </p>
+            {/* A per-place note from the reviewed place list. It informs the
+                answer and never sets it - the question is about what the
+                gardener will actually do. Only some places carry it. */}
+            {selectedPlace?.preferredWaterLevel === "low" && (
+              <p className="field-note">
+                {selectedPlace.name} is a dry area — gardens here usually do
+                best with low watering.
+              </p>
+            )}
+            <div className="choice-grid">
+              {(Object.keys(waterLabels) as Water[]).map((water) => (
+                <ChoiceButton
+                  key={water}
+                  selected={brief.water === water}
+                  title={waterLabels[water]}
+                  copy={
+                    water === "low"
+                      ? "Dry once settled in"
+                      : water === "moderate"
+                        ? "A good soak now and then"
+                        : "Often damp or watered"
+                  }
+                  onClick={() => setBrief({ ...brief, water })}
+                />
+              ))}
+            </div>
+          </fieldset>
+
           <fieldset>
             <legend>Soil</legend>
+            <p className="field-help">
+              Wet a handful and squeeze it. If it falls apart at once it is
+              sandy; if it holds a ball that crumbles when poked it is loam; if
+              it stays in a sticky ribbon it is clay.
+            </p>
             <div className="choice-grid two-column compact-choices">
-              {(
-                Object.keys(soilLabels) as (keyof typeof soilLabels)[]
-              ).map((soil) => (
-                <ChoiceButton
-                  key={soil}
-                  selected={brief.soil === soil}
-                  title={soilLabels[soil]}
-                  onClick={() => setBrief({ ...brief, soil })}
-                />
-              ))}
+              {(Object.keys(soilLabels) as (keyof typeof soilLabels)[]).map(
+                (soil) => (
+                  <ChoiceButton
+                    key={soil}
+                    selected={brief.soil === soil}
+                    title={soilLabels[soil]}
+                    onClick={() => setBrief({ ...brief, soil })}
+                  />
+                ),
+              )}
             </div>
           </fieldset>
+
           <fieldset>
-            <legend>Drainage</legend>
-            <div className="choice-grid two-column compact-choices">
-              {(
-                Object.keys(drainageLabels) as (keyof typeof drainageLabels)[]
-              ).map((drainage) => (
+            <legend>Wind</legend>
+            <p className="field-help">
+              How much wind does this garden bed get? Wind doesn’t remove
+              plants from your list. It will shape how your bed is arranged.
+            </p>
+            <div className="choice-grid">
+              {(Object.keys(windLabels) as Wind[]).map((wind) => (
                 <ChoiceButton
-                  key={drainage}
-                  selected={brief.drainage === drainage}
-                  title={drainageLabels[drainage]}
-                  onClick={() => setBrief({ ...brief, drainage })}
+                  key={wind}
+                  selected={brief.wind === wind}
+                  title={windLabels[wind]}
+                  copy={windDescriptions[wind]}
+                  onClick={() => setBrief({ ...brief, wind })}
                 />
               ))}
             </div>
           </fieldset>
+
+          <SurvivingCount
+            brief={brief}
+            setBrief={setBrief}
+            excluded={excluded}
+            openExcluded={openExcluded}
+          />
         </div>
       ),
     },
     {
-      title: "How much direct sun does the bed get?",
-      note: "Choose what applies to most of the bed.",
+      title: "How big is the planting bed?",
+      // The only step with a drawing: it earns a wider panel.
+      wide: true,
+      note: `Measure the bed in metres and we will draw it as you type. Each side can be between ${MIN_BED_DIMENSION_M} m and ${MAX_BED_DIMENSION_M} m.`,
       content: (
-        <div className="choice-grid">
-          {(Object.keys(sunLabels) as Sun[]).map((sun) => (
-            <ChoiceButton
-              key={sun}
-              selected={brief.sun === sun}
-              title={sunLabels[sun]}
-              copy={
-                sun === "full"
-                  ? "Six or more hours"
-                  : sun === "part"
-                    ? "Three to six hours"
-                    : "Bright, protected light"
-              }
-              onClick={() => setBrief({ ...brief, sun })}
-            />
-          ))}
+        <div className="bed-editor">
+          <div className="bed-controls">
+            <section>
+              <h3>1. Set your bed size</h3>
+              <div className="dimension-editor">
+                <DimensionField
+                  label="Width"
+                  value={brief.bedWidthM}
+                  onChange={(bedWidthM) => setBrief({ ...brief, bedWidthM })}
+                />
+                <span aria-hidden="true">×</span>
+                <DimensionField
+                  label="Length"
+                  value={brief.bedLengthM}
+                  onChange={(bedLengthM) => setBrief({ ...brief, bedLengthM })}
+                />
+              </div>
+              <p className="bed-note">
+                <span aria-hidden="true">i</span> The top edge of the drawing is north.
+              </p>
+            </section>
+            <section>
+              <h3>2. Choose your orientation</h3>
+              <p className="field-help">
+                Pick the side you stand on, so the taller plants go at the
+                back of your view.
+              </p>
+              <div
+                className="viewing-edge-grid"
+                role="group"
+                aria-label="Which side you look at the bed from"
+              >
+                {(
+                  [
+                    ["north", "▲"],
+                    ["west", "◀"],
+                    ["east", "▶"],
+                    ["south", "▼"],
+                  ] as [ViewingEdge, string][]
+                ).map(([edge, arrow]) => (
+                  <button
+                    key={edge}
+                    type="button"
+                    className={`viewing-edge-button is-${edge}${brief.viewingEdge === edge ? " is-selected" : ""}`}
+                    aria-pressed={brief.viewingEdge === edge}
+                    onClick={() => setBrief({ ...brief, viewingEdge: edge })}
+                  >
+                    <span aria-hidden="true">{arrow}</span>
+                    {edge[0].toUpperCase() + edge.slice(1)}
+                  </button>
+                ))}
+              </div>
+            </section>
+          </div>
+          <BedPreview
+            widthM={brief.bedWidthM}
+            lengthM={brief.bedLengthM}
+            valid={dimensionsValid}
+            viewingEdge={brief.viewingEdge}
+          />
         </div>
       ),
     },
     {
-      title: "How much summer water can you provide?",
-      note: "Choose the closest match. You can change it later.",
+      title: "What should the garden feel like?",
+      note: "These are preferences, not rules. Nothing here removes a plant from your list — it only changes what we put first.",
       content: (
-        <div className="choice-grid">
-          {(Object.keys(waterLabels) as Water[]).map((water) => (
-            <ChoiceButton
-              key={water}
-              selected={brief.water === water}
-              title={waterLabels[water]}
-              copy={
-                water === "low"
-                  ? "Dry once settled in"
-                  : water === "moderate"
-                    ? "A good soak now and then"
-                    : "Often damp or watered"
-              }
-              onClick={() => setBrief({ ...brief, water })}
-            />
-          ))}
-        </div>
-      ),
-    },
-    {
-      title: "How large is the planting bed?",
-      note: `Measure the bed in metres. The width and length can each be between ${MIN_BED_DIMENSION_M} m and ${MAX_BED_DIMENSION_M} m.`,
-      content: (
-        <div className="dimension-editor">
-          <label>
-            <span>Width</span>
-            <div>
-              <input
-                type="number"
-                min={MIN_BED_DIMENSION_M}
-                max={MAX_BED_DIMENSION_M}
-                step="0.1"
-                value={Number.isFinite(brief.bedWidthM) ? brief.bedWidthM : ""}
-                onChange={(event) =>
-                  setBrief({
-                    ...brief,
-                    bedWidthM: Number(event.target.value),
-                  })
-                }
-              />
-              <em>metres</em>
+        <div className="choice-stack">
+          <fieldset>
+            <legend>Style</legend>
+            <div className="choice-grid two-column">
+              {(Object.keys(gardenStyleLabels) as GardenStyle[]).map((style) => (
+                <ChoiceButton
+                  key={style}
+                  selected={brief.style === style}
+                  title={gardenStyleLabels[style]}
+                  copy={gardenStyleDescriptions[style]}
+                  onClick={() => setBrief({ ...brief, style })}
+                />
+              ))}
             </div>
-          </label>
-          <span aria-hidden="true">×</span>
-          <label>
-            <span>Length</span>
-            <div>
-              <input
-                type="number"
-                min={MIN_BED_DIMENSION_M}
-                max={MAX_BED_DIMENSION_M}
-                step="0.1"
-                value={
-                  Number.isFinite(brief.bedLengthM) ? brief.bedLengthM : ""
-                }
-                onChange={(event) =>
-                  setBrief({
-                    ...brief,
-                    bedLengthM: Number(event.target.value),
-                  })
-                }
-              />
-              <em>metres</em>
-            </div>
-          </label>
-          <p>
-            {dimensionsValid
-              ? `${(brief.bedWidthM * brief.bedLengthM).toFixed(1)} m² total bed area`
-              : `Enter a width and length between ${MIN_BED_DIMENSION_M} m and ${MAX_BED_DIMENSION_M} m`}
-          </p>
+          </fieldset>
+          <ColourPreferencePicker
+            brief={brief}
+            value={brief.colour}
+            onChange={(colour) => setBrief({ ...brief, colour })}
+          />
         </div>
       ),
     },
     {
-      title: "How full should the bed feel?",
-      note: "This helps us leave the right amount of open space.",
+      title: "Anything else matter to you?",
+      note: "All optional, and all soft — pick as many as you like, or none.",
       content: (
-        <div className="choice-grid">
-          {(
-            Object.keys(densityLabels) as (keyof typeof densityLabels)[]
-          ).map((density) => (
-            <ChoiceButton
-              key={density}
-              selected={brief.density === density}
-              title={densityLabels[density]}
-              copy={
-                density === "open"
-                  ? "About 45% left open"
-                  : density === "balanced"
-                    ? "About 30% left open"
-                    : "About 18% left open"
-              }
-              onClick={() => setBrief({ ...brief, density })}
-            />
-          ))}
-        </div>
-      ),
-    },
-    {
-      title: "What do you want the planting to do?",
-      note: "Choose as many as you like. For now, every goal counts equally.",
-      content: (
-        <div className="choice-grid two-column">
-          {(Object.keys(goalLabels) as Goal[]).map((goal) => {
-            const selected = brief.goals.includes(goal);
-            return (
-              <ChoiceButton
-                key={goal}
-                selected={selected}
-                title={goalLabels[goal]}
-                onClick={() =>
-                  setBrief({
-                    ...brief,
-                    goals: selected
-                      ? brief.goals.filter((item) => item !== goal)
-                      : [...brief.goals, goal],
-                  })
-                }
-              />
-            );
-          })}
-        </div>
+        <ExtraPreferencesPicker
+          brief={brief}
+          onChange={(extras) => setBrief({ ...brief, extras })}
+        />
       ),
     },
   ];
@@ -636,22 +1486,34 @@ function FinderView({
   const finalStep = steps.length - 1;
   const previewPlan = useMemo(() => {
     if (!validateGardenBrief(brief).valid) return null;
-    return buildGardenPlan(plants, brief);
-  }, [brief]);
+    return buildGardenPlan(plants, brief, { excludedPlantIds: excluded });
+  }, [brief, excluded]);
   const planIsReady =
     previewPlan?.status === "provisional-plan" &&
     Boolean(previewPlan.layout?.placements.length);
+  // Steps are referenced by the field they set rather than a bare index,
+  // so inserting a step cannot silently move the gate onto the wrong one.
+  const locationStep = 0;
+  const dimensionsStep = 2;
+  // What is missing on this step, and what it is for. Computed from the
+  // same conditions that disable Continue, so the two can never disagree.
+  const survivors = useMemo(
+    () =>
+      validateGardenBrief(brief).valid
+        ? evaluateHardFilters(plants, brief, excluded).survivingCount
+        : null,
+    [brief, excluded],
+  );
+  const blockers = stepBlockers(step, brief, selectedPlace, dimensionsValid);
+  const notes = stepNotes(step, brief, survivors);
+
   const canContinue =
-    (step !== 4 || dimensionsValid) &&
+    // Step 1 needs the area the user lives in (it drives the plants and
+    // the nursery distances), not just a biome ticked on the map.
+    (step !== locationStep || (selectedPlace !== null && brief.biomes.length > 0)) &&
+    (step !== dimensionsStep || dimensionsValid) &&
     (step !== finalStep ||
       (validateGardenBrief(brief).valid && planIsReady));
-
-  const loadWorkingExample = () => {
-    setBrief({
-      ...workingExampleBrief,
-      goals: [...workingExampleBrief.goals],
-    });
-  };
 
   return (
     <main className="finder-shell">
@@ -668,29 +1530,19 @@ function FinderView({
           ))}
         </div>
       </div>
-      {(step === 0 || (step === finalStep && !planIsReady)) && (
-        <aside
-          className={`finder-example${step === finalStep ? " is-warning" : ""}`}
-          aria-live="polite"
-        >
+      {step === finalStep && !planIsReady && (
+        <aside className="finder-example is-warning" aria-live="polite">
           <div>
-            <strong>
-              {step === finalStep
-                ? "These answers don’t produce a complete plan yet."
-                : "Want a result you can test against?"}
-            </strong>
+            <strong>These answers don’t produce a complete plan yet.</strong>
             <p>
-              {step === finalStep
-                ? "Check your measurements and answers. If they’re accurate, keep them—the current library may not have a suitable mix. Use the test garden only to see how the planner works."
-                : `The Garden Route test garden is preloaded: sandy soil, quick drainage, part sun, occasional summer water and a 2 × 3 m bed. It produces ${workingExampleOutput.totalPlants} plants across ${workingExampleOutput.species} species.`}
+              Check your measurements and answers. If they’re accurate, keep
+              them—the current library may not have a suitable mix for this
+              bed.
             </p>
           </div>
-          <button className="text-link" onClick={loadWorkingExample}>
-            {step === finalStep ? "Use the test garden" : "Reset the test garden"}
-          </button>
         </aside>
       )}
-      <section className="finder-panel">
+      <section className={`finder-panel${current.wide ? " is-wide" : ""}`}>
         <div className="finder-question">
           <h1 className={step === 0 ? "question-two-lines" : undefined}>
             {step === 0 ? (
@@ -704,7 +1556,36 @@ function FinderView({
           </h1>
           <p>{current.note}</p>
         </div>
-        <div className="finder-choices">{current.content}</div>
+        <div className="finder-choices">
+          {current.content}
+          {blockers.length > 0 && (
+            <aside className="finder-alert is-blocking" role="status" aria-live="polite">
+              <strong>
+                {blockers.length === 1
+                  ? "One more answer before you can continue"
+                  : `${blockers.length} more answers before you can continue`}
+              </strong>
+              <ul>
+                {blockers.map((item) => (
+                  <li key={item.label}>
+                    <b>{item.label}</b> — {item.detail}
+                  </li>
+                ))}
+              </ul>
+            </aside>
+          )}
+          {notes.length > 0 && (
+            <aside className="finder-alert" aria-live="polite">
+              <ul>
+                {notes.map((item) => (
+                  <li key={item.label}>
+                    <b>{item.label}</b> — {item.detail}
+                  </li>
+                ))}
+              </ul>
+            </aside>
+          )}
+        </div>
       </section>
       <div className="finder-footer">
         <button
@@ -716,6 +1597,9 @@ function FinderView({
         <button
           className="button button-dark"
           disabled={!canContinue}
+          // Screen readers and hover both get the reason, not just a
+          // greyed-out button.
+          title={canContinue ? undefined : blockers.map((item) => item.label).join("; ") || undefined}
           onClick={step === finalStep ? finish : () => setStep(step + 1)}
         >
           {step === finalStep ? "Build my plan" : "Continue"} <span>↗</span>
@@ -729,18 +1613,22 @@ function PlantCard({
   plant,
   match,
   saved,
+  excluded,
   open,
   toggleSaved,
+  toggleExcluded,
 }: {
   plant: Plant;
   match?: PlantAssessment;
   saved: boolean;
+  excluded: boolean;
   open: () => void;
   toggleSaved: () => void;
+  toggleExcluded: () => void;
 }) {
   return (
     <article
-      className={`plant-card${match ? ` status-${match.status}` : ""}`}
+      className={`plant-card${match ? ` status-${match.status}` : ""}${excluded ? " is-excluded" : ""}`}
     >
       <button className="portrait-button" onClick={open}>
         <PlantPortrait plant={plant} />
@@ -750,18 +1638,41 @@ function PlantCard({
           <p>{plant.commonName}</p>
           <h3>{plant.scientificName}</h3>
         </div>
-        <button
-          className={`save-button${saved ? " is-saved" : ""}`}
-          onClick={toggleSaved}
-          aria-label={`${saved ? "Remove" : "Save"} ${plant.commonName}`}
-          aria-pressed={saved}
-        >
-          {saved ? "Saved" : "Save"} <span>{saved ? "●" : "○"}</span>
-        </button>
+        <div className="plant-card-buttons">
+          <button
+            className={`save-button${saved ? " is-saved" : ""}`}
+            onClick={toggleSaved}
+            aria-label={`${saved ? "Remove" : "Save"} ${plant.commonName}`}
+            aria-pressed={saved}
+          >
+            {saved ? "Saved" : "Save"} <span>{saved ? "●" : "○"}</span>
+          </button>
+          <button
+            type="button"
+            className={`exclude-button${excluded ? " is-excluded" : ""}`}
+            onClick={toggleExcluded}
+            aria-pressed={excluded}
+            aria-label={`${excluded ? "Put back" : "Exclude"} ${plant.commonName}`}
+            title={
+              excluded
+                ? "Put this plant back into your plans"
+                : "Never use this plant in my plans"
+            }
+          >
+            {excluded ? "Put back" : "Exclude"}{" "}
+            <span>{excluded ? "↺" : "✕"}</span>
+          </button>
+        </div>
       </div>
       <div className="plant-card-meta">
         <span>{plant.form}</span>
-        <span>Up to {formatDimension(plant.heightCm)}</span>
+        {/* Named explicitly: users read a bare "Up to 1.2 m" as the width
+            of the plant as often as its height. */}
+        <span>
+          {plant.heightCm === null
+            ? "Height not measured"
+            : `${formatDimension(plant.heightCm)} tall`}
+        </span>
         <span>
           {plant.flowerStart}–{plant.flowerEnd}
         </span>
@@ -776,7 +1687,11 @@ function PlantCard({
                   ? "Check first"
                   : "Not a fit"}
             </span>
-            <strong>{Math.round(match.suitability)}% match for your goals</strong>
+            {match.stage1 && match.stage1.rawMax > 0 && (
+              <strong>
+                {Math.round(match.stage1.score * 100)}% match for your preferences
+              </strong>
+            )}
           </div>
           <p>{match.reasons.join(" · ")}</p>
           <details>
@@ -805,12 +1720,519 @@ function PlantCard({
   );
 }
 
+/** The 12 atomic flower colours, as ink. Circles are filled with these
+ * at 50% transparency (spec 9); a plant with no recorded colour is drawn
+ * in neutral foliage green with a dashed outline instead of a guess. */
+const flowerColourInk: Record<string, string> = {
+  White: "#f2efe4",
+  Cream: "#e8dfbe",
+  Yellow: "#d9b430",
+  Orange: "#cf7a2c",
+  Red: "#a83a2c",
+  Pink: "#d08aa0",
+  Purple: "#7b5a97",
+  "Mauve/Lilac": "#9c8bbd",
+  Blue: "#4a6f9c",
+  Green: "#6f8a5a",
+  Brown: "#7a5c42",
+  Black: "#3a3630",
+};
+
+const UNKNOWN_COLOUR_INK = "#8fa07e";
+
+function tint(ink: string): string {
+  return `color-mix(in srgb, ${ink} 50%, transparent)`;
+}
+
+/** Circles carry the plant's own flower colour. The dominant one is the
+ * first the source records - PlantZAfrica lists the principal colour
+ * first - and a multi-coloured plant is drawn as hard-edged bands of every colour it
+ * records, dominant first, rather than picking one and hiding the rest or
+ * blending them into a colour the plant does not have. Single-colour and
+ * unknown-colour plants get a flat fill. */
+function markerBackground(plant: Plant): string {
+  const inks = (plant.flowerColour ?? [])
+    .map((colour) => flowerColourInk[colour])
+    .filter((ink): ink is string => Boolean(ink));
+
+  if (inks.length <= 1) return tint(inks[0] ?? UNKNOWN_COLOUR_INK);
+
+  const step = 100 / inks.length;
+  const stops = inks
+    .map((ink, index) => {
+      const from = (step * index).toFixed(2);
+      const to = (step * (index + 1)).toFixed(2);
+      return `${tint(ink)} ${from}%, ${tint(ink)} ${to}%`;
+    })
+    .join(", ");
+  return `linear-gradient(135deg, ${stops})`;
+}
+
+/** Trim a common-name field down to something that fits on a marker. */
+function shortName(plant: Plant): string {
+  return plant.commonName.split(";")[0].split("(")[0].trim();
+}
+
+/** Care instructions grouped and de-duplicated rather than repeated per
+ * plant (spec 9). */
+function groupedCareInstructions(
+  species: { plant: Plant }[],
+): { instruction: string; names: string[] }[] {
+  const byInstruction = new Map<string, string[]>();
+  for (const { plant } of species) {
+    // `note` carries the care text the pipeline assembled. The opening
+    // sentence describes the growth form, which is not care guidance.
+    const sentences = plant.note
+      .split(". ")
+      .map((part) => part.trim())
+      .filter(
+        (part) =>
+          part.length > 0 &&
+          !part.startsWith("A ") &&
+          !part.startsWith("No horticultural"),
+      );
+    for (const sentence of sentences) {
+      const text = sentence.endsWith(".") ? sentence : `${sentence}.`;
+      const existing = byInstruction.get(text) ?? [];
+      if (!existing.includes(plant.commonName)) existing.push(plant.commonName);
+      byInstruction.set(text, existing);
+    }
+  }
+  return [...byInstruction.entries()]
+    .map(([instruction, names]) => ({ instruction, names }))
+    .sort((left, right) => right.names.length - left.names.length);
+}
+
+/**
+ * A short care paragraph for the bed as a whole.
+ *
+ * The per-plant notes are lists of tags ("Notable features: Drought
+ * resistant; Feeds honeybees") repeated across species, which read as
+ * clutter when stacked. This counts the tags that recur and states what
+ * they mean for this bed, in order of what a gardener acts on: water
+ * first, then what the planting will attract, then what it can be used
+ * for, then what the data does not vouch for.
+ *
+ * Every sentence is built from counts of the recorded tags. Nothing is
+ * inferred about a plant that the source did not record - an absent tag
+ * means "not recorded", never "not true", so counts are always given as
+ * "n of the m plants here".
+ */
+function careParagraph(species: { plant: Plant; quantity: { quantity: number } }[]): string[] {
+  const total = species.length;
+  if (total === 0) return [];
+
+  const tagged = (tag: string) =>
+    species.filter(({ plant }) => (plant.specialFeatures ?? []).includes(tag));
+  const names = (list: typeof species) => listOf(list.map(({ plant }) => shortName(plant)));
+  const fireCount = species.filter(({ plant }) =>
+    /Resprouts post-fire|Serotinous|Flowers post-fire/.test(plant.note),
+  ).length;
+
+  const drought = tagged("Drought resistant");
+  const wet = tagged("Wet sites");
+  const bees = tagged("Feeds honeybees");
+  const birds = tagged("Attracts birds");
+  const butterflies = tagged("Attracts butterflies");
+  const fragrant = tagged("Fragrant");
+  const hedge = tagged("Hedge/screen");
+  const pot = tagged("Good potplant");
+  const edible = tagged("Edible plant");
+  const medicinal = tagged("Medical plant");
+
+  const sentences: string[] = [];
+
+  // 1. Watering - the thing the gardener actually does week to week.
+  if (drought.length > 0 && wet.length > 0) {
+    sentences.push(
+      `${sentenceCase(numberWord(drought.length))} of the ${total} plants here are recorded as drought resistant, but ${names(wet)} ${wet.length === 1 ? "is" : "are"} recorded for wet sites — give ${wet.length === 1 ? "it" : "them"} the dampest corner of the bed and water ${wet.length === 1 ? "it" : "them"} separately.`,
+    );
+  } else if (drought.length >= Math.ceil(total / 2)) {
+    sentences.push(
+      `Most of this bed is drought tolerant: ${drought.length} of the ${total} plants are recorded as drought resistant, so it should not need frequent watering.`,
+    );
+  } else if (drought.length > 0) {
+    sentences.push(
+      `${sentenceCase(numberWord(drought.length))} of the ${total} plants are recorded as drought resistant; the rest have no water note recorded, so watch them through their first summer.`,
+    );
+  } else if (wet.length > 0) {
+    sentences.push(`${names(wet)} ${wet.length === 1 ? "is" : "are"} recorded for wet sites and will want the dampest part of the bed.`);
+  }
+
+  // 2. What the planting brings in, and what it will smell like.
+  const wildlife: string[] = [];
+  if (bees.length > 0) wildlife.push(`${bees.length} ${bees.length === 1 ? "feeds" : "feed"} honeybees`);
+  if (birds.length > 0) wildlife.push(`${birds.length} ${birds.length === 1 ? "attracts" : "attract"} birds`);
+  if (butterflies.length > 0) {
+    wildlife.push(`${butterflies.length} ${butterflies.length === 1 ? "attracts" : "attract"} butterflies`);
+  }
+  if (wildlife.length > 0) {
+    sentences.push(
+      `Of these, ${listOf(wildlife)}${fragrant.length > 0 ? `, and ${fragrant.length} ${fragrant.length === 1 ? "is" : "are"} recorded as fragrant` : ""}.`,
+    );
+  } else if (fragrant.length > 0) {
+    sentences.push(
+      `${sentenceCase(numberWord(fragrant.length))} of these ${fragrant.length === 1 ? "is" : "are"} recorded as fragrant.`,
+    );
+  }
+
+  // 3. What the plants can be used for, where that changes a decision.
+  const uses: string[] = [];
+  if (hedge.length > 0) uses.push(`${names(hedge)} can be grown as a hedge or screen`);
+  if (pot.length >= Math.ceil(total / 2)) uses.push(`${numberWord(pot.length)} also grow well in pots`);
+  if (uses.length > 0) sentences.push(`${sentenceCase(listOf(uses))}.`);
+
+  // 4. Fire behaviour is habitat background, not a garden instruction, and
+  // is labelled as such so nobody reads it as something to do.
+  if (fireCount > 0) {
+    sentences.push(
+      fireCount === 1
+        ? `${sentenceCase(numberWord(1))} is a fynbos species that regrows or reseeds after fire — that is how it behaves in the wild, not something to do in a garden.`
+        : `${sentenceCase(numberWord(fireCount))} are fynbos species that regrow or reseed after fire — that is how they behave in the wild, not something to do in a garden.`,
+    );
+  }
+
+  // 5. What the record does not vouch for.
+  if (edible.length > 0 || medicinal.length > 0) {
+    const kinds = [edible.length > 0 ? "edible" : null, medicinal.length > 0 ? "medicinal" : null].filter(Boolean);
+    sentences.push(
+      `Some are listed with ${kinds.join(" or ")} uses in their source profiles; those are records of traditional use, not advice, and are not checked here.`,
+    );
+  }
+
+  return sentences;
+}
+
+/** Small counts read better as words when they open a sentence. */
+function numberWord(n: number): string {
+  return ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"][n] ?? String(n);
+}
+
+/** "a, b and c" - used wherever a count is read back as a list. */
+function listOf(parts: string[]): string {
+  if (parts.length <= 1) return parts[0] ?? "";
+  return `${parts.slice(0, -1).join(", ")} and ${parts.at(-1)}`;
+}
+
+function sentenceCase(text: string): string {
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+/** How many times a photo is fetched before we call it missing, and how
+ * long to wait between tries.
+ *
+ * Both photo hosts serve fine when asked one at a time, but pza.sanbi.org
+ * is a single HTTP/1.1 Apache host, which caps the browser at six parallel
+ * connections and makes a gridful of cards a queue. A request that is
+ * dropped or cancelled in that queue used to be permanent - one blip and
+ * the card read "No image available" for the rest of the session even
+ * though the URL was good. Two retries turn a transient failure back into
+ * a photo; a genuinely dead URL still settles on the neutral card. */
+const PHOTO_ATTEMPTS = 3;
+const PHOTO_RETRY_MS = [600, 1800];
+
+/** Retry state for one hot-linked photo. `attempt` is used as the <img>
+ * key: changing it remounts the element, which re-requests the file. The
+ * URL is never mutated - PlantZAfrica's styled images carry a signed
+ * `?itok=` token that a cache-busting parameter could invalidate. */
+function usePhotoRetry(photoUrl: string | null) {
+  const [attempt, setAttempt] = useState(0);
+  const [failed, setFailed] = useState(false);
+  const timer = useRef<number | null>(null);
+
+  // A card can be reused for a different plant as lists re-render, so the
+  // retry count resets when the URL changes. Adjusted during render rather
+  // than in an effect - React's documented way to reset state on a prop
+  // change, and it avoids showing the previous plant's photo first.
+  const [lastUrl, setLastUrl] = useState(photoUrl);
+  if (lastUrl !== photoUrl) {
+    setLastUrl(photoUrl);
+    setAttempt(0);
+    setFailed(false);
+  }
+
+  useEffect(
+    () => () => {
+      if (timer.current !== null) window.clearTimeout(timer.current);
+    },
+    [],
+  );
+
+  // An event handler, so it reads `attempt` from the current render and is
+  // never double-invoked the way a state updater can be. Each retry only
+  // fires after setAttempt has re-rendered, so the value is never stale.
+  const onError = () => {
+    const next = attempt + 1;
+    if (next >= PHOTO_ATTEMPTS) {
+      setFailed(true);
+      return;
+    }
+    if (timer.current !== null) window.clearTimeout(timer.current);
+    timer.current = window.setTimeout(
+      () => setAttempt(next),
+      PHOTO_RETRY_MS[next - 1] ?? 1800,
+    );
+  };
+
+  return { attempt, failed, onError };
+}
+
+/** Photos are hot-linked rather than downloaded, so a moved or
+ * hotlink-blocked file 404s at runtime even when photoUrl is populated.
+ * Both that case and "no photo at all" fall back to the same neutral
+ * card, never a broken image (spec 0.5) - but only after the retries
+ * above, so a slow host does not read as a missing photo. */
+function PlantPhoto({ plant }: { plant: Plant }) {
+  const { attempt, failed, onError } = usePhotoRetry(plant.photoUrl);
+
+  if (!plant.photoUrl || failed) {
+    return (
+      <div
+        className="plant-photo is-missing"
+        role="img"
+        aria-label={`No image available for ${plant.commonName}`}
+      >
+        <span>No image available</span>
+      </div>
+    );
+  }
+
+  return (
+    <figure className="plant-photo">
+      <img
+        key={attempt}
+        src={plant.photoUrl}
+        alt={`${plant.commonName} (${plant.scientificName})`}
+        loading="lazy"
+        onError={onError}
+      />
+      <figcaption>
+        {plant.photoSourceUrl ? (
+          <a href={plant.photoSourceUrl} target="_blank" rel="noreferrer">
+            {plant.photoAttribution}
+          </a>
+        ) : (
+          plant.photoAttribution
+        )}
+        {plant.photoLicense ? ` · ${plant.photoLicense}` : ""}
+      </figcaption>
+    </figure>
+  );
+}
+
+/** The saved-plant mark: a small heart, drawn so it never depends on the
+ * font having the glyph. */
+function SavedHeart() {
+  return (
+    <svg viewBox="0 0 16 16" width="100%" height="100%" focusable="false">
+      <path
+        d="M8 14s-5.5-3.4-5.5-7.2A3 3 0 0 1 8 4.9a3 3 0 0 1 5.5 1.9C13.5 10.6 8 14 8 14z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+/** The planting plan: every plant as a circle at its position, north at the
+ * top. Used for the live layout and for saved gardens alike. */
+function BedDiagram({
+  widthM,
+  lengthM,
+  placements,
+  openPlant,
+  savedIds = [],
+  viewingEdge,
+}: {
+  widthM: number;
+  lengthM: number;
+  placements: { plantId: string; xM: number; yM: number; radiusM: number; instanceId?: string; sequence?: number }[];
+  openPlant: (plant: Plant) => void;
+  /** Plants in the user's saved library get a small badge. */
+  savedIds?: readonly string[];
+  /** Labelled on the drawing so the plan can be held up against the real
+   * bed. The drawing itself is never rotated - north stays at the top. */
+  viewingEdge?: ViewingEdge;
+}) {
+  const plantsById = new Map(plants.map((plant) => [plant.id, plant]));
+  // Two views of the same plan: the sketchbook circles, or each circle
+  // filled with a photo of its species so the finished bed can be pictured.
+  const [view, setView] = useState<"sketchbook" | "real-life">("sketchbook");
+  const [brokenPhotos, setBrokenPhotos] = useState<ReadonlySet<string>>(new Set());
+  const anySaved = placements.some((p) => savedIds.includes(p.plantId));
+  // Sketchbook symbol per species: the plant type it was placed for.
+  const roleType = (plant: Plant) => roleTypeOf(plant, isFeaturePlant(plant));
+  const symbolTypes = [
+    ...new Set(
+      placements.flatMap((p) => {
+        const plant = plantsById.get(p.plantId);
+        const type = plant ? roleType(plant) : null;
+        return type ? [type] : [];
+      }),
+    ),
+  ];
+  const rotated = lengthM > widthM;
+  const displayWidthM = rotated ? lengthM : widthM;
+  const displayLengthM = rotated ? widthM : lengthM;
+  // Names are no longer printed inside the circles - at planting scale they
+  // stacked into unreadable noise. The name is disclosed on hover or
+  // keyboard focus instead, and a tap opens the full plant profile.
+  const [hovered, setHovered] = useState<number | null>(null);
+  const markers = placements.flatMap((placement, index) => {
+    const plant = plantsById.get(placement.plantId);
+    if (!plant) return [];
+    const displayX = rotated ? placement.yM : placement.xM;
+    const displayY = rotated ? widthM - placement.xM : placement.yM;
+    return [{
+      placement, plant, index, displayX, displayY,
+      unknownColour: hasUnknownColour(plant),
+      estimated: plant.spreadConfidence !== "original",
+      saved: savedIds.includes(plant.id),
+    }];
+  });
+  const tip = hovered === null ? null : markers.find((m) => m.index === hovered) ?? null;
+  return (
+    <div className="plan-bed-wrap">
+      {/* Beside the bed, not above it: the option tabs already sit above,
+          and two rows of controls over the drawing was too much. */}
+      <div className="layout-views" role="group" aria-label="Layout view">
+        <button type="button" aria-pressed={view === "sketchbook"} onClick={() => setView("sketchbook")}>
+          Sketchbook
+        </button>
+        <button type="button" aria-pressed={view === "real-life"} onClick={() => setView("real-life")}>
+          Real-life
+        </button>
+      </div>
+      <div className="plan-north" aria-hidden="true">
+        N ↑
+      </div>
+      <div
+        className={`plan-bed${view === "real-life" ? " is-real-life" : ""}`}
+        style={{ aspectRatio: `${displayWidthM} / ${displayLengthM}` }}
+        aria-label={`${widthM} by ${lengthM} metre planting layout, north at the top`}
+      >
+        {markers.map(({ placement, plant, index, displayX, displayY, unknownColour, estimated }) => {
+          const style: CSSProperties = {
+            left: `${((displayX - placement.radiusM) / displayWidthM) * 100}%`,
+            top: `${((displayY - placement.radiusM) / displayLengthM) * 100}%`,
+            width: `${((placement.radiusM * 2) / displayWidthM) * 100}%`,
+            height: `${((placement.radiusM * 2) / displayLengthM) * 100}%`,
+            background: markerBackground(plant),
+          };
+          return (
+            <button
+              key={placement.instanceId ?? `${placement.plantId}-${index}`}
+              className={`plan-marker${estimated ? " is-estimated" : ""}${unknownColour ? " is-unknown-colour" : ""}`}
+              style={style}
+              onClick={() => openPlant(plant)}
+              onMouseEnter={() => setHovered(index)}
+              onMouseLeave={() => setHovered((current) => (current === index ? null : current))}
+              onFocus={() => setHovered(index)}
+              onBlur={() => setHovered((current) => (current === index ? null : current))}
+              aria-label={`${plant.commonName}, plant ${(placement.sequence ?? index) + 1}${savedIds.includes(plant.id) ? ", one of your saved plants" : ""}`}
+            >
+              {view === "real-life" && plant.photoUrl && !brokenPhotos.has(plant.id) ? (
+                <img
+                  className="marker-photo"
+                  src={plant.photoUrl}
+                  alt=""
+                  loading="lazy"
+                  onError={() => setBrokenPhotos((current) => new Set(current).add(plant.id))}
+                />
+              ) : null}
+              {view === "sketchbook" ? <PlantTypeSymbol type={roleType(plant)} /> : null}
+              {savedIds.includes(plant.id) ? (
+                <span className="saved-badge" aria-hidden="true"><SavedHeart /></span>
+              ) : null}
+            </button>
+          );
+        })}
+      </div>
+      {viewingEdge ? (
+        <span className={`plan-front-edge is-${viewingEdge}`}>
+          ▲ you stand here
+        </span>
+      ) : null}
+      {/* Sits outside .plan-bed, which clips its children, so a name near
+          an edge is never cut in half. Purely decorative: the same text is
+          already on the button's aria-label. */}
+      {tip ? (
+        <div className="plan-tip-layer" aria-hidden="true">
+          <span
+            className="plan-tip"
+            style={{
+              left: `${(tip.displayX / displayWidthM) * 100}%`,
+              // Half a radius above centre, not a full one: the label used
+              // to float a whole circle away from the pointer.
+              top: `${((tip.displayY - tip.placement.radiusM / 2) / displayLengthM) * 100}%`,
+            }}
+          >
+            {shortName(tip.plant)}
+            {tip.saved ? " · saved" : ""}
+            {tip.unknownColour ? " · colour unknown" : ""}
+            {tip.estimated ? " · spread estimated" : ""}
+          </span>
+        </div>
+      ) : null}
+      <div className="plan-scale" aria-hidden="true">
+        <span className="plan-scale-bar" style={{ width: `${(1 / displayWidthM) * 100}%` }} />
+        <span>1 m</span>
+      </div>
+      <div className="plan-measure plan-measure-width">{displayWidthM} m</div>
+      <div className="plan-measure plan-measure-length">{displayLengthM} m</div>
+      {view === "sketchbook" && symbolTypes.length > 0 ? (
+        <ul className="symbol-key" aria-label="Plant type symbols">
+          {symbolTypes.map((type) => (
+            <li key={type}>
+              <span className="symbol-key-mark">
+                <PlantTypeSymbol type={type} />
+              </span>
+              {type === "bi/annual" ? "Bi/annual" : type[0].toUpperCase() + type.slice(1)}
+            </li>
+          ))}
+        </ul>
+      ) : null}
+      {anySaved ? (
+        <p className="saved-key">
+          <span className="legend-saved" aria-hidden="true"><SavedHeart /></span> also in your saved plants
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
 function PlanSummary({
   plan,
+  place,
+  savedIds,
   openPlant,
+  onSave,
+  onBudget,
+  onRegenerate,
+  onExclude,
+  isSaved,
+  variantTabs,
+  readOnly = false,
 }: {
-  plan: ReturnType<typeof buildGardenPlan>;
+  plan: GardenPlan;
+  /** The user's town, for nursery distances. */
+  place: string | null;
+  /** The user's saved plant library, to badge those plants in the plan. */
+  savedIds: readonly string[];
   openPlant: (plant: Plant) => void;
+  /** Rule a plant out from here, having seen it in the bed. Absent on a
+   * re-opened saved garden, which is a record and not a live plan. */
+  onExclude?: (id: string) => void;
+  onSave: () => void;
+  /** The nursery budget line, once it arrives - stored with a saved garden. */
+  onBudget: (budget: SavedBudget) => void;
+  onRegenerate: () => void;
+  isSaved: boolean;
+  /** The option switcher, rendered beside the bed so changing option does
+   * not mean scrolling back up to find what moved. */
+  variantTabs?: ReactNode;
+  /** A saved garden being re-opened: it is a record of a decision already
+   * made, so it offers no Save or Regenerate. */
+  readOnly?: boolean;
 }) {
   const plantsById = new Map(plants.map((plant) => [plant.id, plant]));
 
@@ -823,32 +2245,59 @@ function PlanSummary({
     return (
       <section className="plan-output plan-unavailable">
         <div>
-          <span>Your layout</span>
+          <span>Plan failed</span>
           <h2>We couldn’t build a layout for this bed.</h2>
         </div>
         <p>
           Try a larger bed or change one of your answers. We’ll keep the plant
           checks here so you can see what got in the way.
         </p>
+        {/* The engine's own account of what stopped it. Without this the
+            reasons were computed and then thrown away, so a plan could fail
+            with no explanation on screen. */}
+        {plan.diagnostics.length > 0 && (
+          <ul className="plan-failure-reasons">
+            {plan.diagnostics.map((reason) => (
+              <li key={reason}>{reason}</li>
+            ))}
+          </ul>
+        )}
       </section>
     );
   }
 
   const layout = plan.layout;
   const quantities = plan.quantities;
-  const rotated = layout.bedLengthM > layout.bedWidthM;
-  const displayWidthM = rotated ? layout.bedLengthM : layout.bedWidthM;
-  const displayLengthM = rotated ? layout.bedWidthM : layout.bedLengthM;
+
+  // Widest first. The engine returns quantities in species-id order, which
+  // carries no meaning for a reader; sorting by spread makes the list run
+  // the same way the eye reads the bed - the big structural plants that
+  // dominate the layout at the top, the ground cover at the bottom. A
+  // plant with no recorded spread sorts last rather than as zero, and the
+  // name breaks ties so the order is stable between renders.
+  const species = quantities.quantities
+    .flatMap((quantity) => {
+      const plant = plantsById.get(quantity.id);
+      return plant ? [{ plant, quantity }] : [];
+    })
+    .sort((left, right) => {
+      const a = left.plant.spreadCm ?? -1;
+      const b = right.plant.spreadCm ?? -1;
+      return b - a || left.plant.commonName.localeCompare(right.plant.commonName);
+    });
+  const care = groupedCareInstructions(species);
+  const careLines = careParagraph(species);
+  const anyEstimatedSpread = species.some(
+    ({ plant }) => plant.spreadConfidence !== "original",
+  );
+  const anyUnknownColour = species.some(({ plant }) => hasUnknownColour(plant));
 
   return (
     <section className="plan-output">
+      {/* The bed size is stated once, in the page heading above. This line
+          carries what changes between options. */}
       <div className="plan-output-heading">
-        <div>
-          <span>Your garden plan</span>
-          <h2>
-            {plan.brief.bedWidthM} × {plan.brief.bedLengthM} m bed
-          </h2>
-        </div>
+        <span>{plan.character}</span>
         <p>
           {quantities.totalPlants} plants · {quantities.quantities.length}{" "}
           species · about {Math.round(layout.realisedOpenSpaceRatio * 100)}%
@@ -857,59 +2306,24 @@ function PlanSummary({
       </div>
 
       <div className="brief-strip" aria-label="Garden brief summary">
-        <span>{biomeLabels[plan.brief.biome]}</span>
+        <span>{plan.brief.biomes.map((biome) => biomeLabels[biome]).join(" · ")}</span>
         <span>{soilLabels[plan.brief.soil]}</span>
-        <span>{drainageLabels[plan.brief.drainage]}</span>
         <span>{sunLabels[plan.brief.sun]}</span>
         <span>{waterLabels[plan.brief.water]}</span>
-        <span>{densityLabels[plan.brief.density]}</span>
+        <span>{bedShapeLabels[bedShapeFor(plan.brief.bedWidthM, plan.brief.bedLengthM)]}</span>
       </div>
 
       <div className="plan-output-grid">
-        <div className="plan-bed-wrap">
-          <div
-            className="plan-bed"
-            style={{
-              aspectRatio: `${displayWidthM} / ${displayLengthM}`,
-            }}
-            aria-label={`${plan.brief.bedWidthM} by ${plan.brief.bedLengthM} metre planting layout`}
-          >
-            {layout.placements.map((placement) => {
-              const plant = plantsById.get(placement.plantId);
-              if (!plant) return null;
-              const displayX = rotated
-                ? placement.yM
-                : placement.xM;
-              const displayY = rotated
-                ? layout.bedWidthM - placement.xM
-                : placement.yM;
-              const style: CSSProperties = {
-                left: `${((displayX - placement.radiusM) / displayWidthM) * 100}%`,
-                top: `${((displayY - placement.radiusM) / displayLengthM) * 100}%`,
-                width: `${((placement.radiusM * 2) / displayWidthM) * 100}%`,
-                height: `${((placement.radiusM * 2) / displayLengthM) * 100}%`,
-              };
-
-              return (
-                <button
-                  key={placement.instanceId}
-                  className={`plan-marker accent-${plant.accent}`}
-                  style={style}
-                  onClick={() => openPlant(plant)}
-                  aria-label={`${plant.commonName}, plant ${placement.sequence}`}
-                  title={`${plant.commonName} · ${placement.instanceId}`}
-                >
-                  <span>{plant.id}</span>
-                </button>
-              );
-            })}
-          </div>
-          <div className="plan-measure plan-measure-width">
-            {displayWidthM} m
-          </div>
-          <div className="plan-measure plan-measure-length">
-            {displayLengthM} m
-          </div>
+        <div className="plan-layout-column">
+          {variantTabs}
+          <BedDiagram
+            widthM={layout.bedWidthM}
+            lengthM={layout.bedLengthM}
+            placements={layout.placements}
+            openPlant={openPlant}
+            savedIds={savedIds}
+            viewingEdge={plan.brief.viewingEdge}
+          />
         </div>
 
         <div className="plan-legend">
@@ -917,25 +2331,155 @@ function PlanSummary({
             <span>Plants</span>
             <span>Quantity</span>
           </div>
-          {quantities.quantities.map((quantity) => {
-            const plant = plantsById.get(quantity.id);
-            if (!plant) return null;
-            return (
-              <button
-                key={quantity.id}
-                onClick={() => openPlant(plant)}
-                className="plan-legend-row"
-              >
-                <span className={`legend-dot accent-${plant.accent}`} />
+          {species.map(({ plant, quantity }) => (
+            <div key={quantity.id} className="plan-legend-item">
+              <button onClick={() => openPlant(plant)} className="plan-legend-row">
+                <span
+                  className="legend-dot"
+                  style={{ background: markerBackground(plant) }}
+                />
                 <span>
-                  <strong>{plant.commonName}</strong>
+                  <strong>
+                    {shortName(plant)}
+                    {savedIds.includes(plant.id) ? (
+                      <span className="legend-saved" title="In your saved plants" aria-label="saved"><SavedHeart /></span>
+                    ) : null}
+                  </strong>
                   <em>{plant.scientificName}</em>
                 </span>
                 <b>× {quantity.quantity}</b>
               </button>
-            );
-          })}
+              <p className="legend-measure">
+                {formatDimension(plant.heightCm)} tall ·{" "}
+                {formatDimension(plant.spreadCm)} wide
+                {plant.spreadConfidence !== "original" ? " (estimated)" : ""}
+                {hasUnknownColour(plant) ? " · colour unknown" : ""}
+                {onExclude && (
+                  <button
+                    type="button"
+                    className="legend-exclude"
+                    onClick={() => onExclude(plant.id)}
+                    title={`Never use ${plant.commonName} in my plans`}
+                    aria-label={`Exclude ${plant.commonName} and rebuild the layouts`}
+                  >
+                    Exclude
+                  </button>
+                )}
+              </p>
+            </div>
+          ))}
         </div>
+      </div>
+
+      {(anyEstimatedSpread || anyUnknownColour) && (
+        <p className="plan-caveat">
+          {anyEstimatedSpread
+            ? "Circles with a dashed edge use an estimated mature spread rather than a measured one. "
+            : ""}
+          {anyUnknownColour
+            ? "Plants with no recorded flower colour are drawn in neutral green rather than a guessed colour."
+            : ""}
+        </p>
+      )}
+
+      {/* "Why these plants" and "Care" answer two halves of the same
+          question, and each is a short paragraph, so they sit side by side
+          rather than leaving a column of empty page between them. */}
+      <div className="plan-reasoning">
+      <div className="plan-why">
+        <h3>Why these plants</h3>
+        <p>
+          This is <strong>{plan.character.toLowerCase()}</strong> of three,
+          scoring {Math.round((plan.engine?.z ?? 0) * 100)} out of 100. Every plant here survives{" "}
+          {sunLabels[plan.brief.sun].toLowerCase()},{" "}
+          {waterLabels[plan.brief.water].toLowerCase()} and{" "}
+          {soilLabels[plan.brief.soil].toLowerCase()}, and grows in{" "}
+          {plan.brief.biomes.map((biome) => biomeLabels[biome]).join(" or ")}.
+          {plan.brief.style !== "undecided"
+            ? ` We favoured a ${gardenStyleLabels[plan.brief.style].toLowerCase()} character.`
+            : ""}
+          {plan.brief.extras.length > 0
+            ? ` We also looked for ${plan.brief.extras
+                .map((extra) => extraPreferenceLabels[extra].toLowerCase())
+                .join(", ")}.`
+            : ""}
+        </p>
+      </div>
+
+      {(careLines.length > 0 || care.length > 0) && (
+        <div className="plan-care">
+          <h3>Care</h3>
+          {careLines.length > 0 && (
+            <p className="care-summary">{careLines.join(" ")}</p>
+          )}
+          {care.length > 0 && (
+            <details className="care-detail">
+              <summary>
+                What each plant&apos;s profile records
+                <small>{care.length} notes across {species.length} species</small>
+              </summary>
+              <ul>
+                {care.map(({ instruction, names }) => (
+                  <li key={instruction}>
+                    <strong>{instruction}</strong>
+                    <span>{names.join(", ")}</span>
+                  </li>
+                ))}
+              </ul>
+            </details>
+          )}
+        </div>
+      )}
+      </div>
+
+      <div className="plan-plants">
+        <h3>The plants in this layout</h3>
+        <div className="plan-plant-grid">
+          {species.map(({ plant, quantity }) => (
+            <article key={plant.id} className="plan-plant-card">
+              <PlantPhoto plant={plant} />
+              <h4>{plant.commonName}</h4>
+              <em>{plant.scientificName}</em>
+              <dl>
+                <div>
+                  <dt>Quantity</dt>
+                  <dd>× {quantity.quantity}</dd>
+                </div>
+                <div>
+                  <dt>Height</dt>
+                  <dd>{formatDimension(plant.heightCm)}</dd>
+                </div>
+                <div>
+                  <dt>Spread</dt>
+                  <dd>
+                    {formatDimension(plant.spreadCm)}
+                    {plant.spreadConfidence !== "original" ? " (est.)" : ""}
+                  </dd>
+                </div>
+              </dl>
+            </article>
+          ))}
+        </div>
+      </div>
+
+      <SourcingPanel
+        key={place ?? ""}
+        place={place}
+        onBudget={onBudget}
+        items={species.map(({ plant, quantity }) => ({
+          plantId: plant.id,
+          n: quantity.quantity,
+          label: plant.commonName,
+        }))}
+      />
+
+      <div className="plan-actions" hidden={readOnly}>
+        <button className="button button-dark" onClick={onSave} disabled={isSaved}>
+          {isSaved ? "Saved ✓" : "Save this layout"}
+        </button>
+        <button className="text-link" onClick={onRegenerate}>
+          Regenerate
+        </button>
       </div>
 
       <details className="plan-assumptions">
@@ -958,6 +2502,10 @@ function PlanSummary({
               {[...new Set(plan.diagnostics)].map((diagnostic) => (
                 <li key={diagnostic}>{diagnostic}</li>
               ))}
+              <li>
+                Reference {plan.seed} — the same answers always rebuild this
+                layout.
+              </li>
             </ul>
           </section>
         </div>
@@ -969,22 +2517,53 @@ function PlanSummary({
 function CollectionView({
   mode,
   brief,
+  place,
+  onBudgetForSaved,
   saved,
+  excluded,
   openPlant,
   toggleSaved,
+  toggleExcluded,
   restart,
+  onSaveLayout,
+  isLayoutSaved,
 }: {
   mode: "results" | "browse";
   brief: GardenBrief;
+  place: string | null;
   saved: string[];
+  /** Plants the user has ruled out; they never enter the pool. */
+  excluded: string[];
   openPlant: (plant: Plant) => void;
   toggleSaved: (id: string) => void;
+  toggleExcluded: (id: string) => void;
   restart: () => void;
+  onSaveLayout: (plan: GardenPlan, budget: SavedBudget | null) => void;
+  isLayoutSaved: (plan: GardenPlan) => boolean;
+  onBudgetForSaved: (plan: GardenPlan, budget: SavedBudget) => void;
 }) {
+  // Latest budget line per plan (by seed), so saving can store it.
+  const [budgets, setBudgets] = useState<Record<string, SavedBudget>>({});
   const [query, setQuery] = useState("");
   const [form, setForm] = useState<(typeof formFilters)[number]>("All");
   const [limit, setLimit] = useState(12);
-  const plan = useMemo(() => buildGardenPlan(plants, brief), [brief]);
+  // Regenerate deliberately produces a different set; reopening the same
+  // counter reproduces this one exactly (spec 8.6).
+  const [variationCounter, setVariationCounter] = useState(0);
+  const [chosenVariant, setChosenVariant] = useState(0);
+
+  const variants = useMemo(
+    () =>
+      buildGardenPlanVariants(plants, brief, {
+        savedPlantIds: saved,
+        excludedPlantIds: excluded,
+        variationCounter,
+      }),
+    // `excluded` is a dependency, so ruling a plant out rebuilds all three
+    // options straight away - no Regenerate press needed.
+    [brief, saved, excluded, variationCounter],
+  );
+  const plan = variants[Math.min(chosenVariant, variants.length - 1)];
 
   const ranked = useMemo<
     { plant: Plant; match?: PlantAssessment }[]
@@ -1015,14 +2594,12 @@ function CollectionView({
 
   return (
     <main className="collection-shell">
-      <section className="collection-intro">
+      <section className={`collection-intro${mode === "results" ? " is-compact" : ""}`}>
         <div>
           <h1>
             {mode === "results" ? (
               <>
-                Your <em>{brief.bedWidthM} × {brief.bedLengthM} m</em>
-                <br />
-                planting plan.
+                Your <em>{brief.bedWidthM} × {brief.bedLengthM} m</em> planting plan.
               </>
             ) : (
               <>
@@ -1036,8 +2613,8 @@ function CollectionView({
         <div className="collection-note">
           <p>
             {mode === "results"
-              ? "We used your answers to check the plants, choose a mix and lay it out in the bed. Anything we’re unsure about is clearly marked."
-              : `${plants.length.toLocaleString()} plants combine BioSCape occurrence records and PlantZAfrica horticultural profiles. Not every plant has light, water or biome guidance yet — we mark what’s still missing.`}
+              ? "Checked against your answers. Anything we’re unsure about is marked."
+              : `${plants.length.toLocaleString()} Western Cape-compatible plants combine BioSCape occurrence records and PlantZAfrica horticultural profiles. Not every plant has light, water or a specific bioregion match yet — we mark what’s still missing.`}
           </p>
           {mode === "results" && (
             <button className="text-link" onClick={restart}>
@@ -1048,7 +2625,54 @@ function CollectionView({
       </section>
 
       {mode === "results" && (
-        <PlanSummary plan={plan} openPlant={openPlant} />
+        <>
+          <PlanSummary
+            variantTabs={
+              <div className="variant-tabs" role="tablist" aria-label="Three layout options">
+                {variants.map((variant, index) => (
+                  <button
+                    key={variant.character}
+                    role="tab"
+                    aria-selected={index === chosenVariant}
+                    className={`variant-tab${index === chosenVariant ? " is-selected" : ""}`}
+                    onClick={() => setChosenVariant(index)}
+                  >
+                    <strong>{variant.character}</strong>
+                    <small>
+                      {variant.quantities
+                        ? `${variant.quantities.totalPlants} plants · ${variant.quantities.quantities.length} species${
+                            variant.engine ? ` · score ${Math.round(variant.engine.z * 100)}` : ""
+                          }`
+                        : "No layout"}
+                    </small>
+                  </button>
+                ))}
+              </div>
+            }
+            plan={plan}
+            place={place}
+            savedIds={saved}
+            openPlant={openPlant}
+            onSave={() => onSaveLayout(plan, budgets[plan.seed] ?? null)}
+            onBudget={(budget) => {
+              setBudgets((current) => ({ ...current, [plan.seed]: budget }));
+              // Saved before the prices arrived: fill the budget in now.
+              onBudgetForSaved(plan, budget);
+            }}
+            isSaved={isLayoutSaved(plan)}
+            onExclude={(id) => {
+              toggleExcluded(id);
+              // The three options rebuild from the smaller pool; the first
+              // one is the new best, so land the user there rather than on
+              // a tab that now holds a different garden.
+              setChosenVariant(0);
+            }}
+            onRegenerate={() => {
+              setVariationCounter((current) => current + 1);
+              setChosenVariant(0);
+            }}
+          />
+        </>
       )}
 
       <section className="collection-tools" aria-label="Collection filters">
@@ -1099,8 +2723,10 @@ function CollectionView({
               plant={plant}
               match={mode === "results" ? match : undefined}
               saved={saved.includes(plant.id)}
+              excluded={excluded.includes(plant.id)}
               open={() => openPlant(plant)}
               toggleSaved={() => toggleSaved(plant.id)}
+              toggleExcluded={() => toggleExcluded(plant.id)}
             />
           ))}
         </section>
@@ -1133,31 +2759,258 @@ function CollectionView({
   );
 }
 
+/**
+ * A saved garden re-opened in full. The layout is rebuilt from the brief
+ * and the stored seed, which is what makes it the same garden rather than
+ * a new one - so the care notes, the reasoning and the nursery check all
+ * come back with it. If the dataset or the rulebook has changed since it
+ * was saved, the rebuild can differ, and the page says so rather than
+ * quietly showing something else.
+ */
+function SavedLayoutPage({
+  layout,
+  savedIds,
+  openPlant,
+  onBack,
+}: {
+  layout: SavedLayout;
+  savedIds: readonly string[];
+  openPlant: (plant: Plant) => void;
+  onBack: () => void;
+}) {
+  const plan = useMemo(() => {
+    const variants = buildGardenPlanVariants(plants, layout.brief);
+    return variants.find((variant) => variant.seed === layout.seed) ?? variants[0];
+  }, [layout.brief, layout.seed]);
+
+  const stale =
+    (layout.datasetVersion !== null && layout.datasetVersion !== DATASET_VERSION) ||
+    (layout.rulesVersion !== null && plan.engine !== null && layout.rulesVersion !== plan.engine.rulesVersion);
+  const rebuiltDifferently = plan.seed !== layout.seed;
+
+  return (
+    <>
+      <div className="saved-page-bar">
+        <button className="text-link" onClick={onBack}>
+          ← All saved gardens
+        </button>
+        <span>
+          Saved {formatSavedDate(layout.createdAt)} · reference {layout.seed}
+        </span>
+      </div>
+      {(stale || rebuiltDifferently) && (
+        <p className="sourcing-warning">
+          {rebuiltDifferently
+            ? "This garden could not be rebuilt exactly - the plants and positions below are the closest match to the one you saved."
+            : "The plant data or the planting rules have changed since you saved this garden, so what you see may differ slightly from the version you saved."}
+        </p>
+      )}
+      <PlanSummary
+        plan={plan}
+        place={layout.budget?.place ?? null}
+        savedIds={savedIds}
+        openPlant={openPlant}
+        onSave={() => {}}
+        onBudget={() => {}}
+        onRegenerate={() => {}}
+        isSaved
+        readOnly
+      />
+    </>
+  );
+}
+
+function SavedLayoutsList({
+  layouts,
+  onRemove,
+  openPlant,
+  savedIds,
+  onOpen,
+}: {
+  layouts: SavedLayout[];
+  savedIds: readonly string[];
+  onRemove: (id: string) => void;
+  openPlant: (plant: Plant) => void;
+  onOpen: (id: string) => void;
+}) {
+  if (layouts.length === 0) return null;
+  const plantsById = new Map(plants.map((plant) => [plant.id, plant]));
+
+  return (
+    <section className="saved-layouts">
+      <div className="saved-layout-grid">
+        {layouts.map((layout) => (
+          <article key={layout.id} className="saved-layout-card">
+            <header>
+              <strong>{layout.character}</strong>
+              {/* Every saved layout is listed with the date it was made. */}
+              <time dateTime={layout.createdAt}>
+                {formatSavedDate(layout.createdAt)}
+              </time>
+            </header>
+            <p className="saved-layout-meta">
+              {layout.brief.bedWidthM} × {layout.brief.bedLengthM} m ·{" "}
+              {layout.species.reduce((total, item) => total + item.quantity, 0)}{" "}
+              plants · {layout.species.length} species
+            </p>
+            {layout.placements && layout.placements.length > 0 ? (
+              <BedDiagram
+                widthM={layout.brief.bedWidthM}
+                lengthM={layout.brief.bedLengthM}
+                placements={layout.placements}
+                openPlant={openPlant}
+                savedIds={savedIds}
+                viewingEdge={layout.brief.viewingEdge}
+              />
+            ) : (
+              <p className="saved-layout-note">
+                Saved before planting plans were stored - rebuild it from
+                the same answers to see where each plant goes.
+              </p>
+            )}
+            {layout.budget ? (
+              <p className="saved-layout-budget">
+                {layout.budget.text}
+                <small>
+                  {" "}Prices checked {formatSavedDate(layout.budget.checkedAt)}
+                  {layout.budget.place ? ` for ${layout.budget.place}` : ""} — confirm with the nursery.
+                </small>
+              </p>
+            ) : null}
+            <ul>
+              {layout.species.map((item) => {
+                const plant = plantsById.get(item.plantId);
+                if (!plant) return null;
+                return (
+                  <li key={item.plantId}>
+                    <button className="text-link" onClick={() => openPlant(plant)}>
+                      {plant.commonName}
+                    </button>{" "}
+                    × {item.quantity}
+                  </li>
+                );
+              })}
+            </ul>
+            <footer>
+              <button className="text-link" onClick={() => onOpen(layout.id)}>
+                Open full layout →
+              </button>
+              <button className="text-link" onClick={() => onRemove(layout.id)}>
+                Remove
+              </button>
+            </footer>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function SavedView({
   saved,
+  excluded,
+  savedLayouts,
+  removeLayout,
   openPlant,
   toggleSaved,
+  toggleExcluded,
   browse,
 }: {
   saved: string[];
+  excluded: string[];
+  savedLayouts: SavedLayout[];
+  removeLayout: (id: string) => void;
   openPlant: (plant: Plant) => void;
   toggleSaved: (id: string) => void;
+  toggleExcluded: (id: string) => void;
   browse: () => void;
 }) {
   const savedPlants = plants.filter((plant) => saved.includes(plant.id));
+  const excludedPlants = plants.filter((plant) => excluded.includes(plant.id));
+  // Three different things live here - whole gardens, the plants you liked
+  // and the plants you ruled out - so they get their own tabs rather than
+  // one stacked on the other.
+  const [tab, setTab] = useState<"gardens" | "plants" | "excluded">(
+    savedLayouts.length > 0 ? "gardens" : "plants",
+  );
+  // One saved garden opened in full. Cleared if that garden is removed.
+  const [openedId, setOpenedId] = useState<string | null>(null);
+  const opened = savedLayouts.find((item) => item.id === openedId) ?? null;
+
+  if (opened) {
+    return (
+      <main className="saved-shell">
+        <SavedLayoutPage
+          layout={opened}
+          savedIds={saved}
+          openPlant={openPlant}
+          onBack={() => setOpenedId(null)}
+        />
+      </main>
+    );
+  }
+
   return (
     <main className="saved-shell">
       <section className="saved-intro">
         <h1>
-          Plants you’ve
+          Your saved
           <br />
-          saved.
+          work.
         </h1>
         <p>
-          These plants are saved on this device. Use this list to compare the
-          ones you like.
+          Everything here is stored on this device. Saved gardens keep the
+          whole layout; saved plants are the individual species you liked.
         </p>
       </section>
+
+      <div className="saved-tabs" role="tablist" aria-label="Saved gardens and plants">
+        <button
+          role="tab"
+          aria-selected={tab === "gardens"}
+          className={`saved-tab${tab === "gardens" ? " is-selected" : ""}`}
+          onClick={() => setTab("gardens")}
+        >
+          Saved gardens <span>{savedLayouts.length}</span>
+        </button>
+        <button
+          role="tab"
+          aria-selected={tab === "plants"}
+          className={`saved-tab${tab === "plants" ? " is-selected" : ""}`}
+          onClick={() => setTab("plants")}
+        >
+          Saved plants <span>{savedPlants.length}</span>
+        </button>
+        <button
+          role="tab"
+          aria-selected={tab === "excluded"}
+          className={`saved-tab${tab === "excluded" ? " is-selected" : ""}`}
+          onClick={() => setTab("excluded")}
+        >
+          Excluded plants <span>{excludedPlants.length}</span>
+        </button>
+      </div>
+
+      {tab === "gardens" &&
+        (savedLayouts.length > 0 ? (
+          <SavedLayoutsList
+            layouts={savedLayouts}
+            savedIds={saved}
+            onRemove={removeLayout}
+            openPlant={openPlant}
+            onOpen={setOpenedId}
+          />
+        ) : (
+          <section className="saved-empty">
+            <p>
+              No saved gardens yet. Build a plan and use{" "}
+              <strong>Save this layout</strong> to keep it here.
+            </p>
+          </section>
+        ))}
+
+      {tab === "plants" && (
+        <>
       {savedPlants.length ? (
         <>
           <div className="saved-summary">
@@ -1182,8 +3035,10 @@ function SavedView({
                 key={plant.id}
                 plant={plant}
                 saved
+                excluded={false}
                 open={() => openPlant(plant)}
                 toggleSaved={() => toggleSaved(plant.id)}
+                toggleExcluded={() => toggleExcluded(plant.id)}
               />
             ))}
           </section>
@@ -1196,6 +3051,65 @@ function SavedView({
             Browse the plant library <span>↗</span>
           </button>
         </section>
+      )}
+        </>
+      )}
+
+      {tab === "excluded" && (
+        <>
+          {excludedPlants.length ? (
+            <>
+              <div className="saved-summary">
+                <span>{excludedPlants.length} excluded</span>
+                <span>Left out of every new plan</span>
+              </div>
+              <details className="excluded-note">
+                <summary>What excluding does</summary>
+                <p>
+                  An excluded plant is removed before anything is scored, so it
+                  cannot appear in a layout, and the three options rebuild
+                  without it as soon as you exclude it. Nothing is changed in
+                  the plant database — the plant keeps its full entry in the
+                  library and comes back exactly as it was when you put it
+                  back. Gardens you have already saved are left alone.
+                </p>
+              </details>
+              <ul className="excluded-list">
+                {excludedPlants.map((plant) => (
+                  <li key={plant.id} className="excluded-row">
+                    <button
+                      className="excluded-row-main"
+                      onClick={() => openPlant(plant)}
+                    >
+                      <strong>{plant.commonName}</strong>
+                      <em>{plant.scientificName}</em>
+                    </button>
+                    <button
+                      type="button"
+                      className="button button-outline"
+                      onClick={() => toggleExcluded(plant.id)}
+                    >
+                      Put back
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : (
+            <section className="empty-state saved-empty">
+              <h2>You haven’t excluded any plants.</h2>
+              <p>
+                If a plan suggests something you do not want — a plant you
+                dislike, or one you already have too much of — use{" "}
+                <strong>Exclude</strong> on it. It will be left out of every new
+                plan until you put it back here.
+              </p>
+              <button className="button button-dark" onClick={browse}>
+                Browse the plant library <span>↗</span>
+              </button>
+            </section>
+          )}
+        </>
       )}
     </main>
   );
@@ -1211,8 +3125,9 @@ function MethodView({ start }: { start: () => void }) {
           What we’re still <em>checking.</em>
         </h1>
         <p>
-          The planner uses your answers to suggest plants, work out quantities
-          and draw a simple bed layout. When information is missing, we say so.
+          The planner uses your answers to suggest plants, work out quantities,
+          draw a bed layout and estimate what it would cost to buy. When
+          information is missing, we say so.
         </p>
       </section>
       <section className="method-grid">
@@ -1220,34 +3135,43 @@ function MethodView({ start }: { start: () => void }) {
           <span>01</span>
           <h2>Plant records</h2>
           <p>
-            The plant library combines occurrence and trait records from
-            BioSCape with horticultural profiles from PlantZAfrica (SANBI).
+            {plants.length.toLocaleString()} Western Cape plants. Height,
+            spread, growth form and flowering come from BioSCape field records;
+            light, water, soil and the garden notes come from PlantZAfrica
+            (SANBI). Plants on the NEMBA invasive list are removed before
+            anything is chosen.
           </p>
         </article>
         <article>
           <span>02</span>
           <h2>Plant checks</h2>
           <p>
-            Each plant is checked against your biome, light, water and bed
-            size where that data exists. Soil, drainage and some plants’
-            light/water still need expert checking.
+            Your area’s biome, your light, water, soil and bed size are hard
+            checks: a plant that fails one is left out, and poisonous,
+            indoor-only and parasitic plants are excluded too. If too few plants
+            pass, we relax soil first, then water, then light — and tell you
+            which.
           </p>
         </article>
         <article>
           <span>03</span>
           <h2>Your priorities</h2>
           <p>
-            The planner looks at every goal you choose. For now, each goal
-            counts equally.
+            Garden style, flower colours and extras like fragrance or wildlife
+            rank the plants that passed; they never remove one. Wind does the
+            same — it shifts scores and placement, never eligibility. Each goal
+            still counts equally, pending expert calibration.
           </p>
         </article>
         <article>
           <span>04</span>
-          <h2>Plant mix and layout</h2>
+          <h2>Mix, layout and cost</h2>
           <p>
-            The planner chooses a mix, works out how many may fit and places
-            them inside the bed. Plant size is an estimate, not nursery spacing
-            advice.
+            The planner tries thousands of plant combinations and keeps the
+            three best, works out quantities, then places them by height with
+            taller plants toward the windward edge. Finally it checks nursery
+            websites and price lists for what the bed would cost. Most plant
+            sizes are estimated from similar species, not measured.
           </p>
         </article>
       </section>
@@ -1257,11 +3181,12 @@ function MethodView({ start }: { start: () => void }) {
         </div>
         <p>
           A local plant expert still needs to review soil, water, spacing and
-          likely results. Until then, treat the plan as a useful starting
+          how the goals are weighted. Nursery prices are indicative, not live
+          stock — phone ahead. Until then, treat the plan as a useful starting
           point—not a guarantee.
         </p>
         <button className="button button-dark" onClick={start}>
-          Try the plant finder <span>↗</span>
+          Try the layout tool <span>↗</span>
         </button>
       </section>
     </main>
@@ -1270,14 +3195,20 @@ function MethodView({ start }: { start: () => void }) {
 
 function DetailDrawer({
   plant,
+  place,
   saved,
+  excluded,
   close,
   toggleSaved,
+  toggleExcluded,
 }: {
   plant: Plant;
+  place: string | null;
   saved: boolean;
+  excluded: boolean;
   close: () => void;
   toggleSaved: () => void;
+  toggleExcluded: () => void;
 }) {
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -1315,13 +3246,29 @@ function DetailDrawer({
           <p className="plant-common-name">{plant.commonName}</p>
           <h2 id="detail-title">{plant.scientificName}</h2>
           <p className="detail-note">{plant.note}</p>
-          <button
-            className={`button ${saved ? "button-outline" : "button-dark"}`}
-            onClick={toggleSaved}
-          >
-            {saved ? "Remove saved plant" : "Save plant"}{" "}
-            <span>{saved ? "−" : "+"}</span>
-          </button>
+          <div className="detail-actions">
+            <button
+              className={`button ${saved ? "button-outline" : "button-dark"}`}
+              onClick={toggleSaved}
+            >
+              {saved ? "Remove saved plant" : "Save plant"}{" "}
+              <span>{saved ? "−" : "+"}</span>
+            </button>
+            <button
+              type="button"
+              className={`button button-outline${excluded ? " is-excluded" : ""}`}
+              onClick={toggleExcluded}
+              aria-pressed={excluded}
+            >
+              {excluded ? "Put back in my plans" : "Never plan this plant"}
+            </button>
+          </div>
+          {excluded && (
+            <p className="detail-note detail-excluded">
+              Excluded by you, so it is left out of every new plan. Its record
+              here is unchanged.
+            </p>
+          )}
 
           <dl className="detail-facts">
             <div>
@@ -1359,17 +3306,34 @@ function DetailDrawer({
           <div className="detail-evidence">
             <h3>About this information</h3>
             <p>
-              We found {plant.occurrenceCount} Western Cape records for this
-              plant in BODATSA. Height, plant type and flowering time come from
-              BioSCape. We’re still checking the light, water and garden-use
-              advice.
+              We found {plant.occurrenceCount} Western Cape occurrence records
+              for this plant in BioSCape, which is also where its height, plant
+              type and flowering time come from. Light, water, soil and the
+              garden notes come from its PlantZAfrica profile.{" "}
+              {plant.spreadSource === "original"
+                ? "Its spread is a measured value."
+                : "Its spread is estimated from similar plants, not measured."}
             </p>
           </div>
+
+          <SourcingPanel
+            key={`${plant.id}|${place ?? ""}`}
+            compact
+            place={place}
+            items={[{ plantId: plant.id, n: 1, label: plant.commonName }]}
+          />
         </div>
       </aside>
     </div>
   );
 }
+
+/** Where testers send feedback while the MVP is being reviewed. The bare
+ * /viewform URL is the one respondents use; the ?usp=publish-editor
+ * parameter Google appends in its publish dialog is for the editor and is
+ * dropped here. */
+const FEEDBACK_FORM_URL =
+  "https://docs.google.com/forms/d/e/1FAIpQLSdp3qvnTKqknIn8XO_VJ7GAdMpqgvuG-hhEidAh4jSjAs1b3A/viewform";
 
 function Footer({ method }: { method: () => void }) {
   return (
@@ -1378,12 +3342,23 @@ function Footer({ method }: { method: () => void }) {
         <span>Silly Goose</span>
       </div>
       <p>
-        A Western Cape garden planner built with SANPC, BODATSA and BioSCape
-        plant data.
+        A Western Cape garden planner built with BioSCape field records,
+        PlantZAfrica (SANBI) profiles and SANBI’s 2018 vegetation map.
       </p>
       <button className="text-link" onClick={method}>
         How the planner works ↗
       </button>
+      {/* The MVP is being tested: the form is how a tester reports what the
+          planner got wrong. Opens in a new tab so a half-finished garden is
+          never lost - the brief and the plan are device-local. */}
+      <a
+        className="text-link footer-feedback"
+        href={FEEDBACK_FORM_URL}
+        target="_blank"
+        rel="noreferrer"
+      >
+        Tell us what you think ↗
+      </a>
       <span className="footer-version">MVP · 2026</span>
     </footer>
   );
@@ -1393,44 +3368,40 @@ export function GardenApp() {
   const [view, setView] = useState<View>("home");
   const [brief, setBrief] = useState<GardenBrief>(defaultBrief);
   const [saved, setSaved] = useState<string[]>([]);
+  // Plants ruled out by hand. They leave the pool at Stage 0, so the three
+  // options rebuild without them the moment this changes.
+  const [excluded, setExcluded] = useState<string[]>([]);
+  const [savedLayouts, setSavedLayouts] = useState<SavedLayout[]>([]);
   const [savedReady, setSavedReady] = useState(false);
   const [briefReady, setBriefReady] = useState(false);
   const [selectedPlant, setSelectedPlant] = useState<Plant | null>(null);
+  // Location context lives here, not in the finder, so navigating away and
+  // back does not lose the place the user searched for.
+  const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
+  const [availableBiomes, setAvailableBiomes] = useState<NationalBiome[]>([]);
 
   useEffect(() => {
     queueMicrotask(() => {
-      try {
-        const savedValue = window.localStorage.getItem("silly-goose-saved");
-        const parsedSaved = savedValue ? JSON.parse(savedValue) : [];
-        setSaved(
-          Array.isArray(parsedSaved)
-            ? parsedSaved.filter((item): item is string => typeof item === "string")
-            : [],
-        );
-
-        const briefValue = window.localStorage.getItem("silly-goose-brief");
-        const parsedBrief = briefValue
-          ? parseGardenBrief(JSON.parse(briefValue))
-          : null;
-        if (parsedBrief) setBrief(parsedBrief);
-      } catch {
-        setSaved([]);
-      } finally {
-        setSavedReady(true);
-        setBriefReady(true);
-      }
+      const store = loadStore();
+      setSaved(store.savedPlantIds);
+      setExcluded(store.excludedPlantIds);
+      setSavedLayouts(store.savedLayouts);
+      if (store.brief) setBrief(store.brief);
+      setSavedReady(true);
+      setBriefReady(true);
     });
   }, []);
 
   useEffect(() => {
-    if (!savedReady) return;
-    window.localStorage.setItem("silly-goose-saved", JSON.stringify(saved));
-  }, [saved, savedReady]);
-
-  useEffect(() => {
-    if (!briefReady) return;
-    window.localStorage.setItem("silly-goose-brief", JSON.stringify(brief));
-  }, [brief, briefReady]);
+    if (!savedReady || !briefReady) return;
+    saveStore({
+      version: 1,
+      savedPlantIds: saved,
+      excludedPlantIds: excluded,
+      brief,
+      savedLayouts,
+    });
+  }, [saved, excluded, savedLayouts, brief, savedReady, briefReady]);
 
   const navigate = (nextView: View) => {
     setView(nextView);
@@ -1438,12 +3409,73 @@ export function GardenApp() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const toggleSaved = (id: string) => {
-    setSaved((current) =>
-      current.includes(id)
-        ? current.filter((item) => item !== id)
-        : [...current, id],
+  const saveLayout = (plan: GardenPlan, budget: SavedBudget | null) => {
+    if (!plan.quantities) return;
+    const round = (value: number) => Math.round(value * 1000) / 1000;
+    setSavedLayouts((current) => [
+      {
+        id: createLayoutId(),
+        character: plan.character,
+        createdAt: new Date().toISOString(),
+        brief: plan.brief,
+        species: plan.quantities!.quantities.map((quantity) => ({
+          plantId: quantity.id,
+          quantity: quantity.quantity,
+        })),
+        seed: plan.seed,
+        variationCounter: plan.variationCounter,
+        datasetVersion: DATASET_VERSION,
+        rulesVersion: plan.engine?.rulesVersion ?? null,
+        // The plan itself, so the gardener knows exactly where to plant.
+        placements: (plan.layout?.placements ?? []).map((p) => ({
+          plantId: p.plantId, xM: round(p.xM), yM: round(p.yM), radiusM: round(p.radiusM),
+        })),
+        budget,
+      },
+      ...current,
+    ]);
+  };
+
+  // A garden saved before its nursery prices arrived gets the budget line
+  // as soon as it does.
+  const addBudgetToSaved = (plan: GardenPlan, budget: SavedBudget) =>
+    setSavedLayouts((current) =>
+      current.some((l) => l.seed === plan.seed && l.character === plan.character && !l.budget)
+        ? current.map((l) =>
+            l.seed === plan.seed && l.character === plan.character && !l.budget ? { ...l, budget } : l,
+          )
+        : current,
     );
+
+  // A layout is "already saved" when one with the same seed and character
+  // is stored - the seed covers the whole input vector, so this is exactly
+  // "you have saved this garden".
+  const isLayoutSaved = (plan: GardenPlan) =>
+    savedLayouts.some(
+      (layout) => layout.seed === plan.seed && layout.character === plan.character,
+    );
+
+  const removeLayout = (id: string) =>
+    setSavedLayouts((current) => current.filter((layout) => layout.id !== id));
+
+  const toggleSaved = (id: string) => {
+    setSaved((current) => {
+      if (current.includes(id)) return current.filter((item) => item !== id);
+      // Hearting a plant you had excluded is a change of mind, so it comes
+      // back into the pool rather than sitting in both lists at once.
+      setExcluded((ids) => ids.filter((item) => item !== id));
+      return [...current, id];
+    });
+  };
+
+  const toggleExcluded = (id: string) => {
+    setExcluded((current) => {
+      if (current.includes(id)) return current.filter((item) => item !== id);
+      // Excluding and hearting the same plant contradict each other, and the
+      // heart also feeds the Stage 1 bonus, so excluding drops the heart.
+      setSaved((ids) => ids.filter((item) => item !== id));
+      return [...current, id];
+    });
   };
 
   return (
@@ -1453,31 +3485,49 @@ export function GardenApp() {
         <HomeView
           start={() => navigate("finder")}
           browse={() => navigate("browse")}
+          openSavedGardens={() => navigate("saved")}
+          savedLayoutCount={savedLayouts.length}
         />
       )}
       {view === "finder" && (
         <FinderView
           brief={brief}
           setBrief={setBrief}
+          selectedPlace={selectedPlace}
+          setSelectedPlace={setSelectedPlace}
+          availableBiomes={availableBiomes}
+          setAvailableBiomes={setAvailableBiomes}
           finish={() => navigate("results")}
           cancel={() => navigate("home")}
+          excluded={excluded}
+          openExcluded={() => navigate("saved")}
         />
       )}
       {(view === "results" || view === "browse") && (
         <CollectionView
           mode={view}
           brief={brief}
+          place={selectedPlace?.name ?? null}
           saved={saved}
+          excluded={excluded}
           openPlant={setSelectedPlant}
+          onSaveLayout={saveLayout}
+          onBudgetForSaved={addBudgetToSaved}
+          isLayoutSaved={isLayoutSaved}
           toggleSaved={toggleSaved}
+          toggleExcluded={toggleExcluded}
           restart={() => navigate("finder")}
         />
       )}
       {view === "saved" && (
         <SavedView
           saved={saved}
+          excluded={excluded}
+          savedLayouts={savedLayouts}
+          removeLayout={removeLayout}
           openPlant={setSelectedPlant}
           toggleSaved={toggleSaved}
+          toggleExcluded={toggleExcluded}
           browse={() => navigate("browse")}
         />
       )}
@@ -1488,9 +3538,12 @@ export function GardenApp() {
       {selectedPlant && (
         <DetailDrawer
           plant={selectedPlant}
+          place={selectedPlace?.name ?? null}
           saved={saved.includes(selectedPlant.id)}
+          excluded={excluded.includes(selectedPlant.id)}
           close={() => setSelectedPlant(null)}
           toggleSaved={() => toggleSaved(selectedPlant.id)}
+          toggleExcluded={() => toggleExcluded(selectedPlant.id)}
         />
       )}
     </div>

@@ -1,0 +1,26 @@
+# Non-residential place names to suppress from the location picker.
+#
+# One case-insensitive substring per line; blank lines and #-comments are
+# ignored. A place whose name contains any of these is dropped by
+# generate_places_json.py, which logs what it removed.
+#
+# This is a filter over a bulk GIS import, not a hand-built whitelist -
+# it is meant to be extended when something obviously non-residential
+# shows up in the picker.
+
+airport
+industrial
+nature reserve
+game reserve
+dam
+prison
+correctional
+military
+army base
+air force base
+naval base
+quarry
+landfill
+sewage
+water works
+power station

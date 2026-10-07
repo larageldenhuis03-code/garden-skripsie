@@ -1,0 +1,4 @@
+# Python dependency for the PDF catalogue ingest
+# (data/scripts/ingest_catalogues.py). The weekly nursery scrape that
+# also needed beautifulsoup4 is retired (data/scripts/retired/sourcing/).
+pdfplumber==0.11.4

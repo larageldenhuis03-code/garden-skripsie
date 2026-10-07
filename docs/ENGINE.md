@@ -110,6 +110,16 @@ a `needs review` status; it never silently becomes compatibility. The
 provisional planner may still model a review-status plant only when it has a
 usable canopy value, and the resulting plan keeps the warning visible.
 
+One rule in this list is **not** evidence. `not-excluded` carries the plants
+the gardener has ruled out by hand (2026-10-01). It is present only while the
+user's exclusion set is non-empty, it is checked first so nothing else runs
+for a plant already ruled out, and its reason states that the *user* excluded
+the plant - its "source" is their own choice, with no horticultural claim
+attached. Nothing is recorded against the species, so removing an exclusion
+restores the plant exactly. It behaves like any other hard failure in that an
+excluded plant is never scored by Stage 1 and so cannot be recovered by a
+saved-plant bonus or a wind term.
+
 ### AHP
 
 Normalise each pairwise-comparison matrix column and average each row.
@@ -139,12 +149,27 @@ The pilot uses binary goal achievement (`1` recorded, `0` absent), target `1`,
 no over-achievement penalty and the AHP weight as the under-achievement
 penalty. Suitability is the remaining percentage after the normalised penalty.
 
+### Stage 1 - plant score
+
+Every plant in the Stage 0 pool gets
+
+`raw_i = 0.637 style_i + 0.105 colour_i + 0.258 extras_i + 0.105 saved_i + 0.637 W_site windres_i`
+
+`score_i = raw_i / raw_max`, where raw_max sums the weights of the active
+terms only (style if not Undecided, colour if picked, extras if >= 1,
+saved if the user has >= 1 saved plant, 0.637 W_site). If raw_max = 0
+every score is 0. Terms are binary except colour_i and extras_i
+(matches / picked). W_site: none 0, protected 0.5, affected 1. All
+numbers live in `stage1Config.ts`. `v_i` below is score_i; the Goal
+Programming evaluation is kept for the trace (with equal weights its
+achievement equals extras_i).
+
 ### Binary group selection
 
 Variables:
 
 - `x_i` - whether species `i` is selected;
-- `v_i` - Goal Programming suitability;
+- `v_i` - Stage 1 score (plus a pre-Stage-2 result-profile nudge and a sub-0.005 tie-break, used for ordering only);
 - `a_i` - circular canopy-proxy area;
 - `B` - bed area; and
 - `rho` - requested open-space ratio.
@@ -187,8 +212,52 @@ Each plant becomes a circle whose diameter is the sourced field-canopy axis.
 The phase-one shelf packer places larger circles first in boundary-safe rows.
 The layout audit checks:
 
-- every circle remains inside the bed; and
-- every pair of circles is non-overlapping.
+- every circle remains inside the bed (P1); and
+- no pair of circles overlaps by more than P2 allows.
+
+**H7 footprint cap, added 2026-10-05** (rulebook `5_Stage2_Constraints`
+row 11; phi in `1_Parameters` row 103, marked ASSUMPTION):
+
+`pi (s_i / 2)^2 <= phi * W * L` for every **L1** species, phi = 0.25
+
+equivalently `s_i <= 2 sqrt(phi W L / pi)` - 2.76 m on a 6 x 4 m bed. A
+species that fails it gets `y_i = 0`: it is removed before the search rather
+than penalised, and each removal is logged by name with its footprint and the
+cap. L1 only, because the rule exists to stop one canopy swallowing a small
+bed, and the lower layers are already held by H1 (total cover) and H5 (no
+species dominates).
+
+It is enforced in two places on purpose. `runEngine` filters the pool, so
+Stage 3 is never offered the species; `withinLimits()` rejects any state that
+contains one, so the guarantee is checked rather than assumed. Both call the
+same predicate, `exceedsFootprintCap`.
+
+Known consequence, from the rulebook's own note: on a small bed this can
+remove **every** L1 species. That is a soft cost, not a failure - where
+`struct_min = 1` (Fynbos, Mediterranean, Generic) the structure third of A3
+drops. Two further interactions follow from existing rules and are worth
+watching when phi is tested: L2 climbers require an L1 host, and a
+wind-affected shallow bed requires a windward-row species, which is often
+L1-tier.
+
+**P2, revised 2026-10-05** (rulebook `6_Stage3_4_Rules` C15:D15, workbook
+`60273b1253ee`):
+
+`d_ij >= r_i + r_j - delta * MIN(r_i, r_j)`, delta = 0.15
+
+equivalently `overlap / MIN(r_i, r_j) <= delta`. The allowance is a share of
+the **smaller** plant. It previously read `(1 - delta)(r_i + r_j)`, which
+scaled the allowance with the combined radii and so let a large neighbour
+claim a large absolute bite out of a small one: a 0.2 m-radius plant beside a
+1 m-radius Searsia could lose 0.18 m of its 0.20 m radius. Under the revised
+rule the same pair gives up 0.03 m. For two equal plants the allowance halves,
+from `2*delta*r` to `delta*r`.
+
+One definition serves the whole engine - `minCentreDistanceWith` in
+`layout.ts`, called by `minCentreDistance` in `stage4.ts` - so placement, the
+layout audit, the batch script and the Chapter 5 studies cannot drift apart.
+`tests/engine.test.ts` checks the formula and, separately, the ratio on every
+pair of every built layout.
 
 If capacity-based quantities do not all fit geometrically, the planner reduces
 the unplaceable count and records the adjustment. The returned coordinates are

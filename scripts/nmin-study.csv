@@ -1,0 +1,433 @@
+biomes,places,sun,water,soil,survivors,belowNMin
+Fynbos,1096,full,low,sandy,386,false
+Fynbos,1096,full,low,loam,258,false
+Fynbos,1096,full,low,clay,75,false
+Fynbos,1096,full,low,not-sure,411,false
+Fynbos,1096,full,moderate,sandy,1099,false
+Fynbos,1096,full,moderate,loam,631,false
+Fynbos,1096,full,moderate,clay,185,false
+Fynbos,1096,full,moderate,not-sure,1181,false
+Fynbos,1096,full,moist,sandy,1382,false
+Fynbos,1096,full,moist,loam,874,false
+Fynbos,1096,full,moist,clay,248,false
+Fynbos,1096,full,moist,not-sure,1500,false
+Fynbos,1096,part,low,sandy,96,false
+Fynbos,1096,part,low,loam,84,false
+Fynbos,1096,part,low,clay,22,false
+Fynbos,1096,part,low,not-sure,109,false
+Fynbos,1096,part,moderate,sandy,284,false
+Fynbos,1096,part,moderate,loam,225,false
+Fynbos,1096,part,moderate,clay,63,false
+Fynbos,1096,part,moderate,not-sure,318,false
+Fynbos,1096,part,moist,sandy,397,false
+Fynbos,1096,part,moist,loam,337,false
+Fynbos,1096,part,moist,clay,94,false
+Fynbos,1096,part,moist,not-sure,453,false
+Fynbos,1096,sheltered,low,sandy,17,false
+Fynbos,1096,sheltered,low,loam,16,false
+Fynbos,1096,sheltered,low,clay,4,true
+Fynbos,1096,sheltered,low,not-sure,22,false
+Fynbos,1096,sheltered,moderate,sandy,71,false
+Fynbos,1096,sheltered,moderate,loam,58,false
+Fynbos,1096,sheltered,moderate,clay,13,true
+Fynbos,1096,sheltered,moderate,not-sure,84,false
+Fynbos,1096,sheltered,moist,sandy,109,false
+Fynbos,1096,sheltered,moist,loam,100,false
+Fynbos,1096,sheltered,moist,clay,27,false
+Fynbos,1096,sheltered,moist,not-sure,134,false
+Succulent Karoo,212,full,low,sandy,330,false
+Succulent Karoo,212,full,low,loam,217,false
+Succulent Karoo,212,full,low,clay,73,false
+Succulent Karoo,212,full,low,not-sure,349,false
+Succulent Karoo,212,full,moderate,sandy,648,false
+Succulent Karoo,212,full,moderate,loam,429,false
+Succulent Karoo,212,full,moderate,clay,149,false
+Succulent Karoo,212,full,moderate,not-sure,692,false
+Succulent Karoo,212,full,moist,sandy,783,false
+Succulent Karoo,212,full,moist,loam,543,false
+Succulent Karoo,212,full,moist,clay,188,false
+Succulent Karoo,212,full,moist,not-sure,842,false
+Succulent Karoo,212,part,low,sandy,81,false
+Succulent Karoo,212,part,low,loam,64,false
+Succulent Karoo,212,part,low,clay,20,false
+Succulent Karoo,212,part,low,not-sure,88,false
+Succulent Karoo,212,part,moderate,sandy,185,false
+Succulent Karoo,212,part,moderate,loam,139,false
+Succulent Karoo,212,part,moderate,clay,44,false
+Succulent Karoo,212,part,moderate,not-sure,199,false
+Succulent Karoo,212,part,moist,sandy,233,false
+Succulent Karoo,212,part,moist,loam,185,false
+Succulent Karoo,212,part,moist,clay,64,false
+Succulent Karoo,212,part,moist,not-sure,257,false
+Succulent Karoo,212,sheltered,low,sandy,9,true
+Succulent Karoo,212,sheltered,low,loam,8,true
+Succulent Karoo,212,sheltered,low,clay,3,true
+Succulent Karoo,212,sheltered,low,not-sure,13,true
+Succulent Karoo,212,sheltered,moderate,sandy,32,false
+Succulent Karoo,212,sheltered,moderate,loam,25,false
+Succulent Karoo,212,sheltered,moderate,clay,8,true
+Succulent Karoo,212,sheltered,moderate,not-sure,39,false
+Succulent Karoo,212,sheltered,moist,sandy,43,false
+Succulent Karoo,212,sheltered,moist,loam,38,false
+Succulent Karoo,212,sheltered,moist,clay,16,false
+Succulent Karoo,212,sheltered,moist,not-sure,54,false
+Fynbos + Succulent Karoo,72,full,low,sandy,445,false
+Fynbos + Succulent Karoo,72,full,low,loam,288,false
+Fynbos + Succulent Karoo,72,full,low,clay,83,false
+Fynbos + Succulent Karoo,72,full,low,not-sure,473,false
+Fynbos + Succulent Karoo,72,full,moderate,sandy,1188,false
+Fynbos + Succulent Karoo,72,full,moderate,loam,672,false
+Fynbos + Succulent Karoo,72,full,moderate,clay,196,false
+Fynbos + Succulent Karoo,72,full,moderate,not-sure,1275,false
+Fynbos + Succulent Karoo,72,full,moist,sandy,1477,false
+Fynbos + Succulent Karoo,72,full,moist,loam,921,false
+Fynbos + Succulent Karoo,72,full,moist,clay,262,false
+Fynbos + Succulent Karoo,72,full,moist,not-sure,1601,false
+Fynbos + Succulent Karoo,72,part,low,sandy,105,false
+Fynbos + Succulent Karoo,72,part,low,loam,87,false
+Fynbos + Succulent Karoo,72,part,low,clay,24,false
+Fynbos + Succulent Karoo,72,part,low,not-sure,119,false
+Fynbos + Succulent Karoo,72,part,moderate,sandy,302,false
+Fynbos + Succulent Karoo,72,part,moderate,loam,232,false
+Fynbos + Succulent Karoo,72,part,moderate,clay,65,false
+Fynbos + Succulent Karoo,72,part,moderate,not-sure,338,false
+Fynbos + Succulent Karoo,72,part,moist,sandy,415,false
+Fynbos + Succulent Karoo,72,part,moist,loam,344,false
+Fynbos + Succulent Karoo,72,part,moist,clay,96,false
+Fynbos + Succulent Karoo,72,part,moist,not-sure,473,false
+Fynbos + Succulent Karoo,72,sheltered,low,sandy,19,false
+Fynbos + Succulent Karoo,72,sheltered,low,loam,16,false
+Fynbos + Succulent Karoo,72,sheltered,low,clay,4,true
+Fynbos + Succulent Karoo,72,sheltered,low,not-sure,24,false
+Fynbos + Succulent Karoo,72,sheltered,moderate,sandy,74,false
+Fynbos + Succulent Karoo,72,sheltered,moderate,loam,60,false
+Fynbos + Succulent Karoo,72,sheltered,moderate,clay,13,true
+Fynbos + Succulent Karoo,72,sheltered,moderate,not-sure,88,false
+Fynbos + Succulent Karoo,72,sheltered,moist,sandy,113,false
+Fynbos + Succulent Karoo,72,sheltered,moist,loam,103,false
+Fynbos + Succulent Karoo,72,sheltered,moist,clay,28,false
+Fynbos + Succulent Karoo,72,sheltered,moist,not-sure,139,false
+Forest + Fynbos,60,full,low,sandy,386,false
+Forest + Fynbos,60,full,low,loam,258,false
+Forest + Fynbos,60,full,low,clay,75,false
+Forest + Fynbos,60,full,low,not-sure,411,false
+Forest + Fynbos,60,full,moderate,sandy,1099,false
+Forest + Fynbos,60,full,moderate,loam,631,false
+Forest + Fynbos,60,full,moderate,clay,185,false
+Forest + Fynbos,60,full,moderate,not-sure,1181,false
+Forest + Fynbos,60,full,moist,sandy,1382,false
+Forest + Fynbos,60,full,moist,loam,874,false
+Forest + Fynbos,60,full,moist,clay,248,false
+Forest + Fynbos,60,full,moist,not-sure,1500,false
+Forest + Fynbos,60,part,low,sandy,96,false
+Forest + Fynbos,60,part,low,loam,84,false
+Forest + Fynbos,60,part,low,clay,22,false
+Forest + Fynbos,60,part,low,not-sure,109,false
+Forest + Fynbos,60,part,moderate,sandy,284,false
+Forest + Fynbos,60,part,moderate,loam,225,false
+Forest + Fynbos,60,part,moderate,clay,63,false
+Forest + Fynbos,60,part,moderate,not-sure,318,false
+Forest + Fynbos,60,part,moist,sandy,397,false
+Forest + Fynbos,60,part,moist,loam,337,false
+Forest + Fynbos,60,part,moist,clay,94,false
+Forest + Fynbos,60,part,moist,not-sure,453,false
+Forest + Fynbos,60,sheltered,low,sandy,17,false
+Forest + Fynbos,60,sheltered,low,loam,16,false
+Forest + Fynbos,60,sheltered,low,clay,4,true
+Forest + Fynbos,60,sheltered,low,not-sure,22,false
+Forest + Fynbos,60,sheltered,moderate,sandy,71,false
+Forest + Fynbos,60,sheltered,moderate,loam,58,false
+Forest + Fynbos,60,sheltered,moderate,clay,13,true
+Forest + Fynbos,60,sheltered,moderate,not-sure,84,false
+Forest + Fynbos,60,sheltered,moist,sandy,109,false
+Forest + Fynbos,60,sheltered,moist,loam,100,false
+Forest + Fynbos,60,sheltered,moist,clay,27,false
+Forest + Fynbos,60,sheltered,moist,not-sure,134,false
+Albany Thicket + Fynbos,44,full,low,sandy,386,false
+Albany Thicket + Fynbos,44,full,low,loam,258,false
+Albany Thicket + Fynbos,44,full,low,clay,75,false
+Albany Thicket + Fynbos,44,full,low,not-sure,411,false
+Albany Thicket + Fynbos,44,full,moderate,sandy,1100,false
+Albany Thicket + Fynbos,44,full,moderate,loam,631,false
+Albany Thicket + Fynbos,44,full,moderate,clay,186,false
+Albany Thicket + Fynbos,44,full,moderate,not-sure,1186,false
+Albany Thicket + Fynbos,44,full,moist,sandy,1383,false
+Albany Thicket + Fynbos,44,full,moist,loam,874,false
+Albany Thicket + Fynbos,44,full,moist,clay,249,false
+Albany Thicket + Fynbos,44,full,moist,not-sure,1505,false
+Albany Thicket + Fynbos,44,part,low,sandy,96,false
+Albany Thicket + Fynbos,44,part,low,loam,84,false
+Albany Thicket + Fynbos,44,part,low,clay,22,false
+Albany Thicket + Fynbos,44,part,low,not-sure,109,false
+Albany Thicket + Fynbos,44,part,moderate,sandy,284,false
+Albany Thicket + Fynbos,44,part,moderate,loam,225,false
+Albany Thicket + Fynbos,44,part,moderate,clay,63,false
+Albany Thicket + Fynbos,44,part,moderate,not-sure,318,false
+Albany Thicket + Fynbos,44,part,moist,sandy,397,false
+Albany Thicket + Fynbos,44,part,moist,loam,337,false
+Albany Thicket + Fynbos,44,part,moist,clay,94,false
+Albany Thicket + Fynbos,44,part,moist,not-sure,453,false
+Albany Thicket + Fynbos,44,sheltered,low,sandy,17,false
+Albany Thicket + Fynbos,44,sheltered,low,loam,16,false
+Albany Thicket + Fynbos,44,sheltered,low,clay,4,true
+Albany Thicket + Fynbos,44,sheltered,low,not-sure,22,false
+Albany Thicket + Fynbos,44,sheltered,moderate,sandy,71,false
+Albany Thicket + Fynbos,44,sheltered,moderate,loam,58,false
+Albany Thicket + Fynbos,44,sheltered,moderate,clay,13,true
+Albany Thicket + Fynbos,44,sheltered,moderate,not-sure,84,false
+Albany Thicket + Fynbos,44,sheltered,moist,sandy,109,false
+Albany Thicket + Fynbos,44,sheltered,moist,loam,100,false
+Albany Thicket + Fynbos,44,sheltered,moist,clay,27,false
+Albany Thicket + Fynbos,44,sheltered,moist,not-sure,134,false
+Albany Thicket,27,full,low,sandy,13,true
+Albany Thicket,27,full,low,loam,11,true
+Albany Thicket,27,full,low,clay,6,true
+Albany Thicket,27,full,low,not-sure,13,true
+Albany Thicket,27,full,moderate,sandy,27,false
+Albany Thicket,27,full,moderate,loam,24,false
+Albany Thicket,27,full,moderate,clay,9,true
+Albany Thicket,27,full,moderate,not-sure,33,false
+Albany Thicket,27,full,moist,sandy,28,false
+Albany Thicket,27,full,moist,loam,25,false
+Albany Thicket,27,full,moist,clay,10,true
+Albany Thicket,27,full,moist,not-sure,34,false
+Albany Thicket,27,part,low,sandy,5,true
+Albany Thicket,27,part,low,loam,4,true
+Albany Thicket,27,part,low,clay,2,true
+Albany Thicket,27,part,low,not-sure,5,true
+Albany Thicket,27,part,moderate,sandy,13,true
+Albany Thicket,27,part,moderate,loam,13,true
+Albany Thicket,27,part,moderate,clay,3,true
+Albany Thicket,27,part,moderate,not-sure,15,false
+Albany Thicket,27,part,moist,sandy,13,true
+Albany Thicket,27,part,moist,loam,13,true
+Albany Thicket,27,part,moist,clay,3,true
+Albany Thicket,27,part,moist,not-sure,15,false
+Albany Thicket,27,sheltered,low,sandy,0,true
+Albany Thicket,27,sheltered,low,loam,0,true
+Albany Thicket,27,sheltered,low,clay,0,true
+Albany Thicket,27,sheltered,low,not-sure,0,true
+Albany Thicket,27,sheltered,moderate,sandy,2,true
+Albany Thicket,27,sheltered,moderate,loam,2,true
+Albany Thicket,27,sheltered,moderate,clay,0,true
+Albany Thicket,27,sheltered,moderate,not-sure,2,true
+Albany Thicket,27,sheltered,moist,sandy,2,true
+Albany Thicket,27,sheltered,moist,loam,2,true
+Albany Thicket,27,sheltered,moist,clay,0,true
+Albany Thicket,27,sheltered,moist,not-sure,2,true
+Albany Thicket + Succulent Karoo,24,full,low,sandy,332,false
+Albany Thicket + Succulent Karoo,24,full,low,loam,219,false
+Albany Thicket + Succulent Karoo,24,full,low,clay,73,false
+Albany Thicket + Succulent Karoo,24,full,low,not-sure,351,false
+Albany Thicket + Succulent Karoo,24,full,moderate,sandy,653,false
+Albany Thicket + Succulent Karoo,24,full,moderate,loam,435,false
+Albany Thicket + Succulent Karoo,24,full,moderate,clay,151,false
+Albany Thicket + Succulent Karoo,24,full,moderate,not-sure,702,false
+Albany Thicket + Succulent Karoo,24,full,moist,sandy,788,false
+Albany Thicket + Succulent Karoo,24,full,moist,loam,549,false
+Albany Thicket + Succulent Karoo,24,full,moist,clay,190,false
+Albany Thicket + Succulent Karoo,24,full,moist,not-sure,852,false
+Albany Thicket + Succulent Karoo,24,part,low,sandy,82,false
+Albany Thicket + Succulent Karoo,24,part,low,loam,65,false
+Albany Thicket + Succulent Karoo,24,part,low,clay,20,false
+Albany Thicket + Succulent Karoo,24,part,low,not-sure,89,false
+Albany Thicket + Succulent Karoo,24,part,moderate,sandy,188,false
+Albany Thicket + Succulent Karoo,24,part,moderate,loam,143,false
+Albany Thicket + Succulent Karoo,24,part,moderate,clay,45,false
+Albany Thicket + Succulent Karoo,24,part,moderate,not-sure,203,false
+Albany Thicket + Succulent Karoo,24,part,moist,sandy,236,false
+Albany Thicket + Succulent Karoo,24,part,moist,loam,189,false
+Albany Thicket + Succulent Karoo,24,part,moist,clay,65,false
+Albany Thicket + Succulent Karoo,24,part,moist,not-sure,261,false
+Albany Thicket + Succulent Karoo,24,sheltered,low,sandy,9,true
+Albany Thicket + Succulent Karoo,24,sheltered,low,loam,8,true
+Albany Thicket + Succulent Karoo,24,sheltered,low,clay,3,true
+Albany Thicket + Succulent Karoo,24,sheltered,low,not-sure,13,true
+Albany Thicket + Succulent Karoo,24,sheltered,moderate,sandy,32,false
+Albany Thicket + Succulent Karoo,24,sheltered,moderate,loam,25,false
+Albany Thicket + Succulent Karoo,24,sheltered,moderate,clay,8,true
+Albany Thicket + Succulent Karoo,24,sheltered,moderate,not-sure,39,false
+Albany Thicket + Succulent Karoo,24,sheltered,moist,sandy,43,false
+Albany Thicket + Succulent Karoo,24,sheltered,moist,loam,38,false
+Albany Thicket + Succulent Karoo,24,sheltered,moist,clay,16,false
+Albany Thicket + Succulent Karoo,24,sheltered,moist,not-sure,54,false
+Albany Thicket + Fynbos + Succulent Karoo,10,full,low,sandy,445,false
+Albany Thicket + Fynbos + Succulent Karoo,10,full,low,loam,288,false
+Albany Thicket + Fynbos + Succulent Karoo,10,full,low,clay,83,false
+Albany Thicket + Fynbos + Succulent Karoo,10,full,low,not-sure,473,false
+Albany Thicket + Fynbos + Succulent Karoo,10,full,moderate,sandy,1188,false
+Albany Thicket + Fynbos + Succulent Karoo,10,full,moderate,loam,672,false
+Albany Thicket + Fynbos + Succulent Karoo,10,full,moderate,clay,196,false
+Albany Thicket + Fynbos + Succulent Karoo,10,full,moderate,not-sure,1279,false
+Albany Thicket + Fynbos + Succulent Karoo,10,full,moist,sandy,1477,false
+Albany Thicket + Fynbos + Succulent Karoo,10,full,moist,loam,921,false
+Albany Thicket + Fynbos + Succulent Karoo,10,full,moist,clay,262,false
+Albany Thicket + Fynbos + Succulent Karoo,10,full,moist,not-sure,1605,false
+Albany Thicket + Fynbos + Succulent Karoo,10,part,low,sandy,105,false
+Albany Thicket + Fynbos + Succulent Karoo,10,part,low,loam,87,false
+Albany Thicket + Fynbos + Succulent Karoo,10,part,low,clay,24,false
+Albany Thicket + Fynbos + Succulent Karoo,10,part,low,not-sure,119,false
+Albany Thicket + Fynbos + Succulent Karoo,10,part,moderate,sandy,302,false
+Albany Thicket + Fynbos + Succulent Karoo,10,part,moderate,loam,232,false
+Albany Thicket + Fynbos + Succulent Karoo,10,part,moderate,clay,65,false
+Albany Thicket + Fynbos + Succulent Karoo,10,part,moderate,not-sure,338,false
+Albany Thicket + Fynbos + Succulent Karoo,10,part,moist,sandy,415,false
+Albany Thicket + Fynbos + Succulent Karoo,10,part,moist,loam,344,false
+Albany Thicket + Fynbos + Succulent Karoo,10,part,moist,clay,96,false
+Albany Thicket + Fynbos + Succulent Karoo,10,part,moist,not-sure,473,false
+Albany Thicket + Fynbos + Succulent Karoo,10,sheltered,low,sandy,19,false
+Albany Thicket + Fynbos + Succulent Karoo,10,sheltered,low,loam,16,false
+Albany Thicket + Fynbos + Succulent Karoo,10,sheltered,low,clay,4,true
+Albany Thicket + Fynbos + Succulent Karoo,10,sheltered,low,not-sure,24,false
+Albany Thicket + Fynbos + Succulent Karoo,10,sheltered,moderate,sandy,74,false
+Albany Thicket + Fynbos + Succulent Karoo,10,sheltered,moderate,loam,60,false
+Albany Thicket + Fynbos + Succulent Karoo,10,sheltered,moderate,clay,13,true
+Albany Thicket + Fynbos + Succulent Karoo,10,sheltered,moderate,not-sure,88,false
+Albany Thicket + Fynbos + Succulent Karoo,10,sheltered,moist,sandy,113,false
+Albany Thicket + Fynbos + Succulent Karoo,10,sheltered,moist,loam,103,false
+Albany Thicket + Fynbos + Succulent Karoo,10,sheltered,moist,clay,28,false
+Albany Thicket + Fynbos + Succulent Karoo,10,sheltered,moist,not-sure,139,false
+Forest + Fynbos + Succulent Karoo,6,full,low,sandy,445,false
+Forest + Fynbos + Succulent Karoo,6,full,low,loam,288,false
+Forest + Fynbos + Succulent Karoo,6,full,low,clay,83,false
+Forest + Fynbos + Succulent Karoo,6,full,low,not-sure,473,false
+Forest + Fynbos + Succulent Karoo,6,full,moderate,sandy,1188,false
+Forest + Fynbos + Succulent Karoo,6,full,moderate,loam,672,false
+Forest + Fynbos + Succulent Karoo,6,full,moderate,clay,196,false
+Forest + Fynbos + Succulent Karoo,6,full,moderate,not-sure,1275,false
+Forest + Fynbos + Succulent Karoo,6,full,moist,sandy,1477,false
+Forest + Fynbos + Succulent Karoo,6,full,moist,loam,921,false
+Forest + Fynbos + Succulent Karoo,6,full,moist,clay,262,false
+Forest + Fynbos + Succulent Karoo,6,full,moist,not-sure,1601,false
+Forest + Fynbos + Succulent Karoo,6,part,low,sandy,105,false
+Forest + Fynbos + Succulent Karoo,6,part,low,loam,87,false
+Forest + Fynbos + Succulent Karoo,6,part,low,clay,24,false
+Forest + Fynbos + Succulent Karoo,6,part,low,not-sure,119,false
+Forest + Fynbos + Succulent Karoo,6,part,moderate,sandy,302,false
+Forest + Fynbos + Succulent Karoo,6,part,moderate,loam,232,false
+Forest + Fynbos + Succulent Karoo,6,part,moderate,clay,65,false
+Forest + Fynbos + Succulent Karoo,6,part,moderate,not-sure,338,false
+Forest + Fynbos + Succulent Karoo,6,part,moist,sandy,415,false
+Forest + Fynbos + Succulent Karoo,6,part,moist,loam,344,false
+Forest + Fynbos + Succulent Karoo,6,part,moist,clay,96,false
+Forest + Fynbos + Succulent Karoo,6,part,moist,not-sure,473,false
+Forest + Fynbos + Succulent Karoo,6,sheltered,low,sandy,19,false
+Forest + Fynbos + Succulent Karoo,6,sheltered,low,loam,16,false
+Forest + Fynbos + Succulent Karoo,6,sheltered,low,clay,4,true
+Forest + Fynbos + Succulent Karoo,6,sheltered,low,not-sure,24,false
+Forest + Fynbos + Succulent Karoo,6,sheltered,moderate,sandy,74,false
+Forest + Fynbos + Succulent Karoo,6,sheltered,moderate,loam,60,false
+Forest + Fynbos + Succulent Karoo,6,sheltered,moderate,clay,13,true
+Forest + Fynbos + Succulent Karoo,6,sheltered,moderate,not-sure,88,false
+Forest + Fynbos + Succulent Karoo,6,sheltered,moist,sandy,113,false
+Forest + Fynbos + Succulent Karoo,6,sheltered,moist,loam,103,false
+Forest + Fynbos + Succulent Karoo,6,sheltered,moist,clay,28,false
+Forest + Fynbos + Succulent Karoo,6,sheltered,moist,not-sure,139,false
+Albany Thicket + Forest + Fynbos,4,full,low,sandy,386,false
+Albany Thicket + Forest + Fynbos,4,full,low,loam,258,false
+Albany Thicket + Forest + Fynbos,4,full,low,clay,75,false
+Albany Thicket + Forest + Fynbos,4,full,low,not-sure,411,false
+Albany Thicket + Forest + Fynbos,4,full,moderate,sandy,1100,false
+Albany Thicket + Forest + Fynbos,4,full,moderate,loam,631,false
+Albany Thicket + Forest + Fynbos,4,full,moderate,clay,186,false
+Albany Thicket + Forest + Fynbos,4,full,moderate,not-sure,1186,false
+Albany Thicket + Forest + Fynbos,4,full,moist,sandy,1383,false
+Albany Thicket + Forest + Fynbos,4,full,moist,loam,874,false
+Albany Thicket + Forest + Fynbos,4,full,moist,clay,249,false
+Albany Thicket + Forest + Fynbos,4,full,moist,not-sure,1505,false
+Albany Thicket + Forest + Fynbos,4,part,low,sandy,96,false
+Albany Thicket + Forest + Fynbos,4,part,low,loam,84,false
+Albany Thicket + Forest + Fynbos,4,part,low,clay,22,false
+Albany Thicket + Forest + Fynbos,4,part,low,not-sure,109,false
+Albany Thicket + Forest + Fynbos,4,part,moderate,sandy,284,false
+Albany Thicket + Forest + Fynbos,4,part,moderate,loam,225,false
+Albany Thicket + Forest + Fynbos,4,part,moderate,clay,63,false
+Albany Thicket + Forest + Fynbos,4,part,moderate,not-sure,318,false
+Albany Thicket + Forest + Fynbos,4,part,moist,sandy,397,false
+Albany Thicket + Forest + Fynbos,4,part,moist,loam,337,false
+Albany Thicket + Forest + Fynbos,4,part,moist,clay,94,false
+Albany Thicket + Forest + Fynbos,4,part,moist,not-sure,453,false
+Albany Thicket + Forest + Fynbos,4,sheltered,low,sandy,17,false
+Albany Thicket + Forest + Fynbos,4,sheltered,low,loam,16,false
+Albany Thicket + Forest + Fynbos,4,sheltered,low,clay,4,true
+Albany Thicket + Forest + Fynbos,4,sheltered,low,not-sure,22,false
+Albany Thicket + Forest + Fynbos,4,sheltered,moderate,sandy,71,false
+Albany Thicket + Forest + Fynbos,4,sheltered,moderate,loam,58,false
+Albany Thicket + Forest + Fynbos,4,sheltered,moderate,clay,13,true
+Albany Thicket + Forest + Fynbos,4,sheltered,moderate,not-sure,84,false
+Albany Thicket + Forest + Fynbos,4,sheltered,moist,sandy,109,false
+Albany Thicket + Forest + Fynbos,4,sheltered,moist,loam,100,false
+Albany Thicket + Forest + Fynbos,4,sheltered,moist,clay,27,false
+Albany Thicket + Forest + Fynbos,4,sheltered,moist,not-sure,134,false
+Albany Thicket + Forest + Fynbos + Succulent Karoo,2,full,low,sandy,445,false
+Albany Thicket + Forest + Fynbos + Succulent Karoo,2,full,low,loam,288,false
+Albany Thicket + Forest + Fynbos + Succulent Karoo,2,full,low,clay,83,false
+Albany Thicket + Forest + Fynbos + Succulent Karoo,2,full,low,not-sure,473,false
+Albany Thicket + Forest + Fynbos + Succulent Karoo,2,full,moderate,sandy,1188,false
+Albany Thicket + Forest + Fynbos + Succulent Karoo,2,full,moderate,loam,672,false
+Albany Thicket + Forest + Fynbos + Succulent Karoo,2,full,moderate,clay,196,false
+Albany Thicket + Forest + Fynbos + Succulent Karoo,2,full,moderate,not-sure,1279,false
+Albany Thicket + Forest + Fynbos + Succulent Karoo,2,full,moist,sandy,1477,false
+Albany Thicket + Forest + Fynbos + Succulent Karoo,2,full,moist,loam,921,false
+Albany Thicket + Forest + Fynbos + Succulent Karoo,2,full,moist,clay,262,false
+Albany Thicket + Forest + Fynbos + Succulent Karoo,2,full,moist,not-sure,1605,false
+Albany Thicket + Forest + Fynbos + Succulent Karoo,2,part,low,sandy,105,false
+Albany Thicket + Forest + Fynbos + Succulent Karoo,2,part,low,loam,87,false
+Albany Thicket + Forest + Fynbos + Succulent Karoo,2,part,low,clay,24,false
+Albany Thicket + Forest + Fynbos + Succulent Karoo,2,part,low,not-sure,119,false
+Albany Thicket + Forest + Fynbos + Succulent Karoo,2,part,moderate,sandy,302,false
+Albany Thicket + Forest + Fynbos + Succulent Karoo,2,part,moderate,loam,232,false
+Albany Thicket + Forest + Fynbos + Succulent Karoo,2,part,moderate,clay,65,false
+Albany Thicket + Forest + Fynbos + Succulent Karoo,2,part,moderate,not-sure,338,false
+Albany Thicket + Forest + Fynbos + Succulent Karoo,2,part,moist,sandy,415,false
+Albany Thicket + Forest + Fynbos + Succulent Karoo,2,part,moist,loam,344,false
+Albany Thicket + Forest + Fynbos + Succulent Karoo,2,part,moist,clay,96,false
+Albany Thicket + Forest + Fynbos + Succulent Karoo,2,part,moist,not-sure,473,false
+Albany Thicket + Forest + Fynbos + Succulent Karoo,2,sheltered,low,sandy,19,false
+Albany Thicket + Forest + Fynbos + Succulent Karoo,2,sheltered,low,loam,16,false
+Albany Thicket + Forest + Fynbos + Succulent Karoo,2,sheltered,low,clay,4,true
+Albany Thicket + Forest + Fynbos + Succulent Karoo,2,sheltered,low,not-sure,24,false
+Albany Thicket + Forest + Fynbos + Succulent Karoo,2,sheltered,moderate,sandy,74,false
+Albany Thicket + Forest + Fynbos + Succulent Karoo,2,sheltered,moderate,loam,60,false
+Albany Thicket + Forest + Fynbos + Succulent Karoo,2,sheltered,moderate,clay,13,true
+Albany Thicket + Forest + Fynbos + Succulent Karoo,2,sheltered,moderate,not-sure,88,false
+Albany Thicket + Forest + Fynbos + Succulent Karoo,2,sheltered,moist,sandy,113,false
+Albany Thicket + Forest + Fynbos + Succulent Karoo,2,sheltered,moist,loam,103,false
+Albany Thicket + Forest + Fynbos + Succulent Karoo,2,sheltered,moist,clay,28,false
+Albany Thicket + Forest + Fynbos + Succulent Karoo,2,sheltered,moist,not-sure,139,false
+Forest,1,full,low,sandy,0,true
+Forest,1,full,low,loam,0,true
+Forest,1,full,low,clay,0,true
+Forest,1,full,low,not-sure,0,true
+Forest,1,full,moderate,sandy,2,true
+Forest,1,full,moderate,loam,1,true
+Forest,1,full,moderate,clay,2,true
+Forest,1,full,moderate,not-sure,2,true
+Forest,1,full,moist,sandy,5,true
+Forest,1,full,moist,loam,4,true
+Forest,1,full,moist,clay,2,true
+Forest,1,full,moist,not-sure,5,true
+Forest,1,part,low,sandy,0,true
+Forest,1,part,low,loam,0,true
+Forest,1,part,low,clay,0,true
+Forest,1,part,low,not-sure,0,true
+Forest,1,part,moderate,sandy,2,true
+Forest,1,part,moderate,loam,2,true
+Forest,1,part,moderate,clay,1,true
+Forest,1,part,moderate,not-sure,2,true
+Forest,1,part,moist,sandy,4,true
+Forest,1,part,moist,loam,4,true
+Forest,1,part,moist,clay,1,true
+Forest,1,part,moist,not-sure,4,true
+Forest,1,sheltered,low,sandy,0,true
+Forest,1,sheltered,low,loam,0,true
+Forest,1,sheltered,low,clay,0,true
+Forest,1,sheltered,low,not-sure,0,true
+Forest,1,sheltered,moderate,sandy,1,true
+Forest,1,sheltered,moderate,loam,1,true
+Forest,1,sheltered,moderate,clay,1,true
+Forest,1,sheltered,moderate,not-sure,1,true
+Forest,1,sheltered,moist,sandy,2,true
+Forest,1,sheltered,moist,loam,2,true
+Forest,1,sheltered,moist,clay,1,true
+Forest,1,sheltered,moist,not-sure,2,true

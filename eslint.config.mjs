@@ -5,7 +5,7 @@ import tseslint from "typescript-eslint";
 
 export default tseslint.config(
   {
-    ignores: ["dist/**", "node_modules/**", "work/**"],
+    ignores: ["dist/**", "node_modules/**", "work/**", "data/scripts/retired/**"],
   },
   {
     languageOptions: {

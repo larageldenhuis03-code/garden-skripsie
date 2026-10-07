@@ -1,0 +1,40 @@
+name: Nursery sourcing refresh
+
+on:
+  schedule:
+    # Monday 03:00 UTC. Sourcing data changes over time, so this refreshes
+    # it on a schedule rather than scraping at request time - the app has
+    # no backend, it ships a static build-time catalogue.
+    - cron: "0 3 * * 1"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Scrape nursery sourcing
+        run: python data/scripts/sourcing/scrape.py
+
+      - name: Regenerate plant catalogue
+        run: python data/scripts/generate_plants_json.py
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/processed/nursery_sourcing.csv data/processed/nursery_cache app/data/plant_database.generated.json
+          git diff --cached --quiet && echo "No sourcing changes this run." && exit 0
+          git commit -m "Refresh nursery sourcing data"
+          git push

@@ -76,11 +76,11 @@ The product, language and artwork should be recognisably local. Generic
 | Choice | Current decision |
 |---|---|
 | Geography | Western Cape first |
-| Catalogue | 48 curated plants until wider horticultural coverage is reviewed |
+| Catalogue | 2,843 Western Cape species from `FINAL.DATASET.FINAL.xlsx`; coverage of sun, water and soil varies by plant and missing fields stay "unknown" |
 | Primary device | Desktop-first, responsive on smaller screens |
 | Current navigation | One continuous application |
 | Home page | Header and hero only; detailed content begins after an action |
-| Saving | Device-local |
+| Saving | Device-local: saved plants, saved gardens, excluded plants and the draft brief |
 | Recommendation architecture | Hard filters → Goal Programming → group selection → layout |
 | Calibration | AHP supplies weights; it does not rank plants directly |
 | Transparency | Complete trace for every material decision |
@@ -103,7 +103,9 @@ change log.
 
 ## Outside the MVP
 
-- Commerce and nursery availability
+- Checkout, payments and accounts with nurseries
+- Live stock/inventory claims (nursery sourcing shows catalogue listings
+  and indicative prices only - see `NOW.md` - never "in stock")
 - Accounts and collaboration
 - Ongoing garden management
 - National coverage

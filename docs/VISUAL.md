@@ -6,10 +6,10 @@
 
 **Updated:** 2026-07-27
 
-> **Current asset:** the public home page uses `hero.png`, optimised as
-> `public/images/editorial/home-hero.avif` with WebP and JPEG fallbacks. The
-> earlier V01 botanical cabinet is retained as a reference but is not the active
-> hero.
+> **Current asset (2026-09-22):** the AI-generated hero, side columns and V01
+> cabinet were removed before the pilot, files included. The home page shows
+> the owner's crayon flower sketch (`public/images/flowers-sketch.png`), which
+> is also the site icon. The plate plans below are kept as future direction.
 
 ## The Cape Print Cabinet
 
@@ -67,11 +67,25 @@ Avoid:
 | Deep olive | `#555D36` |
 | Soft olive | `#858D5D` |
 | Sage | `#95A79B` |
+| Warning (signal only) | `#8A2A1F` |
 
 Primary page titles may use restrained capitals in the manner of a botanical
 catalogue masthead. Long headings remain mixed case. Use size, weight and
 whitespace before tracking or colour. Flower colour comes from the specimens
 rather than an orange brand accent.
+
+**The warning red is the one colour outside the green palette** (owner request,
+2026-10-01), and it earns its place by being reserved. Every warning draws the
+same shape - a 1.5 px ruled rectangle in `--warning-line` over a 5.5% wash -
+so the treatment is recognisable wherever it appears: too few plants to plan
+from, a blocking unanswered question, the last-step "these answers don't
+produce a plan yet" banner, a failed plan, and a nursery that could not be
+checked. Nothing else may use it.
+
+A provenance note is **not** a warning. The estimated-spread and
+unknown-colour caveat under the layout stays in the green treatment, because
+marking honest uncertainty in red would make the red mean nothing where it
+matters.
 
 ## Voice
 
@@ -122,8 +136,8 @@ Approved editorial assets belong in `public/images/editorial/`. Plant portraits
 belong in `public/images/plants/`. The catalogue in `app/data/plants.ts` is the
 canonical plant manifest; do not duplicate its 48 names here.
 
-The V01 source is retained at `assets/source/home-cape-cabinet.png`. It is not
-used by the current interface.
+The V01 source file was deleted before the pilot; its prompt is kept below
+for the record only.
 
 ## V01 prompt record
 

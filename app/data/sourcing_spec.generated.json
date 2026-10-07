@@ -1,0 +1,485 @@
+{
+ "version": "2026-09-30T11:45:34.193Z",
+ "spec": {
+  "sources": [
+   {
+    "id": "S01",
+    "nursery": "Cape Garden Centre",
+    "website": "https://capegardencentre.co.za",
+    "platform": "shopify",
+    "platformText": "Shopify (verified)",
+    "role": "pricing",
+    "roleText": "Pricing + accessibility",
+    "region": "Western Cape (4 branches)",
+    "deliversTo": "~200 km of Cape Town, 2–5 days",
+    "enabled": true,
+    "notes": "Variant labels Small/Medium/Large → read cm from description; else 'size not stated'",
+    "row": 4
+   },
+   {
+    "id": "S02",
+    "nursery": "Stodels",
+    "website": "https://stodels.com",
+    "platform": "unconfirmed",
+    "platformText": "TO CONFIRM (URL pattern suggests WooCommerce)",
+    "role": "pricing",
+    "roleText": "Pricing + accessibility",
+    "region": "Cape Town",
+    "deliversTo": "Cape Town only (online store)",
+    "enabled": true,
+    "notes": "Sizes shown as BAG WEIGHT (5KG, 20KG) → needs kg rule in 5_Size_Parser",
+    "row": 5
+   },
+   {
+    "id": "S03",
+    "nursery": "Grow Wild",
+    "website": null,
+    "platform": "none",
+    "platformText": "—",
+    "role": "skip",
+    "roleText": "Disabled",
+    "region": "Midrand, Gauteng",
+    "deliversTo": "—",
+    "enabled": false,
+    "notes": "Remove from live search; keep as cited info source only",
+    "row": 6
+   },
+   {
+    "id": "S04",
+    "nursery": "Random Harvest",
+    "website": null,
+    "platform": "none",
+    "platformText": "Custom (DNN)",
+    "role": "skip",
+    "roleText": "Disabled",
+    "region": "Muldersdrift, Gauteng",
+    "deliversTo": "Not stated (wholesale countrywide)",
+    "enabled": false,
+    "notes": "Outside WC pilot scope; re-check only if it adds online prices + WC delivery",
+    "row": 7
+   },
+   {
+    "id": "S05",
+    "nursery": "The Plant Library",
+    "website": null,
+    "platform": "none",
+    "platformText": "Wix",
+    "role": "skip",
+    "roleText": "Advice link only",
+    "region": "South Africa",
+    "deliversTo": "—",
+    "enabled": false,
+    "notes": "Keep as cited advice source",
+    "row": 8
+   },
+   {
+    "id": "S06",
+    "nursery": "Tulbagh Nursery",
+    "website": "https://tulbaghnursery.co.za",
+    "platform": "unconfirmed",
+    "platformText": "TO CONFIRM",
+    "role": "pricing",
+    "roleText": "Pricing + accessibility",
+    "region": "Tulbagh",
+    "deliversTo": "Cape Town, Ceres, Malmesbury, Paarl (courier)",
+    "enabled": true,
+    "notes": "Prices e.g. Azaleas from R129.50 (Lara's manual check). Enable only if code can reach it; else ask nursery for a PDF list",
+    "row": 9
+   },
+   {
+    "id": "S07",
+    "nursery": "ClicknPlant",
+    "website": "https://clicknplant.co.za",
+    "platform": "woocommerce",
+    "platformText": "WooCommerce (verified)",
+    "role": "pricing",
+    "roleText": "Pricing + accessibility",
+    "region": "Cape Town",
+    "deliversTo": "Fast Cape delivery; nationwide",
+    "enabled": true,
+    "notes": "Separate Gauteng store clicknplantgp.co.za — exclude",
+    "row": 10
+   },
+   {
+    "id": "S08",
+    "nursery": "Plantify",
+    "website": "https://plantify.co.za",
+    "platform": "shopify",
+    "platformText": "Shopify (verified)",
+    "role": "pricing",
+    "roleText": "Pricing + accessibility",
+    "region": "Cape Town",
+    "deliversTo": "Nationwide shipping",
+    "enabled": true,
+    "notes": "Expect few matches (indoor focus); keep enabled",
+    "row": 11
+   },
+   {
+    "id": "S09",
+    "nursery": "Harry Goemans Garden Centre",
+    "website": null,
+    "platform": "none",
+    "platformText": "No online shop",
+    "role": "accessibility",
+    "roleText": "Accessibility only (location + contact)",
+    "region": "Sunnydale, Cape Town",
+    "deliversTo": "Walk-in",
+    "enabled": true,
+    "notes": "Show as 'visit / call 021 785 3201'; never priced",
+    "row": 12
+   },
+   {
+    "id": "S10",
+    "nursery": "Ferox Nursery",
+    "website": "https://feroxnursery.co.za",
+    "platform": "unconfirmed",
+    "platformText": "TO CONFIRM (/shop/ pattern suggests WooCommerce)",
+    "role": "availability",
+    "roleText": "Availability only (wholesale)",
+    "region": "Akasia, Pretoria (Gauteng)",
+    "deliversTo": "Nationwide (The Courier Guy); COD",
+    "enabled": true,
+    "notes": "Wholesale succulents/cacti/bonsai: 'in commercial supply' signal, never in budget. Example page: https://feroxnursery.co.za/portulacaria-afra/",
+    "row": 13
+   },
+   {
+    "id": "P01",
+    "nursery": "Garden Route Botanical Garden nursery",
+    "website": null,
+    "platform": "pdf",
+    "platformText": "PDF",
+    "role": "pricing",
+    "roleText": "Pricing (snapshot, retail) + accessibility",
+    "region": "George",
+    "deliversTo": "Collect",
+    "enabled": true,
+    "notes": "Used with 'may be outdated' label; replace when a newer list arrives",
+    "row": 14
+   },
+   {
+    "id": "P02",
+    "nursery": "Kraaibosch",
+    "website": null,
+    "platform": "pdf",
+    "platformText": "PDF",
+    "role": "availability",
+    "roleText": "Availability only (wholesale)",
+    "region": "George",
+    "deliversTo": "Cape Town / Cape Coast weekly",
+    "enabled": true,
+    "notes": "Wholesale: 'in commercial supply' signal, never in budget",
+    "row": 15
+   },
+   {
+    "id": "P03",
+    "nursery": "Samgro (plugs)",
+    "website": null,
+    "platform": "pdf",
+    "platformText": "PDF",
+    "role": "availability",
+    "roleText": "Availability only (wholesale)",
+    "region": "Wellington",
+    "deliversTo": "Collect; COD",
+    "enabled": true,
+    "notes": "Wholesale plugs: not buyable by home gardeners, so not in budget",
+    "row": 16
+   },
+   {
+    "id": "P04",
+    "nursery": "Prime Trees",
+    "website": null,
+    "platform": "pdf",
+    "platformText": "PDF",
+    "role": "availability",
+    "roleText": "Availability only (wholesale)",
+    "region": "TO CONFIRM",
+    "deliversTo": "TO CONFIRM",
+    "enabled": true,
+    "notes": "Landscape-size trees; low relevance to garden beds",
+    "row": 17
+   }
+  ],
+  "branches": [
+   {
+    "sourceId": "S08",
+    "name": "Plantify Gardens",
+    "address": "6 Roodehek Street, Gardens",
+    "town": "Cape Town",
+    "online": false,
+    "lat": null,
+    "lon": null,
+    "row": 4
+   },
+   {
+    "sourceId": "S08",
+    "name": "Plantify Zonnebloem",
+    "address": "59 Harrington Street, Zonnebloem",
+    "town": "Cape Town",
+    "online": false,
+    "lat": null,
+    "lon": null,
+    "row": 5
+   },
+   {
+    "sourceId": "S09",
+    "name": "Harry Goemans",
+    "address": "Kommetjie Road, Sunnydale 7975",
+    "town": "Cape Town",
+    "online": false,
+    "lat": null,
+    "lon": null,
+    "row": 6
+   },
+   {
+    "sourceId": "S02",
+    "name": "Stodels Bellville",
+    "address": "Eversdal Rd, Bellville 7530",
+    "town": "Cape Town",
+    "online": false,
+    "lat": null,
+    "lon": null,
+    "row": 7
+   },
+   {
+    "sourceId": "S02",
+    "name": "Stodels Milnerton",
+    "address": "37 Racecourse Rd, Milnerton 7441",
+    "town": "Cape Town",
+    "online": false,
+    "lat": null,
+    "lon": null,
+    "row": 8
+   },
+   {
+    "sourceId": "S02",
+    "name": "Stodels Constantia (Bergvliet)",
+    "address": "12 Bergvliet Rd, Bergvliet 7945",
+    "town": "Cape Town",
+    "online": false,
+    "lat": null,
+    "lon": null,
+    "row": 9
+   },
+   {
+    "sourceId": "S02",
+    "name": "Stodels Kenilworth",
+    "address": "Doncaster Rd, Kenilworth 7708",
+    "town": "Cape Town",
+    "online": false,
+    "lat": null,
+    "lon": null,
+    "row": 10
+   },
+   {
+    "sourceId": "S01",
+    "name": "Cape Garden Centre Joostenbergvlakte (main)",
+    "address": "58 Tarentaal Rd, Joostenberg Vlakte 7570",
+    "town": "Joostenbergvlakte",
+    "online": false,
+    "lat": null,
+    "lon": null,
+    "row": 11
+   },
+   {
+    "sourceId": "S01",
+    "name": "Cape Garden Centre Stellenbosch",
+    "address": "c/o R44 & Winery Rd, Stellenbosch 7130",
+    "town": "Stellenbosch",
+    "online": false,
+    "lat": null,
+    "lon": null,
+    "row": 12
+   },
+   {
+    "sourceId": "S01",
+    "name": "Cape Garden Centre Somerset West",
+    "address": "22 Mondeor Rd, Helderberg Rural 7130",
+    "town": "Somerset West",
+    "online": false,
+    "lat": null,
+    "lon": null,
+    "row": 13
+   },
+   {
+    "sourceId": "S01",
+    "name": "Cape Garden Centre George",
+    "address": "Lughawe pad (Airport Road) R102, Gwaing Rd, George, 6530.",
+    "town": "George",
+    "online": false,
+    "lat": null,
+    "lon": null,
+    "row": 14
+   },
+   {
+    "sourceId": "P01",
+    "name": "Garden Route Botanical Garden nursery",
+    "address": "49 Caledon Street, Campher's Drift, George, 6529 (Operating as Garden Route Indigenous Nursery).",
+    "town": "George",
+    "online": false,
+    "lat": null,
+    "lon": null,
+    "row": 15
+   },
+   {
+    "sourceId": "P02",
+    "name": "Kraaibosch",
+    "address": "Airport Road, R102, George Ward 23, George, 6529 (Wholesale nursery located just outside George).",
+    "town": "George",
+    "online": false,
+    "lat": null,
+    "lon": null,
+    "row": 16
+   },
+   {
+    "sourceId": "P03",
+    "name": "Samgro",
+    "address": "Geluk Farm 037, R44",
+    "town": "Wellington",
+    "online": false,
+    "lat": null,
+    "lon": null,
+    "row": 17
+   },
+   {
+    "sourceId": "S06",
+    "name": "Tulbagh Nursery",
+    "address": "Tulbaghweg, Tulbagh 6820",
+    "town": "Tulbagh",
+    "online": false,
+    "lat": null,
+    "lon": null,
+    "row": 18
+   },
+   {
+    "sourceId": "S07",
+    "name": "ClicknPlant",
+    "address": "Online only — no walk-in branch",
+    "town": "Cape Town",
+    "online": true,
+    "lat": null,
+    "lon": null,
+    "row": 19
+   }
+  ],
+  "pdfSources": [
+   {
+    "sourceId": null,
+    "fileName": "July-2025-Availability-List.pdf",
+    "nursery": "Garden Route Botanical Garden — Indigenous Plant Nursery (George)",
+    "channel": "retail",
+    "catalogueDate": "2025-07-29",
+    "parserNotes": "Comma decimals 'R 50,00'; section headers = plant groups",
+    "row": 4
+   },
+   {
+    "sourceId": null,
+    "fileName": "KRAAIBOSCH-AVAILABILITY-LIST-18-Sep-2026-WEB.pdf",
+    "nursery": "Kraaibosch (George)",
+    "channel": "wholesale",
+    "catalogueDate": "2026-09-18",
+    "parserNotes": "Two-column layout; icons are not quantities; ignore PBR suffix when matching",
+    "row": 5
+   },
+   {
+    "sourceId": null,
+    "fileName": "wk39-plugs.pdf",
+    "nursery": "Samgro (Wellington)",
+    "channel": "wholesale",
+    "catalogueDate": "2026-09-21",
+    "parserNotes": "Price per plug ex VAT; do not convert to retail",
+    "row": 6
+   },
+   {
+    "sourceId": null,
+    "fileName": "AVAILABILITY-OCT.pdf",
+    "nursery": "Prime Trees",
+    "channel": "wholesale",
+    "catalogueDate": "2025-10-13",
+    "parserNotes": "Landscape trees; mostly too large for beds",
+    "row": 7
+   }
+  ],
+  "pdfWindowDays": 90,
+  "k": 1700,
+  "litresPerKg": 1,
+  "sizeClasses": [
+   {
+    "name": "Plug / seedling",
+    "dMin": null,
+    "dMax": null,
+    "plug": true,
+    "use": "no"
+   },
+   {
+    "name": "Small",
+    "dMin": 0,
+    "dMax": 12,
+    "plug": false,
+    "use": "fallback"
+   },
+   {
+    "name": "Standard (reference)",
+    "dMin": 13,
+    "dMax": 17,
+    "plug": false,
+    "use": "reference"
+   },
+   {
+    "name": "Medium",
+    "dMin": 18,
+    "dMax": 22,
+    "plug": false,
+    "use": "fallback"
+   },
+   {
+    "name": "Large",
+    "dMin": 23,
+    "dMax": 30,
+    "plug": false,
+    "use": "fallback"
+   },
+   {
+    "name": "Specimen",
+    "dMin": 31,
+    "dMax": null,
+    "plug": false,
+    "use": "no"
+   }
+  ],
+  "referenceClass": "Standard (reference)",
+  "bands": [
+   {
+    "name": "Local",
+    "fromKm": 0,
+    "toKm": 15,
+    "label": "Near you"
+   },
+   {
+    "name": "Nearby",
+    "fromKm": 15,
+    "toKm": 50,
+    "label": "Short drive"
+   },
+   {
+    "name": "Far",
+    "fromKm": 50,
+    "toKm": null,
+    "label": "Delivery / long drive"
+   }
+  ],
+  "earthRadiusKm": 6371,
+  "outputFields": [
+   "Nursery",
+   "Distance",
+   "Size",
+   "Price per plant",
+   "Stock",
+   "Link",
+   "Checked",
+   "Match label",
+   "Snapshot note",
+   "Bed budget",
+   "Walk-in only nurseries"
+  ]
+ }
+}
