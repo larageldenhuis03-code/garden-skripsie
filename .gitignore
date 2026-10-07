@@ -39,3 +39,9 @@ yarn-error.log*
 next-env.d.ts
 *.tsbuildinfo
 .sourcing-cache.json
+
+# Dissolved vegetation layers rebuilt by data/scripts/build_bioscape_traits.R
+# from data/raw. Too large for GitHub (305 MB and 91 MB), read only by the
+# R scripts that regenerate the committed map JSON - never by the app.
+data/processed/south_africa_biome_regions.geojson
+data/processed/western_cape_bioregions.geojson
