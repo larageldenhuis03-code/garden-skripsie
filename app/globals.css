@@ -47,7 +47,13 @@
   /* The handwriting. It draws smaller than the display face at the same
      px, so every rule that uses it sizes up to compensate. */
   --font-hand: "Silly Goose Hand", "Patrick Hand", cursive;
-  --serif: "Newsreader Variable", Georgia, serif;
+  /* One text face for every piece of detail information (owner request,
+     2026-10-11). The handwriting now carries the personality in headings,
+     so body copy no longer alternates between Newsreader and Instrument
+     Sans. Kept as an alias rather than rewritten across ~36 rules, so the
+     decision is one line to revisit. */
+  --serif: var(--sans);
+  --serif-original: "Newsreader Variable", Georgia, serif;
   --sans: "Instrument Sans Variable", "Helvetica Neue", Arial, sans-serif;
   --max: 1600px;
   --site-header-height: 88px;
@@ -1057,7 +1063,7 @@ button:disabled {
 .dimension-editor > span {
   padding-bottom: 20px;
   color: var(--ink-soft);
-  font-family: var(--display);
+  font-family: var(--sans);
   font-size: 1.7rem;
 }
 
@@ -1100,7 +1106,7 @@ button:disabled {
   outline: 0;
   background: transparent;
   color: var(--ink);
-  font-family: var(--display);
+  font-family: var(--sans);
   font-size: clamp(1.9rem, 2.3vw, 2.8rem);
   font-weight: 520;
   line-height: 1;
@@ -1625,7 +1631,7 @@ button:disabled {
 
 .bed-preview figcaption {
   justify-self: start;
-  font-family: var(--display);
+  font-family: var(--sans);
   font-size: 1.1rem;
   font-weight: 560;
 }
@@ -1711,7 +1717,7 @@ button:disabled {
 .bed-preview-legend strong {
   margin-left: auto;
   color: var(--ink);
-  font-family: var(--display);
+  font-family: var(--sans);
   font-size: 0.94rem;
   font-weight: 560;
   font-variant-numeric: tabular-nums;
@@ -4451,6 +4457,9 @@ h3 {
 .step-card h3,
 .empty-state h2,
 .plan-output h2,
+.bed-controls h3,
+.saved-layouts h2,
+.home-copy h1,
 .method-hero h1 em,
 .hero-copy h1 em,
 .collection-intro h1 em {
@@ -4532,4 +4541,17 @@ h3 {
   font-synthesis: none;
   font-weight: 500;
   letter-spacing: 0.04em;
+}
+
+/* A label, not detail information and not a heading. Uppercase
+   handwriting reads badly at this size, so it uses the text face with
+   tracking - the same treatment as every other small caps label. */
+.method-eyebrow {
+  margin: 0;
+  color: var(--olive);
+  font-family: var(--sans);
+  font-size: 0.78rem;
+  font-weight: 650;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }

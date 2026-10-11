@@ -16,6 +16,8 @@ import { join } from "node:path";
 
 const BASE = process.argv[2] ?? "http://localhost:3000";
 const OUT = process.argv[3] ?? "screenshots";
+const NAV = process.argv[4] ?? "how it works";
+const EXPECT = process.argv[5] ?? "How it works";
 const CHROME = "C:/Program Files/Google/Chrome/Application/chrome.exe";
 const PORT = 9222;
 
@@ -117,7 +119,7 @@ async function main() {
         await cdp.evaluate(`
           (() => {
             const b = [...document.querySelectorAll("header nav button")]
-              .find((x) => x.textContent.trim().toLowerCase() === "how it works");
+              .find((x) => x.textContent.trim().toLowerCase() === "${NAV}");
             if (b) b.click();
           })()
         `);
@@ -125,7 +127,7 @@ async function main() {
         const heading = await cdp.evaluate(
           `document.querySelector("h1") ? document.querySelector("h1").textContent.trim() : ""`,
         );
-        if (heading === "How it works") { clicked = true; break; }
+        if (heading === EXPECT || (EXPECT === "*" && heading)) { clicked = true; break; }
       }
       if (!clicked) throw new Error("could not reach the How it works view");
       await sleep(1200);
@@ -160,7 +162,7 @@ async function main() {
           scale: 1,
         },
       });
-      const file = join(OUT, `how-it-works-${label}.png`);
+      const file = join(OUT, `${NAV.replace(/ /g, "-")}-${label}.png`);
       writeFileSync(file, Buffer.from(shot.data, "base64"));
       console.log(`  wrote ${file}`);
     }

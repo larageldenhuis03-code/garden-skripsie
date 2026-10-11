@@ -3254,22 +3254,22 @@ const METHOD_STEPS: { icon: "sun" | "filter" | "heart" | "plan"; title: string; 
   {
     icon: "sun",
     title: "Tell us about your garden",
-    copy: "Where you live, sun, water, soil and bed size.",
+    copy: "Where is your garden? How much sun and water does it get? Tell us about your soil, bed size and conditions.",
   },
   {
     icon: "filter",
-    title: "We remove plants that won’t survive",
-    copy: "Wrong sun, water or soil? Out. Invasive or poisonous? Out.",
+    title: "Find plants that can thrive",
+    copy: "We filter out plants that don’t suit your garden’s growing conditions, including unsuitable or invasive plants.",
   },
   {
     icon: "heart",
-    title: "We rank the rest by what you like",
-    copy: "Style, flower colour, scent, birds and bees.",
+    title: "Make it your own",
+    copy: "Choose your garden style, favourite colours and other preferences to help shape your plant selection.",
   },
   {
     icon: "plan",
-    title: "You get your plan",
-    copy: "A bed layout, how many of each plant, and what it costs.",
+    title: "Get your garden plan",
+    copy: "Explore your proposed layout, the plants and quantities to use, and estimated costs where available.",
   },
 ];
 
@@ -3285,10 +3285,12 @@ function MethodView({ start }: { start: () => void }) {
   return (
     <main className="method-shell">
       <section className="method-hero">
+        <p className="method-eyebrow">Your garden, made simple</p>
         <h1>How it works</h1>
         <p>
-          Answer a few questions about your garden. Get a planted bed, a
-          shopping list and a price.
+          Answer a few simple questions about your garden and discover plants
+          that suit your space, conditions and style. Get a garden-bed plan, a
+          plant list and estimated costs.
         </p>
         <button className="button button-dark" onClick={start}>
           Start planning <span aria-hidden="true">→</span>
@@ -3296,7 +3298,7 @@ function MethodView({ start }: { start: () => void }) {
       </section>
 
       <section className="method-steps">
-        <h2>4 simple steps</h2>
+        <h2>Your garden in 4 simple steps</h2>
         <ol className="step-grid">
           {METHOD_STEPS.map((step, index) => (
             <li key={step.title} className="step-card">
