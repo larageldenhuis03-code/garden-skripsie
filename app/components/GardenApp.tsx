@@ -2122,7 +2122,12 @@ function BedDiagram({
       </div>
       <div
         className={`plan-bed${view === "real-life" ? " is-real-life" : ""}`}
-        style={{ aspectRatio: `${displayWidthM} / ${displayLengthM}` }}
+        style={
+          {
+            aspectRatio: `${displayWidthM} / ${displayLengthM}`,
+            "--bed-aspect": displayWidthM / displayLengthM,
+          } as CSSProperties
+        }
         aria-label={`${widthM} by ${lengthM} metre planting layout, north at the top`}
       >
         {markers.map(({ placement, plant, index, displayX, displayY, unknownColour, estimated }) => {
@@ -2246,6 +2251,15 @@ function describeOption(plan: GardenPlan, all: GardenPlan[]): string {
     return "Closest to the colours you chose.";
   }
   return "A different balance of the same conditions.";
+}
+
+/** Just the money from the budget line. The full sentence - what is in
+ * the figure, what was not found, when it was checked - stays in the
+ * budget panel beside the calculation, where there is room for it. */
+function guidePrice(budget: SavedBudget | null | undefined): string {
+  if (!budget) return "Checking…";
+  const range = budget.text.match(/R[\d\s.,]+(?:\s*[-–]\s*R[\d\s.,]+)?/);
+  return range ? range[0].trim() : "Not priced yet";
 }
 
 function PlanSummary({
@@ -2461,9 +2475,7 @@ function PlanSummary({
         </div>
         <div>
           <dt>Guide price</dt>
-          <dd>
-            {budget ? budget.text.replace(/^Budget\s*/i, "") : "Checking nurseries…"}
-          </dd>
+          <dd>{guidePrice(budget)}</dd>
         </div>
       </dl>
 
@@ -2572,14 +2584,6 @@ function PlanSummary({
       <div className="plan-actions" hidden={readOnly}>
         <button className="button button-dark" onClick={onSave} disabled={isSaved}>
           {isSaved ? "Saved ✓" : "Save this layout"}
-        </button>
-        {/* One button for both: every browser's print dialog offers "Save
-            as PDF" as a destination, so generating a PDF ourselves would
-            add a dependency and produce a worse document than the
-            browser's own renderer. The @media print rules decide what
-            lands on the page. */}
-        <button className="text-link" onClick={() => window.print()}>
-          Print / Save as PDF
         </button>
         <button className="text-link" onClick={onRegenerate}>
           Regenerate
@@ -2709,7 +2713,11 @@ function CollectionView({
     const formMatches =
       form === "All" ||
       (form === "Shrub" && plant.form.toLowerCase().includes("shrub")) ||
-      plant.form.toLowerCase().includes(form.toLowerCase());
+      // Spaces are stripped from both sides: the filter reads
+      // "Groundcover" while the catalogue says "Ground Cover", which
+      // hid all 199 of them.
+      plant.form.toLowerCase().replace(/\s+/g, "")
+        .includes(form.toLowerCase().replace(/\s+/g, ""));
     return queryMatches && formMatches;
   });
 

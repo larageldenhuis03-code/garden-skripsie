@@ -4853,10 +4853,13 @@ summary {
   max-width: none;
 }
 
-/* The drawing fills the column, capped so a long thin bed does not
-   become a letterbox strip on a wide monitor. */
+/* The drawing fills the column but must never be clamped on one axis
+   only: the plant markers are positioned and sized in percentages, so
+   squashing the box turns every circle into an oval. The height budget
+   is therefore spent as a max-WIDTH derived from the bed's own ratio
+   (--bed-aspect, set on the element), which keeps aspect-ratio intact. */
 .plan-bed {
-  max-height: min(78vh, 900px);
+  max-width: calc(min(76vh, 860px) * var(--bed-aspect, 1));
   margin-inline: auto;
 }
 
@@ -5023,4 +5026,100 @@ summary {
 
 .legend-saved svg {
   color: var(--olive);
+}
+
+/* =====================================================================
+   SIZE PASS 2 (owner walkthrough, 2026-10-11)
+   =====================================================================
+   The first pass set a 14px floor. The owner's verdict on the real
+   screens was that it is still too small, so the whole scale moves up
+   roughly five steps and the drawing's own labels move up further:
+   they sit over a busy diagram and were the least readable thing on the
+   most important screen. */
+
+:root {
+  --text-xs: 1rem;        /* was 14px - now the floor */
+  --text-sm: 1.0625rem;   /* 17px - labels, metadata, controls */
+  --text-md: 1.1875rem;   /* 19px - body copy */
+  --text-lg: 1.375rem;    /* 22px - lead paragraphs */
+}
+
+body {
+  font-size: var(--text-md);
+}
+
+/* The drawing's own labels. North and the viewpoint tell the gardener
+   which way to stand in front of the real bed, so they are navigation,
+   not decoration. */
+.plan-north {
+  font-size: 1.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.plan-front-edge {
+  padding: 6px 14px;
+  border: 1.5px solid var(--olive);
+  border-radius: 999px;
+  background: var(--paper-light);
+  color: var(--ink);
+  font-family: var(--font-hand);
+  font-size: 1.25rem;
+  font-synthesis: none;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+/* The scale bar, the two bed dimensions and the plant-type key were all
+   captions over a diagram. */
+.plan-scale,
+.plan-scale span,
+.plan-measure,
+.symbol-key,
+.symbol-key li,
+.saved-key {
+  font-family: var(--sans);
+  font-size: var(--text-sm);
+  color: var(--ink);
+}
+
+.symbol-key {
+  gap: 14px 24px;
+}
+
+.symbol-key-mark svg,
+.symbol-key-mark {
+  width: 26px;
+  height: 26px;
+}
+
+/* The length label sat level with the bottom of the bed and read as if
+   it belonged to the footer rather than the drawing. */
+.plan-measure-length {
+  top: 0;
+  bottom: auto;
+  transform: translateX(-100%) rotate(0deg);
+  writing-mode: horizontal-tb;
+}
+
+/* The drawer close sat on top of the Quantity heading, so the cross
+   looked like it belonged to the column rather than the panel. */
+.plan-legend-heading {
+  padding-right: 52px;
+}
+
+.plan-drawer-close {
+  top: -14px;
+  right: -10px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--paper);
+}
+
+/* Renaming a garden is naming it, so it is typed in the hand. */
+.saved-layout-name input {
+  font-family: var(--font-hand);
+  font-size: 1.25rem;
+  font-synthesis: none;
 }
