@@ -42,7 +42,7 @@ printed over the photograph; it is effectively invisible.
 | 8 | Plan output | No plain summary row; counts are scattered | Most important first | One row: plants, species, bed size, guide price |
 | 9 | Plan output | North marker is small; no viewpoint marker | — | Larger marker, plus a viewer marker on the brief's viewing edge |
 | 10 | Option comparison | Tabs differ only by a score number | One-line plain description | Each option labelled by how it differs, using existing attributes |
-| 11 | Brief | No step counter or progress bar | "Step 2 of 5" plus a bar | Both, above the question |
+| 11 | Brief | ~~No step counter or progress bar~~ **Wrong when written.** Both already exist (`.finder-progress`, "Step 1 of 5" plus segment bar) | "Step 2 of 5" plus a bar | Nothing to add; sizes raised by the type scale |
 | 12 | Brief | "Not sure" options do not say what happens | Helper line under the option | Wording taken from the code — see below |
 | 13 | Brief | Colour step does not say preferences can be overridden | — | One line added |
 | 14 | Brief | Hover-only plant names on the layout | Never hover-only | Names in the legend and drawer, which are always visible |

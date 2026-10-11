@@ -389,11 +389,15 @@ function ColourPreferencePicker({
   return (
     <fieldset>
       <legend>Colour (optional)</legend>
+      <p className="field-help">
+        We will favour these colours, but a plant that suits your bed better
+        can still be chosen.
+      </p>
       <div className="colour-modes">
         <ChoiceButton
           selected={value.mode === "none"}
           title="No colour preference"
-          copy="Let variety and site suitability decide."
+          copy="We will not favour any particular colour."
           onClick={() => onChange({ mode: "none" })}
         />
         {(Object.keys(colourSchemes) as ColourScheme[]).map((scheme) => (
@@ -1341,6 +1345,11 @@ function FinderView({
                     key={soil}
                     selected={brief.soil === soil}
                     title={soilLabels[soil]}
+                    copy={
+                      soil === "not-sure"
+                        ? "We will accept sandy, loam or clay, so no plant is left out for having the wrong soil. Plants with no soil recorded are still left out."
+                        : undefined
+                    }
                     onClick={() => setBrief({ ...brief, soil })}
                   />
                 ),
@@ -1458,7 +1467,11 @@ function FinderView({
                   key={style}
                   selected={brief.style === style}
                   title={gardenStyleLabels[style]}
-                  copy={gardenStyleDescriptions[style]}
+                  copy={
+                    style === "undecided"
+                      ? "We will not favour a particular look. Your bed still gets a balanced mix of heights and a few different plant types."
+                      : gardenStyleDescriptions[style]
+                  }
                   onClick={() => setBrief({ ...brief, style })}
                 />
               ))}
