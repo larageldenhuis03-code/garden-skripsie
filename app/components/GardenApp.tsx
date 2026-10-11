@@ -1238,7 +1238,7 @@ function FinderView({
       title: "Where is your garden?",
       note: "Type your town or suburb, or click the map. We do not need your address.",
       content: (
-        <div className="choice-stack">
+        <div className="choice-stack place-step">
           <PlaceCombobox
             onChange={(place) => {
               setSelectedPlace(place);
@@ -1458,7 +1458,7 @@ function FinderView({
       title: "What should the garden feel like?",
       note: "These are preferences, not rules. Nothing here removes a plant from your list — it only changes what we put first.",
       content: (
-        <div className="choice-stack">
+        <div className="choice-stack preference-blocks">
           <fieldset>
             <legend>Style</legend>
             <div className="choice-grid two-column">
@@ -2400,17 +2400,20 @@ function PlanSummary({
           className={`plan-legend${plantsOpen ? " is-open" : ""}`}
           aria-hidden={!plantsOpen}
         >
-          <div className="plan-legend-heading">
+          <div className="plan-drawer-bar">
+            <h3>Plants in this bed</h3>
             <button
               type="button"
               className="plan-drawer-close"
               onClick={() => setPlantsOpen(false)}
               aria-label="Close the plant list"
             >
-              ×
+              <span aria-hidden="true">×</span>
             </button>
-            <span>Plants</span>
-            <span>Quantity</span>
+          </div>
+          <div className="plan-legend-heading">
+            <span>Plant</span>
+            <span>How many</span>
           </div>
           {species.map(({ plant, quantity }) => (
             <div key={quantity.id} className="plan-legend-item">

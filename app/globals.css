@@ -5103,18 +5103,44 @@ body {
   writing-mode: horizontal-tb;
 }
 
-/* The drawer close sat on top of the Quantity heading, so the cross
-   looked like it belonged to the column rather than the panel. */
-.plan-legend-heading {
-  padding-right: 52px;
+/* The close sat on the Quantity heading, so it read as belonging to
+   that column. The drawer now has its own title bar: the panel's name
+   and its close on one line, the column headings on the next. */
+.plan-drawer-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.plan-drawer-bar h3 {
+  margin: 0;
+  font-size: 1.3rem;
 }
 
 .plan-drawer-close {
-  top: -14px;
-  right: -10px;
-  border: 1px solid var(--line);
+  position: static;
+  display: grid;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--line-strong);
   border-radius: 50%;
   background: var(--paper);
+  font-size: 1.4rem;
+  line-height: 1;
+  place-items: center;
+}
+
+.plan-drawer-close:hover {
+  background: var(--paper-deep);
+}
+
+.plan-legend-heading {
+  padding-right: 0;
 }
 
 /* Renaming a garden is naming it, so it is typed in the hand. */
@@ -5122,4 +5148,206 @@ body {
   font-family: var(--font-hand);
   font-size: 1.25rem;
   font-synthesis: none;
+}
+
+/* =====================================================================
+   THE BRIEF, RESTACKED (owner walkthrough, 2026-10-11)
+   =====================================================================
+   The split screen put the question in a left column and the answers in
+   a right one. By the time someone reached the bottom of the answers
+   they had lost the question - the owner's words, and the clearest
+   usability problem on the app.
+
+   Every step is now: question, one short line of help, then the answers
+   across the full width. One reading order, top to bottom, no column to
+   jump back to. */
+
+.finder-panel,
+.finder-panel.is-wide {
+  display: block;
+}
+
+.finder-question {
+  padding: clamp(28px, 3.2vw, 44px) clamp(24px, 3.2vw, 56px) clamp(10px, 1.4vw, 18px);
+  border-right: 0;
+  text-align: center;
+}
+
+.finder-panel.is-wide .finder-question {
+  padding: clamp(28px, 3.2vw, 44px) clamp(24px, 3.2vw, 56px) clamp(10px, 1.4vw, 18px);
+}
+
+.finder-question h1,
+.finder-panel.is-wide .finder-question h1 {
+  /* A question, not a poster. It has to sit above the answers without
+     pushing them off the screen. */
+  max-width: 24ch;
+  margin-inline: auto;
+  font-size: clamp(1.9rem, 3.2vw, 2.9rem);
+  line-height: 1.05;
+}
+
+.finder-question > p:last-child {
+  max-width: 62ch;
+  margin: 14px auto 0;
+  font-size: var(--text-md);
+}
+
+/* These were two blocks forming two lines. Inline lets the question
+   wrap naturally above the answers, but inline elements carry no
+   whitespace between them, which ran "your" into "garden". */
+.question-two-lines span {
+  display: inline;
+  white-space: normal;
+}
+
+.question-two-lines span + span::before {
+  content: " ";
+  white-space: pre;
+}
+
+.finder-choices {
+  padding: clamp(10px, 1.6vw, 22px) clamp(24px, 3.2vw, 56px) clamp(32px, 4vw, 56px);
+  place-items: start stretch;
+}
+
+/* Four conditions, four blocks, side by side on a wide screen so the
+   whole of step 2 is one screenful instead of a long scroll. */
+.site-conditions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+.site-conditions > fieldset {
+  padding: 18px 20px 20px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--paper-light);
+}
+
+.site-conditions .choice-grid,
+.site-conditions .choice-grid.two-column {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+}
+
+.site-conditions .field-help {
+  margin-bottom: 12px;
+}
+
+/* The survivor count belongs under the four blocks, not inside one. */
+.site-conditions > .filter-count {
+  grid-column: 1 / -1;
+}
+
+/* Style and colour sit side by side for the same reason. */
+.choice-stack.preference-blocks {
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  display: grid;
+  gap: 20px;
+  align-items: start;
+}
+
+/* Step 1 gives the map the room: the question is one short line above
+   it, and the map is what the gardener actually points at. */
+.place-step {
+  display: grid;
+  gap: 18px;
+}
+
+.place-step .bioregion-map,
+.place-step figure {
+  width: 100%;
+}
+
+/* Step 1: the map is the answer, so it gets the room. The search box
+   sits above it as one short line, and the vegetation types below,
+   where they appear once a place has been picked. */
+.place-step .place-combobox {
+  max-width: 560px;
+  margin-inline: auto;
+  width: 100%;
+}
+
+.place-step .bioregion-map-svg {
+  width: 100%;
+  height: auto;
+  max-height: 60vh;
+}
+
+.place-step .bioregion-map {
+  margin-inline: auto;
+  max-width: 1000px;
+}
+
+/* The bed step keeps its drawing, now under the question rather than
+   beside it, and centred. */
+.bed-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+.bed-preview {
+  grid-column: 1 / -1;
+  justify-self: center;
+  width: min(100%, 560px);
+}
+
+/* The three options: still one bed at a time, but the choice reads as a
+   choice. Each tab carries its name, its two figures and the one line
+   saying how it differs, and the selected one is unmistakable - the
+   gardener should never have to work out which they are looking at. */
+.plan-layout-column .variant-tabs {
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.variant-tab {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  padding: 14px 16px;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  background: var(--paper-light);
+  text-align: left;
+}
+
+.variant-tab:hover {
+  border-color: var(--line-strong);
+}
+
+.variant-tab.is-selected {
+  border-color: var(--olive);
+  border-width: 2px;
+  background: color-mix(in srgb, var(--olive) 9%, var(--paper-light));
+}
+
+.variant-tab strong {
+  font-size: 1.25rem;
+}
+
+.variant-tab.is-selected strong::after {
+  content: " ✓";
+  color: var(--olive);
+}
+
+.variant-tab small {
+  color: var(--ink-soft);
+  font-family: var(--sans);
+  font-size: var(--text-xs);
+}
+
+.variant-tab em {
+  font-size: var(--text-xs);
+}
+
+@media (max-width: 760px) {
+  .plan-layout-column .variant-tabs {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
