@@ -2560,23 +2560,32 @@ function CollectionView({
   const [variationCounter, setVariationCounter] = useState(0);
   const [chosenVariant, setChosenVariant] = useState(0);
 
+  // Only the results view needs plans. This component also serves the
+  // plant library, where it used to build three full layouts for nothing
+  // - and where a first-time visitor has the default brief, which has no
+  // vegetation type, so buildGardenPlanVariants threw and took the whole
+  // page down. The brief is validated as well as the mode, so an
+  // incomplete answer set can never crash the view again.
   const variants = useMemo(
     () =>
-      buildGardenPlanVariants(plants, brief, {
-        savedPlantIds: saved,
-        excludedPlantIds: excluded,
-        variationCounter,
-      }),
+      mode === "results" && validateGardenBrief(brief).valid
+        ? buildGardenPlanVariants(plants, brief, {
+            savedPlantIds: saved,
+            excludedPlantIds: excluded,
+            variationCounter,
+          })
+        : [],
     // `excluded` is a dependency, so ruling a plant out rebuilds all three
     // options straight away - no Regenerate press needed.
-    [brief, saved, excluded, variationCounter],
+    [mode, brief, saved, excluded, variationCounter],
   );
-  const plan = variants[Math.min(chosenVariant, variants.length - 1)];
+  const plan: GardenPlan | undefined =
+    variants[Math.min(chosenVariant, variants.length - 1)];
 
   const ranked = useMemo<
     { plant: Plant; match?: PlantAssessment }[]
   >(() => {
-    if (mode === "results") {
+    if (mode === "results" && plan) {
       const plantsById = new Map(plants.map((plant) => [plant.id, plant]));
       return plan.assessments.flatMap((match) => {
         const plant = plantsById.get(match.plantId);
@@ -2611,9 +2620,8 @@ function CollectionView({
               </>
             ) : (
               <>
-                The plant
-                <br />
-                <em>library.</em>
+                Explore {plants.length.toLocaleString("en-ZA")} plants suited
+                to the <em>Western Cape.</em>
               </>
             )}
           </h1>
@@ -2622,7 +2630,7 @@ function CollectionView({
           <p>
             {mode === "results"
               ? "Checked against your answers. Anything we’re unsure about is marked."
-              : `${plants.length.toLocaleString()} Western Cape-compatible plants combine BioSCape occurrence records and PlantZAfrica horticultural profiles. Not every plant has light, water or a specific bioregion match yet — we mark what’s still missing.`}
+              : "Our plant library brings together BioSCape occurrence records and PlantZAfrica horticultural profiles to help you explore plants for your garden. Some plants are still missing information on sunlight, water needs or specific bioregions. Where information is unavailable, we make this clear rather than guess."}
           </p>
           {mode === "results" && (
             <button className="text-link" onClick={restart}>
@@ -2632,7 +2640,7 @@ function CollectionView({
         </div>
       </section>
 
-      {mode === "results" && (
+      {mode === "results" && plan && (
         <>
           <PlanSummary
             variantTabs={
@@ -2717,9 +2725,11 @@ function CollectionView({
       <div className="results-count">
         <span>{String(filtered.length).padStart(2, "0")} plants</span>
         <span>
-          {mode === "results"
-            ? `${plan.counts.excluded} not a fit · ${plan.counts.review} need checking`
-            : "Plant library"}
+          {mode === "results" && plan ? (
+            `${plan.counts.excluded} not a fit · ${plan.counts.review} need checking`
+          ) : (
+            <span className="results-label">Plant library</span>
+          )}
         </span>
       </div>
 
@@ -3034,13 +3044,15 @@ function SavedView({
     <main className="saved-shell">
       <section className="saved-intro">
         <h1>
-          Your saved
+          Your gardens, your favourites,
           <br />
-          work.
+          your <em>choices.</em>
         </h1>
         <p>
-          Everything here is stored on this device. Saved gardens keep the
-          whole layout; saved plants are the individual species you liked.
+          Everything is stored on your device. Saved gardens keep your
+          complete garden layouts, favourite plants are the individual species
+          you love, and excluded plants are never selected for your garden
+          plans.
         </p>
       </section>
 

@@ -302,6 +302,7 @@ button:disabled {
 
 .hero-copy h1 em,
 .collection-intro h1 em,
+.saved-intro h1 em,
 .method-hero h1 em {
   color: var(--sky);
   font-weight: 470;
@@ -4460,6 +4461,7 @@ h3 {
 .bed-controls h3,
 .saved-layouts h2,
 .home-copy h1,
+.saved-intro h1 em,
 .method-hero h1 em,
 .hero-copy h1 em,
 .collection-intro h1 em {
@@ -4575,14 +4577,16 @@ summary,
 .variant-tab strong,
 .layout-views button,
 .saved-tab,
+.choice-stack legend,
+.filter-row > span,
+.results-label,
+.plan-legend-heading span,
 .rename-button,
 .exclude-button,
 .save-button,
 .card-link,
 .bed-preview figcaption,
-.collection-tools div button,
 .relax-option strong,
-.choice-button strong,
 .plan-output-heading > span,
 .plan-unavailable > div > span {
   font-family: var(--font-hand);
@@ -4599,15 +4603,18 @@ summary,
 .text-link,
 .saved-link,
 .layout-views button,
-.saved-tab,
-.collection-tools div button {
+.saved-tab {
   font-size: 1.0625rem;
   font-weight: 500;
 }
 
 legend,
+.choice-stack legend,
 .search-field span,
 .place-combobox label > span,
+.filter-row > span,
+.results-label,
+.plan-legend-heading span,
 .bed-preview figcaption {
   font-size: 1.0625rem;
   font-weight: 500;
@@ -4653,6 +4660,8 @@ summary {
    carefully. */
 summary small,
 summary span,
+.choice-button strong,
+.collection-tools div button,
 .variant-tab small,
 .saved-tab span,
 .legend-measure,
