@@ -2631,7 +2631,7 @@ button:disabled {
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  background: var(--ink);
+  background: var(--olive);
   color: var(--paper-light);
   font-family: var(--sans);
   font-size: 0.9rem;
@@ -2737,7 +2737,9 @@ button:disabled {
   align-items: center;
   justify-content: space-between;
   padding: clamp(34px, 4vw, 52px) 3.2vw;
-  background: var(--ink);
+  /* The same green every other filled surface uses - buttons, selected
+     tabs, the saved badge - rather than a second dark for this band. */
+  background: var(--olive);
   color: var(--paper-light);
 }
 
