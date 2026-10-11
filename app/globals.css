@@ -4677,3 +4677,324 @@ summary span,
   font-family: var(--sans);
   letter-spacing: normal;
 }
+
+/* =====================================================================
+   READABILITY PASS (ui-refinement, 2026-10-11)
+   =====================================================================
+   Measured first: the plan output had 144 elements at 9.3px, a
+   445-character line, a 14px link and a 1.18:1 contrast ratio. Many
+   users of this tool are 55+ and new to gardening apps.
+
+   One scale, with 14px as a hard floor. Written as a last-in override
+   block rather than ~70 edits, so the whole pass is one thing to read
+   and one thing to revert.
+
+   The checklist: body >= 17px, labels and buttons >= 16px, nothing
+   below 14px, lines <= ~70ch, contrast >= 4.5:1, controls >= 44px. */
+
+:root {
+  --text-xs: 0.875rem;   /* 14px - the floor, for units and captions */
+  --text-sm: 1rem;       /* 16px - labels, metadata, controls */
+  --text-md: 1.0625rem;  /* 17px - body copy */
+  --text-lg: 1.1875rem;  /* 19px - lead paragraphs */
+  --measure: 68ch;
+}
+
+/* Nothing below the floor. These were the measured offenders. */
+.portrait-index,
+.legend-measure,
+.plant-card-meta,
+.plant-card-meta span,
+.footer-version,
+.saved-count,
+.filter-reason,
+.plan-caveat,
+.saved-layout-meta,
+.sourcing-table,
+.sourcing-row,
+.detail-facts dt,
+.detail-facts dd,
+.note-card,
+.variant-tab small,
+.saved-tab span,
+summary small,
+figcaption,
+small {
+  font-size: var(--text-xs);
+}
+
+.plant-card-meta,
+.detail-facts dd,
+.legend-measure,
+.saved-layout-meta,
+.plan-legend-item b {
+  font-size: var(--text-sm);
+}
+
+/* Body copy and the prose that explains a result. */
+.plan-why p,
+.care-summary,
+.plan-assumptions li,
+.plan-assumptions p,
+.match-reasons p,
+.detail-note,
+.field-help,
+.filter-tip,
+.biome-lead,
+.collection-note p,
+.saved-intro p,
+.home-intro,
+.step-card p,
+.method-sources li {
+  font-size: var(--text-md);
+  line-height: 1.55;
+  max-width: var(--measure);
+}
+
+/* A 445-character line was the worst offender; nothing prose-like
+   should run the full width of a desktop screen. */
+.care-summary,
+.plan-why p,
+.plan-assumptions li,
+.sourcing-footnote,
+.saved-layout-note {
+  max-width: var(--measure);
+}
+
+/* Labels and controls. */
+.choice-button strong,
+.choice-button small,
+.relax-option strong,
+.relax-option small,
+.filter-row > span,
+.search-field input,
+.place-combobox input,
+.plan-legend-heading span {
+  font-size: var(--text-sm);
+}
+
+.search-field input,
+.place-combobox input {
+  font-size: var(--text-lg);
+}
+
+/* Every control reaches 44px, with room between them. */
+.button,
+.text-link,
+.saved-link,
+.save-button,
+.exclude-button,
+.card-link,
+.rename-button,
+.layout-views button,
+.saved-tab,
+.variant-tab,
+.collection-tools div button,
+.choice-button,
+.relax-option,
+.biome-option,
+summary {
+  min-height: 44px;
+}
+
+.text-link,
+.save-button,
+.exclude-button,
+.card-link,
+.rename-button {
+  display: inline-flex;
+  align-items: center;
+}
+
+.plant-card-buttons {
+  gap: 10px;
+}
+
+.plant-card-actions,
+.collection-tools div {
+  gap: 10px;
+}
+
+/* The photo credit was white over a pale photograph: 1.18:1, which is
+   invisible. It moves out of the image and onto the card. */
+.plant-photo figcaption {
+  position: static;
+  padding: 8px 2px 0;
+  background: transparent;
+  color: var(--ink-soft);
+  font-size: var(--text-xs);
+  text-shadow: none;
+}
+
+.plant-photo figcaption a {
+  color: var(--ink-soft);
+  text-decoration: underline;
+}
+
+/* ------------------------------------------------- The plan, full width
+   The bed drawing is what the gardener came for, so it gets the content
+   area. The plant list rides over it in a drawer with a tab on the right
+   edge, open by default on a wide screen and shut on a narrow one. */
+.plan-output-grid {
+  position: relative;
+  display: block;
+  margin-top: 18px;
+}
+
+.plan-layout-column {
+  width: 100%;
+}
+
+/* Named at the same specificity as the 680px cap it replaces, which
+   lives on `.plan-layout-column .plan-bed-wrap`. The 96px gutter stays:
+   the Sketchbook / Real-life switch sits in it. */
+.plan-layout-column .plan-bed-wrap {
+  width: calc(100% - 96px);
+  max-width: none;
+}
+
+/* The drawing fills the column, capped so a long thin bed does not
+   become a letterbox strip on a wide monitor. */
+.plan-bed {
+  max-height: min(78vh, 900px);
+  margin-inline: auto;
+}
+
+.plan-drawer-tab {
+  position: absolute;
+  top: 96px;
+  right: 0;
+  z-index: 3;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-height: 44px;
+  padding: 12px 14px;
+  border: 1px solid var(--line-strong);
+  border-right: 0;
+  border-radius: 8px 0 0 8px;
+  background: var(--paper-light);
+  font-family: var(--font-hand);
+  font-size: 1.0625rem;
+  font-synthesis: none;
+  box-shadow: -2px 2px 0 rgba(23, 60, 50, 0.07);
+}
+
+.plan-drawer-tab:hover {
+  background: var(--paper-deep);
+}
+
+.plan-legend {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 4;
+  width: min(380px, 88vw);
+  max-height: 100%;
+  padding: 18px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--paper-light);
+  box-shadow: -6px 0 24px rgba(23, 60, 50, 0.12);
+  overflow-y: auto;
+  transform: translateX(calc(100% + 24px));
+  transition: transform 220ms ease;
+  visibility: hidden;
+}
+
+.plan-legend.is-open {
+  transform: translateX(0);
+  visibility: visible;
+}
+
+.plan-legend-heading {
+  position: relative;
+}
+
+.plan-drawer-close {
+  position: absolute;
+  top: -8px;
+  right: -6px;
+  display: grid;
+  width: 44px;
+  height: 44px;
+  background: transparent;
+  font-size: 1.5rem;
+  line-height: 1;
+  place-items: center;
+}
+
+/* Below the tablet break the drawer covers the bed rather than sitting
+   beside it, which is the right trade on a phone. */
+@media (max-width: 860px) {
+  .plan-legend {
+    width: min(100%, 420px);
+  }
+
+  .plan-drawer-tab {
+    top: 64px;
+  }
+}
+
+/* The plain summary, under the drawing: the five figures a gardener
+   actually repeats to someone else. Each carries its unit, and the
+   price is labelled a guide because that is what it is. */
+.plan-summary-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 2px;
+  margin: 22px 0 0;
+  padding: 0;
+  border: 1px solid var(--line);
+  background: var(--line);
+}
+
+.plan-summary-row > div {
+  display: grid;
+  gap: 4px;
+  padding: 14px 16px;
+  background: var(--paper-light);
+}
+
+.plan-summary-row dt {
+  color: var(--ink-soft);
+  font-family: var(--sans);
+  font-size: var(--text-xs);
+  letter-spacing: 0.02em;
+}
+
+.plan-summary-row dd {
+  margin: 0;
+  font-family: var(--font-hand);
+  font-size: 1.5rem;
+  font-synthesis: none;
+  line-height: 1.1;
+}
+
+/* The guide price is a sentence, not a figure. */
+.plan-summary-row > div:last-child dd {
+  font-family: var(--sans);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* North was a small grey caption on the busiest screen. */
+.plan-north {
+  font-family: var(--font-hand);
+  font-size: 1.25rem;
+  font-synthesis: none;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+/* The option tabs now carry a plain line about how each differs. */
+.variant-tab em {
+  display: block;
+  margin-top: 4px;
+  color: var(--ink-soft);
+  font-family: var(--sans);
+  font-size: var(--text-xs);
+  font-style: normal;
+  line-height: 1.35;
+}

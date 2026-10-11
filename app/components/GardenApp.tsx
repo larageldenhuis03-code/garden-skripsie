@@ -36,6 +36,7 @@ import {
   hasUnknownColour,
   colourSchemes,
   evaluateHardFilters,
+  pickedColours,
   MINIMUM_VIABLE_POOL,
   gardenStyleDescriptions,
   survivesHardFilters,
@@ -2200,6 +2201,39 @@ function BedDiagram({
   );
 }
 
+/** How many of this plan's species carry one of the colours the gardener
+ * asked for. Display only - the engine has already used this. */
+function coloursMatched(plan: GardenPlan): number {
+  const wanted = pickedColours(plan.brief.colour);
+  if (wanted.length === 0) return 0;
+  const byId = new Map(plants.map((p) => [p.id, p]));
+  const ids = (plan.quantities?.quantities ?? []).map((q) => q.id);
+  return ids.filter((id) => {
+    const colours = byId.get(id)?.flowerColour ?? [];
+    return colours.some((colour) => wanted.includes(colour));
+  }).length;
+}
+
+/** One plain line saying how an option differs from the other two. Only
+ * says something when this option is strictly the leader on that
+ * measure, so it never invents a difference that is not there. */
+function describeOption(plan: GardenPlan, all: GardenPlan[]): string {
+  const species = (p: GardenPlan) => p.quantities?.quantities.length ?? 0;
+  const total = (p: GardenPlan) => p.quantities?.totalPlants ?? 0;
+  const mine = species(plan);
+  const others = all.filter((p) => p !== plan);
+  if (others.length === 0) return "";
+  if (others.every((p) => mine > species(p))) return "The widest mix of different plants.";
+  if (others.every((p) => mine < species(p))) return "The simplest planting, with fewer kinds to look after.";
+  if (others.every((p) => total(plan) > total(p))) return "The fullest bed, with the most plants in it.";
+  if (others.every((p) => total(plan) < total(p))) return "The most open bed, with the most space between plants.";
+  const colours = coloursMatched(plan);
+  if (colours > 0 && others.every((p) => colours > coloursMatched(p))) {
+    return "Closest to the colours you chose.";
+  }
+  return "A different balance of the same conditions.";
+}
+
 function PlanSummary({
   plan,
   place,
@@ -2207,6 +2241,7 @@ function PlanSummary({
   openPlant,
   onSave,
   onBudget,
+  budget,
   onRegenerate,
   onExclude,
   isSaved,
@@ -2225,6 +2260,8 @@ function PlanSummary({
   onSave: () => void;
   /** The nursery budget line, once it arrives - stored with a saved garden. */
   onBudget: (budget: SavedBudget) => void;
+  /** The same line, for the summary row. Display only. */
+  budget?: SavedBudget | null;
   onRegenerate: () => void;
   isSaved: boolean;
   /** The option switcher, rendered beside the bed so changing option does
@@ -2235,6 +2272,10 @@ function PlanSummary({
   readOnly?: boolean;
 }) {
   const plantsById = new Map(plants.map((plant) => [plant.id, plant]));
+  // The bed fills the content area; the plant list slides over it. Open
+  // by default on a wide screen, where there is room for both, and shut
+  // on a narrow one, where the drawing needs every pixel.
+  const [plantsOpen, setPlantsOpen] = useState(true);
 
   if (
     plan.status === "no-plan" ||
@@ -2294,17 +2335,6 @@ function PlanSummary({
 
   return (
     <section className="plan-output">
-      {/* The bed size is stated once, in the page heading above. This line
-          carries what changes between options. */}
-      <div className="plan-output-heading">
-        <span>{plan.character}</span>
-        <p>
-          {quantities.totalPlants} plants · {quantities.quantities.length}{" "}
-          species · about {Math.round(layout.realisedOpenSpaceRatio * 100)}%
-          open space
-        </p>
-      </div>
-
       <div className="brief-strip" aria-label="Garden brief summary">
         <span>{plan.brief.biomes.map((biome) => biomeLabels[biome]).join(" · ")}</span>
         <span>{soilLabels[plan.brief.soil]}</span>
@@ -2326,8 +2356,31 @@ function PlanSummary({
           />
         </div>
 
-        <div className="plan-legend">
+        <button
+          type="button"
+          className="plan-drawer-tab"
+          aria-expanded={plantsOpen}
+          aria-controls="plan-plant-drawer"
+          onClick={() => setPlantsOpen((open) => !open)}
+        >
+          <span>{plantsOpen ? "Hide plants" : "Plants"}</span>
+          <span aria-hidden="true">{plantsOpen ? "›" : "‹"}</span>
+        </button>
+
+        <div
+          id="plan-plant-drawer"
+          className={`plan-legend${plantsOpen ? " is-open" : ""}`}
+          aria-hidden={!plantsOpen}
+        >
           <div className="plan-legend-heading">
+            <button
+              type="button"
+              className="plan-drawer-close"
+              onClick={() => setPlantsOpen(false)}
+              aria-label="Close the plant list"
+            >
+              ×
+            </button>
             <span>Plants</span>
             <span>Quantity</span>
           </div>
@@ -2371,6 +2424,35 @@ function PlanSummary({
         </div>
       </div>
 
+      {/* The plain summary, under the drawing. Each figure carries its
+          unit, and the price says plainly that it is a guide. */}
+      <dl className="plan-summary-row">
+        <div>
+          <dt>Plants</dt>
+          <dd>{quantities.totalPlants}</dd>
+        </div>
+        <div>
+          <dt>Different plants</dt>
+          <dd>{quantities.quantities.length}</dd>
+        </div>
+        <div>
+          <dt>Bed size</dt>
+          <dd>
+            {plan.brief.bedWidthM} × {plan.brief.bedLengthM} m
+          </dd>
+        </div>
+        <div>
+          <dt>Open space</dt>
+          <dd>{Math.round(layout.realisedOpenSpaceRatio * 100)}%</dd>
+        </div>
+        <div>
+          <dt>Guide price</dt>
+          <dd>
+            {budget ? budget.text.replace(/^Budget\s*/i, "") : "Checking nurseries…"}
+          </dd>
+        </div>
+      </dl>
+
       {(anyEstimatedSpread || anyUnknownColour) && (
         <p className="plan-caveat">
           {anyEstimatedSpread
@@ -2389,8 +2471,8 @@ function PlanSummary({
       <div className="plan-why">
         <h3>Why these plants</h3>
         <p>
-          This is <strong>{plan.character.toLowerCase()}</strong> of three,
-          scoring {Math.round((plan.engine?.z ?? 0) * 100)} out of 100. Every plant here survives{" "}
+          This is <strong>{plan.character.toLowerCase()}</strong> of three.
+          Every plant here survives{" "}
           {sunLabels[plan.brief.sun].toLowerCase()},{" "}
           {waterLabels[plan.brief.water].toLowerCase()} and{" "}
           {soilLabels[plan.brief.soil].toLowerCase()}, and grows in{" "}
@@ -2656,11 +2738,10 @@ function CollectionView({
                     <strong>{variant.character}</strong>
                     <small>
                       {variant.quantities
-                        ? `${variant.quantities.totalPlants} plants · ${variant.quantities.quantities.length} species${
-                            variant.engine ? ` · score ${Math.round(variant.engine.z * 100)}` : ""
-                          }`
+                        ? `${variant.quantities.totalPlants} plants · ${variant.quantities.quantities.length} species`
                         : "No layout"}
                     </small>
+                    <em>{describeOption(variant, variants)}</em>
                   </button>
                 ))}
               </div>
@@ -2670,6 +2751,7 @@ function CollectionView({
             savedIds={saved}
             openPlant={openPlant}
             onSave={() => onSaveLayout(plan, budgets[plan.seed] ?? null)}
+            budget={budgets[plan.seed] ?? null}
             onBudget={(budget) => {
               setBudgets((current) => ({ ...current, [plan.seed]: budget }));
               // Saved before the prices arrived: fill the budget in now.
@@ -2691,87 +2773,88 @@ function CollectionView({
         </>
       )}
 
-      <section className="collection-tools" aria-label="Collection filters">
-        <label className="search-field">
-          <span>Search plants</span>
-          <input
-            value={query}
-            onChange={(event) => {
-              setQuery(event.target.value);
-              setLimit(12);
-            }}
-            placeholder="Search by common or scientific name"
-          />
-        </label>
-        <div className="filter-row">
-          <span>Plant form</span>
-          <div>
-            {formFilters.map((item) => (
-              <button
-                key={item}
-                className={form === item ? "is-active" : ""}
-                onClick={() => {
-                  setForm(item);
-                  setLimit(12);
-                }}
-              >
-                {item}
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <div className="results-count">
-        <span>{String(filtered.length).padStart(2, "0")} plants</span>
-        <span>
-          {mode === "results" && plan ? (
-            `${plan.counts.excluded} not a fit · ${plan.counts.review} need checking`
-          ) : (
-            <span className="results-label">Plant library</span>
-          )}
-        </span>
-      </div>
-
-      {filtered.length ? (
-        <section className="plant-grid">
-          {filtered.slice(0, limit).map(({ plant, match }) => (
-            <PlantCard
-              key={plant.id}
-              plant={plant}
-              match={mode === "results" ? match : undefined}
-              saved={saved.includes(plant.id)}
-              excluded={excluded.includes(plant.id)}
-              open={() => openPlant(plant)}
-              toggleSaved={() => toggleSaved(plant.id)}
-              toggleExcluded={() => toggleExcluded(plant.id)}
+      {/* The library is its own screen. It used to render under the
+          plan as well, which buried the result the gardener came for
+          beneath nine thousand pixels of catalogue. */}
+      {mode === "browse" && (
+        <>
+        <section className="collection-tools" aria-label="Collection filters">
+          <label className="search-field">
+            <span>Search plants</span>
+            <input
+              value={query}
+              onChange={(event) => {
+                setQuery(event.target.value);
+                setLimit(12);
+              }}
+              placeholder="Search by common or scientific name"
             />
-          ))}
+          </label>
+          <div className="filter-row">
+            <span>Plant form</span>
+            <div>
+              {formFilters.map((item) => (
+                <button
+                  key={item}
+                  className={form === item ? "is-active" : ""}
+                  onClick={() => {
+                    setForm(item);
+                    setLimit(12);
+                  }}
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
+          </div>
         </section>
-      ) : (
-        <section className="empty-state">
-          <h2>No plants match these filters.</h2>
-          <button
-            className="text-link"
-            onClick={() => {
-              setQuery("");
-              setForm("All");
-            }}
-          >
-            Clear the filters
-          </button>
-        </section>
-      )}
 
-      {limit < filtered.length && (
-        <div className="load-more">
-          <button
-            className="button button-outline"
-            onClick={() => setLimit(limit + 12)}
-          >
-            Show twelve more <span>↓</span>
-          </button>
+        <div className="results-count">
+          <span>{String(filtered.length).padStart(2, "0")} plants</span>
+          <span className="results-label">Plant library</span>
         </div>
+
+        {filtered.length ? (
+          <section className="plant-grid">
+            {filtered.slice(0, limit).map(({ plant, match }) => (
+              <PlantCard
+                key={plant.id}
+                plant={plant}
+                match={match}
+                saved={saved.includes(plant.id)}
+                excluded={excluded.includes(plant.id)}
+                open={() => openPlant(plant)}
+                toggleSaved={() => toggleSaved(plant.id)}
+                toggleExcluded={() => toggleExcluded(plant.id)}
+              />
+            ))}
+          </section>
+        ) : (
+          <section className="empty-state">
+            <h2>No plants match these filters.</h2>
+            <button
+              className="text-link"
+              onClick={() => {
+                setQuery("");
+                setForm("All");
+              }}
+            >
+              Clear the filters
+            </button>
+          </section>
+        )}
+
+        {limit < filtered.length && (
+          <div className="load-more">
+            <button
+              className="button button-outline"
+              onClick={() => setLimit(limit + 12)}
+            >
+              Show twelve more <span>↓</span>
+            </button>
+          </div>
+        )}
+        </>
       )}
     </main>
   );
@@ -2836,6 +2919,7 @@ function SavedLayoutPage({
         openPlant={openPlant}
         onSave={() => {}}
         onBudget={() => {}}
+        budget={layout.budget}
         onRegenerate={() => {}}
         isSaved
         readOnly
