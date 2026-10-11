@@ -42,6 +42,7 @@ import {
   isWindResilient,
   evaluateHardFilters,
 } from "../app/lib/planning/index.ts";
+import { parseSavedLayout } from "../app/lib/storage.ts";
 
 const completeBrief: GardenBrief = {
   biomes: ["Fynbos"],
@@ -991,4 +992,42 @@ test("every recommended species passes every Stage 0 gate", () => {
     }
   }
   assert.ok(checked > 0, "expected at least one plan to check");
+});
+
+// ---------------------------------------------------------------------------
+// Saved-garden labels (2026-10-11)
+//
+// A gardener can name a saved garden. The field is new, so the thing worth
+// pinning is backward compatibility: every garden saved before today has no
+// `label` and must still load.
+// ---------------------------------------------------------------------------
+
+test("saved gardens keep a label, and older saves without one still load", () => {
+  const base = {
+    createdAt: "2026-10-11T00:00:00.000Z",
+    brief: completeBrief,
+    species: [{ plantId: "B0001", quantity: 3 }],
+  };
+
+  const older = parseSavedLayout({ ...base, id: "layout-1", character: "Option 2" });
+  assert.ok(older, "a garden saved before labels existed must still load");
+  assert.equal(older.label, null, "no label reads as unlabelled, not as a blank name");
+  assert.equal(older.character, "Option 2", "and it keeps the name it always showed");
+
+  const named = parseSavedLayout({
+    ...base,
+    id: "layout-2",
+    character: "Option 1",
+    label: "Front bed by the gate",
+  });
+  assert.equal(named?.label, "Front bed by the gate");
+
+  // Whitespace is not a name: it clears back to the default rather than
+  // leaving a garden with a blank title in the list.
+  const blank = parseSavedLayout({ ...base, id: "layout-3", character: "Option 3", label: "   " });
+  assert.equal(blank?.label, null);
+
+  // A non-string label is ignored rather than crashing the whole store.
+  const junk = parseSavedLayout({ ...base, id: "layout-4", character: "Option 1", label: 42 });
+  assert.equal(junk?.label, null);
 });

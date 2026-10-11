@@ -4101,3 +4101,159 @@ button:disabled {
 .footer-feedback {
   display: inline-block;
 }
+
+/* ------------------------------------------------------------- Saved names
+   A saved garden can be named. The control is quiet until wanted - the
+   name is the thing to read, not the button beside it. */
+.saved-layout-name {
+  display: inline-flex;
+  gap: 10px;
+  align-items: baseline;
+  min-width: 0;
+}
+
+.saved-layout-name strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rename-button {
+  flex: none;
+  padding: 0;
+  background: transparent;
+  color: var(--ink-soft);
+  font-family: var(--sans);
+  font-size: 0.66rem;
+  font-weight: 620;
+  letter-spacing: 0.02em;
+  opacity: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: opacity 120ms ease;
+}
+
+.saved-layout-card:hover .rename-button,
+.saved-page-bar:hover .rename-button,
+.saved-layout-name.is-editing .rename-button,
+.rename-button:focus-visible {
+  opacity: 1;
+}
+
+.saved-layout-name input {
+  min-width: 0;
+  max-width: 22ch;
+  padding: 2px 6px;
+  border: 1px solid var(--line-strong);
+  background: var(--paper-light);
+  font-family: var(--serif);
+  font-size: 1rem;
+}
+
+/* ------------------------------------------------------------------- Print
+   The printed sheet is the thing a gardener carries out to the bed, so it
+   keeps the drawing, the plant list with quantities, the brief and the
+   care notes, and drops everything that only works on screen: navigation,
+   buttons, tabs, filters, the nursery panel and the plant grid.
+
+   Backgrounds are forced on. The bed diagram is drawn with coloured divs,
+   not an image, and browsers strip background colour when printing unless
+   told otherwise - without this the plan prints as a page of empty rings. */
+@media print {
+  @page {
+    margin: 14mm;
+  }
+
+  :root {
+    --site-border-width: 0px;
+  }
+
+  *,
+  *::before,
+  *::after {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  body {
+    background: #fff;
+  }
+
+  /* Screen-only furniture. */
+  .site-header,
+  .site-footer,
+  .plan-actions,
+  .variant-tabs,
+  .collection-tools,
+  .results-count,
+  .plant-grid,
+  .load-more,
+  .layout-views,
+  .sourcing-panel,
+  .saved-page-bar,
+  .saved-tabs,
+  .saved-intro,
+  .legend-exclude,
+  .rename-button,
+  .card-link,
+  .exclude-button,
+  .save-button,
+  .drawer-layer,
+  .collection-note {
+    display: none !important;
+  }
+
+  /* Disclosures print open: a folded-away explanation is no explanation
+     once the page is on paper. */
+  details {
+    display: block;
+  }
+
+  details > summary {
+    display: none;
+  }
+
+  .plan-output,
+  .plan-output-grid,
+  .saved-shell,
+  .collection-shell {
+    display: block;
+    padding: 0;
+    border: 0;
+  }
+
+  .plan-output h2 {
+    font-size: 1.9rem;
+  }
+
+  /* Keep a drawing whole rather than split across two sheets. */
+  .plan-bed-wrap,
+  .plan-bed,
+  .saved-layout-card,
+  .plan-legend-item,
+  .plan-plant-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .plan-bed {
+    max-width: 150mm;
+    margin: 0 auto;
+  }
+
+  .plan-legend {
+    margin-top: 10mm;
+  }
+
+  /* Hover-only labels never fire on paper, so the legend carries the
+     names - it must not be clipped to a scrolling column. */
+  .plan-legend,
+  .plan-plants {
+    max-height: none;
+    overflow: visible;
+  }
+
+  a[href]::after {
+    content: "";
+  }
+}

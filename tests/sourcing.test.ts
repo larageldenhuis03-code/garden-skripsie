@@ -525,3 +525,4 @@ test("PoliteClient works with a fetch that rejects a detached call", async () =>
     "the real cause must reach the message, not be swallowed",
   );
 });
+

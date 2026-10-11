@@ -37,6 +37,10 @@ export type SavedLayout = {
   /** What the layout optimised for, e.g. "Most colourful" - shown so the
    * user can tell saved gardens apart. */
   character: string;
+  /** A name the gardener gave this garden, which replaces `character`
+   * wherever the layout is listed. Null until they set one, so older
+   * saves keep showing what they always showed. */
+  label: string | null;
   /** ISO date. Displayed wherever saved layouts are listed. */
   createdAt: string;
   brief: GardenBrief;
@@ -83,7 +87,9 @@ function isStringArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every((item) => typeof item === "string");
 }
 
-function parseSavedLayout(value: unknown): SavedLayout | null {
+/** Exported for tests: this is the function that decides what an older
+ * stored garden becomes, so the compatibility rules are checkable. */
+export function parseSavedLayout(value: unknown): SavedLayout | null {
   if (!value || typeof value !== "object") return null;
   const record = value as Record<string, unknown>;
   const brief = parseGardenBrief(record.brief);
@@ -109,6 +115,8 @@ function parseSavedLayout(value: unknown): SavedLayout | null {
   return {
     id: record.id,
     character: typeof record.character === "string" ? record.character : "Saved garden",
+    label:
+      typeof record.label === "string" && record.label.trim() ? record.label : null,
     createdAt: record.createdAt,
     brief,
     species,

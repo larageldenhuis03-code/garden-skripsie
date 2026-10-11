@@ -2477,6 +2477,14 @@ function PlanSummary({
         <button className="button button-dark" onClick={onSave} disabled={isSaved}>
           {isSaved ? "Saved ✓" : "Save this layout"}
         </button>
+        {/* One button for both: every browser's print dialog offers "Save
+            as PDF" as a destination, so generating a PDF ourselves would
+            add a dependency and produce a worse document than the
+            browser's own renderer. The @media print rules decide what
+            lands on the page. */}
+        <button className="text-link" onClick={() => window.print()}>
+          Print / Save as PDF
+        </button>
         <button className="text-link" onClick={onRegenerate}>
           Regenerate
         </button>
@@ -2771,11 +2779,13 @@ function SavedLayoutPage({
   layout,
   savedIds,
   openPlant,
+  onRename,
   onBack,
 }: {
   layout: SavedLayout;
   savedIds: readonly string[];
   openPlant: (plant: Plant) => void;
+  onRename: (id: string, label: string) => void;
   onBack: () => void;
 }) {
   const plan = useMemo(() => {
@@ -2794,6 +2804,10 @@ function SavedLayoutPage({
         <button className="text-link" onClick={onBack}>
           ← All saved gardens
         </button>
+        <button className="text-link print-button" onClick={() => window.print()}>
+          Print / Save as PDF
+        </button>
+        <LayoutName layout={layout} onRename={onRename} />
         <span>
           Saved {formatSavedDate(layout.createdAt)} · reference {layout.seed}
         </span>
@@ -2820,9 +2834,71 @@ function SavedLayoutPage({
   );
 }
 
+/** The name of a saved garden, editable in place. Blank clears the name
+ * and the default ("Option 1") comes back, so a garden is never nameless.
+ * Enter commits, Escape abandons - typing in a list should never need a
+ * trip to a dialog. */
+function LayoutName({
+  layout,
+  onRename,
+}: {
+  layout: SavedLayout;
+  onRename: (id: string, label: string) => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(layout.label ?? "");
+
+  if (!editing) {
+    return (
+      <span className="saved-layout-name">
+        <strong>{layout.label ?? layout.character}</strong>
+        <button
+          type="button"
+          className="rename-button"
+          onClick={() => {
+            setDraft(layout.label ?? "");
+            setEditing(true);
+          }}
+          aria-label={`Rename ${layout.label ?? layout.character}`}
+        >
+          Rename
+        </button>
+      </span>
+    );
+  }
+
+  const commit = () => {
+    onRename(layout.id, draft);
+    setEditing(false);
+  };
+
+  return (
+    <span className="saved-layout-name is-editing">
+      <input
+        // Focused on open: the button was just clicked to start typing.
+        autoFocus
+        value={draft}
+        maxLength={60}
+        placeholder={layout.character}
+        aria-label="Name for this garden"
+        onChange={(event) => setDraft(event.target.value)}
+        onKeyDown={(event) => {
+          if (event.key === "Enter") commit();
+          if (event.key === "Escape") setEditing(false);
+        }}
+        onBlur={commit}
+      />
+      <button type="button" className="rename-button" onMouseDown={commit}>
+        Save
+      </button>
+    </span>
+  );
+}
+
 function SavedLayoutsList({
   layouts,
   onRemove,
+  onRename,
   openPlant,
   savedIds,
   onOpen,
@@ -2830,6 +2906,7 @@ function SavedLayoutsList({
   layouts: SavedLayout[];
   savedIds: readonly string[];
   onRemove: (id: string) => void;
+  onRename: (id: string, label: string) => void;
   openPlant: (plant: Plant) => void;
   onOpen: (id: string) => void;
 }) {
@@ -2842,7 +2919,7 @@ function SavedLayoutsList({
         {layouts.map((layout) => (
           <article key={layout.id} className="saved-layout-card">
             <header>
-              <strong>{layout.character}</strong>
+              <LayoutName layout={layout} onRename={onRename} />
               {/* Every saved layout is listed with the date it was made. */}
               <time dateTime={layout.createdAt}>
                 {formatSavedDate(layout.createdAt)}
@@ -2911,6 +2988,7 @@ function SavedView({
   excluded,
   savedLayouts,
   removeLayout,
+  renameLayout,
   openPlant,
   toggleSaved,
   toggleExcluded,
@@ -2920,6 +2998,7 @@ function SavedView({
   excluded: string[];
   savedLayouts: SavedLayout[];
   removeLayout: (id: string) => void;
+  renameLayout: (id: string, label: string) => void;
   openPlant: (plant: Plant) => void;
   toggleSaved: (id: string) => void;
   toggleExcluded: (id: string) => void;
@@ -2944,6 +3023,7 @@ function SavedView({
           layout={opened}
           savedIds={saved}
           openPlant={openPlant}
+          onRename={renameLayout}
           onBack={() => setOpenedId(null)}
         />
       </main>
@@ -2997,6 +3077,7 @@ function SavedView({
             layouts={savedLayouts}
             savedIds={saved}
             onRemove={removeLayout}
+            onRename={renameLayout}
             openPlant={openPlant}
             onOpen={setOpenedId}
           />
@@ -3416,6 +3497,7 @@ export function GardenApp() {
       {
         id: createLayoutId(),
         character: plan.character,
+        label: null,
         createdAt: new Date().toISOString(),
         brief: plan.brief,
         species: plan.quantities!.quantities.map((quantity) => ({
@@ -3457,6 +3539,17 @@ export function GardenApp() {
 
   const removeLayout = (id: string) =>
     setSavedLayouts((current) => current.filter((layout) => layout.id !== id));
+
+  /** Name a saved garden, or clear the name back to its default. Blank
+   * input means "no label", not an empty title. */
+  const renameLayout = (id: string, label: string) => {
+    const trimmed = label.trim();
+    setSavedLayouts((current) =>
+      current.map((layout) =>
+        layout.id === id ? { ...layout, label: trimmed ? trimmed : null } : layout,
+      ),
+    );
+  };
 
   const toggleSaved = (id: string) => {
     setSaved((current) => {
@@ -3525,6 +3618,7 @@ export function GardenApp() {
           excluded={excluded}
           savedLayouts={savedLayouts}
           removeLayout={removeLayout}
+          renameLayout={renameLayout}
           openPlant={setSelectedPlant}
           toggleSaved={toggleSaved}
           toggleExcluded={toggleExcluded}
