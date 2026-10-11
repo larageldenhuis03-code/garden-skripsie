@@ -453,3 +453,75 @@ test("with nothing priced, the budget line says so instead of R0", () => {
   const budget = computeBudget([{ plantId: "a", n: 4, prices: [], estimate: null, outdatedPrices: 0 }]);
   assert.equal(budgetText(budget), "No budget yet — none of the 4 plants (1 species) was found at the nurseries checked.");
 });
+
+// ---------------------------------------------------------------------------
+// The deployed worker must be able to fetch at all (2026-10-07)
+//
+// Cloudflare Workers rejects `fetch` invoked with the wrong `this`:
+// storing the bare global and calling it as `this.fetchImpl(...)` throws
+// "Illegal invocation" on every request. Node tolerates the detached call,
+// so local dev and this suite both passed while the deployed worker
+// reported every nursery and the geocoder as unreachable.
+//
+// This reproduces the Workers rule in Node: a fetch that refuses to run
+// unless called with the right receiver.
+// ---------------------------------------------------------------------------
+
+test("PoliteClient works with a fetch that rejects a detached call", async () => {
+  const realm = {
+    fetch(url: string | URL | Request): Promise<Response> {
+      // The Workers check: `this` must be the object the function lives on.
+      if (this !== realm) {
+        throw new TypeError(
+          "Illegal invocation: function called with incorrect `this` reference.",
+        );
+      }
+      const href = String(url);
+      if (href.endsWith("/robots.txt")) {
+        return Promise.resolve(new Response("User-agent: *\nAllow: /", { status: 200 }));
+      }
+      return Promise.resolve(
+        new Response(JSON.stringify({ ok: true }), {
+          status: 200,
+          headers: { "content-type": "application/json" },
+        }),
+      );
+    },
+  };
+
+  // Bound, as PoliteClient's default now is.
+  const client = new PoliteClient({
+    fetch: realm.fetch.bind(realm),
+    cache: new MemoryCache(),
+    noDelay: true,
+  });
+  const result = await client.get<{ ok: boolean }>(
+    "https://example.test/search?q=protea",
+    "probe",
+  );
+  assert.equal(result.ok, true, `expected a successful fetch, got ${JSON.stringify(result)}`);
+
+  // And the failure it used to produce is now reported with its reason
+  // rather than as a bare "could not be read".
+  const detached = new PoliteClient({
+    fetch: realm.fetch as unknown as typeof fetch,
+    cache: new MemoryCache(),
+    noDelay: true,
+  });
+  // Guard the DEFAULT too: it must be a bound wrapper, never the bare
+  // global, or the deployed worker breaks again while Node stays happy.
+  const defaulted = new PoliteClient() as unknown as { fetchImpl: typeof fetch };
+  assert.notEqual(
+    defaulted.fetchImpl,
+    globalThis.fetch,
+    "the default fetch must be bound, not the raw global",
+  );
+
+  const broken = await detached.get("https://example.test/search?q=protea", "probe-2");
+  assert.equal(broken.ok, false);
+  assert.match(
+    (broken as { error: string }).error,
+    /Illegal invocation/,
+    "the real cause must reach the message, not be swallowed",
+  );
+});

@@ -114,11 +114,19 @@ export class PoliteClient {
   private readonly queues = new Map<string, Promise<unknown>>();
   private readonly lastStart = new Map<string, number>();
   private readonly robots = new Map<string, Promise<Robots>>();
+  /** Why robots.txt could not be read, per origin, for the message. */
+  private readonly robotsFailure = new Map<string, string>();
   /** Requests actually sent (not served from cache), for reporting. */
   requests = 0;
 
   constructor(options: PoliteClientOptions = {}) {
-    this.fetchImpl = options.fetch ?? fetch;
+    // Bound to globalThis on purpose. Cloudflare Workers rejects `fetch`
+    // called with the wrong `this` - storing the bare reference and
+    // invoking it as `this.fetchImpl(...)` throws "Illegal invocation" for
+    // every request, which is how the deployed worker came to report every
+    // nursery and the geocoder as unreachable while local dev was fine
+    // (Node tolerates the detached call).
+    this.fetchImpl = options.fetch ?? fetch.bind(globalThis);
     this.cache = options.cache ?? new MemoryCache();
     this.minIntervalMs = options.minIntervalMs ?? 1000;
     this.timeoutMs = options.timeoutMs ?? 5000;
@@ -165,11 +173,20 @@ export class PoliteClient {
           try {
             const response = await this.raw(`${origin}/robots.txt`);
             if (response.status >= 400 && response.status < 500) return "all" as Robots;
-            if (!response.ok) return "none" as Robots;
+            if (!response.ok) {
+              this.robotsFailure.set(origin, `HTTP ${response.status}`);
+              return "none" as Robots;
+            }
             return parseRobots(await response.text());
-          } catch {
+          } catch (error) {
             // Unreachable robots.txt: treated as "do not crawl" (the
-            // conservative reading), so the site shows as not checked.
+            // conservative reading), so the site shows as not checked. The
+            // reason is kept rather than discarded - a failure nobody can
+            // read is a failure nobody can fix.
+            this.robotsFailure.set(
+              origin,
+              error instanceof Error ? `${error.name}: ${error.message}` : String(error),
+            );
             return "none" as Robots;
           }
         }),
@@ -187,7 +204,13 @@ export class PoliteClient {
     const { origin, host } = new URL(url);
     if (!url.includes("nominatim.openstreetmap.org")) {
       const robots = await this.robotsFor(origin);
-      if (robots === "none") return { ok: false, error: "robots.txt could not be read" };
+      if (robots === "none") {
+        const why = this.robotsFailure.get(origin);
+        return {
+          ok: false,
+          error: why ? `robots.txt could not be read (${why})` : "robots.txt could not be read",
+        };
+      }
       if (!robotsAllows(robots, url)) return { ok: false, error: "robots.txt disallows this search" };
     }
     try {
