@@ -4998,3 +4998,29 @@ summary {
   font-style: normal;
   line-height: 1.35;
 }
+
+/* Favourite and Exclude must not read alike: one is a heart in the
+   accent green, the other a crossed circle in the warning red. Icon,
+   colour and word all differ, so neither colour alone nor shape alone
+   carries the meaning. */
+.save-button {
+  color: var(--olive);
+}
+
+.save-button.is-saved {
+  color: var(--olive-dark);
+  font-weight: 700;
+}
+
+.exclude-button {
+  color: var(--ink-soft);
+}
+
+.exclude-button.is-excluded {
+  color: var(--warning);
+  border-bottom-color: var(--warning-line);
+}
+
+.legend-saved svg {
+  color: var(--olive);
+}

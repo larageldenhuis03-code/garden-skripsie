@@ -59,6 +59,7 @@ import {
 import bioregionMapData from "../data/bioregion_map.generated.json" with { type: "json" };
 import { isEstimatedBioregion, places, type Place } from "../data/places";
 import { SourcingPanel } from "./SourcingPanel";
+import { traceEnabled, tracePlan } from "../lib/planning/trace.ts";
 import { PlantTypeSymbol } from "./PlantTypeSymbol";
 import { isFeaturePlant, roleTypeOf } from "../lib/planning/engineData.ts";
 import { DATASET_VERSION } from "../data/datasetVersion";
@@ -1643,10 +1644,10 @@ function PlantCard({
           <button
             className={`save-button${saved ? " is-saved" : ""}`}
             onClick={toggleSaved}
-            aria-label={`${saved ? "Remove" : "Save"} ${plant.commonName}`}
+            aria-label={`${saved ? "Remove" : "Add"} ${plant.commonName} ${saved ? "from" : "to"} favourites`}
             aria-pressed={saved}
           >
-            {saved ? "Saved" : "Save"} <span>{saved ? "●" : "○"}</span>
+            {saved ? "Favourite" : "Favourite"} <span aria-hidden="true">{saved ? "♥" : "♡"}</span>
           </button>
           <button
             type="button"
@@ -1661,7 +1662,7 @@ function PlantCard({
             }
           >
             {excluded ? "Put back" : "Exclude"}{" "}
-            <span>{excluded ? "↺" : "✕"}</span>
+            <span aria-hidden="true">{excluded ? "↺" : "⃠"}</span>
           </button>
         </div>
       </div>
@@ -2129,7 +2130,7 @@ function BedDiagram({
               onMouseLeave={() => setHovered((current) => (current === index ? null : current))}
               onFocus={() => setHovered(index)}
               onBlur={() => setHovered((current) => (current === index ? null : current))}
-              aria-label={`${plant.commonName}, plant ${(placement.sequence ?? index) + 1}${savedIds.includes(plant.id) ? ", one of your saved plants" : ""}`}
+              aria-label={`${plant.commonName}, plant ${(placement.sequence ?? index) + 1}${savedIds.includes(plant.id) ? ", one of your favourites" : ""}`}
             >
               {view === "real-life" && plant.photoUrl && !brokenPhotos.has(plant.id) ? (
                 <img
@@ -2194,7 +2195,7 @@ function BedDiagram({
       ) : null}
       {anySaved ? (
         <p className="saved-key">
-          <span className="legend-saved" aria-hidden="true"><SavedHeart /></span> also in your saved plants
+          <span className="legend-saved" aria-hidden="true"><SavedHeart /></span> also one of your favourites
         </p>
       ) : null}
     </div>
@@ -2395,7 +2396,7 @@ function PlanSummary({
                   <strong>
                     {shortName(plant)}
                     {savedIds.includes(plant.id) ? (
-                      <span className="legend-saved" title="In your saved plants" aria-label="saved"><SavedHeart /></span>
+                      <span className="legend-saved" title="One of your favourites" aria-label="favourite"><SavedHeart /></span>
                     ) : null}
                   </strong>
                   <em>{plant.scientificName}</em>
@@ -2663,6 +2664,14 @@ function CollectionView({
   );
   const plan: GardenPlan | undefined =
     variants[Math.min(chosenVariant, variants.length - 1)];
+
+  // ?trace=1 prints the engine's working to the console, for the demo
+  // video. Strictly a reader of values the plan already carries; with
+  // the flag off this effect does nothing at all.
+  useEffect(() => {
+    if (!plan || !traceEnabled()) return;
+    tracePlan(plan, plants.length);
+  }, [plan]);
 
   const ranked = useMemo<
     { plant: Plant; match?: PlantAssessment }[]
@@ -3136,11 +3145,11 @@ function SavedView({
           Everything is stored on your device. Saved gardens keep your
           complete garden layouts, favourite plants are the individual species
           you love, and excluded plants are never selected for your garden
-          plans.
+          plans. Favourites are only used if they suit your bed.
         </p>
       </section>
 
-      <div className="saved-tabs" role="tablist" aria-label="Saved gardens and plants">
+      <div className="saved-tabs" role="tablist" aria-label="Saved gardens, favourites and exclusions">
         <button
           role="tab"
           aria-selected={tab === "gardens"}
@@ -3155,7 +3164,7 @@ function SavedView({
           className={`saved-tab${tab === "plants" ? " is-selected" : ""}`}
           onClick={() => setTab("plants")}
         >
-          Saved plants <span>{savedPlants.length}</span>
+          Favourite plants <span>{savedPlants.length}</span>
         </button>
         <button
           role="tab"
@@ -3222,8 +3231,11 @@ function SavedView({
         </>
       ) : (
         <section className="empty-state saved-empty">
-          <h2>You haven’t saved any plants yet.</h2>
-          <p>Browse the library and save the plants you want to compare.</p>
+          <h2>You haven’t picked any favourites yet.</h2>
+          <p>
+            Browse the library and tap the heart on plants you like.
+            Favourites are only used if they suit your bed.
+          </p>
           <button className="button button-dark" onClick={browse}>
             Browse the plant library <span>↗</span>
           </button>
@@ -3534,7 +3546,7 @@ function DetailDrawer({
               className={`button ${saved ? "button-outline" : "button-dark"}`}
               onClick={toggleSaved}
             >
-              {saved ? "Remove saved plant" : "Save plant"}{" "}
+              {saved ? "Remove from favourites" : "Add to favourites"}{" "}
               <span>{saved ? "−" : "+"}</span>
             </button>
             <button
