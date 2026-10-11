@@ -3196,84 +3196,182 @@ function SavedView({
   );
 }
 
+/** Line icons for the method page. Stroked, not filled, so they read as
+ * annotations beside the type rather than competing with it. */
+function MethodIcon({ name }: { name: "sun" | "filter" | "heart" | "plan" | "phone" | "ruler" | "clock" }) {
+  const paths: Record<string, ReactNode> = {
+    sun: (
+      <>
+        <circle cx="12" cy="12" r="4" />
+        <path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4" />
+      </>
+    ),
+    filter: <path d="M3 5h18l-7 8v6l-4 2v-8z" />,
+    heart: <path d="M12 20s-7-4.3-7-9.2A3.8 3.8 0 0 1 12 8a3.8 3.8 0 0 1 7 2.8C19 15.7 12 20 12 20z" />,
+    plan: (
+      <>
+        <rect x="3" y="3" width="18" height="18" rx="2" />
+        <circle cx="8.5" cy="8.5" r="1.6" />
+        <circle cx="15.5" cy="8.5" r="1.6" />
+        <circle cx="8.5" cy="15.5" r="1.6" />
+        <circle cx="15.5" cy="15.5" r="1.6" />
+      </>
+    ),
+    phone: <path d="M6 3h4l2 5-2.5 1.5a11 11 0 0 0 5 5L16 12l5 2v4a2 2 0 0 1-2.2 2A16 16 0 0 1 4 5.2 2 2 0 0 1 6 3z" />,
+    ruler: (
+      <>
+        <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />
+      </>
+    ),
+    clock: (
+      <>
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 7v5l3 2" />
+      </>
+    ),
+  };
+  return (
+    <svg
+      className="method-icon"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+    >
+      {paths[name]}
+    </svg>
+  );
+}
+
+/** The four steps, in the order the planner actually runs them. The copy
+ * stays deliberately short: the detail that used to live here is in the
+ * sources disclosure below, where someone who wants it can find it. */
+const METHOD_STEPS: { icon: "sun" | "filter" | "heart" | "plan"; title: string; copy: string }[] = [
+  {
+    icon: "sun",
+    title: "Tell us about your garden",
+    copy: "Where you live, sun, water, soil and bed size.",
+  },
+  {
+    icon: "filter",
+    title: "We remove plants that won’t survive",
+    copy: "Wrong sun, water or soil? Out. Invasive or poisonous? Out.",
+  },
+  {
+    icon: "heart",
+    title: "We rank the rest by what you like",
+    copy: "Style, flower colour, scent, birds and bees.",
+  },
+  {
+    icon: "plan",
+    title: "You get your plan",
+    copy: "A bed layout, how many of each plant, and what it costs.",
+  },
+];
+
+/** The three standing caveats. They are the honest limits of an MVP, so
+ * they sit on the page itself rather than inside a disclosure. */
+const METHOD_NOTES: { icon: "phone" | "ruler" | "clock"; lead: string; copy: string }[] = [
+  { icon: "phone", lead: "Prices are a guide.", copy: "Phone the nursery before you go." },
+  { icon: "ruler", lead: "Plant sizes are estimates.", copy: "Most are based on similar plants." },
+  { icon: "clock", lead: "Experts are still checking.", copy: "Use the plan as a starting point." },
+];
+
 function MethodView({ start }: { start: () => void }) {
   return (
     <main className="method-shell">
       <section className="method-hero">
-        <h1>
-          What works now.
-          <br />
-          What we’re still <em>checking.</em>
-        </h1>
+        <h1>How it works</h1>
         <p>
-          The planner uses your answers to suggest plants, work out quantities,
-          draw a bed layout and estimate what it would cost to buy. When
-          information is missing, we say so.
-        </p>
-      </section>
-      <section className="method-grid">
-        <article>
-          <span>01</span>
-          <h2>Plant records</h2>
-          <p>
-            {plants.length.toLocaleString()} Western Cape plants. Height,
-            spread, growth form and flowering come from BioSCape field records;
-            light, water, soil and the garden notes come from PlantZAfrica
-            (SANBI). Plants on the NEMBA invasive list are removed before
-            anything is chosen.
-          </p>
-        </article>
-        <article>
-          <span>02</span>
-          <h2>Plant checks</h2>
-          <p>
-            Your area’s biome, your light, water, soil and bed size are hard
-            checks: a plant that fails one is left out, and poisonous,
-            indoor-only and parasitic plants are excluded too. If too few plants
-            pass, we relax soil first, then water, then light — and tell you
-            which.
-          </p>
-        </article>
-        <article>
-          <span>03</span>
-          <h2>Your priorities</h2>
-          <p>
-            Garden style, flower colours and extras like fragrance or wildlife
-            rank the plants that passed; they never remove one. Wind does the
-            same — it shifts scores and placement, never eligibility. Each goal
-            still counts equally, pending expert calibration.
-          </p>
-        </article>
-        <article>
-          <span>04</span>
-          <h2>Mix, layout and cost</h2>
-          <p>
-            The planner tries thousands of plant combinations and keeps the
-            three best, works out quantities, then places them by height with
-            taller plants toward the windward edge. Finally it checks nursery
-            websites and price lists for what the bed would cost. Most plant
-            sizes are estimated from similar species, not measured.
-          </p>
-        </article>
-      </section>
-      <section className="method-callout">
-        <div>
-          <h2>The next step is checking the growing advice.</h2>
-        </div>
-        <p>
-          A local plant expert still needs to review soil, water, spacing and
-          how the goals are weighted. Nursery prices are indicative, not live
-          stock — phone ahead. Until then, treat the plan as a useful starting
-          point—not a guarantee.
+          Answer a few questions about your garden. Get a planted bed, a
+          shopping list and a price.
         </p>
         <button className="button button-dark" onClick={start}>
-          Try the layout tool <span>↗</span>
+          Start planning <span aria-hidden="true">→</span>
+        </button>
+      </section>
+
+      <section className="method-steps">
+        <h2>4 simple steps</h2>
+        <ol className="step-grid">
+          {METHOD_STEPS.map((step, index) => (
+            <li key={step.title} className="step-card">
+              <div className="step-card-head">
+                <span className="step-number">{index + 1}</span>
+                <MethodIcon name={step.icon} />
+              </div>
+              <h3>{step.title}</h3>
+              <p>{step.copy}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section className="method-notes">
+        <h2>Good to know</h2>
+        <div className="note-row">
+          {METHOD_NOTES.map((note) => (
+            <p key={note.lead} className="note-card">
+              <MethodIcon name={note.icon} />
+              <span>
+                <strong>{note.lead}</strong> {note.copy}
+              </span>
+            </p>
+          ))}
+        </div>
+
+        {/* The provenance that used to be spread across the four steps.
+            Kept in full - it is what makes a recommendation checkable -
+            but folded away so the page reads in ten seconds. */}
+        <details className="method-sources">
+          <summary>Where does the plant information come from?</summary>
+          <div>
+            <p>
+              {plants.length.toLocaleString("en-ZA")} Western Cape plants. Height,
+              spread, growth form and flowering come from BioSCape field
+              records; light, water, soil and the garden notes come from
+              PlantZAfrica (SANBI); your area’s vegetation type comes from
+              SANBI’s 2018 national vegetation map.
+            </p>
+            <p>
+              Plants on the NEMBA invasive list are removed before anything is
+              chosen, as are poisonous, indoor-only, parasitic and water
+              plants. Your light, water, soil and bed size are hard checks: a
+              plant that fails one is left out, and a plant with no record for
+              one of them is left out too rather than assumed to cope. If too
+              few plants pass, we widen soil first, then water, then light, and
+              say which.
+            </p>
+            <p>
+              Style, flower colour and extras such as scent or wildlife only
+              rank the plants that passed — they never remove one. Wind works
+              the same way: it shifts scores and placement, never eligibility.
+              The planner then tries thousands of combinations, keeps the three
+              best, works out quantities and places each plant by height.
+            </p>
+            <p>
+              Most plant spreads are estimated from similar species rather than
+              measured, so the circles show likely size, not nursery spacing.
+              Nursery prices are checked live from each nursery’s own website
+              and price lists; they are indicative, never live stock.
+            </p>
+          </div>
+        </details>
+      </section>
+
+      <section className="method-cta">
+        <h2>Ready to plan your bed?</h2>
+        <button className="button button-on-dark" onClick={start}>
+          Start planning <span aria-hidden="true">→</span>
         </button>
       </section>
     </main>
   );
 }
-
 function DetailDrawer({
   plant,
   place,
