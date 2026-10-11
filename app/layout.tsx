@@ -44,6 +44,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* Preloaded: it is used by every heading and the header, so a
+            late swap would reflow the whole page. */}
+        <link
+          rel="preload"
+          href="/fonts/SillyGooseHand.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
         <link rel="icon" type="image/png" sizes="192x192" href="/icon.png" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />

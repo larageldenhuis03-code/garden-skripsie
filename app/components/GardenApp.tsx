@@ -3329,45 +3329,51 @@ function MethodView({ start }: { start: () => void }) {
             but folded away so the page reads in ten seconds. */}
         <details className="method-sources">
           <summary>Where does the plant information come from?</summary>
-          <div>
-            <p>
-              {plants.length.toLocaleString("en-ZA")} Western Cape plants. Height,
-              spread, growth form and flowering come from BioSCape field
-              records; light, water, soil and the garden notes come from
-              PlantZAfrica (SANBI); your area’s vegetation type comes from
-              SANBI’s 2018 national vegetation map.
-            </p>
-            <p>
-              Plants on the NEMBA invasive list are removed before anything is
-              chosen, as are poisonous, indoor-only, parasitic and water
-              plants. Your light, water, soil and bed size are hard checks: a
-              plant that fails one is left out, and a plant with no record for
-              one of them is left out too rather than assumed to cope. If too
-              few plants pass, we widen soil first, then water, then light, and
-              say which.
-            </p>
-            <p>
-              Style, flower colour and extras such as scent or wildlife only
-              rank the plants that passed — they never remove one. Wind works
-              the same way: it shifts scores and placement, never eligibility.
-              The planner then tries thousands of combinations, keeps the three
-              best, works out quantities and places each plant by height.
-            </p>
-            <p>
-              Most plant spreads are estimated from similar species rather than
-              measured, so the circles show likely size, not nursery spacing.
-              Nursery prices are checked live from each nursery’s own website
-              and price lists; they are indicative, never live stock.
-            </p>
-          </div>
+          <ul>
+            <li>
+              Plant heights, spreads and flowering months come from{" "}
+              <strong>BioSCape</strong> field records —{" "}
+              {plants.length.toLocaleString("en-ZA")} Western Cape species.
+            </li>
+            <li>
+              Sun, water and soil needs come from{" "}
+              <strong>PlantZAfrica (SANBI)</strong>, and your area’s
+              vegetation type from SANBI’s 2018 national vegetation map.
+            </li>
+            <li>
+              Invasive plants on the <strong>NEMBA list</strong> are removed
+              first, along with poisonous, indoor-only, parasitic and water
+              plants.
+            </li>
+            <li>
+              A plant with <strong>no record</strong> for your sun, water or
+              soil is left out too, rather than assumed to cope.
+            </li>
+            <li>
+              If too few plants fit, we relax{" "}
+              <strong>soil first, then water, then sun</strong> — and tell
+              you which.
+            </li>
+            <li>
+              Most plant spreads are{" "}
+              <strong>estimated from similar species</strong>, not measured,
+              so the circles show likely size rather than nursery spacing.
+            </li>
+            <li>
+              Nursery prices are checked live from each nursery’s own site
+              and price lists. They are indicative, never live stock.
+            </li>
+          </ul>
         </details>
       </section>
 
       <section className="method-cta">
-        <h2>Ready to plan your bed?</h2>
-        <button className="button button-on-dark" onClick={start}>
-          Start planning <span aria-hidden="true">→</span>
-        </button>
+        <div className="method-cta-inner">
+          <h2>Ready to plan your bed?</h2>
+          <button className="button button-on-dark" onClick={start}>
+            Start planning <span aria-hidden="true">→</span>
+          </button>
+        </div>
       </section>
     </main>
   );
