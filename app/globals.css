@@ -4197,7 +4197,7 @@ button:disabled {
 }
 
 .excluded-note summary {
-  font-family: var(--sans);
+  font-family: var(--font-hand);
   font-size: 0.74rem;
   font-weight: 620;
   cursor: pointer;
@@ -4554,4 +4554,117 @@ h3 {
   font-weight: 650;
   letter-spacing: 0.14em;
   text-transform: uppercase;
+}
+
+/* ------------------------------------- Labels and actions in the hand
+   Owner request, 2026-10-11: the handwriting carries headings, buttons,
+   tabs, field labels and section openers; the text face carries detail
+   information - measurements, counts, prices, plant names, body copy.
+   Grouped by role rather than listed one control at a time, so a new
+   button or fieldset is in the right face without another rule.
+
+   What deliberately stays in the text face is listed at the end. */
+.button,
+.text-link,
+.saved-link,
+.saved-label,
+legend,
+summary,
+.search-field span,
+.place-combobox label > span,
+.variant-tab strong,
+.layout-views button,
+.saved-tab,
+.rename-button,
+.exclude-button,
+.save-button,
+.card-link,
+.bed-preview figcaption,
+.collection-tools div button,
+.relax-option strong,
+.choice-button strong,
+.plan-output-heading > span,
+.plan-unavailable > div > span {
+  font-family: var(--font-hand);
+  font-synthesis: none;
+  letter-spacing: 0;
+}
+
+/* The hand draws small, so every one of those sizes up. */
+.button {
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+.text-link,
+.saved-link,
+.layout-views button,
+.saved-tab,
+.collection-tools div button {
+  font-size: 1.0625rem;
+  font-weight: 500;
+}
+
+legend,
+.search-field span,
+.place-combobox label > span,
+.bed-preview figcaption {
+  font-size: 1.0625rem;
+  font-weight: 500;
+  text-transform: none;
+}
+
+summary {
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+.variant-tab strong {
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+.save-button,
+.exclude-button,
+.card-link,
+.rename-button {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+/* Headings that sit inside a named block, so they out-specify `h3`. */
+.plan-why h3,
+.plan-care h3,
+.plan-plants h3,
+.care-detail h3,
+.bed-controls h3,
+.sourcing-panel h3,
+.sourcing-panel h4 {
+  font-family: var(--font-hand);
+  font-synthesis: none;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+/* Detail information stays in the text face, inside a hand element too:
+   counts beside a summary, the score under an option tab, the quantity
+   on a legend row, measurements, prices and plant names. These are the
+   numbers someone reads carefully, and the hand is not for reading
+   carefully. */
+summary small,
+summary span,
+.variant-tab small,
+.saved-tab span,
+.legend-measure,
+.plan-legend-item b,
+.plant-card-meta,
+.detail-facts,
+.sourcing-table,
+.saved-layout-meta,
+.budget-line,
+.filter-count,
+.note-card,
+.step-card p {
+  font-family: var(--sans);
+  letter-spacing: normal;
 }
