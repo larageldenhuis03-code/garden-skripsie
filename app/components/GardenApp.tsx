@@ -57,6 +57,8 @@ import {
   type PlantAssessment,
   rowsAvailable,
   WIND_SITE_FACTOR,
+  computeHeightTiers,
+  tierOf,
 } from "../lib/planning";
 import bioregionMapData from "../data/bioregion_map.generated.json" with { type: "json" };
 import { isEstimatedBioregion, places, type Place } from "../data/places";
@@ -677,6 +679,11 @@ function stepNotes(step: number, brief: GardenBrief, survivors: number | null): 
  * you stand on *and* the way you then look, and the arrow points into the
  * bed, matching the figure in the preview beside it.
  */
+/** P30 / P60 of the catalogue's heights - the engine's own tiers
+ * (3_Height_Tiers), so the drawing shows height the way the engine reads
+ * it. Display only. */
+const HEIGHT_TIERS = computeHeightTiers(plants);
+
 const VIEWING_EDGE_OPTIONS: {
   edge: ViewingEdge;
   label: string;
@@ -2301,6 +2308,19 @@ function BedDiagram({
   const rotated = lengthM > widthM;
   const displayWidthM = rotated ? lengthM : widthM;
   const displayLengthM = rotated ? widthM : lengthM;
+  // A bed longer than it is wide is drawn a quarter-turn round, so it
+  // fills the width of the page. Then north is on the LEFT of the drawing,
+  // east at the top, south on the right and west at the bottom (from
+  // displayX = y and displayY = W - x below). The compass, the viewpoint
+  // mark and the label must turn with it; they did not, so on a long bed
+  // all three pointed at the wrong edge of the real garden.
+  // The mark's CSS classes are named for the side of the DRAWING they sit
+  // on (is-north = top, is-east = right, ...), so this maps an edge of the
+  // bed to the class for wherever that edge is drawn.
+  const drawnSide = (edge: ViewingEdge): ViewingEdge =>
+    rotated
+      ? ({ north: "west", east: "north", south: "east", west: "south" } as const)[edge]
+      : edge;
   // Names are no longer printed inside the circles - at planting scale they
   // stacked into unreadable noise. The name is disclosed on hover or
   // keyboard focus instead, and a tap opens the full plant profile.
@@ -2315,6 +2335,7 @@ function BedDiagram({
       unknownColour: hasUnknownColour(plant),
       estimated: plant.spreadConfidence !== "original",
       saved: savedIds.includes(plant.id),
+      tier: plant.heightCm === null ? null : tierOf(plant.heightCm, HEIGHT_TIERS),
     }];
   });
   const tip = hovered === null ? null : markers.find((m) => m.index === hovered) ?? null;
@@ -2332,7 +2353,7 @@ function BedDiagram({
         <LayoutViewSwitch view={view} onChange={setView} />
       ) : null}
       <div className="plan-north" aria-hidden="true">
-        N ↑
+        {rotated ? "N ←" : "N ↑"}
       </div>
       <div className="plan-bed-frame">
       <div
@@ -2347,9 +2368,9 @@ function BedDiagram({
             "--bed-rows": displayLengthM,
           } as CSSProperties
         }
-        aria-label={`${widthM} by ${lengthM} metre planting layout, north at the top`}
+        aria-label={`${widthM} by ${lengthM} metre planting layout, north at the ${rotated ? "left" : "top"}`}
       >
-        {markers.map(({ placement, plant, index, displayX, displayY, unknownColour, estimated }) => {
+        {markers.map(({ placement, plant, index, displayX, displayY, unknownColour, estimated, tier }) => {
           const style: CSSProperties = {
             left: `${((displayX - placement.radiusM) / displayWidthM) * 100}%`,
             top: `${((displayY - placement.radiusM) / displayLengthM) * 100}%`,
@@ -2360,7 +2381,7 @@ function BedDiagram({
           return (
             <button
               key={placement.instanceId ?? `${placement.plantId}-${index}`}
-              className={`plan-marker${estimated ? " is-estimated" : ""}${unknownColour ? " is-unknown-colour" : ""}`}
+              className={`plan-marker${estimated ? " is-estimated" : ""}${unknownColour ? " is-unknown-colour" : ""}${tier ? ` is-h-${tier}` : ""}`}
               style={style}
               onClick={() => openPlant(plant)}
               onMouseEnter={() => setHovered(index)}
@@ -2390,7 +2411,7 @@ function BedDiagram({
             when the wrap was wider than the bed, out in the page margin. */}
         {viewingEdge ? (
           <span
-            className={`plan-front-edge is-${viewingEdge}`}
+            className={`plan-front-edge is-${drawnSide(viewingEdge)}`}
             title="You stand on this side"
           >
             <ViewerFigure />
@@ -2413,6 +2434,7 @@ function BedDiagram({
             }}
           >
             {shortName(tip.plant)}
+            {tip.plant.heightCm ? ` · ${formatDimension(tip.plant.heightCm)} tall` : ""}
             {tip.saved ? " · saved" : ""}
             {tip.unknownColour ? " · colour unknown" : ""}
             {tip.estimated ? " · spread estimated" : ""}
@@ -2438,6 +2460,25 @@ function BedDiagram({
           ))}
         </ul>
       ) : null}
+      {/* The circles show how WIDE a plant grows, which says nothing about
+          how tall it is - an 8 m tree can draw a smaller circle than a
+          15 cm ground cover. The ring weight carries height, so a bed that
+          is layered tall-at-the-back can also be seen to be. */}
+      <p className="height-key">
+        <span>Ring shows height:</span>
+        <span className="height-key-item">
+          <i className="height-key-ring is-h-short" aria-hidden="true" /> under{" "}
+          {formatDimension(HEIGHT_TIERS.p30)}
+        </span>
+        <span className="height-key-item">
+          <i className="height-key-ring is-h-medium" aria-hidden="true" />{" "}
+          {formatDimension(HEIGHT_TIERS.p30)} to {formatDimension(HEIGHT_TIERS.p60)}
+        </span>
+        <span className="height-key-item">
+          <i className="height-key-ring is-h-tall" aria-hidden="true" />{" "}
+          {formatDimension(HEIGHT_TIERS.p60)} or taller
+        </span>
+      </p>
       {anySaved ? (
         <p className="saved-key">
           <span className="legend-saved" aria-hidden="true"><SavedHeart /></span> also one of your favourites
