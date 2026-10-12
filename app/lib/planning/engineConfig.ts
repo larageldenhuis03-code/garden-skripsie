@@ -187,4 +187,31 @@ export const PLACEMENT = {
   noiseStep: 0.15,
   /** IMPLEMENTATION: share of random draws inside the depth band. */
   inBandShare: 0.6,
+  /**
+   * IMPLEMENTATION: how much a candidate position is preferred for being
+   * a tangency contact point - snug against the bed edge or an existing
+   * plant - rather than a free random draw. It is what packs the bed, and
+   * it is also what pulls plants into clumps.
+   *
+   * It was written into Stage 4 as a bare 0.05. Moved here because this
+   * file is the single home for placement settings that are not rulebook
+   * parameters, and because a coverage study needs to run with it at 0.
+   * The value is unchanged.
+   */
+  contactBonus: 0.05,
+  /**
+   * STUDY SEAM, 0 in the shipped engine so none of it runs.
+   *
+   * Weight of the "emptiest block" preference: the bed is divided into
+   * blocks the size of the median canopy in the selection (at least
+   * 0.5 m) and a candidate position is preferred for sitting in a block
+   * that is still empty. It is added only for the first plant of a group,
+   * so a drift still clusters round its anchor, and only for candidates
+   * already inside the layer's depth band, so it can never pull a plant
+   * out of its band. Hard rules are a filter, not a score, so no weight
+   * here can breach one.
+   *
+   * See scripts/coverage-test.ts (V3), which sets it in memory.
+   */
+  emptiestBlockWeight: 0,
 } as const;

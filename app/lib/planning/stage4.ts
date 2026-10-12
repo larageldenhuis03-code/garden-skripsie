@@ -221,7 +221,36 @@ function placeOnce(
           RULES.stage4.shadeRadius * p.radiusM,
     );
 
+  // Emptiest-block preference (study seam; PLACEMENT.emptiestBlockWeight is
+  // 0 in the shipped engine, so every line below is inert). The bed is cut
+  // into blocks the size of the median canopy in this selection, and how
+  // much canopy already sits in each block is tracked as plants are placed.
+  const blockWeight = PLACEMENT.emptiestBlockWeight;
+  const diameters = [...selection.keys()]
+    .flatMap((id) => {
+      const info = infos.get(id);
+      return info ? [info.diameterM] : [];
+    })
+    .sort((left, right) => left - right);
+  const medianDiameter =
+    diameters.length === 0
+      ? 0
+      : diameters.length % 2 === 1
+        ? diameters[(diameters.length - 1) / 2]
+        : (diameters[diameters.length / 2 - 1] + diameters[diameters.length / 2]) / 2;
+  const blockSize = Math.max(0.5, medianDiameter);
+  const blockCols = Math.max(1, Math.ceil(W / blockSize));
+  const blockRows = Math.max(1, Math.ceil(L / blockSize));
+  const blockOf = (x: number, y: number): number =>
+    Math.min(Math.floor(y / blockSize), blockRows - 1) * blockCols +
+    Math.min(Math.floor(x / blockSize), blockCols - 1);
+  const blockArea = new Map<number, number>();
+
   const record = (info: SpeciesInfo, x: number, y: number, sequence: number, extra: Partial<Placement> = {}) => {
+    if (blockWeight > 0) {
+      const key = blockOf(x, y);
+      blockArea.set(key, (blockArea.get(key) ?? 0) + Math.PI * (info.diameterM / 2) ** 2);
+    }
     placed.push({
       instanceId: `${info.id}-${sequence}`,
       plantId: info.id,
@@ -489,7 +518,8 @@ function placeOnce(
       const { x, y } = raw[index];
       if (!fits(x, y, r, info) || breaksP4(info, x, y)) continue;
       let pref = rng() * (1e-3 + noise); // seeded tie-break; wider on restarts
-      if (index >= firstContact) pref += 0.05; // snug contact spots pack the bed
+      // Snug contact spots pack the bed (engineConfig PLACEMENT).
+      if (index >= firstContact) pref += PLACEMENT.contactBonus;
       if (target !== null) {
         const off = Math.abs(axis.depthOf(x, y) - target * axis.span);
         pref -= off / axis.span + 2 * Math.max(0, off - tol) / axis.span; // depth target +- depth_tol
@@ -503,6 +533,17 @@ function placeOnce(
       } else if (info.layer !== "L1" && info.layer !== "L3" && info.layer !== "L7") {
         // First plant of a drift: prefer snug spots so the bed packs.
         pref -= 0.2 * (Math.min(x - r, W - r - x, y - r, L - r - y) / scale);
+      }
+      // Emptiest block: anchor plants only, and only among candidates
+      // already inside the depth band, so the band always wins.
+      if (blockWeight > 0 && drift.length === 0) {
+        const inBand =
+          target === null ||
+          Math.abs(axis.depthOf(x, y) - target * axis.span) <= tol + EPS;
+        if (inBand) {
+          const filled = (blockArea.get(blockOf(x, y)) ?? 0) / (blockSize * blockSize);
+          pref += blockWeight * (1 - Math.min(1, filled));
+        }
       }
       if (thirdArea && fullestThird > 0) {
         // 1 in an empty third, 0 in the fullest one.

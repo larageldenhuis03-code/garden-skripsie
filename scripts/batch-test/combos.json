@@ -1,0 +1,174 @@
+{
+ "source": "Algorithm_rulebook.xlsx, 8_Species_Reference rows 5-18 (the plant combination library)",
+ "note": "Read from the workbook for measurement only. The rulebook import does not carry this tab, and the engine does not read it.",
+ "combos": [
+  {
+   "id": "C01",
+   "row": 5,
+   "name": "Coastal windbreak trio",
+   "layer": "L1",
+   "species": [
+    "Olea exasperata",
+    "Pterocelastrus tricuspidatus",
+    "Myrsine africana"
+   ]
+  },
+  {
+   "id": "C02",
+   "row": 6,
+   "name": "Bird-garden back row",
+   "layer": "L1",
+   "species": [
+    "Cassine peragua",
+    "Sideroxylon inerme",
+    "Polygala myrtifolia"
+   ]
+  },
+  {
+   "id": "C03",
+   "row": 7,
+   "name": "Fynbos focal group",
+   "layer": "L1 + L4",
+   "species": [
+    "Protea cynaroides",
+    "Leucadendron salignum",
+    "Metalasia muricata"
+   ]
+  },
+  {
+   "id": "C04",
+   "row": 8,
+   "name": "Restio matrix",
+   "layer": "L3",
+   "species": [
+    "Thamnochortus lucens",
+    "Elegia stipularis",
+    "Staberoha cernua",
+    "Hypodiscus aristatus",
+    "Elegia filacea"
+   ]
+  },
+  {
+   "id": "C05",
+   "row": 9,
+   "name": "Fragrant buchu group",
+   "layer": "L4",
+   "species": [
+    "Agathosma imbricata",
+    "Agathosma lanceolata",
+    "Agathosma serpyllacea",
+    "Coleonema album",
+    "Diosma oppositifolia"
+   ]
+  },
+  {
+   "id": "C06",
+   "row": 10,
+   "name": "Pollinator low shrubs",
+   "layer": "L4 / L6",
+   "species": [
+    "Staavia radiata",
+    "Serruria villosa",
+    "Serruria glomerata",
+    "Roella ciliata",
+    "Erica cerinthoides"
+   ]
+  },
+  {
+   "id": "C07",
+   "row": 11,
+   "name": "Succulent carpet",
+   "layer": "L6",
+   "species": [
+    "Carpobrotus edulis",
+    "Carpobrotus acinaciformis",
+    "Mesembryanthemum crystallinum",
+    "Crassula orbicularis"
+   ]
+  },
+  {
+   "id": "C08",
+   "row": 12,
+   "name": "Grey-foliage Mediterranean group",
+   "layer": "L4",
+   "species": [
+    "Helichrysum patulum",
+    "Seriphium plumosum",
+    "Plecostachys serpyllifolia",
+    "Eriocephalus racemosus"
+   ]
+  },
+  {
+   "id": "C09",
+   "row": 13,
+   "name": "Cottage pelargonium group",
+   "layer": "L4 / L5",
+   "species": [
+    "Pelargonium betulinum",
+    "Pelargonium cucullatum",
+    "Pelargonium grossularioides"
+   ]
+  },
+  {
+   "id": "C10",
+   "row": 14,
+   "name": "Wet-bed group",
+   "layer": "L4",
+   "species": [
+    "Berzelia lanuginosa",
+    "Berzelia abrotanoides",
+    "Osmitopsis asteriscoides",
+    "Psoralea pinnata",
+    "Juncus kraussii",
+    "Zantedeschia aethiopica"
+   ]
+  },
+  {
+   "id": "C11",
+   "row": 15,
+   "name": "Year-round flowering set",
+   "layer": "Mixed",
+   "species": [
+    "Erica cerinthoides",
+    "Protea cynaroides",
+    "Zantedeschia aethiopica"
+   ]
+  },
+  {
+   "id": "C12",
+   "row": 16,
+   "name": "Shade understorey",
+   "layer": "L5 / L6",
+   "species": [
+    "Crassula orbicularis",
+    "Agathosma lanceolata",
+    "Pelargonium grossularioides",
+    "Zantedeschia aethiopica",
+    "Euphorbia tuberosa"
+   ]
+  },
+  {
+   "id": "C13",
+   "row": 17,
+   "name": "Alkaline beach-sand group",
+   "layer": "L4",
+   "species": [
+    "Protea obtusifolia",
+    "Protea susannae",
+    "Erica chloroloma",
+    "Acmadenia heterophylla",
+    "Acmadenia mundiana"
+   ]
+  },
+  {
+   "id": "C14",
+   "row": 18,
+   "name": "Succulent hedge",
+   "layer": "L1 / L4",
+   "species": [
+    "Portulacaria afra",
+    "Aloe arborescens"
+   ]
+  }
+ ]
+}
