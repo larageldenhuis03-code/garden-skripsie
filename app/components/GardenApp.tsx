@@ -103,14 +103,23 @@ const SOIL_DESCRIPTIONS: Record<string, string> = {
     "We will accept any of the three. Plants with no soil recorded are still left out.",
 };
 
-const formFilters = [
-  "All",
-  "Shrub",
-  "Tree",
-  "Restio",
-  "Groundcover",
-  "Geophyte",
-] as const;
+/** Every plant type in the catalogue, with how many carry it. A plant
+ * listed as "Ground Cover, Perennial" counts under both, and appears
+ * under either filter - the field is a list, so it is read as one. */
+const PLANT_TYPE_OPTIONS: { value: string; label: string; count: number }[] = (() => {
+  const counts = new Map<string, number>();
+  for (const plant of plants) {
+    for (const part of String(plant.form ?? "")
+      .split(",")
+      .map((piece) => piece.trim())
+      .filter(Boolean)) {
+      counts.set(part, (counts.get(part) ?? 0) + 1);
+    }
+  }
+  return [...counts.entries()]
+    .sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))
+    .map(([value, count]) => ({ value, label: value, count }));
+})();
 
 function formatDimension(value: number | null) {
   if (value === null) return "Not measured";
@@ -2088,6 +2097,27 @@ function SavedHeart() {
 
 /** The planting plan: every plant as a circle at its position, north at the
  * top. Used for the live layout and for saved gardens alike. */
+/** The standing figure from the bed preview, reused on the plan so the
+ * viewpoint mark means the same thing in both places. It sits on the
+ * edge the gardener said they stand on, facing into the bed. */
+function ViewerFigure() {
+  return (
+    <svg
+      className="viewer-figure"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <circle cx="12" cy="5" r="2.6" fill="currentColor" stroke="none" />
+      <path d="M12 8v7M7.5 10.5h9M12 15l-3 6M12 15l3 6" />
+    </svg>
+  );
+}
+
 function BedDiagram({
   widthM,
   lengthM,
@@ -2206,8 +2236,12 @@ function BedDiagram({
         })}
       </div>
       {viewingEdge ? (
-        <span className={`plan-front-edge is-${viewingEdge}`}>
-          you stand here
+        <span
+          className={`plan-front-edge is-${viewingEdge}`}
+          title="You stand on this side"
+        >
+          <ViewerFigure />
+          <span className="plan-front-edge-text">you stand here</span>
         </span>
       ) : null}
       {/* Sits outside .plan-bed, which clips its children, so a name near
@@ -2694,7 +2728,7 @@ function CollectionView({
   // Latest budget line per plan (by seed), so saving can store it.
   const [budgets, setBudgets] = useState<Record<string, SavedBudget>>({});
   const [query, setQuery] = useState("");
-  const [form, setForm] = useState<(typeof formFilters)[number]>("All");
+  const [form, setForm] = useState<string>("All");
   const [limit, setLimit] = useState(12);
   // Regenerate deliberately produces a different set; reopening the same
   // counter reproduces this one exactly (spec 8.6).
@@ -2753,12 +2787,13 @@ function CollectionView({
     const queryMatches = haystack.includes(query.toLowerCase());
     const formMatches =
       form === "All" ||
-      (form === "Shrub" && plant.form.toLowerCase().includes("shrub")) ||
-      // Spaces are stripped from both sides: the filter reads
-      // "Groundcover" while the catalogue says "Ground Cover", which
-      // hid all 199 of them.
-      plant.form.toLowerCase().replace(/\s+/g, "")
-        .includes(form.toLowerCase().replace(/\s+/g, ""));
+      // The field is a list - "Ground Cover, Perennial" - so it is
+      // matched part by part rather than as one string. A plant under
+      // two types appears under either.
+      plant.form
+        .split(",")
+        .map((part) => part.trim().toLowerCase())
+        .includes(form.toLowerCase());
     return queryMatches && formMatches;
   });
 
@@ -2861,23 +2896,27 @@ function CollectionView({
               placeholder="Search by common or scientific name"
             />
           </label>
-          <div className="filter-row">
-            <span>Plant form</span>
-            <div>
-              {formFilters.map((item) => (
-                <button
-                  key={item}
-                  className={form === item ? "is-active" : ""}
-                  onClick={() => {
-                    setForm(item);
-                    setLimit(12);
-                  }}
-                >
-                  {item}
-                </button>
+          {/* Twenty-one types is too many to show as buttons, so this is
+              a list. Each one carries its count, which saves choosing a
+              type and finding three plants behind it. */}
+          <label className="filter-row">
+            <span>Plant type</span>
+            <select
+              className="plant-type-select"
+              value={form}
+              onChange={(event) => {
+                setForm(event.target.value);
+                setLimit(12);
+              }}
+            >
+              <option value="All">All types ({plants.length.toLocaleString("en-ZA")})</option>
+              {PLANT_TYPE_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label} ({option.count})
+                </option>
               ))}
-            </div>
-          </div>
+            </select>
+          </label>
         </section>
 
         <div className="results-count">

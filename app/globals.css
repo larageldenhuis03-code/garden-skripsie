@@ -5677,3 +5677,156 @@ body {
 .choice-stack.preference-blocks .choice-grid {
   margin-top: 0;
 }
+
+/* =====================================================================
+   WALKTHROUGH 3 (2026-10-12)
+   ===================================================================== */
+
+/* The sketch itself is already transparent - the "background" was a
+   tinted square this container painted behind it. Gone, and the drawing
+   is given the room to be inviting rather than framed. */
+.home-illustration {
+  padding: 0;
+  aspect-ratio: auto;
+  background: none;
+}
+
+.home-illustration img {
+  width: min(100%, 680px);
+  max-height: none;
+  transform: scale(1.12);
+  transform-origin: center;
+}
+
+/* The map was stretched: the SVG filled its box on both axes instead of
+   keeping its own proportions. */
+.bioregion-map-svg,
+.place-step .bioregion-map-svg {
+  height: auto;
+  max-height: 64vh;
+  object-fit: contain;
+}
+
+/* "Or pick exact colours" was a small summary between two large blocks,
+   so it disappeared between them. */
+.colour-custom summary {
+  font-size: 1.25rem;
+}
+
+/* Headings on the plan, one size, so the eye can tell a section from a
+   note. "View notes" is the note, so it goes the other way. */
+.collection-note .text-link,
+.sourcing-panel h3,
+.plan-assumptions summary {
+  font-size: 1.375rem;
+}
+
+.plan-assumptions summary span {
+  font-size: var(--text-sm);
+}
+
+/* The bed's own labels. The scale bar measures the drawing, so it
+   starts where the drawing starts; the length label sits beside the
+   bed, not up by the view switch; north moves to the right, clear of
+   both. */
+.plan-bed-wrap {
+  padding-left: 0;
+}
+
+.plan-scale {
+  margin-left: 0;
+}
+
+.plan-north {
+  right: 0;
+  left: auto;
+  text-align: right;
+  font-size: 2rem;
+}
+
+.plan-measure-length {
+  top: 50%;
+  left: 0;
+  transform: translate(-100%, -50%);
+}
+
+.plan-measure-width {
+  bottom: 0;
+}
+
+/* The plant-type key under the bed is a legend for the whole drawing,
+   not a footnote. */
+.symbol-key li {
+  font-size: 1.0625rem;
+}
+
+.symbol-key-mark,
+.symbol-key-mark svg {
+  width: 30px;
+  height: 30px;
+}
+
+/* Printing: the drawer covers the bed, and the bed is the point of the
+   printed sheet. */
+@media print {
+  .plan-legend,
+  .plan-drawer-tab {
+    display: none !important;
+  }
+
+  .plan-bed {
+    max-width: none;
+  }
+}
+
+/* The viewpoint mark: the same standing figure as the bed preview, on
+   the edge the gardener stands on. It used to sit over the view switch
+   on the plan and over the controls on a saved garden. */
+.plan-front-edge {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  z-index: 2;
+}
+
+.viewer-figure {
+  width: 24px;
+  height: 24px;
+  color: var(--olive);
+  flex: none;
+}
+
+.plan-front-edge-text {
+  font-size: 1.0625rem;
+}
+
+/* On the two side edges the label turns with the edge, so it reads
+   along the side it marks rather than across the drawing. */
+.plan-front-edge.is-west .plan-front-edge-text,
+.plan-front-edge.is-east .plan-front-edge-text {
+  writing-mode: vertical-rl;
+}
+
+.plan-front-edge.is-west .plan-front-edge-text {
+  transform: rotate(180deg);
+}
+
+/* The plant-type list. Twenty-one options with counts, so choosing a
+   type never leads to an almost-empty page. */
+.plant-type-select {
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: var(--paper-light);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: var(--text-md);
+}
+
+.filter-row {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+}
