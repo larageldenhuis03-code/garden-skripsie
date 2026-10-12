@@ -6200,3 +6200,31 @@ body {
 .plan-layout-head {
   align-items: center;
 }
+
+/* Photo credits are attribution, not reading matter. The audit moved
+   them off the photograph because they were white on pale at 1.18:1;
+   that stays, but they go back to fine-print size. */
+.plant-photo figcaption {
+  font-size: 0.6875rem;
+  line-height: 1.35;
+}
+
+/* The brief strip is the gardener's own answers read back, so it is set
+   in the hand like the rest of the labelling. Sentence case rather than
+   capitals: the hand has no small caps and sets them badly. */
+.brief-strip span,
+.brief-strip small,
+.brief-strip span:not(:last-child)::after {
+  font-family: var(--font-hand);
+  font-synthesis: none;
+  letter-spacing: 0;
+}
+
+.brief-strip span {
+  font-size: 1.1875rem;
+}
+
+.brief-strip small {
+  font-size: 1.1875rem;
+  text-transform: none;
+}
