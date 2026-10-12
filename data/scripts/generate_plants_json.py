@@ -21,6 +21,11 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 SOURCE_CSV = REPO_ROOT / "data" / "processed" / "plant_database_western_cape.csv"
 INATURALIST_CSV = REPO_ROOT / "data" / "processed" / "inaturalist_photos.csv"
+# Species whose PlantZAfrica photo is not a photo of the plant. Listed with
+# the reason and the date it was decided, so the change is traceable; the
+# species then falls through to the iNaturalist fallback like any species
+# with no PlantZAfrica photo, or to no photo if there is none.
+PHOTO_OVERRIDES_CSV = REPO_ROOT / "data" / "photo_overrides.csv"
 OUTPUT_JSON = REPO_ROOT / "app" / "data" / "plant_database.generated.json"
 LOAD_WARNINGS_JSON = REPO_ROOT / "data" / "processed" / "data_load_warnings.json"
 
@@ -229,10 +234,18 @@ def load_inaturalist_photos() -> dict[str, dict[str, str | None]]:
         return by_name
 
 
+def load_photo_overrides() -> set[str]:
+    if not PHOTO_OVERRIDES_CSV.exists():
+        return set()
+    with PHOTO_OVERRIDES_CSV.open(encoding="utf-8", newline="") as f:
+        return {row["scientific_name"].strip() for row in csv.DictReader(f)}
+
+
 def main() -> None:
     with SOURCE_CSV.open(encoding="utf-8", newline="") as f:
         rows = list(csv.DictReader(f))
     inaturalist_photos = load_inaturalist_photos()
+    rejected_photos = load_photo_overrides()
 
     plants = []
     bad_biomes: set[str] = set()
@@ -339,6 +352,8 @@ def main() -> None:
             goals.append("flowers")
 
         pza_photo_url = blank_to_none(row["photo_url"])
+        if scientific_name in rejected_photos:
+            pza_photo_url = None  # data/photo_overrides.csv: not the plant
         if pza_photo_url:
             photo_url = pza_photo_url
             photo_attribution = "PlantZAfrica (SANBI)"
