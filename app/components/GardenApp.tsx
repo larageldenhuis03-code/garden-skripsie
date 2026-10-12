@@ -668,6 +668,25 @@ function stepNotes(step: number, brief: GardenBrief, survivors: number | null): 
   return out;
 }
 
+/**
+ * The four sides a gardener can stand on. Four, not eight: the depth axis
+ * that puts tall plants at the back is the bed's own width or length, and a
+ * diagonal has no such axis on a rectangle. So each option names the side
+ * you stand on *and* the way you then look, and the arrow points into the
+ * bed, matching the figure in the preview beside it.
+ */
+const VIEWING_EDGE_OPTIONS: {
+  edge: ViewingEdge;
+  label: string;
+  looking: string;
+  arrow: string;
+}[] = [
+  { edge: "north", label: "North side", looking: "south", arrow: "↓" },
+  { edge: "west", label: "West side", looking: "east", arrow: "→" },
+  { edge: "east", label: "East side", looking: "west", arrow: "←" },
+  { edge: "south", label: "South side", looking: "north", arrow: "↑" },
+];
+
 function BedPreview({
   widthM,
   lengthM,
@@ -706,11 +725,14 @@ function BedPreview({
   // Kept clear of the dimension lines (14-18px out) and the compass
   // letters, so the figure never sits on top of a measurement.
   const figure = {
-    north: { x: x0 + w / 2 + 34, y: y0 - 34, look: "south", dx: 0, dy: 1 },
-    south: { x: x0 + w / 2 + 34, y: y0 + h + 34, look: "north", dx: 0, dy: -1 },
-    east: { x: x0 + w + 36, y: y0 + h / 2, look: "west", dx: -1, dy: 0 },
-    west: { x: x0 - 36, y: y0 + h / 2, look: "east", dx: 1, dy: 0 },
+    north: { x: x0 + w / 2 + 34, y: y0 - 34, dx: 0, dy: 1 },
+    south: { x: x0 + w / 2 + 34, y: y0 + h + 34, dx: 0, dy: -1 },
+    east: { x: x0 + w + 36, y: y0 + h / 2, dx: -1, dy: 0 },
+    west: { x: x0 - 36, y: y0 + h / 2, dx: 1, dy: 0 },
   }[viewingEdge];
+  // The way you face is read off the same list the buttons use, so the
+  // preview and the choice can never disagree about it.
+  const looking = VIEWING_EDGE_OPTIONS.find((o) => o.edge === viewingEdge)?.looking;
 
   return (
     <figure className="bed-preview">
@@ -787,7 +809,7 @@ function BedPreview({
       )}
       {valid && (
         <p className="bed-preview-standing">
-          You are standing on the <strong>{viewingEdge}</strong> side, looking {figure.look}.
+          You are standing on the <strong>{viewingEdge}</strong> side, looking {looking}.
         </p>
       )}
     </figure>
@@ -1461,31 +1483,32 @@ function FinderView({
             <section>
               <h3>2. Choose your orientation</h3>
               <p className="field-help">
-                Pick the side you stand on, so the taller plants go at the
-                back of your view.
+                Pick the side you stand on. One of the three plans we offer
+                banks the taller plants at the back of that view. If you
+                usually come at the bed from a corner, pick the side you
+                face most.
               </p>
               <div
                 className="viewing-edge-grid"
                 role="group"
                 aria-label="Which side you look at the bed from"
               >
-                {(
-                  [
-                    ["north", "▲"],
-                    ["west", "◀"],
-                    ["east", "▶"],
-                    ["south", "▼"],
-                  ] as [ViewingEdge, string][]
-                ).map(([edge, arrow]) => (
+                {VIEWING_EDGE_OPTIONS.map(({ edge, label, looking, arrow }) => (
                   <button
                     key={edge}
                     type="button"
                     className={`viewing-edge-button is-${edge}${brief.viewingEdge === edge ? " is-selected" : ""}`}
                     aria-pressed={brief.viewingEdge === edge}
+                    aria-label={`Stand on the ${edge} side, looking ${looking}`}
                     onClick={() => setBrief({ ...brief, viewingEdge: edge })}
                   >
-                    <span aria-hidden="true">{arrow}</span>
-                    {edge[0].toUpperCase() + edge.slice(1)}
+                    <span className="viewing-edge-arrow" aria-hidden="true">
+                      {arrow}
+                    </span>
+                    <span className="viewing-edge-name">{label}</span>
+                    <span className="viewing-edge-look" aria-hidden="true">
+                      looking {looking}
+                    </span>
                   </button>
                 ))}
               </div>
@@ -2118,6 +2141,108 @@ function ViewerFigure() {
   );
 }
 
+/**
+ * Every answer the plan was built from, as one labelled chip each. It used
+ * to show five of them, which read as if the rest had been ignored. Each
+ * value is the same label the question itself used, so the strip and the
+ * brief cannot say different things.
+ */
+function briefChips(brief: GardenBrief): { label: string; value: string }[] {
+  const edge = VIEWING_EDGE_OPTIONS.find((o) => o.edge === brief.viewingEdge);
+  const colour =
+    brief.colour.mode === "scheme"
+      ? colourSchemeLabels[brief.colour.scheme]
+      : brief.colour.mode === "custom" && brief.colour.colours.length > 0
+        ? brief.colour.colours
+            .map((c) => c[0].toUpperCase() + c.slice(1))
+            .join(", ")
+        : "No preference";
+  return [
+    { label: "Vegetation", value: brief.biomes.map((b) => biomeLabels[b]).join(" · ") },
+    { label: "Soil", value: soilLabels[brief.soil] },
+    { label: "Sun", value: sunLabels[brief.sun] },
+    { label: "Water", value: waterLabels[brief.water] },
+    { label: "Wind", value: windLabels[brief.wind] },
+    { label: "Bed", value: `${brief.bedWidthM} × ${brief.bedLengthM} m` },
+    { label: "Shape", value: bedShapeLabels[bedShapeFor(brief.bedWidthM, brief.bedLengthM)] },
+    {
+      label: "You stand",
+      value: edge ? `${edge.label}, looking ${edge.looking}` : brief.viewingEdge,
+    },
+    { label: "Style", value: gardenStyleLabels[brief.style] },
+    { label: "Colour", value: colour },
+    {
+      label: "Also wanted",
+      value:
+        brief.extras.length > 0
+          ? brief.extras.map((e) => extraPreferenceLabels[e]).join(", ")
+          : "Nothing extra",
+    },
+  ];
+}
+
+/**
+ * Where this option actually put its tall plants, read off the drawing.
+ *
+ * Only one of the three options is laid out from the edge the gardener
+ * stands on; the other two keep the rulebook's assumption that the front
+ * of a bed is its north edge (gardenPlan.ts, owner decision 2026-09-28).
+ * So on two plans in three the tallest plant can land at the viewer's
+ * feet, which looks like a mistake and is not one. Rather than claim a
+ * rule that did not apply, this measures the height-weighted average
+ * distance from where she stands and says what is there.
+ */
+function layeringNote(
+  layout: { bedWidthM: number; bedLengthM: number; placements: { plantId: string; xM: number; yM: number }[] },
+  brief: GardenBrief,
+): string | null {
+  const byId = new Map(plants.map((plant) => [plant.id, plant]));
+  const heights = layout.placements.flatMap((p) => {
+    const height = byId.get(p.plantId)?.heightCm;
+    return height ? [{ height, xM: p.xM, yM: p.yM }] : [];
+  });
+  if (heights.length < 3) return null;
+  const { bedWidthM: W, bedLengthM: L, } = layout;
+  const edge = brief.viewingEdge;
+  const span = edge === "north" || edge === "south" ? L : W;
+  if (span <= 0) return null;
+  const depthOf = (x: number, y: number) =>
+    edge === "north" ? y : edge === "south" ? L - y : edge === "west" ? x : W - x;
+  const total = heights.reduce((sum, h) => sum + h.height, 0);
+  const share =
+    heights.reduce((sum, h) => sum + h.height * depthOf(h.xM, h.yM), 0) / total / span;
+  if (share > 0.55) {
+    return `The taller plants sit towards the back of this bed, away from the ${edge} side where you stand.`;
+  }
+  if (share < 0.45) {
+    return `In this option the taller plants sit nearest the ${edge} side, where you stand, rather than at the back. Try the other options for the opposite.`;
+  }
+  return "The taller plants are spread through this bed rather than banked at the back.";
+}
+
+type BedView = "sketchbook" | "real-life";
+
+/** Sketchbook or Real-life. Its own component because the plan renders it
+ * on the options line while a saved-garden card renders it on the bed. */
+function LayoutViewSwitch({
+  view,
+  onChange,
+}: {
+  view: BedView;
+  onChange: (view: BedView) => void;
+}) {
+  return (
+    <div className="layout-views" role="group" aria-label="Layout view">
+      <button type="button" aria-pressed={view === "sketchbook"} onClick={() => onChange("sketchbook")}>
+        Sketchbook
+      </button>
+      <button type="button" aria-pressed={view === "real-life"} onClick={() => onChange("real-life")}>
+        Real-life
+      </button>
+    </div>
+  );
+}
+
 function BedDiagram({
   widthM,
   lengthM,
@@ -2125,6 +2250,8 @@ function BedDiagram({
   openPlant,
   savedIds = [],
   viewingEdge,
+  view: controlledView,
+  onViewChange,
 }: {
   widthM: number;
   lengthM: number;
@@ -2132,6 +2259,11 @@ function BedDiagram({
   openPlant: (plant: Plant) => void;
   /** Plants in the user's saved library get a small badge. */
   savedIds?: readonly string[];
+  /** Given by the plan, which puts the Sketchbook / Real-life switch on
+   * the same line as the three options. Left out elsewhere, and then the
+   * drawing carries its own switch. */
+  view?: BedView;
+  onViewChange?: (view: BedView) => void;
   /** Labelled on the drawing so the plan can be held up against the real
    * bed. The drawing itself is never rotated - north stays at the top. */
   viewingEdge?: ViewingEdge;
@@ -2139,7 +2271,9 @@ function BedDiagram({
   const plantsById = new Map(plants.map((plant) => [plant.id, plant]));
   // Two views of the same plan: the sketchbook circles, or each circle
   // filled with a photo of its species so the finished bed can be pictured.
-  const [view, setView] = useState<"sketchbook" | "real-life">("sketchbook");
+  const [ownView, setOwnView] = useState<BedView>("sketchbook");
+  const view = controlledView ?? ownView;
+  const setView = onViewChange ?? setOwnView;
   const [brokenPhotos, setBrokenPhotos] = useState<ReadonlySet<string>>(new Set());
   const anySaved = placements.some((p) => savedIds.includes(p.plantId));
   // Sketchbook symbol per species: the plant type it was placed for.
@@ -2174,28 +2308,23 @@ function BedDiagram({
   });
   const tip = hovered === null ? null : markers.find((m) => m.index === hovered) ?? null;
   return (
-    <div className="plan-bed-wrap">
-      {/* Beside the bed, not above it: the option tabs already sit above,
-          and two rows of controls over the drawing was too much. */}
-      <div className="layout-views" role="group" aria-label="Layout view">
-        <button type="button" aria-pressed={view === "sketchbook"} onClick={() => setView("sketchbook")}>
-          Sketchbook
-        </button>
-        <button type="button" aria-pressed={view === "real-life"} onClick={() => setView("real-life")}>
-          Real-life
-        </button>
-      </div>
+    /* The ratio lives on the wrap, not only on the drawing. The scale bar,
+       the two dimensions and the viewpoint mark are all positioned against
+       the wrap, so unless the wrap is exactly as wide as the bed they drift
+       out into the page margin - which is what used to happen. */
+    <div
+      className="plan-bed-wrap"
+      style={{ "--bed-aspect": displayWidthM / displayLengthM } as CSSProperties}
+    >
+      {controlledView === undefined ? (
+        <LayoutViewSwitch view={view} onChange={setView} />
+      ) : null}
       <div className="plan-north" aria-hidden="true">
         N ↑
       </div>
       <div
         className={`plan-bed${view === "real-life" ? " is-real-life" : ""}`}
-        style={
-          {
-            aspectRatio: `${displayWidthM} / ${displayLengthM}`,
-            "--bed-aspect": displayWidthM / displayLengthM,
-          } as CSSProperties
-        }
+        style={{ aspectRatio: `${displayWidthM} / ${displayLengthM}` } as CSSProperties}
         aria-label={`${widthM} by ${lengthM} metre planting layout, north at the top`}
       >
         {markers.map(({ placement, plant, index, displayX, displayY, unknownColour, estimated }) => {
@@ -2234,16 +2363,19 @@ function BedDiagram({
             </button>
           );
         })}
+        {/* Inside the drawing, just within the edge the gardener stands
+            on. Outside it, the mark landed on the length dimension and,
+            when the wrap was wider than the bed, out in the page margin. */}
+        {viewingEdge ? (
+          <span
+            className={`plan-front-edge is-${viewingEdge}`}
+            title="You stand on this side"
+          >
+            <ViewerFigure />
+            <span className="plan-front-edge-text">you stand here</span>
+          </span>
+        ) : null}
       </div>
-      {viewingEdge ? (
-        <span
-          className={`plan-front-edge is-${viewingEdge}`}
-          title="You stand on this side"
-        >
-          <ViewerFigure />
-          <span className="plan-front-edge-text">you stand here</span>
-        </span>
-      ) : null}
       {/* Sits outside .plan-bed, which clips its children, so a name near
           an edge is never cut in half. Purely decorative: the same text is
           already on the button's aria-label. */}
@@ -2376,6 +2508,9 @@ function PlanSummary({
   // by default on a wide screen, where there is room for both, and shut
   // on a narrow one, where the drawing needs every pixel.
   const [plantsOpen, setPlantsOpen] = useState(true);
+  // Held here rather than in the drawing, so the switch can sit on the
+  // same line as the three options.
+  const [bedView, setBedView] = useState<BedView>("sketchbook");
 
   if (
     plan.status === "no-plan" ||
@@ -2436,94 +2571,120 @@ function PlanSummary({
   return (
     <section className="plan-output">
       <div className="brief-strip" aria-label="Garden brief summary">
-        <span>{plan.brief.biomes.map((biome) => biomeLabels[biome]).join(" · ")}</span>
-        <span>{soilLabels[plan.brief.soil]}</span>
-        <span>{sunLabels[plan.brief.sun]}</span>
-        <span>{waterLabels[plan.brief.water]}</span>
-        <span>{bedShapeLabels[bedShapeFor(plan.brief.bedWidthM, plan.brief.bedLengthM)]}</span>
+        {briefChips(plan.brief).map(({ label, value }) => (
+          <span key={label}>
+            <small>{label}</small>
+            {value}
+          </span>
+        ))}
       </div>
 
-      <div className="plan-output-grid">
+      {/* The ratio again, so the drawer tab and the panel can be pinned to
+          the drawing's own right-hand edge rather than the page's. */}
+      <div
+        className="plan-output-grid"
+        style={
+          {
+            "--bed-aspect":
+              Math.max(layout.bedWidthM, layout.bedLengthM) /
+              Math.min(layout.bedWidthM, layout.bedLengthM),
+          } as CSSProperties
+        }
+      >
         <div className="plan-layout-column">
-          {variantTabs}
-          <BedDiagram
-            widthM={layout.bedWidthM}
-            lengthM={layout.bedLengthM}
-            placements={layout.placements}
-            openPlant={openPlant}
-            savedIds={savedIds}
-            viewingEdge={plan.brief.viewingEdge}
-          />
-        </div>
-
-        <button
-          type="button"
-          className="plan-drawer-tab"
-          aria-expanded={plantsOpen}
-          aria-controls="plan-plant-drawer"
-          onClick={() => setPlantsOpen((open) => !open)}
-        >
-          <span>{plantsOpen ? "Hide plants" : "Plants"}</span>
-          <span aria-hidden="true">{plantsOpen ? "›" : "‹"}</span>
-        </button>
-
-        <div
-          id="plan-plant-drawer"
-          className={`plan-legend${plantsOpen ? " is-open" : ""}`}
-          aria-hidden={!plantsOpen}
-        >
-          <div className="plan-drawer-bar">
-            <h3>Plants in this bed</h3>
-            <button
-              type="button"
-              className="plan-drawer-close"
-              onClick={() => setPlantsOpen(false)}
-              aria-label="Close the plant list"
-            >
-              <span aria-hidden="true">×</span>
-            </button>
+          <div className="plan-layout-head">
+            <LayoutViewSwitch view={bedView} onChange={setBedView} />
+            {variantTabs}
           </div>
-          <div className="plan-legend-heading">
-            <span>Plant</span>
-            <span>How many</span>
-          </div>
-          {species.map(({ plant, quantity }) => (
-            <div key={quantity.id} className="plan-legend-item">
-              <button onClick={() => openPlant(plant)} className="plan-legend-row">
-                <span
-                  className="legend-dot"
-                  style={{ background: markerBackground(plant) }}
-                />
-                <span>
-                  <strong>
-                    {shortName(plant)}
-                    {savedIds.includes(plant.id) ? (
-                      <span className="legend-saved" title="One of your favourites" aria-label="favourite"><SavedHeart /></span>
-                    ) : null}
-                  </strong>
-                  <em>{plant.scientificName}</em>
-                </span>
-                <b>× {quantity.quantity}</b>
+          {/* The tab and the panel live in here, so they hang off the
+              drawing's own top right corner rather than off the page -
+              which is what made the tab look stranded, and what made the
+              open panel cover the third option. */}
+          <div className="plan-bed-area">
+            <BedDiagram
+              widthM={layout.bedWidthM}
+              lengthM={layout.bedLengthM}
+              placements={layout.placements}
+              openPlant={openPlant}
+              savedIds={savedIds}
+              viewingEdge={plan.brief.viewingEdge}
+              view={bedView}
+              onViewChange={setBedView}
+            />
+
+          <button
+            type="button"
+            className="plan-drawer-tab"
+            aria-expanded={plantsOpen}
+            aria-controls="plan-plant-drawer"
+            onClick={() => setPlantsOpen((open) => !open)}
+          >
+            <span>{plantsOpen ? "Hide plants" : "Plants"}</span>
+            <span aria-hidden="true">{plantsOpen ? "›" : "‹"}</span>
+          </button>
+
+          <div
+            id="plan-plant-drawer"
+            className={`plan-legend${plantsOpen ? " is-open" : ""}`}
+            aria-hidden={!plantsOpen}
+          >
+            <div className="plan-drawer-bar">
+              <h3>Plants in this bed</h3>
+              <button
+                type="button"
+                className="plan-drawer-close"
+                onClick={() => setPlantsOpen(false)}
+                aria-label="Close the plant list"
+              >
+                <span aria-hidden="true">×</span>
               </button>
-              <p className="legend-measure">
-                {formatDimension(plant.heightCm)} tall ·{" "}
-                {formatDimension(plant.spreadCm)} wide
-                {plant.spreadConfidence !== "original" ? " (estimated)" : ""}
-                {hasUnknownColour(plant) ? " · colour unknown" : ""}
-                {onExclude && (
-                  <button
-                    type="button"
-                    className="legend-exclude"
-                    onClick={() => onExclude(plant.id)}
-                    title={`Never use ${plant.commonName} in my plans`}
-                    aria-label={`Exclude ${plant.commonName} and rebuild the layouts`}
-                  >
-                    Exclude
-                  </button>
-                )}
-              </p>
             </div>
-          ))}
+            <div className="plan-legend-heading">
+              <span>Plant</span>
+              <span>How many</span>
+            </div>
+            {species.map(({ plant, quantity }) => (
+              <div key={quantity.id} className="plan-legend-item">
+                <button onClick={() => openPlant(plant)} className="plan-legend-row">
+                  <span
+                    className="legend-dot"
+                    style={{ background: markerBackground(plant) }}
+                  />
+                  <span>
+                    <strong>
+                      {shortName(plant)}
+                      {savedIds.includes(plant.id) ? (
+                        <span className="legend-saved" title="One of your favourites" aria-label="favourite"><SavedHeart /></span>
+                      ) : null}
+                    </strong>
+                    <em>{plant.scientificName}</em>
+                  </span>
+                  <b>× {quantity.quantity}</b>
+                </button>
+                <p className="legend-measure">
+                  {formatDimension(plant.heightCm)} tall ·{" "}
+                  {formatDimension(plant.spreadCm)} wide
+                  {plant.spreadConfidence !== "original" ? " (estimated)" : ""}
+                  {hasUnknownColour(plant) ? " · colour unknown" : ""}
+                  {onExclude && (
+                    <button
+                      type="button"
+                      className="legend-exclude"
+                      onClick={() => onExclude(plant.id)}
+                      title={`Never use ${plant.commonName} in my plans`}
+                      aria-label={`Exclude ${plant.commonName} and rebuild the layouts`}
+                    >
+                      Exclude
+                    </button>
+                  )}
+                </p>
+              </div>
+            ))}
+            </div>
+          </div>
+          {layeringNote(layout, plan.brief) ? (
+            <p className="plan-view-note">{layeringNote(layout, plan.brief)}</p>
+          ) : null}
         </div>
       </div>
 
@@ -3713,8 +3874,10 @@ function DetailDrawer({
             </div>
           </dl>
 
-          <div className="detail-evidence">
-            <h3>About this information</h3>
+          {/* Collapsed: it is provenance, which matters but is not what
+              someone opens a plant to read. */}
+          <details className="detail-evidence">
+            <summary>About this information</summary>
             <p>
               We found {plant.occurrenceCount} Western Cape occurrence records
               for this plant in BioSCape, which is also where its height, plant
@@ -3724,7 +3887,7 @@ function DetailDrawer({
                 ? "Its spread is a measured value."
                 : "Its spread is estimated from similar plants, not measured."}
             </p>
-          </div>
+          </details>
 
           <SourcingPanel
             key={`${plant.id}|${place ?? ""}`}

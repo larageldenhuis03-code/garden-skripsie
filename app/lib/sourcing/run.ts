@@ -173,7 +173,16 @@ export async function runSourcing(
   if (input.place) {
     const point = await geocode(client, `${input.place}, Western Cape, South Africa`);
     user = { query: input.place, point };
-    if (!point) warnings.push(`Couldn't find "${input.place}" on the map - distances are not shown.`);
+    // Many of the smaller rural places in the picker come from the
+    // Department of Agriculture communities layer and simply are not in
+    // OpenStreetMap. Nothing can be done about that here, and guessing a
+    // looser query is worse than saying so: dropping the province from
+    // the query returns matches on other continents.
+    if (!point) {
+      warnings.push(
+        `OpenStreetMap has no record of "${input.place}", so we can't work out how far each nursery is. The prices below are still real — choose a nearby town in step 1 if you want distances too.`,
+      );
+    }
   }
 
   // Branches: nearest branch per source (geocoded, cached per address).

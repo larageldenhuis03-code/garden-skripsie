@@ -5830,3 +5830,212 @@ body {
   gap: 8px;
   align-content: start;
 }
+
+/* Which side you stand on. Four options, laid out as a compass so the
+   button's position on screen is the side of the real bed. Each one names
+   the side and the way you then look, because the two are easy to confuse
+   and only one of them is the question. The arrow points into the bed, the
+   same direction the figure in the preview faces. */
+.viewing-edge-grid {
+  max-width: 420px;
+  gap: 10px;
+}
+
+.viewing-edge-button {
+  justify-items: center;
+  gap: 2px;
+  min-height: 72px;
+  padding: 10px 8px;
+  border-radius: 8px;
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+.viewing-edge-arrow {
+  font-size: 1.375rem;
+  line-height: 1;
+}
+
+.viewing-edge-name {
+  font-weight: 600;
+}
+
+.viewing-edge-look {
+  font-size: var(--text-xs);
+  color: var(--ink-soft);
+}
+
+.viewing-edge-button.is-selected .viewing-edge-look {
+  color: var(--paper-light);
+}
+
+/* ---------------------------------------------------------------------
+   The drawing and everything pinned to it.
+
+   The bug behind several complaints at once: `.plan-bed-wrap` was the
+   full width of the column while `.plan-bed` inside it was capped and
+   centred. Every label positioned against the wrap - the scale bar, the
+   two dimensions, the viewpoint mark - therefore sat against the page
+   instead of against the bed, and the plants tab, pinned to the grid,
+   floated off on its own. Both boxes now take the bed's own width.
+   --------------------------------------------------------------------- */
+.plan-output-grid {
+  width: 100%;
+  max-width: calc(min(76vh, 860px) * var(--bed-aspect, 1));
+  margin-inline: auto;
+}
+
+.plan-layout-column .plan-bed-wrap,
+.plan-bed-wrap {
+  width: 100%;
+  max-width: none;
+  margin-inline: auto;
+  padding: 0;
+}
+
+.plan-bed {
+  max-width: none;
+}
+
+/* The view switch and the three options on one line, the switch hard
+   against the left as the two sets of controls for the same drawing. */
+.plan-layout-head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 16px;
+  align-items: stretch;
+  margin-bottom: 12px;
+}
+
+.plan-layout-column .plan-layout-head .layout-views {
+  position: static;
+  flex-direction: row;
+  align-items: stretch;
+  width: auto;
+  margin: 0;
+}
+
+.plan-layout-column .plan-layout-head .variant-tabs {
+  width: 100%;
+  margin: 0;
+}
+
+@media (max-width: 860px) {
+  .plan-layout-head {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+}
+
+/* The plants tab now hangs off the top right corner of the drawing
+   itself, which is what it opens, and the panel slides out of that same
+   corner instead of from the far side of the page. */
+.plan-drawer-tab {
+  top: 0;
+}
+
+.plan-legend {
+  max-height: min(76vh, 860px);
+}
+
+/* The viewpoint mark lives inside the drawing now. The old rules rotated
+   the whole pill by 90 degrees AND the text inside it by another 90, so
+   on an east or west bed it came out upside down. */
+.plan-front-edge.is-north {
+  top: 10px;
+  bottom: auto;
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+}
+
+.plan-front-edge.is-south {
+  top: auto;
+  bottom: 10px;
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+}
+
+.plan-front-edge.is-west {
+  top: 50%;
+  bottom: auto;
+  left: 10px;
+  right: auto;
+  transform: translateY(-50%);
+}
+
+.plan-front-edge.is-east {
+  top: 50%;
+  bottom: auto;
+  left: auto;
+  right: 10px;
+  transform: translateY(-50%);
+}
+
+/* Provenance, collapsed: worth having, not worth reading first. */
+.detail-evidence {
+  padding: 0;
+}
+
+.detail-evidence summary {
+  padding: 16px 28px;
+  cursor: pointer;
+  font-family: var(--font-hand);
+  font-size: 1.25rem;
+  font-synthesis: none;
+}
+
+.detail-evidence p:last-child {
+  padding: 0 28px 20px;
+  font-size: var(--text-md);
+}
+
+/* Each brief answer with the question it answers above it, so eleven
+   chips still read as a list rather than a run-on sentence. */
+.brief-strip span {
+  display: grid;
+  gap: 1px;
+}
+
+.brief-strip small {
+  font-family: var(--sans);
+  font-size: var(--text-xs);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+/* What this option actually did with the tall plants. On two plans in
+   three the bed is arranged from the north edge rather than from where
+   the gardener stands, and without this line that reads as a bug. */
+.plan-view-note {
+  margin: 10px 0 0;
+  font-family: var(--sans);
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+}
+
+/* The drawing's own box. The plants tab and the panel are pinned to this
+   rather than to the whole plan area, so the tab hangs off the top right
+   corner of the bed and the panel can no longer cover the options row. */
+.plan-bed-area {
+  position: relative;
+}
+
+.plan-bed-area .plan-drawer-tab,
+.plan-bed-area .plan-legend {
+  top: 0;
+  right: 0;
+}
+
+.plan-bed-area .plan-legend {
+  max-height: 100%;
+}
+
+/* North moves to the left of the drawing's top edge: the tab now owns
+   the right-hand corner, and the viewpoint mark sits inside the bed. */
+.plan-north {
+  text-align: left;
+}
