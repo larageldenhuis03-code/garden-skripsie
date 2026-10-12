@@ -5472,22 +5472,48 @@ body {
 }
 
 /* Step 3: the drawing belongs beside the numbers it is drawn from, so a
-   change to either is seen against the other. */
-.bed-controls {
-  grid-template-columns: minmax(260px, 0.8fr) minmax(300px, 1.2fr);
+   change to either is seen against the other. The two columns are the
+   CARD and the DRAWING - putting "set your size" and "choose your
+   orientation" side by side inside the card gave each a column narrower
+   than the compass it contains, which is what pushed the orientation
+   text out past the card's edge. They stack instead. */
+.bed-editor {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.9fr) minmax(360px, 1.1fr);
   align-items: start;
-  gap: 32px;
+  gap: 24px;
+}
+
+.bed-controls {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 26px;
+  height: 100%;
+  border-radius: 10px;
+}
+
+/* Grid and flex children are min-width:auto by default, so a long line
+   can force its box wider than its column instead of wrapping. */
+.bed-editor *,
+.bed-controls section,
+.bed-controls p {
+  min-width: 0;
+}
+
+.bed-controls .field-help {
+  font-size: var(--text-xs);
+  overflow-wrap: anywhere;
 }
 
 .bed-preview {
   grid-column: auto;
   justify-self: stretch;
   width: 100%;
-  max-width: 560px;
+  max-width: none;
+  height: 100%;
 }
 
-@media (max-width: 820px) {
-  .bed-controls {
+@media (max-width: 900px) {
+  .bed-editor {
     grid-template-columns: minmax(0, 1fr);
   }
 }
@@ -5544,4 +5570,110 @@ body {
 .plan-actions .button,
 .plan-actions .text-link {
   font-size: 1.25rem;
+}
+
+/* =====================================================================
+   STEP 2 AS A 2x2 GRID (owner's wireframe, 2026-10-12)
+   =====================================================================
+   Four cards across gave each one a narrow column, so the descriptions
+   wrapped badly and the blocks ended up different heights. Two across
+   and two down gives each question room to read, and the pairs line up
+   on both axes. */
+
+.site-conditions {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+@media (max-width: 820px) {
+  .site-conditions {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* The question is what stays visible; the guidance folds away under it
+   so it can never push the answers off the card. */
+.site-conditions .field-help {
+  margin: 0 0 4px;
+  color: var(--ink-soft);
+  font-size: var(--text-sm);
+}
+
+.field-more {
+  margin: 0 0 14px;
+}
+
+.field-more summary {
+  min-height: 0;
+  padding: 2px 0;
+  color: var(--olive);
+  font-family: var(--sans);
+  font-size: var(--text-xs);
+  font-weight: 620;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.field-more p {
+  margin: 8px 0 0;
+  color: var(--ink-soft);
+  font-size: var(--text-xs);
+  line-height: 1.45;
+}
+
+/* Answers as compact rows: label, one line under it, tick on the right
+   when chosen. Each row the same height whether its block holds three
+   or four, so the two columns stay level. */
+.site-conditions .choice-button {
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 2px 12px;
+  min-height: 0;
+  padding: 12px 14px;
+  border-radius: 8px;
+}
+
+.site-conditions .choice-button > span:first-child {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  justify-self: end;
+}
+
+.site-conditions .choice-button strong {
+  grid-column: 1;
+  font-size: var(--text-sm);
+}
+
+.site-conditions .choice-button small {
+  grid-column: 1;
+  color: var(--ink-soft);
+  font-size: var(--text-xs);
+  line-height: 1.35;
+}
+
+/* The survivor count reads as the result of the four answers, so it
+   sits under both columns with a rule above it. */
+.site-conditions > .filter-count {
+  margin-top: 4px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+/* The selected option turns olive, but its description kept the body
+   grey, which on olive is about 2:1 - the line effectively disappeared.
+   Selected state has to carry BOTH lines. */
+.choice-button.is-selected small,
+.choice-button.is-selected strong,
+.colour-scheme.is-selected small,
+.colour-scheme.is-selected strong {
+  color: var(--paper-light);
+}
+
+/* Answers start under their question, so the four cards read across as
+   well as down. Bottom-aligning them left the tops ragged, which is the
+   opposite of what lining them up was for. */
+.site-conditions .choice-grid,
+.choice-stack.preference-blocks .colour-modes,
+.choice-stack.preference-blocks .choice-grid {
+  margin-top: 0;
 }

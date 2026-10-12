@@ -91,6 +91,18 @@ const defaultBrief: GardenBrief = {
   extras: [],
 };
 
+/** One line under each soil option, so no block is left with bare
+ * labels while its neighbours explain themselves. The first three
+ * describe the squeeze test above; the fourth says what the planner
+ * actually does with an unknown answer. */
+const SOIL_DESCRIPTIONS: Record<string, string> = {
+  sandy: "Loose and free-draining",
+  loam: "Balanced, crumbly soil",
+  clay: "Heavy soil that holds water",
+  "not-sure":
+    "We will accept any of the three. Plants with no soil recorded are still left out.",
+};
+
 const formFilters = [
   "All",
   "Shrub",
@@ -1285,13 +1297,17 @@ function FinderView({
       content: (
         <div className="choice-stack site-conditions">
           <fieldset>
-            <legend>Sun</legend>
+            <legend>Sunlight</legend>
             <p className="field-help">
-              Full = 6+ hours of direct sun. Part = three to six hours,
-              morning or dappled. Sheltered = less than three hours. Choose
-              what applies to most of the bed — this is the one answer we will
-              not stretch later.
+              How many hours of direct sunlight does your bed receive?
             </p>
+            <details className="field-more">
+              <summary>How do I tell?</summary>
+              <p>
+                Choose what applies to most of the bed. This is the one answer
+                we will not stretch later.
+              </p>
+            </details>
             <div className="choice-grid">
               {(Object.keys(sunLabels) as Sun[]).map((sun) => (
                 <ChoiceButton
@@ -1314,9 +1330,12 @@ function FinderView({
           <fieldset>
             <legend>Water</legend>
             <p className="field-help">
-              How often are you realistically going to water this bed? Answer
-              for the habit you will keep, not the one you intend.
+              How often can you realistically water your garden?
             </p>
+            <details className="field-more">
+              <summary>How do I tell?</summary>
+              <p>Answer for the habit you will keep, not the one you intend.</p>
+            </details>
             {/* A per-place note from the reviewed place list. It informs the
                 answer and never sets it - the question is about what the
                 gardener will actually do. Only some places carry it. */}
@@ -1347,11 +1366,15 @@ function FinderView({
 
           <fieldset>
             <legend>Soil</legend>
-            <p className="field-help">
-              Wet a handful and squeeze it. If it falls apart at once it is
-              sandy; if it holds a ball that crumbles when poked it is loam; if
-              it stays in a sticky ribbon it is clay.
-            </p>
+            <p className="field-help">What best describes your soil?</p>
+            <details className="field-more">
+              <summary>How do I tell?</summary>
+              <p>
+                Wet a handful and squeeze it. If it falls apart at once it is
+                sandy; if it holds a ball that crumbles when poked it is loam;
+                if it stays in a sticky ribbon it is clay.
+              </p>
+            </details>
             <div className="choice-grid two-column compact-choices">
               {(Object.keys(soilLabels) as (keyof typeof soilLabels)[]).map(
                 (soil) => (
@@ -1359,11 +1382,7 @@ function FinderView({
                     key={soil}
                     selected={brief.soil === soil}
                     title={soilLabels[soil]}
-                    copy={
-                      soil === "not-sure"
-                        ? "We will accept sandy, loam or clay, so no plant is left out for having the wrong soil. Plants with no soil recorded are still left out."
-                        : undefined
-                    }
+                    copy={SOIL_DESCRIPTIONS[soil]}
                     onClick={() => setBrief({ ...brief, soil })}
                   />
                 ),
@@ -1372,11 +1391,15 @@ function FinderView({
           </fieldset>
 
           <fieldset>
-            <legend>Wind</legend>
-            <p className="field-help">
-              How much wind does this garden bed get? Wind doesn’t remove
-              plants from your list. It will shape how your bed is arranged.
-            </p>
+            <legend>Wind exposure</legend>
+            <p className="field-help">How exposed is your bed to wind?</p>
+            <details className="field-more">
+              <summary>Does this remove plants?</summary>
+              <p>
+                No. Wind never removes a plant from your list. It shapes how
+                the bed is arranged.
+              </p>
+            </details>
             <div className="choice-grid">
               {(Object.keys(windLabels) as Wind[]).map((wind) => (
                 <ChoiceButton
