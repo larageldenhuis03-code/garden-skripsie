@@ -180,7 +180,7 @@ export function SourcingPanel({
 
   const budget = report && !compact && (
     <div className="sourcing-budget" key="budget">
-      <h4>Bed budget</h4>
+      <h4 className="sourcing-budget-title">Bed budget</h4>
       <p>
         <strong>{report.budgetText}</strong>
       </p>

@@ -6286,3 +6286,99 @@ body {
   background: var(--paper-light);
   box-shadow: inset 0 0 0 var(--height-ring, 0) rgba(23, 60, 50, 0.62);
 }
+
+/* =====================================================================
+   Type, sized by how it LOOKS (walkthrough 4, 12 October 2026).
+
+   Silly Goose Hand draws at the same height as the text face but about
+   31% narrower (measured: scripts/type-audit.mjs --caps), so a hand
+   heading at 26 px covers roughly the area of 18 px text. Every earlier
+   pass checked pixel sizes, which passed headings that looked no bigger
+   than the text under them. These sizes are checked by the audit, which
+   scales the hand by that measured width before comparing.
+   ===================================================================== */
+:root {
+  /* Block headings on the brief, and the option names on the plan. */
+  --hand-section: 2.25rem;
+  /* Previous, Continue, Build my plan, Back home. */
+  --hand-control: 1.625rem;
+  /* The plan page's own title. Shared by the headings and actions that
+     should match it, so they stay equal at every screen width. */
+  --plan-title-size: clamp(1.3rem, 1.9vw, 1.75rem);
+}
+
+/* Step 1: "Town or suburb" is the heading for its box, like the others. */
+.place-combobox label > span {
+  font-family: var(--font-hand);
+  font-synthesis: none;
+  font-size: var(--hand-section);
+  line-height: 1.1;
+}
+
+/* Its example text is one size down, matching "Type your town or suburb,
+   or click the map". The typed answer keeps its size. */
+.place-combobox input::placeholder {
+  font-size: var(--text-md);
+}
+
+/* Steps 2, 3 and 4: every block heading one clear size up. */
+.choice-stack legend,
+.site-conditions legend,
+.bed-controls h3,
+.bed-preview figcaption {
+  font-family: var(--font-hand);
+  font-synthesis: none;
+  font-size: var(--hand-section);
+  line-height: 1.1;
+}
+
+/* "Or pick exact colours" reads the same size as the colour options
+   above it (17 px text = about 25 px of the narrower hand). */
+.colour-custom summary {
+  font-size: 1.5625rem;
+}
+
+/* The step buttons, one size up. */
+.finder-footer .button,
+.finder-footer .text-link {
+  font-size: var(--hand-control);
+}
+
+/* The plan: each option's name is the largest thing in its tab, and what
+   is written inside the tab steps down beneath it. */
+.plan-layout-column .variant-tab strong {
+  font-family: var(--font-hand);
+  font-synthesis: none;
+  font-size: var(--hand-section);
+  line-height: 1;
+}
+
+.plan-layout-column .variant-tab small {
+  font-size: 0.875rem;
+}
+
+.plan-layout-column .variant-tab em {
+  font-size: 0.9375rem;
+}
+
+/* "Where to buy", "Bed budget", "Save this layout" and "Regenerate" match
+   the plan's own title. */
+.sourcing-panel h3,
+.sourcing-panel h4.sourcing-budget-title,
+.plan-actions .button,
+.plan-actions .text-link {
+  font-size: var(--plan-title-size);
+}
+
+/* "Why these plants" and "Care" read at the size of the note about
+   dashed circles, one size down from before. */
+.plan-why p,
+.plan-care p,
+.plan-care li {
+  font-size: 1rem;
+}
+
+/* "View notes" is smaller than the heading it sits beside. */
+.plan-assumptions summary span {
+  font-size: 0.875rem;
+}
