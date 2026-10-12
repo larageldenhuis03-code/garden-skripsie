@@ -170,6 +170,37 @@ export const P11_ANGLE_TEST = false;
 export const CLIMBERS_NEED_L1_HOST = true;
 
 /** Placement retry budget (6_Stage3_4_Rules step 8). */
+/**
+ * STUDY SEAMS for the coverage test, both off in the shipped engine.
+ *
+ * `coverMinHard` makes the style's cover_min a hard lower bound on a
+ * finished selection instead of only the denominator of goal A4. When no
+ * selection reaches it, Stage 3 returns the highest-cover selection it
+ * saw and says so, rather than failing.
+ *
+ * `gapFill` runs a pass after Stage 4 that tops up the emptiest square
+ * metres with more of a ground-cover or matrix species already in the
+ * plan. It never introduces a species and never breaks H1, H5, P1 or P2.
+ *
+ * See scripts/coverage-test.ts (V5 and V6), which set them in memory.
+ */
+export const SEARCH = {
+  coverMinHard: false,
+  gapFill: false,
+  /**
+   * Whether gap fill keeps the filler inside its layer's depth band.
+   *
+   * True is the brief as written. It is also very restrictive: a ground
+   * cover's band is depth_tol either side of its target, which on a 4 m
+   * bed is 0.40-1.20 m - a fifth of the depth - so the pass can only
+   * reach a strip at the front. False lets it fill any square metre that
+   * P1 and P2 allow. Measured both ways; see reports/coverage_test.md.
+   */
+  gapFillRespectBand: true,
+  /** A square metre counts as filled at this much canopy. */
+  cellFullAt: 0.5,
+} as const;
+
 export const PLACEMENT = {
   /**
    * random_draws_per_plant (1_Parameters C91). The number of random

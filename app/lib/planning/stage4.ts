@@ -12,6 +12,7 @@ import {
   P17_BALANCE_WEIGHT,
   P2_OVERLAP_TOLERANCE,
   PLACEMENT,
+  SEARCH,
   ROW_PITCH_M,
   SHADE_ENABLED,
 } from "./engineConfig.ts";
@@ -124,6 +125,188 @@ const FINE_LEAVED_GENERA = ["Erica", "Agathosma"]; // P4: ericas and buchus
  * constant, so a study can vary it in memory (T4). */
 export function minCentreDistance(ri: number, rj: number): number {
   return minCentreDistanceWith(ri, rj, RULES.stage4.overlapDelta);
+}
+
+/** One square metre of bed, the same grid the layout drawing shows. */
+const FILL_CELL_M = 1;
+/** Points sampled per axis inside a cell when measuring its cover. */
+const FILL_SAMPLES = 8;
+/** Candidate positions per axis inside a cell when looking for a gap. */
+const FILL_CANDIDATES = 7;
+/** A cell is not worth filling below this, in square metres. */
+const FILL_MIN_CELL_AREA = 0.25;
+
+/**
+ * Top up the emptiest square metres (SEARCH.gapFill; off in the shipped
+ * engine, so this never runs there).
+ *
+ * The bed is read on the same one-metre grid the plan is drawn on. Any
+ * cell carrying less than SEARCH.cellFullAt of canopy gets more of a
+ * ground-cover or matrix species the plan already contains - never a new
+ * species - added two at a time, so an odd group size stays odd. Every
+ * addition must satisfy P1 and P2, sit inside its layer's depth band, and
+ * leave H1 and H5 intact; a cell stops as soon as it is full enough or no
+ * valid position is left.
+ *
+ * It mutates the layout and the realised counts in place and returns what
+ * it did.
+ */
+export function gapFill(
+  layout: RectangularLayout,
+  realised: Selection,
+  infos: ReadonlyMap<string, SpeciesInfo>,
+  site: PlacementSite,
+  limits: { coverCapM2: number; rMax: number; featureExemptH5: boolean },
+): { added: number; speciesId: string | null; cellsTouched: number } {
+  const W = site.widthM;
+  const L = site.depthM;
+  const none = { added: 0, speciesId: null, cellsTouched: 0 };
+  if (W <= 0 || L <= 0) return none;
+
+  // The filler: a ground cover if the plan has one, else the matrix, else
+  // the opportunists. Within that layer the narrowest canopy, because a
+  // gap is easier to fill with small plants than large ones.
+  const LOWEST_FIRST: LayerId[] = ["L6", "L3", "L7"];
+  let filler: SpeciesInfo | null = null;
+  for (const layer of LOWEST_FIRST) {
+    const candidates = [...realised.keys()]
+      .flatMap((id) => {
+        const info = infos.get(id);
+        return info && info.layer === layer && (realised.get(id) ?? 0) > 0 ? [info] : [];
+      })
+      .sort((left, right) => left.diameterM - right.diameterM || left.id.localeCompare(right.id));
+    if (candidates.length > 0) {
+      filler = candidates[0];
+      break;
+    }
+  }
+  if (!filler) return none;
+
+  const radius = filler.diameterM / 2;
+  const plantArea = Math.PI * radius * radius;
+  const axis = viewingAxis(site.frontEdge, W, L);
+  const profile = windProfile(site);
+  const target = targetDepth(filler.layer, profile);
+  const tol = RULES.stage4.depthTol * axis.span;
+  const isTree = (plantId: string) => infos.get(plantId)?.types.includes("tree") ?? false;
+
+  const fits = (x: number, y: number): boolean => {
+    if (x < radius - EPS || x > W - radius + EPS) return false;
+    if (y < radius - EPS || y > L - radius + EPS) return false;
+    if (
+      SEARCH.gapFillRespectBand &&
+      target !== null &&
+      Math.abs(axis.depthOf(x, y) - target * axis.span) > tol + EPS
+    ) {
+      return false;
+    }
+    for (const other of layout.placements) {
+      const gap = Math.hypot(other.xM - x, other.yM - y);
+      if (gap < minCentreDistance(other.radiusM, radius) - EPS) return false;
+      // P5, as in placement: a plant that does not take shade may not
+      // overlap a tree canopy at all.
+      if (!filler.shade && isTree(other.plantId) && gap < other.radiusM + radius - EPS) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  /** What share of this cell has canopy over it, by point sampling. */
+  const cellCover = (x0: number, y0: number, w: number, h: number): number => {
+    let covered = 0;
+    for (let i = 0; i < FILL_SAMPLES; i += 1) {
+      const y = y0 + ((i + 0.5) / FILL_SAMPLES) * h;
+      for (let j = 0; j < FILL_SAMPLES; j += 1) {
+        const x = x0 + ((j + 0.5) / FILL_SAMPLES) * w;
+        for (const p of layout.placements) {
+          const dx = x - p.xM;
+          const dy = y - p.yM;
+          if (dx * dx + dy * dy <= p.radiusM * p.radiusM) {
+            covered += 1;
+            break;
+          }
+        }
+      }
+    }
+    return covered / (FILL_SAMPLES * FILL_SAMPLES);
+  };
+
+  let plantedArea = layout.placements.reduce(
+    (sum, p) => sum + Math.PI * p.radiusM ** 2,
+    0,
+  );
+  let totalPlants = layout.placements.length;
+  let count = realised.get(filler.id) ?? 0;
+  let added = 0;
+  let cellsTouched = 0;
+  const exempt = limits.featureExemptH5 && filler.feature;
+
+  /** H1 and H5 for one more pair. */
+  const pairAllowed = (): boolean => {
+    if (plantedArea + 2 * plantArea > limits.coverCapM2 + 1e-9) return false;
+    if (exempt) return true;
+    return (count + 2) / (totalPlants + 2) <= limits.rMax + 1e-9;
+  };
+
+  for (let row = 0; row * FILL_CELL_M < L - 1e-9; row += 1) {
+    for (let col = 0; col * FILL_CELL_M < W - 1e-9; col += 1) {
+      const x0 = col * FILL_CELL_M;
+      const y0 = row * FILL_CELL_M;
+      const w = Math.min(FILL_CELL_M, W - x0);
+      const h = Math.min(FILL_CELL_M, L - y0);
+      if (w * h < FILL_MIN_CELL_AREA) continue;
+      if (cellCover(x0, y0, w, h) >= SEARCH.cellFullAt) continue;
+
+      let addedHere = 0;
+      // Plants go in two at a time, so an odd group size stays odd.
+      for (let attempt = 0; attempt < 8; attempt += 1) {
+        if (!pairAllowed()) break;
+        const spots: { x: number; y: number }[] = [];
+        for (let i = 0; i < FILL_CANDIDATES && spots.length < 2; i += 1) {
+          const y = y0 + ((i + 0.5) / FILL_CANDIDATES) * h;
+          for (let j = 0; j < FILL_CANDIDATES && spots.length < 2; j += 1) {
+            const x = x0 + ((j + 0.5) / FILL_CANDIDATES) * w;
+            if (!fits(x, y)) continue;
+            // The pair must not collide with each other either.
+            if (
+              spots.length === 1 &&
+              Math.hypot(spots[0].x - x, spots[0].y - y) <
+                minCentreDistance(radius, radius) - EPS
+            ) {
+              continue;
+            }
+            spots.push({ x, y });
+          }
+        }
+        // Only a whole pair, so the group size keeps its parity.
+        if (spots.length < 2) break;
+        for (const spot of spots) {
+          layout.placements.push({
+            instanceId: `${filler.id}-fill-${added}`,
+            plantId: filler.id,
+            sequence: count + added,
+            xM: spot.x,
+            yM: spot.y,
+            radiusM: radius,
+          });
+          added += 1;
+        }
+        count += 2;
+        totalPlants += 2;
+        plantedArea += 2 * plantArea;
+        addedHere += 2;
+        if (cellCover(x0, y0, w, h) >= SEARCH.cellFullAt) break;
+      }
+      if (addedHere > 0) cellsTouched += 1;
+    }
+  }
+
+  if (added === 0) return { added: 0, speciesId: filler.id, cellsTouched: 0 };
+  realised.set(filler.id, count);
+  layout.canopyAreaM2 = plantedArea;
+  layout.realisedOpenSpaceRatio = Math.max(0, 1 - plantedArea / (W * L));
+  return { added, speciesId: filler.id, cellsTouched };
 }
 
 export function windProfile(site: PlacementSite): WindProfile {

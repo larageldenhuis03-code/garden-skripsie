@@ -7,6 +7,7 @@ import {
   MIN_GROUPED_SHARE,
   SINGLETON_K_BY_BAND,
   SIZE_VAR_MIN,
+  SEARCH,
 } from "./engineConfig.ts";
 
 /**
@@ -346,12 +347,29 @@ export class SelectionState {
     );
   }
 
+  /** The style's cover_min as an area, i.e. what goal A4 measures against
+   * and what SEARCH.coverMinHard turns into a floor. */
+  coverFloorM2(): number {
+    return this.site.style.coverMin * this.site.widthM * this.site.depthM;
+  }
+
   /** Conditions only a finished selection must meet: the H2 floor, and a
-   * windward-row species when P3 applies. */
-  complete(): boolean {
+   * windward-row species when P3 applies. Unaffected by the cover floor,
+   * so Stage 3 can still tell "no mix exists" from "no mix is dense
+   * enough". */
+  baseComplete(): boolean {
     return (
       this.speciesCount >= this.site.sMin &&
       (!this.site.windbreakRequired || this.windbreakSpecies > 0)
+    );
+  }
+
+  /** As baseComplete, plus the cover floor when the study seam is on. */
+  complete(): boolean {
+    return (
+      this.baseComplete() &&
+      (!SEARCH.coverMinHard ||
+        this.plantedAreaM2 >= this.coverFloorM2() - 1e-9)
     );
   }
 }

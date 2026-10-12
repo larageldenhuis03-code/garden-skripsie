@@ -31,12 +31,13 @@ import {
   minCentreDistance,
   PLACEMENT,
   RULES,
+  SEARCH,
   RULES_VERSION,
   speciesInfo,
   type GardenPlan,
 } from "../app/lib/planning/index.ts";
 import { buildScenarios, type Scenario } from "./batch-test/scenarios.ts";
-import { spreadMetrics } from "./batch-test/metrics.ts";
+import { cellsAtLeastHalf, spreadMetrics } from "./batch-test/metrics.ts";
 import COMBOS from "./batch-test/combos.json" with { type: "json" };
 
 const OUT = "reports";
@@ -63,7 +64,7 @@ function setPath(
 const EMPTIEST_BLOCK_WEIGHT = 0.25;
 
 type Version = {
-  id: "V0" | "V1" | "V2" | "V3";
+  id: "V0" | "V1" | "V2" | "V3" | "V5" | "V6";
   label: string;
   /** Applies the override; returns the undo. */
   apply: () => () => void;
@@ -83,6 +84,9 @@ const BASE_COVER: Record<string, { coverMin: number; coverMax: number }> =
       { coverMin: value.coverMin, coverMax: value.coverMax },
     ]),
   );
+
+/** The versions this report compares. */
+const RUN_IDS = ["V0", "V2", "V5", "V6"];
 
 const VERSIONS: Version[] = [
   {
@@ -120,6 +124,35 @@ const VERSIONS: Version[] = [
       const undo = [
         setPath(placement, "contactBonus", 0),
         setPath(placement, "emptiestBlockWeight", EMPTIEST_BLOCK_WEIGHT),
+      ];
+      return () => undo.forEach((undoOne) => undoOne());
+    },
+    target: (style) => BASE_COVER[styleKeyOf(style)].coverMin,
+  },
+  {
+    id: "V5",
+    label: "contact 0, cover_min a hard floor",
+    apply: () => {
+      const placement = PLACEMENT as unknown as Record<string, unknown>;
+      const search = SEARCH as unknown as Record<string, unknown>;
+      const undo = [
+        setPath(placement, "contactBonus", 0),
+        setPath(search, "coverMinHard", true),
+      ];
+      return () => undo.forEach((undoOne) => undoOne());
+    },
+    target: (style) => BASE_COVER[styleKeyOf(style)].coverMin,
+  },
+  {
+    id: "V6",
+    label: "V5 plus the gap-fill pass",
+    apply: () => {
+      const placement = PLACEMENT as unknown as Record<string, unknown>;
+      const search = SEARCH as unknown as Record<string, unknown>;
+      const undo = [
+        setPath(placement, "contactBonus", 0),
+        setPath(search, "coverMinHard", true),
+        setPath(search, "gapFill", true),
       ];
       return () => undo.forEach((undoOne) => undoOne());
     },
@@ -171,6 +204,10 @@ type Row = {
   neighbourSameCombo: number;
   neighbourBothInCombo: number;
   neighbourShare: number;
+  /** Share of square metres at least half planted (the layout's own grid). */
+  cellsFull: number;
+  /** The cover floor could not be met; this is the densest mix found. */
+  coverShort: boolean;
 };
 
 /**
@@ -434,6 +471,12 @@ function runVersion(version: Version, scenarios: Scenario[]): Row[] {
         neighbourSameCombo: pairs.sameCombo,
         neighbourBothInCombo: pairs.bothInACombo,
         neighbourShare: pairs.pairs === 0 ? 0 : Number((pairs.sameCombo / pairs.pairs).toFixed(5)),
+        cellsFull: layout
+          ? Number(
+              cellsAtLeastHalf(layout.placements, layout.bedWidthM, layout.bedLengthM).toFixed(4),
+            )
+          : 0,
+        coverShort: (plan?.diagnostics ?? []).some((note) => note.startsWith("cover_short")),
       });
     }
   } finally {
@@ -468,6 +511,7 @@ const METRICS: Metric[] = [
   { key: "cover", get: (r) => r.cover, dp: 3 },
   { key: "empty-cell share", get: (r) => r.emptyCellShare, dp: 3 },
   { key: "largest empty patch", get: (r) => r.largestEmptyPatch, dp: 3 },
+  { key: "square metres >= 50% planted", get: (r) => r.cellsFull, dp: 3 },
   { key: "quadrant CV", get: (r) => r.quadrantCV, dp: 3 },
   { key: "species", get: (r) => r.species, dp: 1 },
   { key: "plants", get: (r) => r.plants, dp: 1 },
@@ -532,6 +576,14 @@ function table(
     return `${n} / ${rows.length}`;
   });
   lines.push(`| **reached its target cover** | ${reached.join(" | ")} |`);
+  const short = ids.map((id) => {
+    const rows = (rowsByVersion.get(id) ?? []).filter(
+      (row) => row.feasible && (!only || only(row)),
+    );
+    if (rows.length === 0) return "-";
+    return `${rows.filter((row) => row.coverShort).length} / ${rows.length}`;
+  });
+  lines.push(`| **flagged cover_short** | ${short.join(" | ")} |`);
   return lines.join("\n");
 }
 
@@ -611,7 +663,7 @@ type Panel = {
 function figureData(scenarios: Scenario[]): Panel[] {
   const picks = figureScenarios(scenarios);
   const panels: Panel[] = [];
-  for (const version of VERSIONS) {
+  for (const version of VERSIONS.filter((v) => RUN_IDS.includes(v.id))) {
     const undo = version.apply();
     try {
       for (const { label, scenario } of picks) {
@@ -752,7 +804,12 @@ function main(): void {
   const scenarios = buildScenarios();
   const rowsByVersion = new Map<string, Row[]>();
   const all: Row[] = [];
-  for (const version of VERSIONS) {
+  // V1 and V3 stay defined above for reproducibility but are not run here;
+  // their results are in the previous commit. V0 and V2 are re-run only so
+  // the new per-square-metre figure exists for them, and are otherwise
+  // identical - the engine has not changed and every run is seeded.
+  const running = VERSIONS.filter((version) => RUN_IDS.includes(version.id));
+  for (const version of running) {
     process.stdout.write(`${version.id} (${version.label}) ... `);
     const started = performance.now();
     const rows = runVersion(version, scenarios);
@@ -784,7 +841,9 @@ function main(): void {
     "",
     "| version | what it changes |",
     "|---|---|",
-    ...VERSIONS.map((version) => `| **${version.id}** | ${version.label} |`),
+    ...VERSIONS.filter((version) => RUN_IDS.includes(version.id)).map(
+      (version) => `| **${version.id}** | ${version.label} |`,
+    ),
     "",
     "V1 and V2 are in-memory overrides applied around each run and undone",
     "afterwards - the same technique the Chapter 5 sensitivity study uses.",

@@ -125,3 +125,53 @@ export function spreadMetrics(
     quadrantCV: quadrantCV(cells),
   };
 }
+
+/**
+ * Share of square metres that are at least half planted.
+ *
+ * This uses the one-metre grid the layout is already drawn on, not the
+ * 20 x 20 sampling grid above, so a reader can count the squares on the
+ * figure. The last row and column of a bed that is not a whole number of
+ * metres are partial, and are measured over their real area; a sliver
+ * below a quarter of a square metre is ignored rather than counted as a
+ * failure it could never pass.
+ */
+export function cellsAtLeastHalf(
+  circles: readonly Circle[],
+  widthM: number,
+  lengthM: number,
+  fullAt = 0.5,
+): number {
+  if (widthM <= 0 || lengthM <= 0) return 0;
+  const SAMPLES = 8;
+  const MIN_AREA = 0.25;
+  let cells = 0;
+  let full = 0;
+  for (let row = 0; row * 1 < lengthM - 1e-9; row += 1) {
+    for (let col = 0; col * 1 < widthM - 1e-9; col += 1) {
+      const x0 = col;
+      const y0 = row;
+      const w = Math.min(1, widthM - x0);
+      const h = Math.min(1, lengthM - y0);
+      if (w * h < MIN_AREA) continue;
+      let covered = 0;
+      for (let i = 0; i < SAMPLES; i += 1) {
+        const y = y0 + ((i + 0.5) / SAMPLES) * h;
+        for (let j = 0; j < SAMPLES; j += 1) {
+          const x = x0 + ((j + 0.5) / SAMPLES) * w;
+          for (const circle of circles) {
+            const dx = x - circle.xM;
+            const dy = y - circle.yM;
+            if (dx * dx + dy * dy <= circle.radiusM * circle.radiusM) {
+              covered += 1;
+              break;
+            }
+          }
+        }
+      }
+      cells += 1;
+      if (covered / (SAMPLES * SAMPLES) >= fullAt) full += 1;
+    }
+  }
+  return cells === 0 ? 0 : full / cells;
+}
