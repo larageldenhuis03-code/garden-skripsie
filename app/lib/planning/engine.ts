@@ -60,6 +60,11 @@ export function engineSite(brief: GardenBrief): EngineSite {
     windSite,
     rowsAvailable: rows,
     windbreakRequired: windSite > 0 && rows <= 2,
+    // Every option is laid out from the edge the gardener stands on
+    // (owner decision, 12 October 2026). Until then only one of the three
+    // was, and the other two assumed north, so a tall plant could land at
+    // the viewer's feet in two plans out of three.
+    frontEdge: brief.viewingEdge,
   };
 }
 

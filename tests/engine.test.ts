@@ -39,6 +39,7 @@ import {
   stateFrom,
   survivesHardFilters,
   targetDepth,
+  depthAxisFor,
   viewingAxis,
   windProfile,
   type EngineSite,
@@ -603,42 +604,87 @@ test("the viewing axis measures depth from the chosen edge", () => {
   }
 });
 
-test("a viewing edge moves the tall plants without moving the windward row", () => {
-  // Looking from the south, the tallest plants should end up nearer the
-  // north edge (small y) than they would with the rulebook's default.
-  const brief: GardenBrief = { ...baseBrief, bedWidthM: 8, bedLengthM: 6, viewingEdge: "south" };
-  const variants = buildGardenPlanVariants(plants, brief);
-  assert.ok(variants.length > 1, "expected more than one option to compare");
-
-  const meanTallY = (plan: (typeof variants)[number]) => {
-    const byId = new Map(plants.map((plant) => [plant.id, plant]));
-    const tall = (plan.layout?.placements ?? []).filter(
-      (p) => (byId.get(p.plantId)?.heightCm ?? 0) >= 100,
-    );
-    return tall.length === 0 ? null : tall.reduce((sum, p) => sum + p.yM, 0) / tall.length;
-  };
-
-  const viewer = variants[variants.length - 1];
-  assert.match(
-    viewer.diagnostics.join(" "),
-    /tallest plants furthest from the south edge/i,
-    "the viewer-facing option must say so",
-  );
-
-  const viewerTall = meanTallY(viewer);
-  const defaultTall = variants.slice(0, -1).map(meanTallY).filter((v): v is number => v !== null);
-  if (viewerTall !== null && defaultTall.length > 0) {
-    const meanDefault = defaultTall.reduce((a, b) => a + b, 0) / defaultTall.length;
-    assert.ok(
-      viewerTall < meanDefault,
-      `tall plants should sit nearer the north edge when viewed from the south (viewer ${viewerTall.toFixed(2)} m vs default ${meanDefault.toFixed(2)} m)`,
-    );
+test("every option is laid out from the viewing edge, not only one", () => {
+  // Owner decision 12 October 2026, replacing 2026-09-28. Until then only
+  // the last option measured depth from the gardener and the other two
+  // assumed north, so a tall plant could land at the viewer's feet in two
+  // plans out of three. This tests the rule itself - taller plants further
+  // from the viewer than shorter ones - on EVERY option and EVERY edge,
+  // which is stronger than the test it replaces (one option, compared only
+  // with the others).
+  //
+  // No wind, so the standard profile applies. The windy deep-bed ramp is a
+  // separate, deliberate exception, pinned by the next test.
+  const byId = new Map(plants.map((plant) => [plant.id, plant]));
+  for (const edge of ["north", "east", "south", "west"] as const) {
+    const brief: GardenBrief = {
+      ...baseBrief,
+      bedWidthM: 8,
+      bedLengthM: 6,
+      style: "fynbos",
+      wind: "none",
+      viewingEdge: edge,
+    };
+    const variants = buildGardenPlanVariants(plants, brief);
+    assert.ok(variants.length > 1, `${edge}: expected more than one option`);
+    for (const plan of variants) {
+      const layout = plan.layout;
+      assert.ok(layout, `${edge} ${plan.character}: no layout`);
+      const axis = viewingAxis(edge, layout.bedWidthM, layout.bedLengthM);
+      const meanDepth = (test: (heightCm: number) => boolean) => {
+        const picked = layout.placements.filter((p) => {
+          const height = byId.get(p.plantId)?.heightCm;
+          return height !== null && height !== undefined && test(height);
+        });
+        return picked.length === 0
+          ? null
+          : picked.reduce((sum, p) => sum + axis.depthOf(p.xM, p.yM), 0) / picked.length;
+      };
+      const tall = meanDepth((h) => h >= 100);
+      const short = meanDepth((h) => h < 50);
+      if (tall !== null && short !== null) {
+        assert.ok(
+          tall > short,
+          `${edge} ${plan.character}: tall plants should sit further from the viewer than short ones (tall ${tall.toFixed(2)} m, short ${short.toFixed(2)} m)`,
+        );
+      }
+      // The note that used to label one option as the odd one out must be
+      // gone: it now describes every option, and claimed the rest used north.
+      assert.doesNotMatch(
+        plan.diagnostics.join(" "),
+        /step up away from the north edge/i,
+        `${edge} ${plan.character}: still claims the other options use north`,
+      );
+      // Every hard placement rule still holds.
+      for (const check of plan.engine?.placementChecks.filter((c) => c.kind === "hard") ?? []) {
+        assert.ok(check.pass, `${edge} ${plan.character} ${check.id}: ${check.detail}`);
+      }
+    }
   }
+});
 
-  // Every option still satisfies every hard placement rule.
-  for (const plan of variants) {
-    for (const check of plan.engine?.placementChecks.filter((c) => c.kind === "hard") ?? []) {
-      assert.ok(check.pass, `${plan.character} ${check.id}: ${check.detail}`);
+test("the wind ramp keeps the wind's axis, whatever the viewing edge", () => {
+  // The aerodynamic ramp is a WIND rule: low plants on the windward south
+  // and east side, rising to tall away from it. targetDepth writes that as
+  // depth 0 on the north axis. If it were measured from the viewer, a
+  // south-facing gardener would get the tallest plants ON the windward
+  // edge - the opposite of the rule. So under the ramp, depth is measured
+  // from north for every edge; under every other profile, from the viewer.
+  const W = 8;
+  const L = 6;
+  const x = 2;
+  const y = 1.5;
+  for (const edge of ["north", "east", "south", "west"] as const) {
+    assert.ok(
+      Math.abs(depthAxisFor("ramp", edge, W, L).depthOf(x, y) - y) < 1e-9,
+      `ramp, ${edge} viewer: depth must be measured from the north edge`,
+    );
+    const viewer = viewingAxis(edge, W, L);
+    for (const profile of ["standard", "windbreak"] as const) {
+      assert.ok(
+        Math.abs(depthAxisFor(profile, edge, W, L).depthOf(x, y) - viewer.depthOf(x, y)) < 1e-9,
+        `${profile}, ${edge} viewer: depth must be measured from the viewer`,
+      );
     }
   }
 });

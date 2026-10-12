@@ -1211,32 +1211,10 @@ export function buildGardenPlanVariants(
       ? [`Only ${found.length} distinct garden${found.length === 1 ? "" : "s"} could be found for these answers.`]
       : [];
 
-  // One option tries the viewing edge (owner decision, 2026-09-28): its
-  // heights step up away from where the gardener stands, while the others
-  // keep the rulebook's assumption that the front of a bed is its north
-  // edge. Offering both lets the difference be seen rather than argued.
-  // Wind is untouched either way - the windward row stays on the true
-  // south and east edges in all three.
-  const viewerIndex = brief.viewingEdge !== "north" && found.length > 1 ? found.length - 1 : -1;
-  if (viewerIndex >= 0) {
-    const viewerSite = { ...site, frontEdge: brief.viewingEdge };
-    const seed = found[viewerIndex].seed;
-    const run = runEngine(prepared.pool, viewerSite, seed);
-    if (run.status === "plan") found[viewerIndex] = { run, seed };
-  }
-
+  // All three options are laid out from the viewing edge now - engineSite
+  // carries it - so there is no longer a single "viewer" option to re-run
+  // or label. (Owner decision 12 October 2026, replacing 2026-09-28.)
   return found.map(({ run, seed }, index) =>
-    planFromRun(
-      prepared,
-      run,
-      RESULT_LABELS[index],
-      seed,
-      index === viewerIndex
-        ? [
-            ...note,
-            `This option puts the tallest plants furthest from the ${brief.viewingEdge} edge, where you said you look at the bed from. The others step up away from the north edge, which is what the rulebook assumes.`,
-          ]
-        : note,
-    ),
+    planFromRun(prepared, run, RESULT_LABELS[index], seed, note),
   );
 }

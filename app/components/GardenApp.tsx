@@ -55,6 +55,8 @@ import {
   type Wind,
   type ViewingEdge,
   type PlantAssessment,
+  rowsAvailable,
+  WIND_SITE_FACTOR,
 } from "../lib/planning";
 import bioregionMapData from "../data/bioregion_map.generated.json" with { type: "json" };
 import { isEstimatedBioregion, places, type Place } from "../data/places";
@@ -1483,10 +1485,11 @@ function FinderView({
             <section>
               <h3>2. Choose your orientation</h3>
               <p className="field-help">
-                Pick the side you stand on. One of the three plans we offer
-                banks the taller plants at the back of that view. If you
-                usually come at the bed from a corner, pick the side you
-                face most.
+                Pick the side you stand on and the taller plants go at the
+                back of that view - except in a windy bed deep enough for
+                several rows, where they step up away from the wind
+                instead. If you usually come at the bed from a corner, pick
+                the side you face most.
               </p>
               <div
                 className="viewing-edge-grid"
@@ -2182,15 +2185,17 @@ function briefChips(brief: GardenBrief): { label: string; value: string }[] {
 }
 
 /**
- * Where this option actually put its tall plants, read off the drawing.
+ * Where this plan actually put its tall plants, read off the drawing.
  *
- * Only one of the three options is laid out from the edge the gardener
- * stands on; the other two keep the rulebook's assumption that the front
- * of a bed is its north edge (gardenPlan.ts, owner decision 2026-09-28).
- * So on two plans in three the tallest plant can land at the viewer's
- * feet, which looks like a mistake and is not one. Rather than claim a
- * rule that did not apply, this measures the height-weighted average
- * distance from where she stands and says what is there.
+ * Every option is laid out from the edge the gardener stands on (owner
+ * decision, 12 October 2026). Two things can still put tall plants near
+ * the viewer: the aerodynamic ramp, which in a windy bed deep enough for
+ * several rows steps the planting up away from the south and east wind
+ * whichever side the gardener is on; and layering being a placement
+ * preference rather than a hard rule. Rather than claim a rule that may
+ * not have held, this measures the height-weighted average distance from
+ * where she stands and says what is there - and, when it is the wind,
+ * says that.
  */
 function layeringNote(
   layout: { bedWidthM: number; bedLengthM: number; placements: { plantId: string; xM: number; yM: number }[] },
@@ -2215,7 +2220,13 @@ function layeringNote(
     return `The taller plants sit towards the back of this bed, away from the ${edge} side where you stand.`;
   }
   if (share < 0.45) {
-    return `In this option the taller plants sit nearest the ${edge} side, where you stand, rather than at the back. Try the other options for the opposite.`;
+    // The same test the engine uses to choose the ramp (engineSite +
+    // windProfile): any wind, and room for three rows or more.
+    const windyAndDeep =
+      WIND_SITE_FACTOR[brief.wind] > 0 && rowsAvailable(brief.bedLengthM) >= 3;
+    return windyAndDeep
+      ? `In a windy bed this deep, the planting steps up away from the south and east wind rather than away from you, so the taller plants sit nearer the ${edge} side.`
+      : `The taller plants in this layout ended up nearer the ${edge} side, where you stand. Regenerate for one that banks them at the back.`;
   }
   return "The taller plants are spread through this bed rather than banked at the back.";
 }

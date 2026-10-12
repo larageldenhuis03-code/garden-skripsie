@@ -126,6 +126,23 @@ export function minCentreDistance(ri: number, rj: number): number {
   return minCentreDistanceWith(ri, rj, RULES.stage4.overlapDelta);
 }
 
+/**
+ * The axis layer depths are measured along: the gardener's, except under
+ * the aerodynamic ramp. The ramp is a wind rule - low plants on the
+ * windward south and east side rising to tall away from it - and
+ * targetDepth writes it as depth 0 on the north axis. Measuring it from
+ * the viewer instead would put a south-facing gardener's tallest plants
+ * ON the windward edge, the opposite of what the ramp is for.
+ */
+export function depthAxisFor(
+  profile: WindProfile,
+  frontEdge: ViewingEdge | undefined,
+  W: number,
+  L: number,
+) {
+  return viewingAxis(profile === "ramp" ? "north" : frontEdge, W, L);
+}
+
 export function windProfile(site: PlacementSite): WindProfile {
   if (site.windSite <= 0) return "standard";
   return site.rowsAvailable >= 3 ? "ramp" : "windbreak";
@@ -410,8 +427,17 @@ function placeOnce(
     const r = info.diameterM / 2;
     const targetDepthFraction = targetDepth(info.layer, profile);
     // Layer depths are measured from the viewing edge, so the heights step
-    // up away from wherever the gardener stands.
-    const axis = viewingAxis(site.frontEdge, W, L);
+    // up away from wherever the gardener stands - with one exception. The
+    // aerodynamic ramp is a WIND rule: it puts L1 furthest from the
+    // windward south and east edges, and targetDepth expresses that as
+    // depth 0 on the north axis. Measured from the viewer instead, a
+    // south-facing gardener would get the tallest plants ON the windward
+    // edge, the opposite of what the ramp is for. So the ramp keeps the
+    // north axis, as AGENTS.md says of every wind rule.
+    const axis = depthAxisFor(profile, site.frontEdge, W, L);
+    // P17 balances across what the gardener actually looks at, so it always
+    // uses the viewer's axis, ramp or not.
+    const viewAxis = viewingAxis(site.frontEdge, W, L);
     // Default: the rulebook's single band, target +- depth_tol. A band
     // override (test seam) supplies its own interval instead; the centre
     // and half-width are read off it so the maths below is identical.
@@ -473,7 +499,7 @@ function placeOnce(
     // number of draws. See engineConfig for why this counts all layers
     // together and applies to every plant rather than only drift starts.
     const thirdOf = (x: number, y: number): number =>
-      Math.min(2, Math.floor((axis.acrossOf(x, y) / axis.across) * 3));
+      Math.min(2, Math.floor((viewAxis.acrossOf(x, y) / viewAxis.across) * 3));
     let thirdArea: [number, number, number] | null = null;
     if (P17_BALANCE_WEIGHT > 0 && axis.across > 0) {
       const areas: [number, number, number] = [0, 0, 0];
