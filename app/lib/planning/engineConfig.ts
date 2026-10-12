@@ -54,14 +54,21 @@ export const MIN_LAYOUT_CANOPY_DIAMETER_M = 0.15;
 // Stage 1 - 4_Stage1_Score
 // ---------------------------------------------------------------------------
 
-/** b_shade / shade_term_active (1_Parameters A79:H84) and P14
- * (6_Stage3_4_Rules A35): ON HOLD in the rulebook - no shade term in
- * Stage 1 and no P14 in Stage 4 while the status reads ON HOLD. */
-// Off unless the rulebook carries b_shade AND does not mark it ON HOLD.
-// The workbook dropped b_shade on 2026-09-30; an absent parameter must
-// mean the feature stays off, not that it silently switches back on.
-export const SHADE_ENABLED =
-  RULES.status["b_shade"] !== undefined && RULES.status["b_shade"] !== "ON HOLD";
+/** The shade bonus is FUTURE WORK (owner's decision, 12 October 2026).
+ *
+ * It switches off the Stage 1 shade term and P14 in Stage 4. It used to
+ * be inferred from the rulebook - on unless `b_shade` was absent or
+ * marked ON HOLD - which meant the feature could switch itself back on
+ * the moment someone added a `b_shade` row for any reason. The rulebook
+ * deleted that parameter on 2026-09-28 and is not getting it back, so
+ * the switch is stated here instead of being guessed from an absence.
+ *
+ * This is not a rulebook number being typed into the code: there is no
+ * such number in the rulebook. It is the decision not to run the
+ * feature. Turning shade back on means restoring b_shade, shade_offset
+ * and shade_radius to the workbook and setting this to true.
+ */
+export const SHADE_ENABLED = false;
 
 // ---------------------------------------------------------------------------
 // Stage 2 - 5_Stage2_Constraints

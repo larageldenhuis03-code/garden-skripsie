@@ -9,7 +9,10 @@
  *            + w_extras * extras_i
  *            + b_saved  * saved_i
  *            + b_wind   * W_site * windres_i
- *            + b_shade  * shade_i          (only when shade_term_active)
+ *
+ * There was a seventh term, b_shade * shade_i. The rulebook deleted
+ * b_shade on 2026-09-28 and the bonus is future work, so no plan has
+ * carried it since.
  *   score_i  = raw_i / raw_max      (raw_max = sum of ACTIVE terms' weights)
  */
 
@@ -22,8 +25,10 @@ import type {
 import { RULES, type StyleKey } from "./rules.ts";
 import { ROW_PITCH_M, SHADE_ENABLED } from "./engineConfig.ts";
 
-/** 1_Parameters: w_style, w_colour, w_extras, b_saved, b_wind (AGREED)
- * and b_shade (ASSUMPTION, in the rulebook's sensitivity test). */
+/** 1_Parameters: w_style, w_colour, w_extras, b_saved, b_wind (all
+ * AGREED). The `shade` weight this object also carries is NOT a rulebook
+ * value - the workbook has no b_shade row and the importer substitutes a
+ * default. Nothing reads it while SHADE_ENABLED is false. */
 export const STAGE1_WEIGHTS = RULES.stage1.weights;
 
 /** 1_Parameters: W_site per wind answer (AGREED, R012). */
@@ -85,7 +90,8 @@ export function rowsAvailable(bedDepthM: number): number {
 /** shade_term_active = struct_min >= 1 AND rows_available >= 3
  * (1_Parameters). Both are known before any plant is scored. */
 export function shadeTermActive(style: GardenStyle, bedDepthM: number): boolean {
-  // engineConfig SHADE_ENABLED (TR1-4): the shade feature is switched off.
+  // engineConfig SHADE_ENABLED: the shade bonus is future work, so this
+  // is always false and the Stage 1 shade term never becomes active.
   if (!SHADE_ENABLED) return false;
   return (
     RULES.styles[styleKeyFor(style)].structMin >= 1 &&
