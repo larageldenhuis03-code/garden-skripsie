@@ -2321,6 +2321,7 @@ function BedDiagram({
     rotated
       ? ({ north: "west", east: "north", south: "east", west: "south" } as const)[edge]
       : edge;
+  const viewerSide = viewingEdge ? drawnSide(viewingEdge) : null;
   // Names are no longer printed inside the circles - at planting scale they
   // stacked into unreadable noise. The name is disclosed on hover or
   // keyboard focus instead, and a tap opens the full plant profile.
@@ -2346,7 +2347,7 @@ function BedDiagram({
        box: the two dimensions, the hover label and the viewpoint mark are
        measured off that, so none of them can drift. */
     <div
-      className="plan-bed-wrap"
+      className={`plan-bed-wrap${viewerSide ? ` viewer-${viewerSide}` : ""}`}
       style={{ "--bed-aspect": displayWidthM / displayLengthM } as CSSProperties}
     >
       {controlledView === undefined ? (
@@ -2406,19 +2407,21 @@ function BedDiagram({
             </button>
           );
         })}
-        {/* Inside the drawing, just within the edge the gardener stands
-            on. Outside it, the mark landed on the length dimension and,
-            when the wrap was wider than the bed, out in the page margin. */}
-        {viewingEdge ? (
-          <span
-            className={`plan-front-edge is-${drawnSide(viewingEdge)}`}
-            title="You stand on this side"
-          >
-            <ViewerFigure />
-            <span className="plan-front-edge-text">you stand here</span>
-          </span>
-        ) : null}
       </div>
+      {/* Where the gardener stands: the same figure the bed preview uses,
+          just outside the edge, with a small arrow pointing into the bed.
+          It sits in the frame, not the bed, which clips its contents. */}
+      {viewerSide ? (
+        <span
+          className={`plan-viewer is-${viewerSide}`}
+          role="img"
+          aria-label={`You stand on the ${viewingEdge} side`}
+          title="You stand on this side"
+        >
+          <ViewerFigure />
+          <span className="plan-viewer-look" aria-hidden="true" />
+        </span>
+      ) : null}
       {/* Sits outside .plan-bed, which clips its children, so a name near
           an edge is never cut in half. Purely decorative: the same text is
           already on the button's aria-label. */}
@@ -2518,7 +2521,9 @@ function describeOption(plan: GardenPlan, all: GardenPlan[]): string {
   if (colours > 0 && others.every((p) => colours > coloursMatched(p))) {
     return "Closest to the colours you chose.";
   }
-  return "A different balance of the same conditions.";
+  // No strict lead on anything: say nothing rather than a line that
+  // describes every option equally (owner, walkthrough 4).
+  return "";
 }
 
 /** Just the money from the budget line. The full sentence - what is in
@@ -2568,10 +2573,10 @@ function PlanSummary({
   readOnly?: boolean;
 }) {
   const plantsById = new Map(plants.map((plant) => [plant.id, plant]));
-  // The bed fills the content area; the plant list slides over it. Open
-  // by default on a wide screen, where there is room for both, and shut
-  // on a narrow one, where the drawing needs every pixel.
-  const [plantsOpen, setPlantsOpen] = useState(true);
+  // The bed fills the content area; the plant list slides over it. It
+  // starts closed, so the drawing is seen whole first, and the "Plants"
+  // tab on its top right corner opens it (owner, walkthrough 4).
+  const [plantsOpen, setPlantsOpen] = useState(false);
   // Held here rather than in the drawing, so the switch can sit on the
   // same line as the three options.
   const [bedView, setBedView] = useState<BedView>("sketchbook");
@@ -2634,13 +2639,35 @@ function PlanSummary({
 
   return (
     <section className="plan-output">
-      <div className="brief-strip" aria-label="Garden brief summary">
-        {briefChips(plan.brief).map(({ label, value }) => (
-          <span key={label}>
-            <small>{label}</small>
-            {value}
+      {/* Every answer the plan was built from, folded into one clean line
+          across the page; open it to read them all. */}
+      <details className="brief-strip">
+        <summary>
+          <span>Your answers</span>
+          <span className="brief-strip-hint" aria-hidden="true">
+            {briefChips(plan.brief)
+              .slice(0, 4)
+              .map(({ value }) => value)
+              .join(" · ")}
+            {" …"}
           </span>
-        ))}
+        </summary>
+        <div className="brief-strip-body" aria-label="Garden brief summary">
+          {briefChips(plan.brief).map(({ label, value }) => (
+            <span key={label}>
+              <small>{label}</small>
+              {value}
+            </span>
+          ))}
+        </div>
+      </details>
+
+      {/* The view switch and the three options, on one line across the
+          whole page like the answers above, rather than squeezed into the
+          width of the drawing. */}
+      <div className="plan-layout-head">
+        <LayoutViewSwitch view={bedView} onChange={setBedView} />
+        {variantTabs}
       </div>
 
       {/* The ratio again, so the drawer tab and the panel can be pinned to
@@ -2656,10 +2683,6 @@ function PlanSummary({
         }
       >
         <div className="plan-layout-column">
-          <div className="plan-layout-head">
-            <LayoutViewSwitch view={bedView} onChange={setBedView} />
-            {variantTabs}
-          </div>
           {/* The tab and the panel live in here, so they hang off the
               drawing's own top right corner rather than off the page -
               which is what made the tab look stranded, and what made the
@@ -3072,7 +3095,9 @@ function CollectionView({
                         ? `${variant.quantities.totalPlants} plants · ${variant.quantities.quantities.length} species`
                         : "No layout"}
                     </small>
-                    <em>{describeOption(variant, variants)}</em>
+                    {describeOption(variant, variants) ? (
+                      <em>{describeOption(variant, variants)}</em>
+                    ) : null}
                   </button>
                 ))}
               </div>
@@ -3546,16 +3571,6 @@ function SavedView({
           <div className="saved-summary">
             <span>{savedPlants.length} plants</span>
             <span>
-              Tallest ·{" "}
-              {formatDimension(
-                savedPlants.reduce<number | null>((tallest, plant) => {
-                  if (plant.heightCm === null) return tallest;
-                  if (tallest === null) return plant.heightCm;
-                  return Math.max(tallest, plant.heightCm);
-                }, null),
-              )}
-            </span>
-            <span>
               {new Set(savedPlants.map((plant) => plant.form)).size} plant types
             </span>
           </div>
@@ -3594,39 +3609,21 @@ function SavedView({
             <>
               <div className="saved-summary">
                 <span>{excludedPlants.length} excluded</span>
-                <span>Left out of every new plan</span>
+                <span>Left out of every new plan until you put it back</span>
               </div>
-              <details className="excluded-note">
-                <summary>What excluding does</summary>
-                <p>
-                  An excluded plant is removed before anything is scored, so it
-                  cannot appear in a layout, and the three options rebuild
-                  without it as soon as you exclude it. Nothing is changed in
-                  the plant database — the plant keeps its full entry in the
-                  library and comes back exactly as it was when you put it
-                  back. Gardens you have already saved are left alone.
-                </p>
-              </details>
-              <ul className="excluded-list">
+              <section className="plant-grid saved-grid">
                 {excludedPlants.map((plant) => (
-                  <li key={plant.id} className="excluded-row">
-                    <button
-                      className="excluded-row-main"
-                      onClick={() => openPlant(plant)}
-                    >
-                      <strong>{plant.commonName}</strong>
-                      <em>{plant.scientificName}</em>
-                    </button>
-                    <button
-                      type="button"
-                      className="button button-outline"
-                      onClick={() => toggleExcluded(plant.id)}
-                    >
-                      Put back
-                    </button>
-                  </li>
+                  <PlantCard
+                    key={plant.id}
+                    plant={plant}
+                    saved={saved.includes(plant.id)}
+                    excluded
+                    open={() => openPlant(plant)}
+                    toggleSaved={() => toggleSaved(plant.id)}
+                    toggleExcluded={() => toggleExcluded(plant.id)}
+                  />
                 ))}
-              </ul>
+              </section>
             </>
           ) : (
             <section className="empty-state saved-empty">

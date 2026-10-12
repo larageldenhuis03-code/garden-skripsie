@@ -6382,3 +6382,239 @@ body {
 .plan-assumptions summary span {
   font-size: 0.875rem;
 }
+
+/* ---------------------------------------------------------------------
+   The viewpoint: just the figure, outside the edge the gardener stands
+   on, with an arrow into the bed - the same mark the bed preview in step
+   3 uses. Positioned against .plan-bed-frame, which is exactly the
+   drawing, so it cannot drift. On the two side edges it sits a quarter of
+   the way along, because the length label holds the middle of the left
+   side; at the bottom it sits a quarter in, clear of the centred width.
+   --------------------------------------------------------------------- */
+.plan-viewer {
+  position: absolute;
+  z-index: 3;
+  display: inline-flex;
+  gap: 1px;
+  align-items: center;
+  color: var(--olive-dark);
+}
+
+.plan-viewer .viewer-figure {
+  width: 26px;
+  height: 26px;
+}
+
+.plan-viewer-look {
+  width: 0;
+  height: 0;
+  border: 6px solid transparent;
+}
+
+.plan-viewer.is-west {
+  top: 25%;
+  right: 100%;
+  margin-right: 3px;
+  flex-direction: row;
+  transform: translateY(-50%);
+}
+.plan-viewer.is-west .plan-viewer-look { border-left-color: currentColor; border-right-width: 0; }
+
+.plan-viewer.is-east {
+  top: 50%;
+  left: 100%;
+  margin-left: 3px;
+  flex-direction: row-reverse;
+  transform: translateY(-50%);
+}
+.plan-viewer.is-east .plan-viewer-look { border-right-color: currentColor; border-left-width: 0; }
+
+.plan-viewer.is-north {
+  bottom: 100%;
+  left: 50%;
+  margin-bottom: 2px;
+  flex-direction: column;
+  transform: translateX(-50%);
+}
+.plan-viewer.is-north .plan-viewer-look { border-top-color: currentColor; border-bottom-width: 0; }
+
+.plan-viewer.is-south {
+  top: 100%;
+  left: 25%;
+  margin-top: 2px;
+  flex-direction: column-reverse;
+  transform: translateX(-50%);
+}
+.plan-viewer.is-south .plan-viewer-look { border-bottom-color: currentColor; border-top-width: 0; }
+
+/* Room for the figure on its side. The left gutter already holds the
+   length label, so it only widens a little; the right gets a gutter only
+   when someone stands there. */
+.plan-bed-wrap.viewer-west { padding-left: 40px; }
+.plan-bed-wrap.viewer-east { padding-right: 40px; }
+.plan-bed-wrap.viewer-south .plan-bed-frame { margin-bottom: 40px; }
+
+/* On a saved-garden card there are no dimension labels, so the only
+   gutter needed is the figure's own. */
+.saved-layout-card .plan-bed-wrap.viewer-west { padding-left: 36px; }
+.saved-layout-card .plan-bed-wrap.viewer-east { padding-right: 36px; }
+.saved-layout-card .plan-bed-wrap.viewer-south .plan-bed-frame { margin-bottom: 38px; }
+.saved-layout-card .plan-viewer .viewer-figure { width: 20px; height: 20px; }
+.saved-layout-card .plan-viewer-look { border-width: 5px; }
+
+/* ---------------------------------------------------------------------
+   Your answers: one clean olive line across the page that opens to show
+   every answer. Closed, it shows the first few so the line still says
+   something.
+   --------------------------------------------------------------------- */
+details.brief-strip {
+  display: block;
+  margin-top: 10px;
+  border: 0;
+  border-top: 2px solid var(--olive);
+  border-bottom: 2px solid var(--olive);
+}
+
+details.brief-strip > summary {
+  display: flex;
+  gap: 18px;
+  align-items: baseline;
+  padding: 12px 2px;
+  list-style: none;
+  cursor: pointer;
+}
+
+details.brief-strip > summary::-webkit-details-marker { display: none; }
+
+details.brief-strip > summary > span:first-child {
+  font-family: var(--font-hand);
+  font-synthesis: none;
+  font-size: 1.5rem;
+  color: var(--olive-dark);
+  white-space: nowrap;
+}
+
+details.brief-strip > summary > span:first-child::after {
+  margin-left: 10px;
+  font-family: var(--sans);
+  font-size: 0.9rem;
+  content: "\25BE";
+}
+
+details.brief-strip[open] > summary > span:first-child::after { content: "\25B4"; }
+
+/* details.brief-strip .brief-strip-hint, not .brief-strip-hint: the old
+   ".brief-strip span" rule is more specific and would set it in the hand. */
+details.brief-strip .brief-strip-hint {
+  display: block;
+  padding: 0;
+  min-width: 0;
+  overflow: hidden;
+  font-family: var(--sans);
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+details.brief-strip[open] .brief-strip-hint { visibility: hidden; }
+
+.brief-strip-body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 0;
+  padding: 0 2px 14px;
+}
+
+.brief-strip-body span {
+  padding: 4px 14px 4px 0;
+  font-family: var(--font-hand);
+  font-synthesis: none;
+  font-size: 1.1875rem;
+  color: var(--ink);
+}
+
+.brief-strip-body small {
+  margin-right: 7px;
+  font-family: var(--font-hand);
+  font-size: 1.1875rem;
+  color: var(--ink-soft);
+}
+
+.brief-strip-body span:not(:last-child)::after {
+  padding-left: 4px;
+  color: var(--ink-soft);
+  content: "\00B7";
+}
+
+/* ---------------------------------------------------------------------
+   The view switch and the three options: one line across the whole page,
+   like the answers above it. The switch holds the left; the three
+   options share the rest equally.
+   --------------------------------------------------------------------- */
+.plan-output > .plan-layout-head {
+  display: grid;
+  grid-template-columns: auto repeat(1, minmax(0, 1fr));
+  gap: 18px;
+  align-items: stretch;
+  width: 100%;
+  margin: 18px 0 10px;
+}
+
+.plan-output > .plan-layout-head .layout-views {
+  position: static;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: auto;
+  margin: 0;
+}
+
+.plan-output > .plan-layout-head .layout-views button {
+  flex: 1;
+  min-width: 128px;
+}
+
+.plan-output > .plan-layout-head .variant-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+.plan-output > .plan-layout-head .variant-tab {
+  display: grid;
+  gap: 4px;
+  align-content: start;
+  padding: 12px 16px;
+  text-align: left;
+}
+
+.plan-output > .plan-layout-head .variant-tab strong {
+  font-family: var(--font-hand);
+  font-synthesis: none;
+  font-size: var(--hand-section);
+  line-height: 1;
+}
+
+.plan-output > .plan-layout-head .variant-tab small {
+  font-size: 0.875rem;
+}
+
+.plan-output > .plan-layout-head .variant-tab em {
+  font-size: 0.9375rem;
+}
+
+@media (max-width: 860px) {
+  .plan-output > .plan-layout-head {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .plan-output > .plan-layout-head .layout-views {
+    flex-direction: row;
+  }
+  .plan-output > .plan-layout-head .variant-tabs {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
