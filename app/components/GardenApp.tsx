@@ -2308,10 +2308,11 @@ function BedDiagram({
   });
   const tip = hovered === null ? null : markers.find((m) => m.index === hovered) ?? null;
   return (
-    /* The ratio lives on the wrap, not only on the drawing. The scale bar,
-       the two dimensions and the viewpoint mark are all positioned against
-       the wrap, so unless the wrap is exactly as wide as the bed they drift
-       out into the page margin - which is what used to happen. */
+    /* The ratio lives on the wrap, not only on the drawing, so the scale
+       bar and the plant key line up with the bed instead of with the
+       page. Inside it, `.plan-bed-frame` is exactly the drawing's own
+       box: the two dimensions, the hover label and the viewpoint mark are
+       measured off that, so none of them can drift. */
     <div
       className="plan-bed-wrap"
       style={{ "--bed-aspect": displayWidthM / displayLengthM } as CSSProperties}
@@ -2322,9 +2323,19 @@ function BedDiagram({
       <div className="plan-north" aria-hidden="true">
         N ↑
       </div>
+      <div className="plan-bed-frame">
       <div
         className={`plan-bed${view === "real-life" ? " is-real-life" : ""}`}
-        style={{ aspectRatio: `${displayWidthM} / ${displayLengthM}` } as CSSProperties}
+        style={
+          {
+            aspectRatio: `${displayWidthM} / ${displayLengthM}`,
+            // One grid square = one square metre, so the drawing can be
+            // paced out in the real bed. It used to be a tenth of the bed
+            // whatever the bed measured, which told the gardener nothing.
+            "--bed-cols": displayWidthM,
+            "--bed-rows": displayLengthM,
+          } as CSSProperties
+        }
         aria-label={`${widthM} by ${lengthM} metre planting layout, north at the top`}
       >
         {markers.map(({ placement, plant, index, displayX, displayY, unknownColour, estimated }) => {
@@ -2403,6 +2414,7 @@ function BedDiagram({
       </div>
       <div className="plan-measure plan-measure-width">{displayWidthM} m</div>
       <div className="plan-measure plan-measure-length">{displayLengthM} m</div>
+      </div>
       {view === "sketchbook" && symbolTypes.length > 0 ? (
         <ul className="symbol-key" aria-label="Plant type symbols">
           {symbolTypes.map((type) => (
@@ -3294,6 +3306,10 @@ function SavedLayoutsList({
               {layout.brief.bedWidthM} × {layout.brief.bedLengthM} m ·{" "}
               {layout.species.reduce((total, item) => total + item.quantity, 0)}{" "}
               plants · {layout.species.length} species
+              {/* The card's drawing is too small to carry the words
+                  "you stand here", so the side is said here instead and
+                  the drawing keeps only the figure. */}
+              {" · "}you stand on the {layout.brief.viewingEdge} side
             </p>
             {layout.placements && layout.placements.length > 0 ? (
               <BedDiagram

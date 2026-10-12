@@ -6039,3 +6039,164 @@ body {
 .plan-north {
   text-align: left;
 }
+
+/* One square metre per grid square. The size comes from the bed's own
+   measurements, set on the element, so a 9 m bed shows nine columns and
+   a 3 m bed shows three - a gardener can count squares in the drawing
+   and pace the same squares out in the garden. */
+.plan-bed {
+  background-size: calc(100% / var(--bed-cols, 10)) calc(100% / var(--bed-rows, 10));
+}
+
+/* The brief strip reads as one line of answers again, as it did before
+   it grew from five to eleven: the question inline in front of its
+   answer rather than stacked above it. */
+.brief-strip span {
+  display: inline;
+  padding: 8px 14px 8px 0;
+  font-size: var(--text-xs);
+  color: var(--ink);
+}
+
+.brief-strip small {
+  display: inline;
+  margin-right: 7px;
+  font-family: var(--sans);
+  font-size: 0.875rem;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+/* The view switch wore a near-black that appears nowhere else. */
+.layout-views button[aria-pressed="true"] {
+  background: var(--olive);
+  color: var(--paper-light);
+}
+
+/* The viewpoint mark scales with the drawing it sits on. It was a fixed
+   17px pill, which is right on a full-width plan and far too big on a
+   saved-garden card or at a high browser zoom, where the drawing shrinks
+   but the text does not - on a side edge the vertical label then ran the
+   whole depth of the bed and was clipped. The bed is a size container,
+   so the mark can be a share of the drawing's height with a floor and a
+   ceiling. */
+.plan-bed {
+  container-type: size;
+}
+
+.plan-front-edge {
+  gap: clamp(3px, 1.5cqh, 8px);
+  padding: clamp(2px, 1cqh, 6px) clamp(6px, 3cqh, 14px);
+}
+
+.viewer-figure {
+  width: clamp(11px, 7cqh, 24px);
+  height: clamp(11px, 7cqh, 24px);
+}
+
+.plan-front-edge-text {
+  font-size: clamp(0.5625rem, 5cqh, 1.0625rem);
+}
+
+/* On a side edge the label is set vertically, so the room it needs is on
+   the block axis - without this the rounded ends crowd the first and
+   last letter. */
+.plan-front-edge.is-west,
+.plan-front-edge.is-east {
+  padding-block: clamp(8px, 4cqh, 18px);
+}
+
+/* `.plan-bed-frame` is exactly the drawing's box. The two dimensions and
+   the hover label hang off it, so they stay on the bed however wide the
+   column is - on a saved-garden card the length label used to be cut off
+   the side of the card and the width label landed on the plant key. */
+.plan-bed-frame {
+  position: relative;
+  margin-bottom: 26px;
+}
+
+.plan-bed-wrap {
+  padding-left: 34px;
+}
+
+.plan-measure-width {
+  right: 0;
+  bottom: 0;
+  left: 0;
+  text-align: center;
+  transform: translateY(calc(100% + 6px));
+}
+
+.plan-measure-length {
+  top: 50%;
+  bottom: auto;
+  left: 0;
+  transform: translate(calc(-100% - 9px), -50%);
+  writing-mode: horizontal-tb;
+}
+
+/* North sits above the drawing, which now starts after the gutter the
+   length label lives in. */
+.plan-north {
+  margin-left: 0;
+}
+
+/* A saved-garden card draws the bed a few hundred pixels wide. The
+   figure still marks the viewpoint, but the words beside it took up a
+   third of the drawing, so the side is named in the card's summary line
+   instead. */
+.saved-layout-card .plan-front-edge-text {
+  display: none;
+}
+
+.saved-layout-card .plan-front-edge {
+  padding: 5px;
+  border-radius: 50%;
+}
+
+/* The width label reads directly under the bed, and the scale bar and
+   the plant key follow it rather than sharing its line. */
+.plan-bed-frame {
+  margin-bottom: 36px;
+}
+
+.plan-measure-width {
+  transform: translateY(5px);
+}
+
+/* On a card the drawing is a couple of hundred pixels wide, so the two
+   dimension labels and the scale bar fight for the same line. The card's
+   own summary already says "5.5 x 3 m", so the drawing keeps the scale
+   bar - the thing the summary cannot say - and drops the labels. */
+.saved-layout-card .plan-measure {
+  display: none;
+}
+
+.saved-layout-card .plan-bed-frame {
+  margin-bottom: 12px;
+}
+
+.saved-layout-card .plan-bed-wrap {
+  padding-left: 0;
+}
+
+/* Eleven answers wrap to two lines, and a leading separator at the start
+   of the second line reads as a missing word. The dot trails its own
+   answer instead, and the last one has none. */
+.brief-strip span + span::before {
+  content: none;
+}
+
+.brief-strip span:not(:last-child)::after {
+  padding-left: 4px;
+  color: var(--ink-soft);
+  content: "·";
+}
+
+/* The view switch keeps its own height beside the option cards rather
+   than stretching into a block of solid colour as tall as they are. */
+.plan-layout-head {
+  align-items: center;
+}
