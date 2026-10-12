@@ -86,7 +86,7 @@ const BASE_COVER: Record<string, { coverMin: number; coverMax: number }> =
   );
 
 /** The versions this report compares. */
-const RUN_IDS = ["V0", "V2", "V5", "V6"];
+const RUN_IDS = ["V0", "V1", "V2", "V3", "V5", "V6"];
 
 const VERSIONS: Version[] = [
   {
@@ -700,100 +700,137 @@ function figureData(scenarios: Scenario[]): Panel[] {
   return panels;
 }
 
-/** The close, in plain English, written from the measured figures. */
+/** The close: a decision aid, written from the measured figures. */
 function summarise(rowsByVersion: Map<string, Row[]>): string {
+  const ids = [...rowsByVersion.keys()];
+  const feasibleRows = (id: string) =>
+    (rowsByVersion.get(id) ?? []).filter((row) => row.feasible);
   const median = (id: string, get: (row: Row) => number | null) =>
     percentile(
-      (rowsByVersion.get(id) ?? [])
-        .filter((row) => row.feasible)
+      feasibleRows(id)
         .map(get)
         .filter((value): value is number => value !== null),
       0.5,
     );
-  const feasible = (id: string) =>
-    (rowsByVersion.get(id) ?? []).filter((row) => row.feasible).length;
+  const count = (id: string, test: (row: Row) => boolean) =>
+    feasibleRows(id).filter(test).length;
   const pct = (from: number, to: number) =>
     `${to > from ? "+" : ""}${(((to - from) / from) * 100).toFixed(0)}%`;
 
-  const cv = (id: string) => median(id, (r) => r.quadrantCV);
-  const patch = (id: string) => median(id, (r) => r.largestEmptyPatch);
-  const empty = (id: string) => median(id, (r) => r.emptyCellShare);
-  const cover = (id: string) => median(id, (r) => r.cover);
-  const z = (id: string) => median(id, (r) => r.z);
-  const a4 = (id: string) => median(id, (r) => r.A4);
-  const short1 = (rowsByVersion.get("V1") ?? []).filter(
-    (row) => row.feasible && row.cover < row.target - 1e-9,
-  );
-  const stoppedEarly = short1.filter(
-    (row) => row.poolReason === "stopped early",
-  ).length;
-  const pairs = (rowsByVersion.get("V0") ?? []).reduce(
-    (sum, row) => sum + row.neighbourSameCombo,
-    0,
-  );
+  /** The version(s) with the best median on one measure, ties included -
+   * picking the first of a tie would credit one version with a result two
+   * share. */
+  const best = (get: (row: Row) => number | null, lowerIsBetter: boolean) => {
+    const values = ids.map((id) => ({ id, value: median(id, get) }));
+    const top = values.reduce(
+      (acc, v) => (lowerIsBetter ? Math.min(acc, v.value) : Math.max(acc, v.value)),
+      lowerIsBetter ? Infinity : -Infinity,
+    );
+    const winners = values.filter((v) => Math.abs(v.value - top) < 5e-4).map((v) => v.id);
+    return winners.length === 1 ? winners[0] : `${winners.join(" and ")}, tied at ${fmt(top)}`;
+  };
+
+  const cv = (r: Row) => r.quadrantCV;
+  const patch = (r: Row) => r.largestEmptyPatch;
+  const full = (r: Row) => r.cellsFull;
+  const empty = (r: Row) => r.emptyCellShare;
+  const z = (r: Row) => r.z;
+
+  const row = (id: string) =>
+    `| **${id}** | ${fmt(median(id, (r) => r.cover))} | ${fmt(median(id, empty))} | ` +
+    `${fmt(median(id, patch))} | ${fmt(median(id, full))} | ${fmt(median(id, cv))} | ` +
+    `${fmt(median(id, z), 4)} | ${fmt(median(id, (r) => r.A1))} | ${fmt(median(id, (r) => r.A4))} | ` +
+    `${feasibleRows(id).length} | ${count(id, (r) => r.cover >= r.target - 1e-9)} | ` +
+    `${count(id, (r) => r.coverShort)} | ${fmt(median(id, (r) => r.plants), 0)} | ` +
+    `${fmt(median(id, (r) => r.ms), 0)} |`;
+
+  const v0cv = median("V0", cv);
+  const v0patch = median("V0", patch);
+  const v0z = median("V0", z);
 
   return [
-    "## What this says",
+    "## Decision table",
     "",
-    "**V2 is the best of the four, and it is the simplest.** Taking the",
-    "contact-point preference to 0 moves the median quadrant CV from",
-    `${fmt(cv("V0"))} to ${fmt(cv("V2"))} (${pct(cv("V0"), cv("V2"))}) and the median largest`,
-    `empty patch from ${fmt(patch("V0"))} to ${fmt(patch("V2"))} (${pct(patch("V0"), patch("V2"))}).`,
-    `Cover is unchanged at ${fmt(cover("V2"))} against ${fmt(cover("V0"))}, the same`,
-    `${feasible("V2")} of 100 scenarios stay feasible, no hard rule breaks, and`,
-    `median Z goes slightly up, ${fmt(z("V0"), 4)} to ${fmt(z("V2"), 4)}. That bonus`,
-    "was packing plants against the bed edge and against each other, which",
-    "is exactly what reads as a clump.",
+    "Medians over plans that produced a layout. The best on each measure is",
+    "named under the table, with ties shown. Lower is better for empty share,",
+    "largest patch and quadrant CV; higher",
+    "is better for cover, square metres at least half planted, Z, A1 and A4.",
     "",
-    "**V1 does not do what it was meant to do.** Raising cover_max to 1.0",
-    `and cover_min to 0.95 moves median cover from ${fmt(cover("V0"))} to`,
-    `${fmt(cover("V1"))} - no gain. Not one plan of ${feasible("V1")} reached 0.95.`,
-    "H1 was not what was holding cover down, so removing it changes little.",
-    `It costs: A4 falls from ${fmt(a4("V0"))} to ${fmt(a4("V1"))}, because A4 is`,
-    "measured against cover_min and the target moved; median Z follows it",
-    `down, ${fmt(z("V0"), 4)} to ${fmt(z("V1"), 4)}; and ${feasible("V0") - feasible("V1")} scenarios that had a`,
-    "plan in V0 have none in V1. On small beds it is clearly worse - the",
-    "largest empty patch and the quadrant CV both rise, because asking a",
-    "small bed for 95% cover pushes it towards fewer, bigger plants.",
+    "| | cover | empty | largest patch | m2 >=50% | quadrant CV | Z | A1 | A4 | feasible | reached target | cover_short | plants | ms |",
+    "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|",
+    ...ids.map(row),
     "",
-    "**V3 made things worse, not better.** Adding the emptiest-block",
-    `preference on top of V2 moves the largest empty patch from ${fmt(patch("V2"))}`,
-    `to ${fmt(patch("V3"))} (${pct(patch("V2"), patch("V3"))}), the empty-cell share from ${fmt(empty("V2"))}`,
-    `to ${fmt(empty("V3"))}, and cover down from ${fmt(cover("V2"))} to ${fmt(cover("V3"))}.`,
-    "Quadrant CV is a fraction worse too. The likely mechanism is visible in",
-    "the figures: pushing each group's anchor into an empty block scatters",
-    "the anchors, and the drift rule then pulls the rest of the group after",
-    "them, so the bed ends up with the same canopy in fewer, further-apart",
-    "clusters and bigger holes between them.",
+    `Best on each spatial measure: quadrant CV **${best(cv, true)}**, largest empty`,
+    `patch **${best(patch, true)}**, empty-cell share **${best(empty, true)}**, square`,
+    `metres at least half planted **${best(full, false)}**. Highest Z: **${best(z, false)}**.`,
     "",
-    "`scripts/block-weight-sweep.ts` ran the same 100 scenarios at weights",
-    "0.10, 0.25 and 0.50, and at 0.25 with the contact bonus left on. No",
-    "setting beat V2 on the largest empty patch. At 0.10 the term is a wash",
-    "- a shade better on quadrant CV and empty-cell share, a shade worse on",
-    "the patch. So this is not a weight that needs tuning; the preference",
-    "does not earn its place.",
+    "Note that \"reached target\" is not comparable across every column: V1",
+    "asks for 0.95 cover where the others ask for the style's cover_min.",
     "",
-    "**V4 was not run.** The combination rules it needs do exist - 14 of",
-    "them, in 8_Species_Reference rows 5-18, and 55 of their 56 species are",
-    "in the catalogue. The Stage 4 rule is stated at row 23: members of the",
-    "same combo should be placed as neighbours. But a Stage 4 neighbour",
-    "bonus can only arrange pairs that Stage 2 has already selected, and",
-    `across all 100 scenarios only ${pairs} neighbouring plant pair${pairs === 1 ? "" : "s"}`,
-    "belonged to the same combo - they come from two species pairs, in two",
-    "plans out of 95.",
-    "The same-combo neighbour share is therefore 0.0000 in every version,",
-    "and a bonus acting on one or two pairs could not be measured against",
-    "the 2-percentage-point guard. The rulebook names the missing piece",
-    "itself: the Stage 2 combo preference at row 22 is also NOT IMPLEMENTED.",
-    "Stage 2 has to prefer combo members before Stage 4 can place them",
-    "together.",
+    "## What each version does, and what it costs",
     "",
-    "**What is actually holding cover down.** `placement` is zero in every",
-    "version - Stage 4 never failed to fit what it was given - and",
-    "`pool: exhausted` is zero too, so the candidate pool never ran out. Of",
-    `the ${short1.length} short plans in V1, ${stoppedEarly} had species to spare and stopped`,
-    "anyway. The limit is in what Stage 2 and Stage 3 choose to select, not",
-    "in the cover rule, not in the packer, and not in the pool.",
+    "**V2 - contact bonus 0 (D26).** The simplest change, and the base for V3,",
+    "V5 and V6. Against V0 it moves quadrant CV",
+    `${fmt(v0cv)} to ${fmt(median("V2", cv))} (${pct(v0cv, median("V2", cv))}) and the largest`,
+    `empty patch ${fmt(v0patch)} to ${fmt(median("V2", patch))} (${pct(v0patch, median("V2", patch))}),`,
+    `with Z ${fmt(v0z, 4)} to ${fmt(median("V2", z), 4)} and no loss of feasibility. The`,
+    "contact bonus was packing plants against the bed edge and each other,",
+    "which is what reads as a clump.",
+    "",
+    "**V1 - cover_max 1.0, cover_min 0.95.** Does not work. Median cover",
+    `${fmt(median("V0", (r) => r.cover))} to ${fmt(median("V1", (r) => r.cover))}, and`,
+    `${count("V1", (r) => r.cover >= 0.95 - 1e-9)} plans of ${feasibleRows("V1").length} reach 0.95.`,
+    "H1 was never the limit. It costs A4, because A4 is measured against",
+    `cover_min and the target moved (${fmt(median("V0", (r) => r.A4))} to`,
+    `${fmt(median("V1", (r) => r.A4))}), and ${feasibleRows("V0").length - feasibleRows("V1").length}`,
+    "feasible scenario(s).",
+    "",
+    `**V3 - V2 plus the emptiest-block preference.** ${median("V3", patch) > median("V2", patch) ? "Worse" : "No better"} than V2 on the`,
+    `largest empty patch (${fmt(median("V2", patch))} to ${fmt(median("V3", patch))}). Pushing`,
+    "each group's anchor into an empty block scatters the anchors, and the",
+    "drift rule then drags each group after its anchor. The weight sweep",
+    "(scripts/block-weight-sweep.ts) found no weight that beats V2.",
+    "",
+    "**V5 - V2 plus cover_min as a hard floor in Stage 2/3.** Feasible plans:",
+    `${feasibleRows("V5").length}, against ${feasibleRows("V2").length} for V2. Plans reaching the target:`,
+    `${count("V5", (r) => r.cover >= r.target - 1e-9)}, against ${count("V2", (r) => r.cover >= r.target - 1e-9)}. In`,
+    `${count("V5", (r) => r.coverShort)} of ${feasibleRows("V5").length} no selection could reach the floor, so the`,
+    "densest one found is used and flagged cover_short. Median cover barely",
+    `moves (${fmt(median("V2", (r) => r.cover))} to ${fmt(median("V5", (r) => r.cover))}) because`,
+    "the search already aims at cover_min - A4 saturates there, so it had no",
+    "reason to go further - and because what falls short is lost in",
+    "placement, when groups shrink to fit. It costs height balance:",
+    `A1 ${fmt(median("V2", (r) => r.A1))} to ${fmt(median("V5", (r) => r.A1))}, and Z`,
+    `${fmt(median("V2", z), 4)} to ${fmt(median("V5", z), 4)}.`,
+    "",
+    "**V6 - V5 plus gap fill.** Adds plants of a ground cover or matrix",
+    "species already in the plan, two at a time, into square metres under",
+    "half canopy, and stops at the 50% mark, at H1, or at H5 - whichever",
+    "comes first. Which one stopped it is not recorded per plan; in the one",
+    "bed traced by hand it was H5, because the filler is already one of the",
+    "bigger groups and a few more plants push it to the share limit.",
+    `Median plants ${fmt(median("V5", (r) => r.plants), 0)} to`,
+    `${fmt(median("V6", (r) => r.plants), 0)}; run time ${fmt(median("V5", (r) => r.ms), 0)} ms to`,
+    `${fmt(median("V6", (r) => r.ms), 0)} ms. It never introduces a species and never`,
+    "breaks P1, P2, H1 or H5.",
+    "",
+    "## What stops a bed reaching its target cover",
+    "",
+    "`placement` and `pool: exhausted` are zero in every version: Stage 4",
+    "fits what it is given, and the candidate pool never runs out. Almost",
+    "every short plan is `pool: stopped early` - more species were available",
+    "than H2 allows, and the selection used fewer. The limit on cover is in",
+    "what Stage 2 and Stage 3 choose, not in the cover rule, the packer or",
+    "the pool. That is why V1 changes nothing and V5 changes little.",
+    "",
+    "## V4 was not run",
+    "",
+    "The combination rules exist - 14 combos in 8_Species_Reference rows",
+    "5-18, the Stage 4 rule at row 23 - and 55 of their 56 species are in the",
+    "catalogue. But Stage 2 selects same-combo species together in only 2",
+    "plans of 95, so a Stage 4 neighbour bonus has almost nothing to act on",
+    "and could not be measured against the 2-point guard. The Stage 2 half",
+    "(row 22) is also NOT IMPLEMENTED; it has to come first.",
     "",
   ].join("\n");
 }
