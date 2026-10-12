@@ -214,6 +214,18 @@ export async function runSourcing(
     };
   };
 
+  // Cloudflare Workers allows 50 subrequests per request on the free
+  // plan. A full run wants roughly 70: five nurseries x six species x up
+  // to two queries, plus robots.txt for each and the geocode. Going over
+  // throws "too many subrequests", which the gardener saw as "couldn't
+  // check Stodels" - a real nursery blamed for a platform limit.
+  //
+  // So the run keeps a budget and stops cleanly when it is nearly spent,
+  // reporting which nurseries it got to. A short honest answer beats a
+  // long one that dies halfway.
+  const SUBREQUEST_BUDGET = 42;
+  const budgetSpent = () => client.requests >= SUBREQUEST_BUDGET;
+
   const offers = new Map<string, Offer[]>(input.species.map((s) => [s.plantId, []]));
   const availability = new Map<string, SpeciesReport["availability"]>(input.species.map((s) => [s.plantId, []]));
 
@@ -236,8 +248,30 @@ export async function runSourcing(
       }
       const adapter = adapters[platform];
       let failure: string | null = null;
+      if (budgetSpent()) {
+        statuses.push({
+          id: source.id,
+          nursery: source.nursery,
+          platform,
+          status: "skipped",
+          detail: "not checked this time - the request limit was reached",
+        });
+        return;
+      }
+      let stoppedEarly = false;
       for (const species of input.species) {
-        const queries = [binomial(species.scientificName), ...commonNamesOf(species).slice(0, 1)];
+        if (budgetSpent()) {
+          stoppedEarly = true;
+          break;
+        }
+        // The common-name fallback doubles the request count for a
+        // small gain, so it only runs while there is budget to spare.
+        const queries = [
+          binomial(species.scientificName),
+          ...(client.requests < SUBREQUEST_BUDGET - 12
+            ? commonNamesOf(species).slice(0, 1)
+            : []),
+        ];
         let matched: { product: Product; rank: MatchRank }[] = [];
         for (const query of queries) {
           const result = await adapter.search(client, source, query);
@@ -272,7 +306,17 @@ export async function runSourcing(
         statuses.push({ id: source.id, nursery: source.nursery, platform, status: "failed", detail: failure });
         warnings.push(`Couldn't check ${source.nursery} (${failure}).`);
       } else {
-        statuses.push({ id: source.id, nursery: source.nursery, platform, status: "checked", detail: source.platform === "unconfirmed" ? `platform detected: ${platform}` : "" });
+        statuses.push({
+          id: source.id,
+          nursery: source.nursery,
+          platform,
+          status: "checked",
+          detail: stoppedEarly
+            ? "some plants not checked - the request limit was reached"
+            : source.platform === "unconfirmed"
+              ? `platform detected: ${platform}`
+              : "",
+        });
       }
     }),
   );

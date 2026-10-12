@@ -212,7 +212,7 @@ function Header({
         </button>
       </nav>
       <button className="saved-link" onClick={() => navigate("saved")}>
-        <span className="saved-label">Saved</span>
+        <span className="saved-label">Saved gardens</span>
         <span className="saved-count">
           {String(savedCount).padStart(2, "0")}
         </span>
@@ -388,11 +388,8 @@ function ColourPreferencePicker({
 
   return (
     <fieldset>
-      <legend>Colour (optional)</legend>
-      <p className="field-help">
-        We will favour these colours, but a plant that suits your bed better
-        can still be chosen.
-      </p>
+      <legend>2. Colour palette</legend>
+      <p className="field-help">What colours appeal to you?</p>
       <div className="colour-modes">
         <ChoiceButton
           selected={value.mode === "none"}
@@ -400,15 +397,32 @@ function ColourPreferencePicker({
           copy="We will not favour any particular colour."
           onClick={() => onChange({ mode: "none" })}
         />
-        {(Object.keys(colourSchemes) as ColourScheme[]).map((scheme) => (
-          <ChoiceButton
-            key={scheme}
-            selected={value.mode === "scheme" && value.scheme === scheme}
-            title={colourSchemeLabels[scheme]}
-            copy={colourSchemes[scheme].join(", ")}
-            onClick={() => onChange({ mode: "scheme", scheme })}
-          />
-        ))}
+        {(Object.keys(colourSchemes) as ColourScheme[]).map((scheme) => {
+          const selected = value.mode === "scheme" && value.scheme === scheme;
+          return (
+            <button
+              key={scheme}
+              type="button"
+              className={`choice-button colour-scheme${selected ? " is-selected" : ""}`}
+              onClick={() => onChange({ mode: "scheme", scheme })}
+              aria-pressed={selected}
+            >
+              <span>{selected ? "●" : "○"}</span>
+              <strong>{colourSchemeLabels[scheme]}</strong>
+              {/* The colours themselves, rather than their names: a
+                  gardener choosing a palette is choosing by eye. */}
+              <span className="colour-swatches" aria-hidden="true">
+                {colourSchemes[scheme].map((colour) => (
+                  <i
+                    key={colour}
+                    style={{ background: flowerColourInk[colour] ?? UNKNOWN_COLOUR_INK }}
+                  />
+                ))}
+              </span>
+              <small>{colourSchemes[scheme].join(", ")}</small>
+            </button>
+          );
+        })}
       </div>
 
       <details className="colour-custom">
@@ -1460,7 +1474,8 @@ function FinderView({
       content: (
         <div className="choice-stack preference-blocks">
           <fieldset>
-            <legend>Style</legend>
+            <legend>1. Garden style</legend>
+            <p className="field-help">What look do you love?</p>
             <div className="choice-grid two-column">
               {(Object.keys(gardenStyleLabels) as GardenStyle[]).map((style) => (
                 <ChoiceButton
@@ -2169,7 +2184,7 @@ function BedDiagram({
       </div>
       {viewingEdge ? (
         <span className={`plan-front-edge is-${viewingEdge}`}>
-          ▲ you stand here
+          you stand here
         </span>
       ) : null}
       {/* Sits outside .plan-bed, which clips its children, so a name near
@@ -3074,11 +3089,11 @@ function SavedLayoutsList({
             )}
             {layout.budget ? (
               <p className="saved-layout-budget">
-                {layout.budget.text}
-                <small>
-                  {" "}Prices checked {formatSavedDate(layout.budget.checkedAt)}
-                  {layout.budget.place ? ` for ${layout.budget.place}` : ""} — confirm with the nursery.
-                </small>
+                {/* The figure only. The full line - what is in it, what
+                    was not found, when it was checked - is on the
+                    garden's own page, where there is room for it. */}
+                {guidePrice(layout.budget)}
+                <small> guide price</small>
               </p>
             ) : null}
             <ul>
@@ -3098,6 +3113,20 @@ function SavedLayoutsList({
             <footer>
               <button className="text-link" onClick={() => onOpen(layout.id)}>
                 Open full layout →
+              </button>
+              {/* Printing from the list would put every saved garden on
+                  the page, so this opens the one you picked first and
+                  prints that. The wait is for the layout to rebuild -
+                  a saved garden is re-planned from its seed, not
+                  stored as a picture. */}
+              <button
+                className="text-link"
+                onClick={() => {
+                  onOpen(layout.id);
+                  window.setTimeout(() => window.print(), 900);
+                }}
+              >
+                Print / Save as PDF
               </button>
               <button className="text-link" onClick={() => onRemove(layout.id)}>
                 Remove
@@ -3811,7 +3840,7 @@ export function GardenApp() {
 
   return (
     <div className="site-shell">
-      <Header view={view} savedCount={saved.length} navigate={navigate} />
+      <Header view={view} savedCount={savedLayouts.length} navigate={navigate} />
       {view === "home" && (
         <HomeView
           start={() => navigate("finder")}
