@@ -6618,3 +6618,15 @@ details.brief-strip[open] .brief-strip-hint { visibility: hidden; }
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* "Why these plants", "Care" and "The plants in this layout" are the plan
+   page's main section headings: the same size as the brief's block
+   headings and the option names, so the three siblings stay matched. */
+.plan-why h3,
+.plan-care h3,
+.plan-plants h3 {
+  font-family: var(--font-hand);
+  font-synthesis: none;
+  font-size: var(--hand-section);
+  line-height: 1.1;
+}

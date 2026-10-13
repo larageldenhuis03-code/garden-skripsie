@@ -147,6 +147,8 @@ const RULES = {
     { name: "'Bed budget' matches the plan title", a: [".sourcing-budget-title", null], b: [".collection-intro h1", null], rule: "eq" },
     { name: "'Save this layout' matches the plan title", a: [".plan-actions .button", null], b: [".collection-intro h1", null], rule: "eq" },
     { name: "'Regenerate' matches the plan title", a: [".plan-actions .text-link", null], b: [".collection-intro h1", null], rule: "eq" },
+    { name: "'Why these plants' heading is clearly bigger than its text", a: [".plan-why h3", null], b: [".plan-why p", null], rule: "gt" },
+    { name: "'Care' heading is clearly bigger than its text", a: [".plan-care h3", null], b: [".plan-care p", null], rule: "gt" },
     { name: "'Why these plants' text matches the dashed-edge note", a: [".plan-why p", null], b: [".plan-caveat", null], rule: "eq" },
     { name: "'View notes' is smaller than its heading", a: [".plan-assumptions summary span", null], b: [".plan-assumptions summary", null], rule: "lt" },
   ],
