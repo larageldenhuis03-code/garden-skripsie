@@ -29,7 +29,7 @@ import {
 import { STAGE1_WEIGHTS } from "../app/lib/planning/stage1Config.ts";
 
 type TermName = keyof Stage1Score["terms"];
-const TERMS: TermName[] = ["style", "colour", "extras", "saved", "wind", "shade"];
+const TERMS: TermName[] = ["style", "colour", "extras", "saved", "wind"];
 const TOP_N = 20;
 
 const base: GardenBrief = {

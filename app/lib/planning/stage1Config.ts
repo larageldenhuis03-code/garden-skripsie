@@ -26,9 +26,7 @@ import { RULES, type StyleKey } from "./rules.ts";
 import { ROW_PITCH_M, SHADE_ENABLED } from "./engineConfig.ts";
 
 /** 1_Parameters: w_style, w_colour, w_extras, b_saved, b_wind (all
- * AGREED). The `shade` weight this object also carries is NOT a rulebook
- * value - the workbook has no b_shade row and the importer substitutes a
- * default. Nothing reads it while SHADE_ENABLED is false. */
+ * AGREED). */
 export const STAGE1_WEIGHTS = RULES.stage1.weights;
 
 /** 1_Parameters: W_site per wind answer (AGREED, R012). */

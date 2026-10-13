@@ -401,8 +401,8 @@ def build(path: Path) -> dict:
                 "extras": num(p, "w_extras"),
                 "saved": num(p, "b_saved"),
                 "wind": num(p, "b_wind"),
-                # Optional: the shade term is off (B1/test run 1).
-                "shade": num_optional(p, "b_shade", 0.105),
+                # No shade weight: the rulebook dropped b_shade and the
+                # shade bonus is future work (Step 3, 13 Oct 2026).
             },
             "windSiteFactor": {
                 "none": num(p, "W_site (No wind)"),

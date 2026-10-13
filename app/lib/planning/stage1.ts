@@ -6,7 +6,6 @@ import {
   EXTRA_TAGS,
   STAGE1_WEIGHTS,
   STYLE_FIT,
-  shadeTermActive,
 } from "./stage1Config.ts";
 import { isWindResilient, windSiteFactor } from "./windRules.ts";
 
@@ -15,11 +14,12 @@ import { isWindResilient, windSiteFactor } from "./windRules.ts";
  * score in [0, 1]:
  *
  *   raw_i   = 0.637 style_i + 0.105 colour_i + 0.258 extras_i
- *           + 0.105 saved_i + 0.637 W_site windres_i + 0.105 shade_i
+ *           + 0.105 saved_i + 0.637 W_site windres_i
  *   score_i = raw_i / raw_max
  *
- * (weights from the rulebook; the shade term is active only when a
- * canopy is expected - see shadeTermActive).
+ * (weights from the rulebook. A shade term, b_shade x shade_i, was removed
+ * on 13 Oct 2026: the rulebook dropped b_shade and the bonus is future
+ * work.)
  *
  * raw_max counts ONLY the terms the user activated, so a preference nobody
  * expressed neither helps nor dilutes anyone. Stage 1 ranks; it never
@@ -59,7 +59,6 @@ export type Stage1Score = {
     extras: Stage1Term;
     saved: Stage1Term;
     wind: Stage1Term & { siteFactor: number };
-    shade: Stage1Term;
   };
 };
 
@@ -127,8 +126,7 @@ export function stage1RawMax({ brief, savedPlantIds }: Stage1Inputs): number {
     (pickedColours(brief.colour).length > 0 ? STAGE1_WEIGHTS.colour : 0) +
     (brief.extras.length > 0 ? STAGE1_WEIGHTS.extras : 0) +
     (savedPlantIds.length > 0 ? STAGE1_WEIGHTS.saved : 0) +
-    STAGE1_WEIGHTS.wind * siteFactor +
-    (shadeTermActive(brief.style, brief.bedLengthM) ? STAGE1_WEIGHTS.shade : 0)
+    STAGE1_WEIGHTS.wind * siteFactor
   );
 }
 
@@ -165,11 +163,6 @@ export function scorePlantStage1(
       ),
       siteFactor,
     },
-    shade: term(
-      toleratesShade(plant) ? 1 : 0,
-      STAGE1_WEIGHTS.shade,
-      shadeTermActive(brief.style, brief.bedLengthM),
-    ),
   };
 
   const raw =
@@ -177,8 +170,7 @@ export function scorePlantStage1(
     terms.colour.contribution +
     terms.extras.contribution +
     terms.saved.contribution +
-    terms.wind.contribution +
-    terms.shade.contribution;
+    terms.wind.contribution;
   const rawMax = stage1RawMax(inputs);
 
   return {

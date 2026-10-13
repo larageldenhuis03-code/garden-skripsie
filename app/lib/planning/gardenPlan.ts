@@ -722,9 +722,6 @@ function assessPlant(
     if (terms.wind.active && terms.wind.value === 1) {
       reasons.push("copes with wind");
     }
-    if (terms.shade.active && terms.shade.value === 1) {
-      reasons.push("happy in the shade of taller plants");
-    }
     if (terms.colour.active && terms.colour.value > 0) {
       reasons.push("matches your colour choice");
     }

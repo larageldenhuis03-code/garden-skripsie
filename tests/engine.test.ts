@@ -232,8 +232,9 @@ test("shade is switched off: the hand check keeps raw_max 1.4235 and score 0.811
   close(result.rawMax, 1.4235, 1e-9);
   close(result.raw, 1.1545, 1e-9);
   close(result.score, 0.811, 5e-4);
-  assert.equal(result.terms.shade.active, false);
-  assert.equal(result.terms.shade.contribution, 0);
+  // The shade term is gone (b_shade removed, 13 Oct 2026); raw_max and the
+  // score are unchanged because it was never active.
+  assert.equal("shade" in result.terms, false);
 });
 
 // ---------------------------------------------------------------------------
