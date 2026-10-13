@@ -102,3 +102,34 @@ A repeat happens only when the bed's pool holds too few eligible carpeters to gi
 ![small bed, S032](figures/mat_study/small-S032.svg)
 ![medium bed, S009](figures/mat_study/medium-S009.svg)
 ![large bed, S076](figures/mat_study/large-S076.svg)
+
+## Conclusion: not adopted
+
+**Decision (owner, 13 October 2026): the mat model is rejected on design
+review and will not be merged.** Two reasons:
+
+- **It reads as a uniform carpet.** Every open gap is filled with the
+  same textured ground cover, which looks like lawn, not a planted bed.
+- **The quantities are unrealistic.** Area x density at 0.6 x spread
+  takes the median plan from 19 to 85 plants (90th percentile 511) and
+  one bed to 7,812. Most of the excess is the shade patch under trees,
+  which adds plants but no cover.
+
+| | V0 | V2 | M (V2 + mat) |
+|---|---|---|---|
+| plans produced | 95 / 100 | 95 / 100 | 95 / 100 |
+| bare ground, median (10th-90th) | 0.347 (0.239-0.497) | 0.343 (0.243-0.477) | 0.150 (0.100-0.200) |
+| bare within open_min-open_max | 27 | 28 | 95 |
+| bare <= 20% | 3 | 3 | 95 |
+| largest empty patch | 0.165 | 0.150 | 0.018 |
+| quadrant CV | 0.212 | 0.156 | 0.033 |
+| Z (selection) | 0.9196 | 0.9293 | 0.9293 |
+| hard violations (specimens) | 0 | 0 | 0 |
+| plans over H2's s_max | 0 | 0 | 4 |
+| run time per plan, ms | 526 | 513 | 498 |
+| plants to buy, median (90th) | 20 (45) | 19 (46) | 85 (511) |
+
+The mat met the cover target in every plan, but it did so by changing
+what the bed is. The code stays on branch `coverage-test` (commit
+`4a1ba4f`) as evidence; the figures are in `figures/mat_study/` as SVG
+and PNG.
