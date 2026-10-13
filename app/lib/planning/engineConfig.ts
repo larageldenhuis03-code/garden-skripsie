@@ -186,6 +186,10 @@ export const CLIMBERS_NEED_L1_HOST = true;
  */
 export const SEARCH = {
   coverMinHard: false,
+  /** The floor applies only to beds at least this big, in m2. 0 means
+   * every bed, which is what V5 measured; V7 sets 6, so small beds - where
+   * V5 made the spread clearly worse - have no floor. */
+  coverMinHardFromM2: 0,
   gapFill: false,
   /**
    * Whether gap fill keeps the filler inside its layer's depth band.

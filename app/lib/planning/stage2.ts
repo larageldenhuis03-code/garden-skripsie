@@ -369,6 +369,7 @@ export class SelectionState {
     return (
       this.baseComplete() &&
       (!SEARCH.coverMinHard ||
+        this.site.widthM * this.site.depthM < SEARCH.coverMinHardFromM2 ||
         this.plantedAreaM2 >= this.coverFloorM2() - 1e-9)
     );
   }

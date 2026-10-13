@@ -41,7 +41,7 @@ import { cellsAtLeastHalf, spreadMetrics } from "./batch-test/metrics.ts";
 import COMBOS from "./batch-test/combos.json" with { type: "json" };
 
 const OUT = "reports";
-const FIG = join(OUT, "figures", "coverage_test");
+const FIG = join(OUT, "figures", process.env.COVERAGE_OUT ?? "coverage_test");
 
 // ---------------------------------------------------------------- versions
 
@@ -64,7 +64,7 @@ function setPath(
 const EMPTIEST_BLOCK_WEIGHT = 0.25;
 
 type Version = {
-  id: "V0" | "V1" | "V2" | "V3" | "V5" | "V6";
+  id: "V0" | "V1" | "V2" | "V3" | "V5" | "V6" | "V7";
   label: string;
   /** Applies the override; returns the undo. */
   apply: () => () => void;
@@ -85,8 +85,11 @@ const BASE_COVER: Record<string, { coverMin: number; coverMax: number }> =
     ]),
   );
 
-/** The versions this report compares. */
-const RUN_IDS = ["V0", "V1", "V2", "V3", "V5", "V6"];
+/** The versions this report compares. COVERAGE_RUN overrides it, e.g.
+ * COVERAGE_RUN=V0,V2,V5,V7 for the V7 comparison. */
+const RUN_IDS = (process.env.COVERAGE_RUN ?? "V0,V1,V2,V3,V5,V6").split(",").map((v) => v.trim());
+/** Report name: reports/<name>.md and .csv, figures in reports/figures/<name>. */
+const REPORT_NAME = process.env.COVERAGE_OUT ?? "coverage_test";
 
 const VERSIONS: Version[] = [
   {
@@ -153,6 +156,21 @@ const VERSIONS: Version[] = [
         setPath(placement, "contactBonus", 0),
         setPath(search, "coverMinHard", true),
         setPath(search, "gapFill", true),
+      ];
+      return () => undo.forEach((undoOne) => undoOne());
+    },
+    target: (style) => BASE_COVER[styleKeyOf(style)].coverMin,
+  },
+  {
+    id: "V7",
+    label: "contact 0, cover floor on beds of 6 m2 or more only",
+    apply: () => {
+      const placement = PLACEMENT as unknown as Record<string, unknown>;
+      const search = SEARCH as unknown as Record<string, unknown>;
+      const undo = [
+        setPath(placement, "contactBonus", 0),
+        setPath(search, "coverMinHard", true),
+        setPath(search, "coverMinHardFromM2", 6),
       ];
       return () => undo.forEach((undoOne) => undoOne());
     },
@@ -835,6 +853,108 @@ function summarise(rowsByVersion: Map<string, Row[]>): string {
   ].join("\n");
 }
 
+/** The V7 close: does turning the floor off for small beds keep V5's gain
+ * on medium and large beds without its damage on small ones? Every
+ * comparison is computed from the run. */
+function summariseV7(rowsByVersion: Map<string, Row[]>): string {
+  const ids = [...rowsByVersion.keys()];
+  const rowsOf = (id: string, only?: (row: Row) => boolean) =>
+    (rowsByVersion.get(id) ?? []).filter((row) => row.feasible && (!only || only(row)));
+  const med = (id: string, get: (row: Row) => number | null, only?: (row: Row) => boolean) =>
+    percentile(
+      rowsOf(id, only)
+        .map(get)
+        .filter((value): value is number => value !== null),
+      0.5,
+    );
+  const count = (id: string, test: (row: Row) => boolean, only?: (row: Row) => boolean) =>
+    rowsOf(id, only).filter(test).length;
+  const patch = (r: Row) => r.largestEmptyPatch;
+  const cv = (r: Row) => r.quadrantCV;
+  const full = (r: Row) => r.cellsFull;
+  const z = (r: Row) => r.z;
+  const reached = (r: Row) => r.cover >= r.target - 1e-9;
+  const small = (r: Row) => r.bedAreaM2 < 6;
+  const notSmall = (r: Row) => r.bedAreaM2 >= 6;
+  const better = (a: number, b: number, lower: boolean) =>
+    Math.abs(a - b) < 5e-4 ? "level with" : (lower ? a < b : a > b) ? "better than" : "worse than";
+
+  const tableRow = (id: string) =>
+    `| **${id}** | ${fmt(med(id, (r) => r.cover))} | ${fmt(med(id, (r) => r.emptyCellShare))} | ` +
+    `${fmt(med(id, patch))} | ${fmt(med(id, full))} | ${fmt(med(id, cv))} | ${fmt(med(id, z), 4)} | ` +
+    `${fmt(med(id, (r) => r.A1))} | ${fmt(med(id, (r) => r.A4))} | ${rowsOf(id).length} | ` +
+    `${count(id, reached)} | ${count(id, (r) => r.coverShort)} | ${fmt(med(id, (r) => r.plants), 0)} | ` +
+    `${fmt(med(id, (r) => r.ms), 0)} |`;
+
+  const bandLine = (name: string, only: (row: Row) => boolean) =>
+    `| ${name} | ${ids.map((id) => `${fmt(med(id, patch, only))} / ${fmt(med(id, cv, only))}`).join(" | ")} |`;
+
+  /** Do two versions build the same plan for every scenario in a group? */
+  const identical = (a: string, b: string, only: (row: Row) => boolean) => {
+    const byId = new Map((rowsByVersion.get(b) ?? []).map((row) => [row.id, row]));
+    const group = (rowsByVersion.get(a) ?? []).filter(only);
+    const differ = group.filter((row) => {
+      const other = byId.get(row.id);
+      return !other || other.z !== row.z || other.cover !== row.cover || other.plants !== row.plants;
+    });
+    return differ.length === 0
+      ? `all ${group.length} identical to ${b}`
+      : `${differ.length} of ${group.length} differ from ${b} (${differ.map((row) => row.id).join(", ")})`;
+  };
+
+  const v7SmallPatch = med("V7", patch, small);
+  const v2SmallPatch = med("V2", patch, small);
+  const v5SmallPatch = med("V5", patch, small);
+  const v7BigPatch = med("V7", patch, notSmall);
+  const v5BigPatch = med("V5", patch, notSmall);
+  const v2BigPatch = med("V2", patch, notSmall);
+
+  return [
+    "## Decision table",
+    "",
+    "Medians over plans that produced a layout. Lower is better for empty",
+    "share, largest patch and quadrant CV; higher for cover, square metres",
+    "at least half planted, Z, A1 and A4.",
+    "",
+    "| | cover | empty | largest patch | m2 >=50% | quadrant CV | Z | A1 | A4 | feasible | reached target | cover_short | plants | ms |",
+    "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|",
+    ...ids.map(tableRow),
+    "",
+    "## Largest empty patch / quadrant CV, by bed size",
+    "",
+    `| bed | ${ids.join(" | ")} |`,
+    `|---|${ids.map(() => "---").join("|")}|`,
+    bandLine("small (<6 m2)", small),
+    bandLine("medium (6-30 m2)", (r) => r.bedAreaM2 >= 6 && r.bedAreaM2 < 30),
+    bandLine("large (>=30 m2)", (r) => r.bedAreaM2 >= 30),
+    "",
+    "## What V7 does",
+    "",
+    "V7 is V5 with the cover floor switched off for beds under 6 m2. The",
+    "question it answers: does that keep V5's gain on medium and large beds",
+    "while removing the damage V5 did to small ones?",
+    "",
+    `**Small beds.** V7's largest empty patch is ${fmt(v7SmallPatch)}, ${better(v7SmallPatch, v5SmallPatch, true)} V5`,
+    `(${fmt(v5SmallPatch)}) and ${better(v7SmallPatch, v2SmallPatch, true)} V2 (${fmt(v2SmallPatch)}). With no floor and`,
+    "the same seeds, a small bed under V7 should be built exactly as V2 builds",
+    `it. Checked scenario by scenario: ${identical("V7", "V2", small)}.`,
+    "",
+    `**Beds of 6 m2 or more.** V7's largest empty patch is ${fmt(v7BigPatch)}, ${better(v7BigPatch, v5BigPatch, true)}`,
+    `V5 (${fmt(v5BigPatch)}) and ${better(v7BigPatch, v2BigPatch, true)} V2 (${fmt(v2BigPatch)}). On these beds V7 and V5`,
+    `apply the same rule with the same seeds. Checked: ${identical("V7", "V5", notSmall)}.`,
+    "So V7 is an exact splice - V2 on small beds, V5 on the rest - and its",
+    "figures are what that splice gives, not a new behaviour.",
+    "",
+    `**Cost.** Median Z ${fmt(med("V2", z), 4)} for V2, ${fmt(med("V5", z), 4)} for V5, ${fmt(med("V7", z), 4)} for V7.`,
+    `Beds reaching their target: V2 ${count("V2", reached)}, V5 ${count("V5", reached)}, V7 ${count("V7", reached)}.`,
+    `Flagged cover_short: V5 ${count("V5", (r) => r.coverShort)}, V7 ${count("V7", (r) => r.coverShort)}.`,
+    "",
+    "Only 5 scenarios are small beds, so the small-bed figures are a",
+    "warning sign rather than a measurement.",
+    "",
+  ].join("\n");
+}
+
 // -------------------------------------------------------------------- main
 
 function main(): void {
@@ -863,7 +983,7 @@ function main(): void {
 
   mkdirSync(FIG, { recursive: true });
   writeFileSync(join(FIG, "panels.json"), JSON.stringify(panels, null, 1), "utf8");
-  writeFileSync(join(OUT, "coverage_test.csv"), toCsv(all), "utf8");
+  writeFileSync(join(OUT, `${REPORT_NAME}.csv`), toCsv(all), "utf8");
 
   const styles = [...new Set(all.map((row) => row.style))].sort();
   const bands = ["small (<6 m2)", "medium (6-30 m2)", "large (>=30 m2)"];
@@ -933,11 +1053,11 @@ function main(): void {
     "bed, plus a Mediterranean and a Cottage example, each in V0, V1 and V2",
     "on the same seed.",
     "",
-    summarise(rowsByVersion),
+    RUN_IDS.includes("V7") ? summariseV7(rowsByVersion) : summarise(rowsByVersion),
   ].join("\n");
 
-  writeFileSync(join(OUT, "coverage_test.md"), md, "utf8");
-  console.log(`Written ${join(OUT, "coverage_test.md")}`);
+  writeFileSync(join(OUT, `${REPORT_NAME}.md`), md, "utf8");
+  console.log(`Written ${join(OUT, `${REPORT_NAME}.md`)}`);
 }
 
 main();
