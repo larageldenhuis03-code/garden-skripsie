@@ -88,6 +88,10 @@ export type EngineRules = {
     /** contact_bonus (D26): placement preference for a candidate spot
      * touching the bed edge or an already-placed plant. */
     contactBonus: number;
+    /** sweep_weight (D27): sweep packing. Above 0, a plant's candidate
+     * spots are the contact points first, and an in-band contact spot is
+     * preferred with this weight in place of contactBonus. */
+    sweepWeight: number;
     hedgeSpacingFormalCm: [number, number];
     hedgeSpacingInformalCm: [number, number];
     windbreakPorosity: { min: number; max: number; target: number };

@@ -467,6 +467,9 @@ def build(path: Path) -> dict:
             # D26: preference for a candidate spot touching a placed plant
             # (was +0.05 hard-coded in stage4.ts).
             "contactBonus": num(p, "contact_bonus"),
+            # D27: sweep packing - contact points first, in-band contact
+            # spots preferred with this weight (replaces contact_bonus).
+            "sweepWeight": num(p, "sweep_weight"),
             "hedgeSpacingFormalCm": [num(p, "hedge_spacing_formal_min"), num(p, "hedge_spacing_formal_max")],
             "hedgeSpacingInformalCm": [num(p, "hedge_spacing_informal_min"), num(p, "hedge_spacing_informal_max")],
             "windbreakPorosity": {

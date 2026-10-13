@@ -550,14 +550,44 @@ function placeOnce(
       if (any) thirdArea = areas;
     }
     const fullestThird = thirdArea ? Math.max(...thirdArea) : 0;
-    for (let index = 0; index < raw.length; index += 1) {
+    // D27 sweep packing (sweep_weight, rulebook; the W2 / W2p study,
+    // 13 Oct 2026). Contact points first: when one fits and sits inside
+    // the layer's depth band, the random draws are not scored at all - they
+    // are used only to seed an empty area. An in-band contact spot gets
+    // sweep_weight, which is above the largest depth-scatter penalty a spot
+    // inside the band can carry (depth_tol), so a snug spot wins anywhere
+    // in the band; one outside the band gets nothing, so the weight never
+    // pulls a plant out of its band. While it is on it replaces
+    // contact_bonus.
+    const sweep = RULES.stage4.sweepWeight;
+    const inDepthBand = (x: number, y: number) =>
+      target === null || Math.abs(axis.depthOf(x, y) - target * axis.span) <= tol + EPS;
+    let startIndex = 0;
+    if (sweep > 0 && Number.isFinite(firstContact)) {
+      for (let index = firstContact; index < raw.length; index += 1) {
+        const { x, y } = raw[index];
+        if (inDepthBand(x, y) && fits(x, y, r, info) && !breaksP4(info, x, y)) {
+          startIndex = firstContact;
+          break;
+        }
+      }
+    }
+    for (let index = startIndex; index < raw.length; index += 1) {
       const { x, y } = raw[index];
       if (!fits(x, y, r, info) || breaksP4(info, x, y)) continue;
       let pref = rng() * (1e-3 + noise); // seeded tie-break; wider on restarts
       // contact_bonus (D26, rulebook): a snug contact spot packs the bed,
       // but the preference also pulls plants into clumps. It was a bare
-      // +0.05 here until 13 Oct 2026; the rulebook now sets it (0).
-      if (index >= firstContact) pref += RULES.stage4.contactBonus;
+      // +0.05 here until 13 Oct 2026; the rulebook now sets it. Under
+      // sweep packing only an in-band contact spot is preferred, with
+      // sweep_weight instead.
+      if (index >= firstContact) {
+        if (sweep > 0) {
+          if (inDepthBand(x, y)) pref += sweep;
+        } else {
+          pref += RULES.stage4.contactBonus;
+        }
+      }
       if (target !== null) {
         const off = Math.abs(axis.depthOf(x, y) - target * axis.span);
         pref -= off / axis.span + 2 * Math.max(0, off - tol) / axis.span; // depth target +- depth_tol

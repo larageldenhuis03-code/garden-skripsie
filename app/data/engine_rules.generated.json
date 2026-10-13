@@ -300,6 +300,7 @@
     "randomDrawsSource": "random_draws_per_plant",
     "overlapDelta": 0.15,
     "contactBonus": 0.0,
+    "sweepWeight": 0.15,
     "hedgeSpacingFormalCm": [
       45.0,
       60.0
