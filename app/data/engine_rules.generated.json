@@ -64,8 +64,8 @@
           "Fynbos"
         ]
       },
-      "coverMin": 0.7,
-      "coverMax": 0.85,
+      "coverMin": 0.9,
+      "coverMax": 1.0,
       "openMin": 0.15,
       "openMax": 0.3,
       "tau": {
@@ -76,7 +76,7 @@
       "tMin": 3.0,
       "rMax": 0.15,
       "structMin": 1.0,
-      "status": "AGREED (all). T_min = variety; struct_min = emergent structure"
+      "status": "CHANGED"
     },
     "mediterranean": {
       "label": "Mediterranean",
@@ -91,8 +91,8 @@
         ],
         "biomes": null
       },
-      "coverMin": 0.6,
-      "coverMax": 0.8,
+      "coverMin": 0.9,
+      "coverMax": 1.0,
       "openMin": 0.2,
       "openMax": 0.4,
       "tau": {
@@ -103,7 +103,7 @@
       "tMin": 3.0,
       "rMax": 0.2,
       "structMin": 1.0,
-      "status": "AGREED (all). T_min = variety; struct_min = emergent structure"
+      "status": "CHANGED"
     },
     "cottage": {
       "label": "Cottage",
@@ -120,8 +120,8 @@
         ],
         "biomes": null
       },
-      "coverMin": 0.85,
-      "coverMax": 0.9,
+      "coverMin": 0.9,
+      "coverMax": 1.0,
       "openMin": 0.1,
       "openMax": 0.15,
       "tau": {
@@ -132,7 +132,7 @@
       "tMin": 3.0,
       "rMax": 0.2,
       "structMin": 0.0,
-      "status": "AGREED (all). Cottage needs no emergent structure, so struct_min = 0"
+      "status": "CHANGED"
     },
     "generic": {
       "label": "Generic (Undecided)",
@@ -141,8 +141,8 @@
         "plantTypes": null,
         "biomes": null
       },
-      "coverMin": 0.75,
-      "coverMax": 0.85,
+      "coverMin": 0.9,
+      "coverMax": 1.0,
       "openMin": 0.15,
       "openMax": 0.25,
       "tau": {
@@ -153,7 +153,7 @@
       "tMin": 3.0,
       "rMax": 0.25,
       "structMin": 1.0,
-      "status": "AGREED (all). T_min = variety; struct_min = emergent structure"
+      "status": "CHANGED"
     }
   },
   "stage2": {
@@ -383,6 +383,7 @@
     "k_headroom": "SUPERSEDED",
     "struct_min": "AGREED",
     "feature_exempt_H5": "AGREED",
+    "colour_unknown_score": "ASSUMPTION",
     "placement_fail_limit": "ASSUMPTION",
     "retry_cover_factor": "ASSUMPTION",
     "row_pitch": "ASSUMPTION",
@@ -400,10 +401,10 @@
     "spread_P33 (band 1 / 2 boundary)": "DERIVED",
     "spread_P67 (band 2 / 3 boundary)": "DERIVED",
     "footprint_cap (φ)": "ASSUMPTION",
-    "viewing_edge": "AGREED",
-    "viewer_option_count": "AGREED",
+    "viewing_edge": "CHANGED",
+    "viewer_option_count": "CHANGED",
     "viewer_depth_set": "AGREED",
-    "viewer_windbreak_edge": "AGREED",
+    "viewer_windbreak_edge": "SUPERSEDED 2026-10-12 (D24)",
     "band_min_L1": "SUPERSEDED 2026-09-29",
     "band_min_L4": "SUPERSEDED 2026-09-29",
     "band_min_L5": "SUPERSEDED 2026-09-29",

@@ -76,7 +76,10 @@ test("engine numbers are read from the rulebook", () => {
   assert.deepEqual(RULES.stage2.speciesBands.map((b) => [b.sMin, b.sMax]), [[3, 6], [5, 12], [10, 20]]);
   assert.equal(RULES.stage3.alpha, 0.95);
   assert.equal(RULES.stage3.iterations, 2000);
-  assert.equal(RULES.styles.cottage.coverMin, 0.85);
+  // cover_min 0.90 for every style (owner, 13 Oct 2026, rulebook 6f37affddbc2;
+  // was 0.85 for cottage). cover_max is 1.0 for every style.
+  assert.equal(RULES.styles.cottage.coverMin, 0.9);
+  assert.equal(RULES.styles.cottage.coverMax, 1);
   assert.equal(RULES.styles.fynbos.structMin, 1);
   assert.equal(RULES.styles.cottage.structMin, 0);
 });

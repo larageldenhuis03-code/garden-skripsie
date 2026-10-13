@@ -1,4 +1,4 @@
-# Final engine changes - Step 2 check (STOPPED)
+# Final engine changes - Step 2 check
 
 Baseline rulebook (imported): `098c8d085f61`.
 Updated workbook (dry import only, NOT imported into the app): `6f37affddbc2`.
@@ -25,7 +25,17 @@ goal weights 0.2 each; Stage 1 weights (style 0.637, colour 0.105, extras
 alpha 0.95 (T0 is derived in code, not a rulebook value); H2 bands; H3
 group sizes; size_var_min 3.
 
-## Why this stops here
+## Owner decision, 13 October 2026
+
+**Keep cover_min 0.90 and cover_max 1.0 for every style** ("we are still
+testing and trying to improve the spatial layout"). This overrides the
+prompt's "D23 reverted" line; the workbook is imported as it stands.
+Imported: rulebook `6f37affddbc2`. The one unit test that pinned a cover
+value (cottage cover_min 0.85) now pins 0.90 and cover_max 1.0.
+
+The contact bonus (D26) is still open: see below.
+
+## Why this stopped first
 
 1. **D23 is not reverted in the workbook.** Change_Log shows the D23 change
    (cover_min 0.95, cover_max 1.0) and the style rows now read 0.90 / 1.0;
