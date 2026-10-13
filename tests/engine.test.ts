@@ -28,7 +28,6 @@ import {
   onFeatureList,
   P2_OVERLAP_TOLERANCE,
   PLACEMENT,
-  SHADE_ENABLED,
   placeSelection,
   RULES,
   runEngine,
@@ -204,11 +203,11 @@ test("G3 in thirds: two types, no structure, no size choice scores 0.556", () =>
   close(state.goals().A3, 5 / 9, 1e-12);
 });
 
-test("shade is switched off: the hand check keeps raw_max 1.4235 and score 0.811", () => {
-  // TR1-4: shade_enabled = false. On the hand-check bed (6 x 4 m, 3 rows,
-  // a style with struct_min 1) the rulebook's shade condition would hold,
-  // yet raw_max must stay 1.4235 and the worked-example plant 0.811.
-  assert.equal(SHADE_ENABLED, false);
+test("no shade term in the Stage 1 breakdown: the hand check keeps raw_max 1.4235 and score 0.811", () => {
+  // The shade bonus is future work. On the hand-check bed (6 x 4 m, 3
+  // rows, a style with struct_min 1) a shade term would once have applied;
+  // there is none, so raw_max stays 1.4235 and the worked-example plant
+  // 0.811.
   const brief: GardenBrief = {
     ...baseBrief,
     style: "fynbos",
@@ -232,8 +231,6 @@ test("shade is switched off: the hand check keeps raw_max 1.4235 and score 0.811
   close(result.rawMax, 1.4235, 1e-9);
   close(result.raw, 1.1545, 1e-9);
   close(result.score, 0.811, 5e-4);
-  // The shade term is gone (b_shade removed, 13 Oct 2026); raw_max and the
-  // score are unchanged because it was never active.
   assert.equal("shade" in result.terms, false);
 });
 

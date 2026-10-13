@@ -13,7 +13,6 @@ import {
   P2_OVERLAP_TOLERANCE,
   PLACEMENT,
   ROW_PITCH_M,
-  SHADE_ENABLED,
 } from "./engineConfig.ts";
 import { canFormWindbreak, type Selection } from "./stage2.ts";
 
@@ -205,7 +204,6 @@ function placeOnce(
   // The windward row bands: one row pitch in from the south and east edges.
   const inWindwardBand = (x: number, y: number): boolean =>
     y > L - ROW_PITCH_M || x > W - ROW_PITCH_M;
-  const shadeOn = SHADE_ENABLED;
   const isTree = (plantId: string) => infos.get(plantId)?.types.includes("tree") ?? false;
 
   const fits = (x: number, y: number, r: number, info?: SpeciesInfo): boolean => {
@@ -228,15 +226,6 @@ function placeOnce(
     FINE_LEAVED_GENERA.includes(info.genus) &&
     inWindwardBand(x, y);
 
-  // P14 shade footprints of the L1 plants: same radius as the canopy
-  // (shade_radius), centre shifted south by shade_offset canopy radii.
-  const inShadow = (x: number, y: number): boolean =>
-    placed.some(
-      (p) =>
-        p.layer === "L1" &&
-        Math.hypot(x - p.xM, y - (p.yM + RULES.stage4.shadeOffset * p.radiusM)) <=
-          RULES.stage4.shadeRadius * p.radiusM,
-    );
 
   const record = (info: SpeciesInfo, x: number, y: number, sequence: number, extra: Partial<Placement> = {}) => {
     placed.push({
@@ -537,9 +526,6 @@ function placeOnce(
       }
       if (site.windSite > 0 && inWindwardBand(x, y)) {
         pref += info.windres ? 0.5 : -0.5; // P13: exposed band takes windres forms
-      }
-      if (shadeOn && info.layer !== "L1" && l1.length > 0) {
-        pref += inShadow(x, y) === info.shade ? 0.3 : -0.3; // P14
       }
       if (!best || pref > best.pref) best = { x, y, pref };
     }

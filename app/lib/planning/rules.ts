@@ -94,8 +94,6 @@ export type EngineRules = {
     shelterDepthH: number;
     maxWindAngleDev: number;
     minGroupWindbreakRow: number;
-    shadeOffset: number;
-    shadeRadius: number;
     rowPitchM: number;
     placementRestarts: number;
     /** Random candidate positions drawn per plant per restart (B1,

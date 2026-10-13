@@ -147,14 +147,8 @@ def param(params, symbol: str) -> str:
 
 
 def num_optional(params, symbol: str, default: float) -> float:
-    """A parameter the workbook may legitimately drop.
-
-    Used for the three shade values. The shade term has been switched off
-    since test run 1 (engineConfig SHADE_ENABLED), so the rulebook no
-    longer has to carry b_shade, shade_offset or shade_radius. They keep
-    their previous values here so that turning shade back on does not
-    silently run with zeros; the import simply stops demanding them.
-    """
+    """A parameter the workbook may legitimately drop: the default is used
+    when it is absent or not a number."""
     live = current(params, symbol)
     if live not in params:
         return default
@@ -401,8 +395,7 @@ def build(path: Path) -> dict:
                 "extras": num(p, "w_extras"),
                 "saved": num(p, "b_saved"),
                 "wind": num(p, "b_wind"),
-                # No shade weight: the rulebook dropped b_shade and the
-                # shade bonus is future work (Step 3, 13 Oct 2026).
+                # No shade weight: the shade bonus is future work.
             },
             "windSiteFactor": {
                 "none": num(p, "W_site (No wind)"),
@@ -483,8 +476,6 @@ def build(path: Path) -> dict:
             "shelterDepthH": num(p, "shelter_depth_H"),
             "maxWindAngleDev": num(p, "max_wind_angle_dev"),
             "minGroupWindbreakRow": int(num(p, "min_group_windbreak_row")),
-            "shadeOffset": num_optional(p, "shade_offset", 1.0),
-            "shadeRadius": num_optional(p, "shade_radius", 1.0),
         },
         "status": {symbol: entry["status"] for symbol, entry in p.items()},
     }

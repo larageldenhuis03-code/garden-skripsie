@@ -17,9 +17,8 @@ import { isWindResilient, windSiteFactor } from "./windRules.ts";
  *           + 0.105 saved_i + 0.637 W_site windres_i
  *   score_i = raw_i / raw_max
  *
- * (weights from the rulebook. A shade term, b_shade x shade_i, was removed
- * on 13 Oct 2026: the rulebook dropped b_shade and the bonus is future
- * work.)
+ * (weights from the rulebook; the shade bonus is future work and has no
+ * term.)
  *
  * raw_max counts ONLY the terms the user activated, so a preference nobody
  * expressed neither helps nor dilutes anyone. Stage 1 ranks; it never

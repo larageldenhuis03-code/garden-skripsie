@@ -170,7 +170,8 @@ The engine, one file per stage:
 
 - Stage 0 `gardenPlan.ts` feasibilityConstraints + `stage0Rules.ts`
   (F5 without its wind trigger, F6, F9). Wind and style never filter.
-- Stage 1 `stage1.ts` / `stage1Config.ts` (now with the shade term).
+- Stage 1 `stage1.ts` / `stage1Config.ts` (no shade term: the shade
+  bonus is future work).
 - Data-derived inputs `engineData.ts`: P30/P60 and the spread-band
   terciles recalculated from the catalogue on load; layers L1-L7; feature
   plants; flowering seasons.
@@ -178,7 +179,8 @@ The engine, one file per stage:
 - Stage 3 `stage3.ts`: greedy start, local improvement, annealing (T0
   derived: a 5%-worse move accepted half the time at the start).
 - Stage 4 `stage4.ts`: layered placement, Option C wind profile (no wind =
-  L1 at the back, owner decision), P1-P14.
+  L1 at the back, owner decision), P1-P13 (P14, the shade footprints, is
+  future work with the shade bonus).
 - `engine.ts` runs Stages 2-4 with the fail rule; `gardenPlan.ts` shows the
   three best distinct results by Z.
 
@@ -186,7 +188,7 @@ The engine, one file per stage:
 keep it passing.
 
 Engine settings that are not rulebook parameters - the test-run-1
-decisions (P2 overlap tolerance, shade switch, feature size thresholds,
+decisions (P2 overlap tolerance, feature size thresholds,
 windward edges, fail-rule and placement settings, NEMBA file) - live in
 ONE file, `app/lib/planning/engineConfig.ts`, each labelled with its
 rulebook ID. Do not scatter engine numbers elsewhere.

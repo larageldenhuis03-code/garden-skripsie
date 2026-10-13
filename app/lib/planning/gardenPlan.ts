@@ -48,7 +48,6 @@ import {
 import { engineSite, runEngine, type EngineRun } from "./engine.ts";
 import { RULES_VERSION } from "./rules.ts";
 import { DATASET_VERSION } from "../../data/datasetVersion.ts";
-import { shadeTermActive } from "./stage1Config.ts";
 import type { Goals, HardCheck } from "./stage2.ts";
 import type { SearchTrace } from "./stage3.ts";
 import type { PlacementCheck, WindProfile } from "./stage4.ts";
@@ -103,7 +102,6 @@ export type EngineSummary = {
   heightTiers: HeightTiers;
   spreadBands: SpreadBands;
   rowsAvailable: number;
-  shadeTermActive: boolean;
   rulesVersion: string;
 };
 
@@ -969,7 +967,6 @@ function planFromRun(
       heightTiers: prepared.heightTiers,
       spreadBands: prepared.spreadBands,
       rowsAvailable: site.rowsAvailable,
-      shadeTermActive: shadeTermActive(brief.style, brief.bedLengthM),
       rulesVersion: RULES_VERSION,
     },
     diagnostics: [...run.diagnostics, ...extraDiagnostics],

@@ -10,9 +10,7 @@
  *            + b_saved  * saved_i
  *            + b_wind   * W_site * windres_i
  *
- * There was a seventh term, b_shade * shade_i. The rulebook deleted
- * b_shade on 2026-09-28 and the bonus is future work, so no plan has
- * carried it since.
+ * There is no shade term: the shade bonus is future work.
  *   score_i  = raw_i / raw_max      (raw_max = sum of ACTIVE terms' weights)
  */
 
@@ -23,7 +21,7 @@ import type {
   GardenStyle,
 } from "./preferences.ts";
 import { RULES, type StyleKey } from "./rules.ts";
-import { ROW_PITCH_M, SHADE_ENABLED } from "./engineConfig.ts";
+import { ROW_PITCH_M } from "./engineConfig.ts";
 
 /** 1_Parameters: w_style, w_colour, w_extras, b_saved, b_wind (all
  * AGREED). */
@@ -85,14 +83,3 @@ export function rowsAvailable(bedDepthM: number): number {
   return Math.floor(bedDepthM / ROW_PITCH_M + 1e-9);
 }
 
-/** shade_term_active = struct_min >= 1 AND rows_available >= 3
- * (1_Parameters). Both are known before any plant is scored. */
-export function shadeTermActive(style: GardenStyle, bedDepthM: number): boolean {
-  // engineConfig SHADE_ENABLED: the shade bonus is future work, so this
-  // is always false and the Stage 1 shade term never becomes active.
-  if (!SHADE_ENABLED) return false;
-  return (
-    RULES.styles[styleKeyFor(style)].structMin >= 1 &&
-    rowsAvailable(bedDepthM) >= 3
-  );
-}
