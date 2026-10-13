@@ -1,0 +1,401 @@
+version,id,style,bed,bedAreaM2,band,code,feasible,violations,species,plants,unplaced,cover,target,emptyCellShare,largestEmptyPatch,quadrantCV,z,A1,A2,A3,A4,A5,ms,limit,limitCount,limitPlacement,limitPool,candidates,sMax,poolReason,neighbourPairs,neighbourSameCombo,neighbourBothInCombo,neighbourShare,cellsFull,coverShort
+V0,S001,fynbos,2x3,6,medium (6-30 m2),provisional-plan,true,,5,21,0,0.7057,0.9,0.325,0.105,0.181,0.9627,0.8429,1,1,0.7841,1,593,pool,false,false,true,352,6,stopped early,50,0,0,0,1,false
+V0,S002,mediterranean,4x2,8,medium (6-30 m2),provisional-plan,true,,4,16,0,0.6433,0.9,0.3575,0.1075,0.0716,0.9553,0.9875,1,1,0.7148,1,548,pool,false,false,true,229,6,stopped early,23,0,0,0,1,false
+V0,S003,cottage,6x4,24,medium (6-30 m2),provisional-plan,true,,10,30,0,0.7612,0.9,0.2475,0.07,0.1639,0.9309,0.9333,1,1,0.8458,1,503,pool,false,false,true,76,12,stopped early,51,0,0,0,0.9167,false
+V0,S004,undecided,8x5,40,large (>=30 m2),provisional-plan,true,,5,23,0,0.5047,0.9,0.51,0.38,0.503,0.8722,0.9783,1,1,0.5608,1,590,pool,false,false,true,423,12,stopped early,16,0,0,0,0.525,false
+V0,S005,fynbos,3x3,9,medium (6-30 m2),provisional-plan,true,,4,10,0,0.6789,0.9,0.3275,0.12,0.1816,0.9003,0.9,1,0.8889,0.7544,1,682,pool,false,false,true,656,6,stopped early,17,0,0,0,0.7778,false
+V0,S006,mediterranean,12x8,96,large (>=30 m2),provisional-plan,true,,17,61,0,0.7816,0.9,0.2175,0.1125,0.0936,0.9855,0.9869,1,1,0.8684,1,894,pool,false,false,true,706,20,stopped early,102,0,0,0,0.8438,false
+V0,S007,cottage,2x3,6,medium (6-30 m2),provisional-plan,true,,3,19,0,0.5812,0.9,0.4325,0.34,0.3138,0.9279,0.9368,1,1,0.6458,1,605,pool,false,false,true,128,6,stopped early,37,0,0,0,0.6667,false
+V0,S008,undecided,4x2,8,medium (6-30 m2),provisional-plan,true,,4,12,0,0.6901,0.9,0.3,0.1675,0.1481,0.9108,0.8333,1,1,0.7667,1,675,pool,false,false,true,607,6,stopped early,16,0,0,0,0.875,false
+V0,S009,fynbos,6x4,24,medium (6-30 m2),provisional-plan,true,,6,16,0,0.5839,0.9,0.415,0.32,0.2674,0.9258,0.8,1,1,0.6488,1,736,pool,false,false,true,794,12,stopped early,14,0,0,0,0.7083,false
+V0,S010,mediterranean,8x5,40,large (>=30 m2),provisional-plan,true,,6,24,0,0.5837,0.9,0.4225,0.3225,0.42,0.9197,0.9917,1,1,0.6486,1,767,pool,false,false,true,558,12,stopped early,64,0,0,0,0.675,false
+V0,S011,cottage,3x3,9,medium (6-30 m2),provisional-plan,true,,4,14,0,0.655,0.9,0.3525,0.1875,0.1809,0.9628,0.9,1,1,0.7278,1,551,pool,false,false,true,245,6,stopped early,25,0,0,0,0.7778,false
+V0,S012,undecided,12x8,96,large (>=30 m2),provisional-plan,true,,12,32,0,0.7392,0.9,0.2825,0.1425,0.1271,0.9511,0.9812,1,1,0.8213,1,844,pool,false,false,true,863,20,stopped early,60,0,0,0,0.7813,false
+V0,S013,fynbos,2x3,6,medium (6-30 m2),provisional-plan,true,,5,13,0,0.772,0.9,0.24,0.09,0.1462,0.8729,0.8692,1,0.8889,0.8578,1,514,pool,false,false,true,85,6,stopped early,25,0,0,0,1,false
+V0,S014,mediterranean,4x2,8,medium (6-30 m2),provisional-plan,true,,6,30,0,0.7043,0.9,0.325,0.065,0.0497,0.8947,0.8,1,1,0.7825,1,476,-,false,false,false,73,6,-,77,0,0,0,1,false
+V0,S015,cottage,6x4,24,medium (6-30 m2),provisional-plan,true,,6,28,0,0.7005,0.9,0.3225,0.1025,0.1477,0.8993,0.7714,1,1,0.7784,1,503,pool,false,false,true,22,12,stopped early,34,0,0,0,0.8333,false
+V0,S016,undecided,8x5,40,large (>=30 m2),provisional-plan,true,,8,26,0,0.6993,0.9,0.32,0.15,0.269,0.4769,0.9923,1,1,0.777,1,477,pool,false,false,true,111,12,stopped early,55,0,0,0,0.8,false
+V0,S017,fynbos,3x3,9,medium (6-30 m2),provisional-plan,true,,6,28,0,0.7133,0.9,0.305,0.0525,0.104,0.9433,0.85,1,1,0.7926,1,540,-,false,false,false,288,6,-,82,0,0,0,1,false
+V0,S018,mediterranean,12x8,96,large (>=30 m2),provisional-plan,true,,14,40,0,0.798,0.9,0.2175,0.1125,0.1806,0.9366,1,1,1,0.8867,1,644,pool,false,false,true,148,20,stopped early,55,0,0,0,0.8542,false
+V0,S019,cottage,2x3,6,medium (6-30 m2),provisional-plan,true,,5,17,0,0.7549,0.9,0.2625,0.1,0.1625,0.8061,0.6706,0.25,1,0.8388,1,538,pool,false,false,true,55,6,stopped early,39,0,0,0,0.8333,false
+V0,S020,undecided,4x2,8,medium (6-30 m2),provisional-plan,true,,5,15,0,0.6126,0.9,0.39,0.265,0.2384,0.8949,0.9667,1,1,0.6806,1,518,pool,false,false,true,275,6,stopped early,24,0,0,0,0.75,false
+V0,S021,fynbos,6x4,24,medium (6-30 m2),provisional-plan,true,,6,20,0,0.6964,0.9,0.305,0.1775,0.2046,0.9724,0.95,1,1,0.7738,1,546,pool,false,false,true,407,12,stopped early,26,0,0,0,0.8333,false
+V0,S022,mediterranean,8x5,40,large (>=30 m2),provisional-plan,true,,8,22,0,0.7264,0.9,0.2875,0.15,0.2533,0.9523,0.9364,1,1,0.8071,1,692,pool,false,false,true,354,12,stopped early,34,0,0,0,0.775,false
+V0,S023,cottage,3x3,9,medium (6-30 m2),provisional-plan,true,,3,9,0,0.7992,0.9,0.2125,0.05,0.0549,0.8805,0.8667,0.6667,1,0.888,1,448,pool,false,false,true,92,6,stopped early,13,0,0,0,1,false
+V0,S024,undecided,12x8,96,large (>=30 m2),provisional-plan,true,,11,49,0,0.7744,0.9,0.2475,0.1675,0.1908,0.9228,0.902,1,1,0.8604,1,601,pool,false,false,true,475,20,stopped early,88,0,0,0,0.8438,false
+V0,S025,fynbos,2x3,6,medium (6-30 m2),provisional-plan,true,,4,18,0,0.6086,0.9,0.395,0.175,0.1315,0.8084,0.9333,1,1,0.6762,1,476,pool,false,false,true,17,6,stopped early,29,0,0,0,0.8333,false
+V0,S026,mediterranean,4x2,8,medium (6-30 m2),no-plan,false,,0,0,0,0,0.9,1,1,0,,,,,,,430,-,false,false,false,15,0,-,0,0,0,0,0,false
+V0,S027,cottage,6x4,24,medium (6-30 m2),no-plan,false,,0,0,0,0,0.9,1,1,0,,,,,,,438,-,false,false,false,3,0,-,0,0,0,0,0,false
+V0,S028,undecided,8x5,40,large (>=30 m2),provisional-plan,true,,5,19,0,0.3076,0.9,0.6975,0.6775,1.0268,0.6995,0.7737,0.6667,1,0.3417,1,442,count,true,false,true,25,12,stopped early,15,0,0,0,0.325,false
+V0,S029,fynbos,3x3,9,medium (6-30 m2),provisional-plan,true,,3,9,0,0.7236,0.9,0.2825,0.1175,0.2176,0.8118,0.7444,0.25,1,0.804,1,438,pool,false,false,true,33,6,stopped early,10,0,0,0,0.8889,false
+V0,S030,mediterranean,12x8,96,large (>=30 m2),provisional-plan,true,,10,38,0,0.8313,0.9,0.1725,0.0325,0.0404,0.899,0.9737,1,1,0.9237,1,475,pool,false,false,true,26,20,stopped early,51,0,0,0,0.8854,false
+V0,S031,cottage,2x3,6,medium (6-30 m2),provisional-plan,true,,4,18,0,0.6701,0.9,0.345,0.145,0.1722,0.9345,0.6,1,1,0.7446,1,414,pool,false,false,true,6,6,stopped early,35,0,0,0,0.8333,false
+V0,S032,undecided,4x2,8,medium (6-30 m2),provisional-plan,true,,4,16,0,0.6428,0.9,0.3575,0.195,0.2966,0.7848,0.45,0.75,1,0.7142,1,478,pool,false,false,true,35,6,stopped early,26,0,0,0,0.75,false
+V0,S033,fynbos,6x4,24,medium (6-30 m2),provisional-plan,true,,8,32,0,0.8001,0.9,0.2075,0.0375,0.0912,0.9033,0.9875,1,1,0.889,1,452,pool,false,false,true,109,12,stopped early,58,0,0,0,1,false
+V0,S034,mediterranean,8x5,40,large (>=30 m2),provisional-plan,true,,7,19,0,0.834,0.9,0.1675,0.0225,0.0585,0.8678,0.7,0.5,1,0.9266,1,447,pool,false,false,true,38,12,stopped early,34,0,0,0,0.925,false
+V0,S035,cottage,3x3,9,medium (6-30 m2),provisional-plan,true,,5,17,0,0.7522,0.9,0.26,0.0525,0.0253,0.888,0.8706,1,1,0.8358,1,390,pool,false,false,true,27,6,stopped early,43,0,0,0,1,false
+V0,S036,undecided,12x8,96,large (>=30 m2),provisional-plan,true,,12,38,0,0.7293,0.9,0.2775,0.1525,0.1378,0.98,0.9895,1,1,0.8104,1,511,pool,false,false,true,137,20,stopped early,41,0,0,0,0.7917,false
+V0,S037,fynbos,2x3,6,medium (6-30 m2),provisional-plan,true,,6,18,0,0.5873,0.9,0.4125,0.245,0.2191,0.9462,0.9556,1,1,0.6525,1,1067,-,false,false,false,352,6,-,49,0,0,0,0.6667,false
+V0,S038,mediterranean,4x2,8,medium (6-30 m2),provisional-plan,true,,5,19,0,0.6355,0.9,0.365,0.2375,0.2152,0.9034,0.9632,1,1,0.7061,1,552,pool,false,false,true,229,6,stopped early,29,0,0,0,0.875,false
+V0,S039,cottage,6x4,24,medium (6-30 m2),provisional-plan,true,,9,27,0,0.5751,0.9,0.4375,0.3,0.2911,0.8612,0.9556,1,1,0.639,1,519,pool,false,false,true,76,12,stopped early,48,0,0,0,0.5417,false
+V0,S040,undecided,8x5,40,large (>=30 m2),provisional-plan,true,,7,19,0,0.6861,0.9,0.3275,0.165,0.2201,0.8498,0.9579,1,1,0.7623,1,613,pool,false,false,true,358,12,stopped early,32,0,0,0,0.775,false
+V0,S041,fynbos,3x3,9,medium (6-30 m2),provisional-plan,true,,5,15,0,0.6419,0.9,0.3725,0.28,0.1966,0.9613,0.9,1,1,0.7132,1,687,pool,false,false,true,1107,6,stopped early,18,0,0,0,0.8889,false
+V0,S042,mediterranean,12x8,96,large (>=30 m2),provisional-plan,true,,12,30,0,0.5279,0.9,0.4875,0.335,0.3906,0.9316,1,1,1,0.5865,1,910,pool,false,false,true,664,20,stopped early,50,0,0,0,0.5417,false
+V0,S043,cottage,2x3,6,medium (6-30 m2),provisional-plan,true,,4,18,0,0.6652,0.9,0.345,0.0825,0.1574,0.9136,0.9222,1,1,0.7391,1,525,pool,false,false,true,159,6,stopped early,31,0,0,0,1,false
+V0,S044,undecided,4x2,8,medium (6-30 m2),provisional-plan,true,,4,12,0,0.6203,0.9,0.39,0.1775,0.1898,0.8959,0.7833,1,1,0.6892,1,692,pool,false,false,true,1046,6,stopped early,17,0,0,0,0.75,false
+V0,S045,fynbos,6x4,24,medium (6-30 m2),provisional-plan,true,,5,11,0,0.5798,0.9,0.4175,0.3125,0.3742,0.9021,0.9636,1,0.8889,0.6442,1,1085,pool,false,false,true,1417,12,stopped early,6,0,0,0,0.5833,false
+V0,S046,mediterranean,8x5,40,large (>=30 m2),provisional-plan,true,,8,28,0,0.6293,0.9,0.385,0.2,0.2753,0.9663,0.9643,1,1,0.6992,1,877,pool,false,false,true,906,12,stopped early,30,0,0,0,0.675,false
+V0,S047,cottage,3x3,9,medium (6-30 m2),provisional-plan,true,,4,10,0,0.6946,0.9,0.315,0.2025,0.2631,0.9372,0.9,1,0.8889,0.7718,1,498,pool,false,false,true,245,6,stopped early,11,0,0,0,0.8889,false
+V0,S048,undecided,12x8,96,large (>=30 m2),provisional-plan,true,,12,52,0,0.6296,0.9,0.38,0.3375,0.3941,0.9255,0.9885,1,1,0.6995,1,1528,pool,false,false,true,1561,20,stopped early,59,0,0,0,0.6667,false
+V0,S049,fynbos,2x3,6,medium (6-30 m2),provisional-plan,true,,5,23,0,0.4943,0.9,0.5175,0.4125,0.5512,0.8357,0.7,0.75,1,0.5493,1,524,pool,false,false,true,73,6,stopped early,55,0,0,0,0.6667,false
+V0,S050,mediterranean,4x2,8,medium (6-30 m2),provisional-plan,true,,5,13,0,0.6297,0.9,0.3575,0.175,0.1663,0.8837,0.8923,1,0.8889,0.6997,1,484,pool,false,false,true,76,6,stopped early,20,0,0,0,0.875,false
+V0,S051,cottage,6x4,24,medium (6-30 m2),provisional-plan,true,,7,45,0,0.7573,0.9,0.245,0.0625,0.0534,0.9708,0.8667,1,1,0.8415,1,433,count,true,false,true,20,12,stopped early,78,0,0,0,0.875,false
+V0,S052,undecided,8x5,40,large (>=30 m2),provisional-plan,true,,7,33,0,0.5412,0.9,0.46,0.41,0.5077,0.8885,0.9848,1,1,0.6013,1,453,pool,false,false,true,91,12,stopped early,85,0,0,0,0.6,false
+V0,S053,fynbos,3x3,9,medium (6-30 m2),provisional-plan,true,,6,16,0,0.6294,0.9,0.3825,0.2425,0.1147,0.878,0.8375,1,0.8889,0.6994,1,466,-,false,false,false,188,6,-,24,0,0,0,0.8889,false
+V0,S054,mediterranean,12x8,96,large (>=30 m2),provisional-plan,true,,13,45,0,0.8064,0.9,0.2,0.105,0.1403,0.928,0.9667,1,1,0.8961,1,477,pool,false,false,true,148,20,stopped early,55,0,0,0,0.875,false
+V0,S055,cottage,2x3,6,medium (6-30 m2),provisional-plan,true,,4,16,0,0.675,0.9,0.3225,0.1725,0.1726,0.8818,0.7625,1,1,0.75,1,445,pool,false,false,true,55,6,stopped early,28,0,0,0,0.8333,false
+V0,S056,undecided,4x2,8,medium (6-30 m2),provisional-plan,true,,4,12,0,0.7193,0.9,0.295,0.1625,0.2351,0.9583,0.7833,1,1,0.7992,1,461,pool,false,false,true,176,6,stopped early,18,0,0,0,0.875,false
+V0,S057,fynbos,6x4,24,medium (6-30 m2),provisional-plan,true,,6,30,0,0.6831,0.9,0.3425,0.0975,0.1972,0.9525,0.9667,1,1,0.759,1,565,pool,false,false,true,407,12,stopped early,40,0,0,0,0.75,false
+V0,S058,mediterranean,8x5,40,large (>=30 m2),provisional-plan,true,,8,30,0,0.8406,0.9,0.175,0.0525,0.0917,0.9332,0.9667,1,1,0.934,1,551,pool,false,false,true,354,12,stopped early,50,0,0,0,0.95,false
+V0,S059,cottage,3x3,9,medium (6-30 m2),provisional-plan,true,,6,22,0,0.7163,0.9,0.3025,0.1525,0.1026,0.8311,0.8364,0.75,1,0.7959,1,438,-,false,false,false,92,6,-,59,0,0,0,0.8889,false
+V0,S060,undecided,12x8,96,large (>=30 m2),provisional-plan,true,,13,43,0,0.793,0.9,0.2025,0.0925,0.1981,0.9317,0.986,1,1,0.8811,1,642,pool,false,false,true,475,20,stopped early,66,0,0,0,0.8229,false
+V0,S061,fynbos,2x3,6,medium (6-30 m2),provisional-plan,true,,3,9,0,0.4358,0.9,0.5675,0.5675,0.2153,0.9229,0.7444,1,1,0.4842,1,541,pool,false,false,true,17,6,stopped early,6,0,0,0,0.5,false
+V0,S062,mediterranean,4x2,8,medium (6-30 m2),no-plan,false,,0,0,0,0,0.9,1,1,0,,,,,,,418,-,false,false,false,7,0,-,0,0,0,0,0,false
+V0,S063,cottage,6x4,24,medium (6-30 m2),no-plan,false,,0,0,0,0,0.9,1,1,0,,,,,,,446,-,false,false,false,4,0,-,0,0,0,0,0,false
+V0,S064,undecided,8x5,40,large (>=30 m2),provisional-plan,true,,7,43,0,0.5068,0.9,0.495,0.3775,0.5506,0.8034,0.9651,0.75,1,0.5632,1,562,pool,false,false,true,22,12,stopped early,78,0,0,0,0.525,false
+V0,S065,fynbos,3x3,9,medium (6-30 m2),provisional-plan,true,,3,17,0,0.5407,0.9,0.455,0.325,0.5833,0.8332,0.4529,1,1,0.6007,1,604,pool,false,false,true,72,6,stopped early,12,0,0,0,0.7778,false
+V0,S066,mediterranean,12x8,96,large (>=30 m2),provisional-plan,true,,12,40,0,0.8457,0.9,0.1475,0.0325,0.0392,0.9727,0.975,1,1,0.9397,1,523,pool,false,false,true,60,20,stopped early,62,0,0,0,0.8854,false
+V0,S067,cottage,2x3,6,medium (6-30 m2),provisional-plan,true,,4,18,0,0.7298,0.9,0.27,0.1125,0.1669,0.7513,0.8,0.5,1,0.8109,1,470,pool,false,false,true,9,6,stopped early,33,0,0,0,0.8333,false
+V0,S068,undecided,4x2,8,medium (6-30 m2),provisional-plan,true,,5,27,0,0.808,0.9,0.205,0.06,0.0274,0.6733,0.5333,0.3333,1,0.8978,1,703,pool,false,false,true,74,6,stopped early,93,0,0,0,1,false
+V0,S069,fynbos,6x4,24,medium (6-30 m2),provisional-plan,true,,7,21,0,0.7731,0.9,0.225,0.065,0.0642,0.8898,0.8857,0.75,1,0.859,1,634,pool,false,false,true,109,12,stopped early,40,0,0,0,0.9583,false
+V0,S070,mediterranean,8x5,40,large (>=30 m2),provisional-plan,true,,6,20,0,0.7702,0.9,0.2475,0.1025,0.1392,0.9159,0.95,1,1,0.8558,1,495,pool,false,false,true,102,12,stopped early,25,0,0,0,0.85,false
+V0,S071,cottage,3x3,9,medium (6-30 m2),provisional-plan,true,,3,9,0,0.6811,0.9,0.33,0.145,0.1045,0.9557,0.8,1,1,0.7568,1,439,pool,false,false,true,16,6,stopped early,8,0,0,0,0.7778,false
+V0,S072,undecided,12x8,96,large (>=30 m2),provisional-plan,true,,11,35,0,0.8076,0.9,0.18,0.0575,0.0628,0.946,0.9,1,1,0.8973,1,556,count,true,false,true,144,20,stopped early,52,0,0,0,0.8958,false
+V0,S073,fynbos,0.5x0.5,0.25,small (<6 m2),no-plan,false,,0,0,0,0,0.9,1,1,0,,,,,,,624,-,false,false,false,348,0,-,0,0,0,0,0,false
+V0,S074,mediterranean,0.5x30,15,medium (6-30 m2),no-plan,false,,0,0,0,0,0.9,1,1,0,,,,,,,1977,-,false,false,false,348,0,-,0,0,0,0,0,false
+V0,S075,cottage,30x0.5,15,medium (6-30 m2),provisional-plan,true,,11,65,0,0.7296,0.9,0.2025,0.12,0.0852,0.9377,0.9846,1,1,0.8106,1,1085,pool,false,false,true,348,12,stopped early,41,0,0,0,0.9,false
+V0,S076,undecided,30x30,900,large (>=30 m2),provisional-plan,true,,14,36,0,0.3325,0.9,0.6575,0.63,0.6297,0.856,0.9944,1,1,0.3694,1,2807,count,true,false,true,1161,20,stopped early,20,0,0,0,0.3322,false
+V0,S077,fynbos,1x1,1,small (<6 m2),provisional-plan,true,,3,7,0,0.6205,0.9,0.3625,0.135,0.0435,0.8647,0.6714,1,0.8889,0.6894,1,581,pool,false,false,true,451,6,stopped early,13,0,0,0,1,false
+V0,S078,mediterranean,1x10,10,medium (6-30 m2),provisional-plan,true,,6,16,0,0.4587,0.9,0.5175,0.2925,0.2644,0.9397,0.8875,1,1,0.5096,1,926,pool,false,false,true,821,12,stopped early,12,0,0,0,0.4,false
+V0,S079,cottage,10x1,10,medium (6-30 m2),provisional-plan,true,,7,23,0,0.7285,0.9,0.2875,0.1025,0.0538,0.946,0.9304,1,1,0.8094,1,611,pool,false,false,true,451,12,stopped early,28,0,0,0,1,false
+V0,S080,undecided,0.8x12,9.6,medium (6-30 m2),provisional-plan,true,,6,28,0,0.6916,0.9,0.3125,0.0575,0.0645,0.9026,0.9643,1,1,0.7684,1,482,-,false,false,false,349,6,-,17,0,0,0,1,false
+V0,S081,fynbos,2.5x1.5,3.75,small (<6 m2),provisional-plan,true,,3,7,0,0.6178,0.9,0.3775,0.1625,0.2515,0.873,0.7,0.75,0.8889,0.6865,1,487,pool,false,false,true,499,6,stopped early,8,0,0,0,0.5,false
+V0,S082,mediterranean,7.25x3.75,27.19,medium (6-30 m2),provisional-plan,true,,7,19,0,0.6387,0.9,0.3625,0.1575,0.2559,0.8891,0.9579,1,1,0.7096,1,557,pool,false,false,true,662,12,stopped early,28,0,0,0,0.6452,false
+V0,S083,cottage,15x2,30,large (>=30 m2),provisional-plan,true,,8,26,0,0.6981,0.9,0.3025,0.1125,0.1406,0.9691,0.9154,1,1,0.7756,1,658,pool,false,false,true,977,12,stopped early,42,0,0,0,0.8,false
+V0,S084,undecided,2x15,30,large (>=30 m2),provisional-plan,true,,7,19,0,0.7935,0.9,0.1975,0.0625,0.0712,0.9572,0.9737,1,1,0.8817,1,541,pool,false,false,true,570,12,stopped early,22,0,0,0,0.9333,false
+V0,S085,fynbos,20x20,400,large (>=30 m2),provisional-plan,true,,14,50,0,0.4651,0.9,0.5325,0.48,0.5965,0.9128,1,1,1,0.5168,1,1258,pool,false,false,true,1161,20,stopped early,40,0,0,0,0.4675,false
+V0,S086,mediterranean,25x4,100,large (>=30 m2),provisional-plan,true,,12,32,0,0.5898,0.9,0.405,0.3425,0.1716,0.9256,0.9812,1,1,0.6553,1,1221,pool,false,false,true,1136,20,stopped early,40,0,0,0,0.6,false
+V0,S087,cottage,4x25,100,large (>=30 m2),provisional-plan,true,,11,39,0,0.4847,0.9,0.5375,0.26,0.2706,0.9128,0.9897,1,1,0.5386,1,1265,count,true,false,true,1136,20,stopped early,42,0,0,0,0.53,false
+V0,S088,undecided,0.6x0.9,0.54,small (<6 m2),provisional-plan,true,,3,9,0,0.7422,0.9,0.25,0.06,0.0422,0.4436,0.8333,1,0.7778,0.8247,1,541,pool,false,false,true,464,6,stopped early,26,0,0,0,1,false
+V0,S089,undecided,8x5,40,large (>=30 m2),provisional-plan,true,,6,16,0,0.8214,0.9,0.1925,0.105,0.1273,0.8446,0.8,0.75,1,0.9127,1,898,pool,false,false,true,29,12,stopped early,22,0,0,0,0.9,false
+V0,S090,fynbos,3x3,9,medium (6-30 m2),no-plan,false,,0,0,0,0,0.9,1,1,0,,,,,,,366,-,false,false,false,3,0,-,0,0,0,0,0,false
+V0,S091,mediterranean,12x8,96,large (>=30 m2),provisional-plan,true,,13,51,0,0.842,0.9,0.1725,0.045,0.1336,0.9494,0.9902,1,1,0.9355,1,500,pool,false,false,true,247,20,stopped early,103,0,0,0,0.8958,false
+V0,S092,cottage,2x3,6,medium (6-30 m2),provisional-plan,true,,3,11,0,0.6053,0.9,0.4125,0.34,0.3273,0.7782,0.7455,0,0.8889,0.6726,1,464,pool,false,false,true,118,6,stopped early,16,0,0,0,0.6667,false
+V0,S093,undecided,4x2,8,medium (6-30 m2),provisional-plan,true,,5,23,0,0.7552,0.9,0.26,0.06,0.0438,0.8667,0.8087,1,1,0.8391,1,403,pool,false,false,true,118,6,stopped early,52,0,0,0,1,false
+V0,S094,mediterranean,6x4,24,medium (6-30 m2),provisional-plan,true,,7,21,0,0.7006,0.9,0.315,0.17,0.1508,0.9189,0.9429,1,1,0.7784,1,447,pool,false,false,true,145,12,stopped early,38,0,0,0,0.7917,false
+V0,S095,fynbos,8x5,40,large (>=30 m2),provisional-plan,true,,8,22,0,0.6737,0.9,0.345,0.2275,0.2816,0.9268,0.9636,1,1,0.7485,1,487,pool,false,false,true,147,12,stopped early,18,0,0,0,0.675,false
+V0,S096,cottage,6x1,6,medium (6-30 m2),provisional-plan,true,,3,7,0,0.665,0.9,0.34,0.1825,0.2116,0.9399,0.7714,1,0.8889,0.7389,1,369,pool,false,false,true,141,6,stopped early,4,0,0,0,0.8333,false
+V0,S097,undecided,12x8,96,large (>=30 m2),provisional-plan,true,,12,32,0,0.8581,0.9,0.175,0.0275,0.0424,0.8946,0.95,1,1,0.9534,1,407,pool,false,false,true,56,20,stopped early,51,0,0,0,0.9167,false
+V0,S098,fynbos,1x1,1,small (<6 m2),provisional-plan,true,,3,9,0,0.5598,0.9,0.4375,0.3775,0.2319,0.7268,0.9,0.6667,0.7778,0.622,1,446,pool,false,false,true,141,6,stopped early,26,0,0,0,1,false
+V0,S099,cottage,4x2,8,medium (6-30 m2),provisional-plan,true,,3,19,0,0.4186,0.9,0.595,0.36,0.1335,0.8521,0.6211,1,1,0.4652,1,467,pool,false,false,true,352,6,stopped early,25,0,0,0,0.125,false
+V0,S100,cottage,20x10,200,large (>=30 m2),provisional-plan,true,,20,84,0,0.8297,0.9,0.1825,0.0325,0.0608,0.9386,0.9952,1,1,0.9218,1,496,-,false,false,false,245,20,-,139,0,0,0,0.85,false
+V2,S001,fynbos,2x3,6,medium (6-30 m2),provisional-plan,true,,5,21,0,0.7455,0.9,0.2675,0.0575,0.0827,0.9714,0.8857,1,1,0.8283,1,427,pool,false,false,true,352,6,stopped early,48,0,0,0,1,false
+V2,S002,mediterranean,4x2,8,medium (6-30 m2),provisional-plan,true,,4,16,0,0.5543,0.9,0.4525,0.2375,0.0908,0.9491,0.9875,1,1,0.6159,1,446,pool,false,false,true,229,6,stopped early,22,0,0,0,0.75,false
+V2,S003,cottage,6x4,24,medium (6-30 m2),provisional-plan,true,,10,36,0,0.7628,0.9,0.2575,0.06,0.0982,0.9331,0.9778,1,1,0.8476,1,444,pool,false,false,true,76,12,stopped early,72,0,0,0,0.9583,false
+V2,S004,undecided,8x5,40,large (>=30 m2),provisional-plan,true,,5,29,0,0.4765,0.9,0.535,0.5225,0.4957,0.8555,0.9483,1,1,0.5294,1,625,pool,false,false,true,423,12,stopped early,31,0,0,0,0.525,false
+V2,S005,fynbos,3x3,9,medium (6-30 m2),provisional-plan,true,,5,15,0,0.66,0.9,0.325,0.1825,0.2091,0.8937,0.7667,1,1,0.7333,1,664,pool,false,false,true,656,6,stopped early,18,0,0,0,0.7778,false
+V2,S006,mediterranean,12x8,96,large (>=30 m2),provisional-plan,true,,13,33,0,0.5693,0.9,0.4175,0.355,0.4852,0.9587,0.9545,1,1,0.6325,1,1179,pool,false,false,true,706,20,stopped early,37,0,0,0,0.5833,false
+V2,S007,cottage,2x3,6,medium (6-30 m2),provisional-plan,true,,4,12,0,0.492,0.9,0.525,0.5,0.3531,0.9089,0.7833,1,1,0.5467,1,614,pool,false,false,true,128,6,stopped early,21,0,0,0,0.6667,false
+V2,S008,undecided,4x2,8,medium (6-30 m2),provisional-plan,true,,4,12,0,0.6901,0.9,0.2975,0.0925,0.1612,0.9108,0.8333,1,1,0.7667,1,698,pool,false,false,true,607,6,stopped early,17,0,0,0,0.875,false
+V2,S009,fynbos,6x4,24,medium (6-30 m2),provisional-plan,true,,6,16,0,0.4981,0.9,0.525,0.39,0.4264,0.9278,0.925,1,1,0.5535,1,763,pool,false,false,true,794,12,stopped early,18,0,0,0,0.4583,false
+V2,S010,mediterranean,8x5,40,large (>=30 m2),provisional-plan,true,,7,19,0,0.6958,0.9,0.3125,0.1075,0.1688,0.9301,0.9579,1,1,0.7731,1,591,pool,false,false,true,558,12,stopped early,25,0,0,0,0.75,false
+V2,S011,cottage,3x3,9,medium (6-30 m2),provisional-plan,true,,4,10,0,0.4961,0.9,0.52,0.4925,0.4454,0.9173,0.9,1,0.8889,0.5512,1,655,pool,false,false,true,245,6,stopped early,8,0,0,0,0.4444,false
+V2,S012,undecided,12x8,96,large (>=30 m2),provisional-plan,true,,13,37,0,0.7401,0.9,0.2725,0.09,0.0798,0.9557,0.9865,1,1,0.8223,1,801,pool,false,false,true,863,20,stopped early,59,0,0,0,0.8021,false
+V2,S013,fynbos,2x3,6,medium (6-30 m2),provisional-plan,true,,6,16,0,0.7865,0.9,0.225,0.0925,0.0733,0.9013,0.8375,1,0.8889,0.8739,1,570,-,false,false,false,85,6,-,35,0,0,0,1,false
+V2,S014,mediterranean,4x2,8,medium (6-30 m2),provisional-plan,true,,4,24,0,0.5538,0.9,0.4525,0.28,0.2393,0.8757,0.8,1,1,0.6153,1,534,count,true,false,true,73,6,stopped early,41,0,0,0,0.875,false
+V2,S015,cottage,6x4,24,medium (6-30 m2),provisional-plan,true,,6,28,0,0.7005,0.9,0.3275,0.2075,0.165,0.8993,0.7714,1,1,0.7784,1,530,pool,false,false,true,22,12,stopped early,33,0,0,0,0.75,false
+V2,S016,undecided,8x5,40,large (>=30 m2),provisional-plan,true,,7,25,0,0.8567,0.9,0.1675,0.035,0.0402,0.4932,0.98,1,1,0.9519,1,426,pool,false,false,true,111,12,stopped early,41,0,0,0,0.925,false
+V2,S017,fynbos,3x3,9,medium (6-30 m2),provisional-plan,true,,6,28,0,0.7133,0.9,0.3175,0.11,0.1006,0.9433,0.85,1,1,0.7926,1,441,-,false,false,false,288,6,-,69,0,0,0,0.8889,false
+V2,S018,mediterranean,12x8,96,large (>=30 m2),provisional-plan,true,,14,48,0,0.8078,0.9,0.195,0.0825,0.1482,0.9441,0.9875,1,1,0.8975,1,447,pool,false,false,true,148,20,stopped early,70,0,0,0,0.8438,false
+V2,S019,cottage,2x3,6,medium (6-30 m2),provisional-plan,true,,4,12,0,0.6345,0.9,0.3875,0.205,0.106,0.809,0.6167,0.25,1,0.705,1,554,pool,false,false,true,55,6,stopped early,22,0,0,0,0.8333,false
+V2,S020,undecided,4x2,8,medium (6-30 m2),provisional-plan,true,,5,15,0,0.6126,0.9,0.39,0.2225,0.2384,0.8949,0.9667,1,1,0.6806,1,534,pool,false,false,true,275,6,stopped early,24,0,0,0,0.625,false
+V2,S021,fynbos,6x4,24,medium (6-30 m2),provisional-plan,true,,6,22,0,0.6761,0.9,0.3325,0.1675,0.1167,0.9651,0.9,1,1,0.7512,1,525,pool,false,false,true,407,12,stopped early,22,0,0,0,0.75,false
+V2,S022,mediterranean,8x5,40,large (>=30 m2),provisional-plan,true,,5,13,0,0.4489,0.9,0.5525,0.48,0.3926,0.9218,0.9615,1,1,0.4987,1,491,count,true,false,true,354,12,stopped early,4,0,0,0,0.4,false
+V2,S023,cottage,3x3,9,medium (6-30 m2),provisional-plan,true,,3,9,0,0.7992,0.9,0.21,0.05,0.0627,0.8805,0.8667,0.6667,1,0.888,1,398,pool,false,false,true,92,6,stopped early,15,0,0,0,1,false
+V2,S024,undecided,12x8,96,large (>=30 m2),provisional-plan,true,,10,36,0,0.7732,0.9,0.2425,0.065,0.1122,0.9346,0.8,1,1,0.8591,1,540,pool,false,false,true,475,20,stopped early,36,0,0,0,0.8333,false
+V2,S025,fynbos,2x3,6,medium (6-30 m2),provisional-plan,true,,4,18,0,0.6086,0.9,0.395,0.175,0.1315,0.8084,0.9333,1,1,0.6762,1,407,pool,false,false,true,17,6,stopped early,29,0,0,0,0.8333,false
+V2,S026,mediterranean,4x2,8,medium (6-30 m2),no-plan,false,,0,0,0,0,0.9,1,1,0,,,,,,,390,-,false,false,false,15,0,-,0,0,0,0,0,false
+V2,S027,cottage,6x4,24,medium (6-30 m2),no-plan,false,,0,0,0,0,0.9,1,1,0,,,,,,,389,-,false,false,false,3,0,-,0,0,0,0,0,false
+V2,S028,undecided,8x5,40,large (>=30 m2),provisional-plan,true,,5,19,0,0.3076,0.9,0.69,0.685,0.8855,0.6995,0.7737,0.6667,1,0.3417,1,384,count,true,false,true,25,12,stopped early,15,0,0,0,0.25,false
+V2,S029,fynbos,3x3,9,medium (6-30 m2),provisional-plan,true,,3,9,0,0.7236,0.9,0.2875,0.1125,0.2113,0.8118,0.7444,0.25,1,0.804,1,384,pool,false,false,true,33,6,stopped early,11,0,0,0,0.8889,false
+V2,S030,mediterranean,12x8,96,large (>=30 m2),provisional-plan,true,,10,38,0,0.8313,0.9,0.1675,0.0425,0.0928,0.899,0.9737,1,1,0.9237,1,407,pool,false,false,true,26,20,stopped early,66,0,0,0,0.875,false
+V2,S031,cottage,2x3,6,medium (6-30 m2),provisional-plan,true,,3,19,0,0.6124,0.9,0.39,0.1925,0.2532,0.928,0.6,1,1,0.6804,1,433,pool,false,false,true,6,6,stopped early,25,0,0,0,0.6667,false
+V2,S032,undecided,4x2,8,medium (6-30 m2),provisional-plan,true,,4,14,0,0.3485,0.9,0.6475,0.615,0.7589,0.7451,0.4857,0.75,1,0.3872,1,426,pool,false,false,true,35,6,stopped early,12,0,0,0,0.375,false
+V2,S033,fynbos,6x4,24,medium (6-30 m2),provisional-plan,true,,7,19,0,0.6974,0.9,0.3175,0.1275,0.1675,0.8965,0.9526,1,1,0.7749,1,448,pool,false,false,true,109,12,stopped early,27,0,0,0,0.8333,false
+V2,S034,mediterranean,8x5,40,large (>=30 m2),provisional-plan,true,,5,19,0,0.7425,0.9,0.2725,0.16,0.1459,0.8611,0.7,0.5,1,0.825,1,398,count,true,false,true,38,12,stopped early,20,0,0,0,0.75,false
+V2,S035,cottage,3x3,9,medium (6-30 m2),provisional-plan,true,,5,15,0,0.6807,0.9,0.32,0.065,0.0864,0.8776,0.8,1,1,0.7564,1,371,pool,false,false,true,27,6,stopped early,25,0,0,0,0.8889,false
+V2,S036,undecided,12x8,96,large (>=30 m2),provisional-plan,true,,13,43,0,0.7341,0.9,0.265,0.1725,0.2457,0.9795,0.9791,1,1,0.8157,1,440,pool,false,false,true,137,20,stopped early,59,0,0,0,0.7604,false
+V2,S037,fynbos,2x3,6,medium (6-30 m2),provisional-plan,true,,6,18,0,0.5873,0.9,0.4325,0.26,0.0849,0.9462,0.9556,1,1,0.6525,1,533,-,false,false,false,352,6,-,48,0,0,0,0.6667,false
+V2,S038,mediterranean,4x2,8,medium (6-30 m2),provisional-plan,true,,4,14,0,0.4588,0.9,0.5425,0.3875,0.328,0.8638,0.9143,1,1,0.5098,1,497,pool,false,false,true,229,6,stopped early,18,0,0,0,0.375,false
+V2,S039,cottage,6x4,24,medium (6-30 m2),provisional-plan,true,,7,21,0,0.6342,0.9,0.3675,0.1025,0.1362,0.8535,0.7714,0.75,1,0.7046,1,514,pool,false,false,true,76,12,stopped early,18,0,0,0,0.6667,false
+V2,S040,undecided,8x5,40,large (>=30 m2),provisional-plan,true,,7,19,0,0.6861,0.9,0.32,0.1875,0.1954,0.8498,0.9579,1,1,0.7623,1,601,pool,false,false,true,358,12,stopped early,27,0,0,0,0.775,false
+V2,S041,fynbos,3x3,9,medium (6-30 m2),provisional-plan,true,,5,15,0,0.6419,0.9,0.3875,0.28,0.1957,0.9613,0.9,1,1,0.7132,1,711,pool,false,false,true,1107,6,stopped early,20,0,0,0,0.7778,false
+V2,S042,mediterranean,12x8,96,large (>=30 m2),provisional-plan,true,,12,30,0,0.7346,0.9,0.265,0.1075,0.1148,0.9562,1,1,1,0.8162,1,773,pool,false,false,true,664,20,stopped early,29,0,0,0,0.8021,false
+V2,S043,cottage,2x3,6,medium (6-30 m2),provisional-plan,true,,5,29,0,0.7715,0.9,0.255,0.065,0.0604,0.9183,0.9379,1,1,0.8572,1,422,pool,false,false,true,159,6,stopped early,59,0,0,0,1,false
+V2,S044,undecided,4x2,8,medium (6-30 m2),provisional-plan,true,,4,12,0,0.6203,0.9,0.39,0.1775,0.1898,0.8959,0.7833,1,1,0.6892,1,591,pool,false,false,true,1046,6,stopped early,17,0,0,0,0.75,false
+V2,S045,fynbos,6x4,24,medium (6-30 m2),provisional-plan,true,,12,48,0,0.8006,0.9,0.2075,0.025,0.0314,0.9439,0.9917,1,1,0.8896,1,669,-,false,false,false,1417,12,-,133,0,2,0,1,false
+V2,S046,mediterranean,8x5,40,large (>=30 m2),provisional-plan,true,,7,21,0,0.714,0.9,0.2925,0.1025,0.1021,0.9755,0.9619,1,1,0.7934,1,667,pool,false,false,true,906,12,stopped early,32,0,0,0,0.75,false
+V2,S047,cottage,3x3,9,medium (6-30 m2),provisional-plan,true,,4,10,0,0.6946,0.9,0.32,0.1175,0.2174,0.9372,0.9,1,0.8889,0.7718,1,442,pool,false,false,true,245,6,stopped early,11,0,0,0,0.8889,false
+V2,S048,undecided,12x8,96,large (>=30 m2),provisional-plan,true,,12,30,0,0.7847,0.9,0.225,0.12,0.071,0.9344,1,1,1,0.8719,1,922,pool,false,false,true,1561,20,stopped early,44,4,4,0.09091,0.875,false
+V2,S049,fynbos,2x3,6,medium (6-30 m2),provisional-plan,true,,5,17,0,0.4074,0.9,0.5875,0.4875,0.6309,0.836,0.9235,1,1,0.4527,1,484,pool,false,false,true,73,6,stopped early,24,0,0,0,0.5,false
+V2,S050,mediterranean,4x2,8,medium (6-30 m2),provisional-plan,true,,4,12,0,0.5944,0.9,0.3925,0.3075,0.298,0.8904,0.8833,1,1,0.6604,1,579,pool,false,false,true,76,6,stopped early,15,0,0,0,0.5,false
+V2,S051,cottage,6x4,24,medium (6-30 m2),provisional-plan,true,,7,45,0,0.7573,0.9,0.2575,0.06,0.074,0.9708,0.8667,1,1,0.8415,1,427,count,true,false,true,20,12,stopped early,79,0,0,0,0.875,false
+V2,S052,undecided,8x5,40,large (>=30 m2),provisional-plan,true,,9,45,0,0.5399,0.9,0.47,0.345,0.3425,0.8787,0.9667,1,1,0.5999,1,434,pool,false,false,true,91,12,stopped early,110,0,0,0,0.575,false
+V2,S053,fynbos,3x3,9,medium (6-30 m2),provisional-plan,true,,6,16,0,0.6294,0.9,0.3725,0.1875,0.1184,0.878,0.8375,1,0.8889,0.6994,1,437,-,false,false,false,188,6,-,32,0,0,0,0.7778,false
+V2,S054,mediterranean,12x8,96,large (>=30 m2),provisional-plan,true,,14,42,0,0.8078,0.9,0.2125,0.09,0.1449,0.9225,0.9762,1,1,0.8975,1,448,pool,false,false,true,148,20,stopped early,64,0,0,0,0.8646,false
+V2,S055,cottage,2x3,6,medium (6-30 m2),provisional-plan,true,,5,15,0,0.6827,0.9,0.315,0.205,0.1922,0.8823,0.8667,1,1,0.7586,1,362,pool,false,false,true,55,6,stopped early,29,0,0,0,0.8333,false
+V2,S056,undecided,4x2,8,medium (6-30 m2),provisional-plan,true,,4,14,0,0.5805,0.9,0.43,0.185,0.1622,0.9448,0.9143,1,0.8889,0.645,1,423,pool,false,false,true,176,6,stopped early,19,0,0,0,0.75,false
+V2,S057,fynbos,6x4,24,medium (6-30 m2),provisional-plan,true,,8,32,0,0.7372,0.9,0.2675,0.085,0.1449,0.9594,0.975,1,1,0.8191,1,490,pool,false,false,true,407,12,stopped early,43,0,0,0,0.875,false
+V2,S058,mediterranean,8x5,40,large (>=30 m2),provisional-plan,true,,7,21,0,0.6818,0.9,0.325,0.225,0.1618,0.9287,0.9381,1,1,0.7576,1,578,pool,false,false,true,354,12,stopped early,20,0,0,0,0.675,false
+V2,S059,cottage,3x3,9,medium (6-30 m2),provisional-plan,true,,6,22,0,0.7163,0.9,0.3025,0.1525,0.1026,0.8311,0.8364,0.75,1,0.7959,1,448,-,false,false,false,92,6,-,59,0,0,0,0.8889,false
+V2,S060,undecided,12x8,96,large (>=30 m2),provisional-plan,true,,15,45,0,0.7849,0.9,0.2125,0.1425,0.1767,0.9348,0.9889,1,1,0.8722,1,712,pool,false,false,true,475,20,stopped early,61,0,0,0,0.8646,false
+V2,S061,fynbos,2x3,6,medium (6-30 m2),provisional-plan,true,,4,10,0,0.534,0.9,0.475,0.165,0.2658,0.9482,1,1,0.8889,0.5934,1,498,pool,false,false,true,17,6,stopped early,15,0,0,0,0.6667,false
+V2,S062,mediterranean,4x2,8,medium (6-30 m2),no-plan,false,,0,0,0,0,0.9,1,1,0,,,,,,,419,-,false,false,false,7,0,-,0,0,0,0,0,false
+V2,S063,cottage,6x4,24,medium (6-30 m2),no-plan,false,,0,0,0,0,0.9,1,1,0,,,,,,,429,-,false,false,false,4,0,-,0,0,0,0,0,false
+V2,S064,undecided,8x5,40,large (>=30 m2),provisional-plan,true,,7,43,0,0.5068,0.9,0.5125,0.415,0.4962,0.8034,0.9651,0.75,1,0.5632,1,416,pool,false,false,true,22,12,stopped early,91,0,0,0,0.5,false
+V2,S065,fynbos,3x3,9,medium (6-30 m2),provisional-plan,true,,3,17,0,0.5407,0.9,0.46,0.4,0.5863,0.8332,0.4529,1,1,0.6007,1,435,pool,false,false,true,72,6,stopped early,13,0,0,0,0.7778,false
+V2,S066,mediterranean,12x8,96,large (>=30 m2),provisional-plan,true,,12,42,0,0.8856,0.9,0.1075,0.0125,0.0184,0.9782,0.9762,1,1,0.984,1,401,pool,false,false,true,60,20,stopped early,80,0,0,0,0.9896,false
+V2,S067,cottage,2x3,6,medium (6-30 m2),provisional-plan,true,,4,18,0,0.6568,0.9,0.34,0.165,0.1417,0.7461,0.8,0.5,1,0.7298,1,403,pool,false,false,true,9,6,stopped early,49,0,0,0,1,false
+V2,S068,undecided,4x2,8,medium (6-30 m2),provisional-plan,true,,4,10,0,0.7598,0.9,0.245,0.1325,0.0685,0.6632,0.9,0,0.8889,0.8442,1,429,pool,false,false,true,74,6,stopped early,13,0,0,0,1,false
+V2,S069,fynbos,6x4,24,medium (6-30 m2),provisional-plan,true,,7,21,0,0.7743,0.9,0.21,0.04,0.04,0.8944,0.919,0.75,1,0.8604,1,418,pool,false,false,true,109,12,stopped early,31,0,0,0,0.9583,false
+V2,S070,mediterranean,8x5,40,large (>=30 m2),provisional-plan,true,,7,25,0,0.7623,0.9,0.2525,0.0775,0.1439,0.9076,0.98,1,1,0.847,1,437,pool,false,false,true,102,12,stopped early,48,0,0,0,0.875,false
+V2,S071,cottage,3x3,9,medium (6-30 m2),provisional-plan,true,,3,9,0,0.6811,0.9,0.325,0.13,0.0385,0.9557,0.8,1,1,0.7568,1,440,pool,false,false,true,16,6,stopped early,9,0,0,0,0.8889,false
+V2,S072,undecided,12x8,96,large (>=30 m2),provisional-plan,true,,12,50,0,0.731,0.9,0.2775,0.095,0.2211,0.9126,0.82,1,1,0.8122,1,497,pool,false,false,true,144,20,stopped early,77,0,0,0,0.7917,false
+V2,S073,fynbos,0.5x0.5,0.25,small (<6 m2),no-plan,false,,0,0,0,0,0.9,1,1,0,,,,,,,505,-,false,false,false,348,0,-,0,0,0,0,0,false
+V2,S074,mediterranean,0.5x30,15,medium (6-30 m2),no-plan,false,,0,0,0,0,0.9,1,1,0,,,,,,,1255,-,false,false,false,348,0,-,0,0,0,0,0,false
+V2,S075,cottage,30x0.5,15,medium (6-30 m2),provisional-plan,true,,12,58,0,0.6483,0.9,0.3725,0.2425,0.1467,0.926,0.9759,1,1,0.7204,1,956,-,false,false,false,348,12,-,33,0,0,0,0.8,false
+V2,S076,undecided,30x30,900,large (>=30 m2),provisional-plan,true,,11,35,0,0.472,0.9,0.505,0.3975,0.2905,0.8725,0.9857,1,1,0.5244,1,2158,count,true,false,true,1161,20,stopped early,23,0,0,0,0.4744,false
+V2,S077,fynbos,1x1,1,small (<6 m2),provisional-plan,true,,3,7,0,0.6205,0.9,0.3675,0.235,0.299,0.8647,0.6714,1,0.8889,0.6894,1,747,pool,false,false,true,451,6,stopped early,15,0,0,0,1,false
+V2,S078,mediterranean,1x10,10,medium (6-30 m2),provisional-plan,true,,8,24,0,0.5119,0.9,0.4625,0.295,0.2303,0.9527,0.9583,1,1,0.5688,1,740,pool,false,false,true,821,12,stopped early,43,0,0,0,0.6,false
+V2,S079,cottage,10x1,10,medium (6-30 m2),provisional-plan,true,,6,16,0,0.6663,0.9,0.3225,0.1175,0.0483,0.9406,0.8875,1,1,0.7404,1,509,pool,false,false,true,451,12,stopped early,23,0,0,0,0.7,false
+V2,S080,undecided,0.8x12,9.6,medium (6-30 m2),provisional-plan,true,,6,28,0,0.6916,0.9,0.2975,0.06,0.0497,0.9026,0.9643,1,1,0.7684,1,670,-,false,false,false,349,6,-,19,0,0,0,1,false
+V2,S081,fynbos,2.5x1.5,3.75,small (<6 m2),provisional-plan,true,,3,7,0,0.4931,0.9,0.515,0.3375,0.4222,0.9102,0.8714,1,0.8889,0.5479,1,515,pool,false,false,true,499,6,stopped early,7,0,0,0,0.5,false
+V2,S082,mediterranean,7.25x3.75,27.19,medium (6-30 m2),provisional-plan,true,,6,16,0,0.6258,0.9,0.3725,0.2,0.0918,0.8788,0.8125,1,1,0.6953,1,561,pool,false,false,true,662,12,stopped early,15,0,0,0,0.6774,false
+V2,S083,cottage,15x2,30,large (>=30 m2),provisional-plan,true,,7,19,0,0.6367,0.9,0.3825,0.1725,0.2667,0.9665,0.9579,1,1,0.7075,1,754,pool,false,false,true,977,12,stopped early,24,0,0,0,0.8333,false
+V2,S084,undecided,2x15,30,large (>=30 m2),provisional-plan,true,,7,19,0,0.6384,0.9,0.365,0.22,0.2283,0.9469,0.9737,1,1,0.7094,1,648,pool,false,false,true,570,12,stopped early,19,0,0,0,0.7333,false
+V2,S085,fynbos,20x20,400,large (>=30 m2),provisional-plan,true,,18,56,0,0.7358,0.9,0.26,0.1025,0.1437,0.9412,0.9893,1,1,0.8176,1,789,pool,false,false,true,1161,20,stopped early,83,2,2,0.0241,0.76,false
+V2,S086,mediterranean,25x4,100,large (>=30 m2),provisional-plan,true,,12,32,0,0.5325,0.9,0.47,0.2825,0.2067,0.9168,0.9812,1,1,0.5917,1,1108,pool,false,false,true,1136,20,stopped early,29,0,0,0,0.53,false
+V2,S087,cottage,4x25,100,large (>=30 m2),provisional-plan,true,,11,31,0,0.4326,0.9,0.57,0.3625,0.3902,0.9091,0.9871,1,1,0.4806,1,1299,count,true,false,true,1136,20,stopped early,32,0,0,0,0.49,false
+V2,S088,undecided,0.6x0.9,0.54,small (<6 m2),provisional-plan,true,,3,9,0,0.6654,0.9,0.3325,0.1425,0.1496,0.435,0.8333,1,0.7778,0.7393,1,519,pool,false,false,true,464,6,stopped early,24,0,0,0,1,false
+V2,S089,undecided,8x5,40,large (>=30 m2),provisional-plan,true,,6,16,0,0.8214,0.9,0.195,0.07,0.0753,0.8446,0.8,0.75,1,0.9127,1,385,pool,false,false,true,29,12,stopped early,22,0,0,0,0.9,false
+V2,S090,fynbos,3x3,9,medium (6-30 m2),no-plan,false,,0,0,0,0,0.9,1,1,0,,,,,,,354,-,false,false,false,3,0,-,0,0,0,0,0,false
+V2,S091,mediterranean,12x8,96,large (>=30 m2),provisional-plan,true,,15,57,0,0.8358,0.9,0.195,0.0725,0.1439,0.951,0.9912,1,1,0.9286,1,524,pool,false,false,true,247,20,stopped early,113,0,0,0,0.8958,false
+V2,S092,cottage,2x3,6,medium (6-30 m2),provisional-plan,true,,5,15,0,0.6382,0.9,0.37,0.175,0.128,0.8721,0.8,1,1,0.7091,1,434,pool,false,false,true,118,6,stopped early,30,0,0,0,0.6667,false
+V2,S093,undecided,4x2,8,medium (6-30 m2),provisional-plan,true,,4,10,0,0.626,0.9,0.36,0.1625,0.1495,0.8361,0.6,1,0.8889,0.6955,1,428,pool,false,false,true,118,6,stopped early,16,0,0,0,0.625,false
+V2,S094,mediterranean,6x4,24,medium (6-30 m2),provisional-plan,true,,7,21,0,0.7006,0.9,0.325,0.2075,0.2374,0.9189,0.9429,1,1,0.7784,1,515,pool,false,false,true,145,12,stopped early,34,0,0,0,0.7083,false
+V2,S095,fynbos,8x5,40,large (>=30 m2),provisional-plan,true,,9,27,0,0.7598,0.9,0.255,0.045,0.072,0.9251,0.9889,1,1,0.8442,1,508,pool,false,false,true,147,12,stopped early,27,0,0,0,0.875,false
+V2,S096,cottage,6x1,6,medium (6-30 m2),provisional-plan,true,,3,7,0,0.665,0.9,0.35,0.1575,0.1685,0.9399,0.7714,1,0.8889,0.7389,1,362,pool,false,false,true,141,6,stopped early,3,0,0,0,0.6667,false
+V2,S097,undecided,12x8,96,large (>=30 m2),provisional-plan,true,,12,32,0,0.8581,0.9,0.1575,0.02,0.0295,0.8946,0.95,1,1,0.9534,1,398,pool,false,false,true,56,20,stopped early,64,0,0,0,0.9063,false
+V2,S098,fynbos,1x1,1,small (<6 m2),provisional-plan,true,,3,9,0,0.5598,0.9,0.4425,0.4275,0.2235,0.7268,0.9,0.6667,0.7778,0.622,1,396,pool,false,false,true,141,6,stopped early,27,0,0,0,1,false
+V2,S099,cottage,4x2,8,medium (6-30 m2),provisional-plan,true,,4,14,0,0.5503,0.9,0.4475,0.41,0.2473,0.8933,0.9,1,1,0.6115,1,519,pool,false,false,true,352,6,stopped early,14,0,0,0,0.5,false
+V2,S100,cottage,20x10,200,large (>=30 m2),provisional-plan,true,,20,84,0,0.872,0.9,0.1725,0.02,0.0324,0.943,0.9952,1,1,0.9689,1,529,-,false,false,false,245,20,-,144,0,0,0,0.91,false
+W1,S001,fynbos,2x3,6,medium (6-30 m2),provisional-plan,true,,5,21,0,0.7057,0.9,0.325,0.105,0.181,0.9627,0.8429,1,1,0.7841,1,409,pool,false,false,true,352,6,stopped early,50,0,0,0,1,false
+W1,S002,mediterranean,4x2,8,medium (6-30 m2),provisional-plan,true,,5,15,0,0.6453,0.9,0.3675,0.145,0.1092,0.9498,0.9,1,1,0.717,1,451,pool,false,false,true,229,6,stopped early,34,0,0,0,0.75,true
+W1,S003,cottage,6x4,24,medium (6-30 m2),provisional-plan,true,,11,33,0,0.7784,0.9,0.2325,0.05,0.1048,0.9331,0.9758,1,1,0.8649,1,422,pool,false,false,true,76,12,stopped early,67,0,0,0,0.9583,true
+W1,S004,undecided,8x5,40,large (>=30 m2),provisional-plan,true,,5,23,0,0.5047,0.9,0.51,0.38,0.503,0.8722,0.9783,1,1,0.5608,1,416,pool,false,false,true,423,12,stopped early,16,0,0,0,0.525,false
+W1,S005,fynbos,3x3,9,medium (6-30 m2),provisional-plan,true,,5,15,0,0.5817,0.9,0.4275,0.33,0.213,0.8904,0.9,1,1,0.6463,1,530,pool,false,false,true,656,6,stopped early,19,0,0,0,0.6667,true
+W1,S006,mediterranean,12x8,96,large (>=30 m2),provisional-plan,true,,13,33,0,0.4153,0.9,0.565,0.545,0.645,0.9416,0.9545,1,1,0.4615,1,1084,pool,false,false,true,706,20,stopped early,49,0,0,0,0.4167,true
+W1,S007,cottage,2x3,6,medium (6-30 m2),provisional-plan,true,,5,21,0,0.5609,0.9,0.45,0.2375,0.2045,0.9036,0.781,1,1,0.6232,1,613,pool,false,false,true,128,6,stopped early,47,0,0,0,0.5,true
+W1,S008,undecided,4x2,8,medium (6-30 m2),provisional-plan,true,,5,19,0,0.7069,0.9,0.285,0.12,0.1697,0.8629,0.7105,1,1,0.7854,1,524,pool,false,false,true,607,6,stopped early,28,0,0,0,0.75,true
+W1,S009,fynbos,6x4,24,medium (6-30 m2),provisional-plan,true,,8,22,0,0.5883,0.9,0.4125,0.2275,0.3971,0.8998,0.7636,1,1,0.6537,1,669,pool,false,false,true,794,12,stopped early,24,0,0,0,0.6667,true
+W1,S010,mediterranean,8x5,40,large (>=30 m2),provisional-plan,true,,7,19,0,0.653,0.9,0.3675,0.225,0.1931,0.9033,0.8789,1,1,0.7256,1,589,pool,false,false,true,558,12,stopped early,15,0,0,0,0.7,true
+W1,S011,cottage,3x3,9,medium (6-30 m2),provisional-plan,true,,5,21,0,0.6954,0.9,0.3325,0.155,0.0901,0.9639,0.8667,1,1,0.7727,1,426,pool,false,false,true,245,6,stopped early,39,0,0,0,0.7778,true
+W1,S012,undecided,12x8,96,large (>=30 m2),provisional-plan,true,,12,30,0,0.6006,0.9,0.41,0.2925,0.0822,0.9229,0.9333,1,1,0.6673,1,992,pool,false,false,true,863,20,stopped early,44,0,0,0,0.6146,true
+W1,S013,fynbos,2x3,6,medium (6-30 m2),provisional-plan,true,,5,13,0,0.7198,0.9,0.29,0.1375,0.1136,0.8175,0.6385,0.6667,0.8889,0.7997,1,424,pool,false,false,true,85,6,stopped early,26,0,0,0,1,true
+W1,S014,mediterranean,4x2,8,medium (6-30 m2),provisional-plan,true,,4,10,0,0.5433,0.9,0.465,0.3925,0.2658,0.859,0.8,1,0.8889,0.6036,1,568,pool,false,false,true,73,6,stopped early,8,0,0,0,0.625,true
+W1,S015,cottage,6x4,24,medium (6-30 m2),provisional-plan,true,,6,28,0,0.7005,0.9,0.3225,0.1025,0.1477,0.8993,0.7714,1,1,0.7784,1,394,pool,false,false,true,22,12,stopped early,34,0,0,0,0.8333,false
+W1,S016,undecided,8x5,40,large (>=30 m2),provisional-plan,true,,9,25,0,0.7809,0.9,0.235,0.085,0.0398,0.4808,0.94,1,1,0.8677,1,416,pool,false,false,true,111,12,stopped early,39,0,0,0,0.85,true
+W1,S017,fynbos,3x3,9,medium (6-30 m2),provisional-plan,true,,5,19,0,0.7512,0.9,0.2625,0.135,0.167,0.9166,0.7316,1,1,0.8347,1,422,pool,false,false,true,288,6,stopped early,29,0,0,0,0.8889,true
+W1,S018,mediterranean,12x8,96,large (>=30 m2),provisional-plan,true,,15,39,0,0.8093,0.9,0.205,0.0475,0.0644,0.9186,0.8846,1,1,0.8992,1,425,pool,false,false,true,148,20,stopped early,84,0,3,0,0.8646,true
+W1,S019,cottage,2x3,6,medium (6-30 m2),provisional-plan,true,,4,10,0,0.5602,0.9,0.4425,0.3425,0.4279,0.7741,0.8,0.25,0.8889,0.6225,1,371,pool,false,false,true,55,6,stopped early,17,0,0,0,0.6667,true
+W1,S020,undecided,4x2,8,medium (6-30 m2),provisional-plan,true,,6,22,0,0.6391,0.9,0.3775,0.2425,0.1411,0.8382,0.9273,1,1,0.7102,1,384,-,false,false,false,275,6,-,47,0,0,0,0.75,false
+W1,S021,fynbos,6x4,24,medium (6-30 m2),provisional-plan,true,,6,16,0,0.786,0.9,0.2225,0.0525,0.0712,0.9455,0.7375,1,1,0.8733,1,449,pool,false,false,true,407,12,stopped early,26,0,0,0,0.9167,true
+W1,S022,mediterranean,8x5,40,large (>=30 m2),provisional-plan,true,,9,33,0,0.8078,0.9,0.1975,0.0775,0.1241,0.9657,0.9818,1,1,0.8976,1,443,pool,false,false,true,354,12,stopped early,62,0,0,0,0.875,true
+W1,S023,cottage,3x3,9,medium (6-30 m2),provisional-plan,true,,5,15,0,0.7198,0.9,0.2825,0.06,0.1045,0.8337,0.8,1,1,0.7998,1,399,pool,false,false,true,92,6,stopped early,23,0,0,0,1,true
+W1,S024,undecided,12x8,96,large (>=30 m2),provisional-plan,true,,15,41,0,0.7755,0.9,0.2275,0.0875,0.1431,0.9083,0.8659,1,1,0.8617,1,534,pool,false,false,true,475,20,stopped early,60,0,0,0,0.8333,true
+W1,S025,fynbos,2x3,6,medium (6-30 m2),provisional-plan,true,,4,18,0,0.6086,0.9,0.395,0.175,0.1315,0.8084,0.9333,1,1,0.6762,1,393,pool,false,false,true,17,6,stopped early,29,0,0,0,0.8333,false
+W1,S026,mediterranean,4x2,8,medium (6-30 m2),no-plan,false,,0,0,0,0,0.9,1,1,0,,,,,,,381,-,false,false,false,15,0,-,0,0,0,0,0,false
+W1,S027,cottage,6x4,24,medium (6-30 m2),no-plan,false,,0,0,0,0,0.9,1,1,0,,,,,,,372,-,false,false,false,3,0,-,0,0,0,0,0,false
+W1,S028,undecided,8x5,40,large (>=30 m2),provisional-plan,true,,11,33,0,0.8053,0.9,0.2025,0.0775,0.1161,0.6363,0.9576,0.6667,1,0.8947,1,481,pool,false,false,true,25,12,stopped early,61,0,0,0,0.9,true
+W1,S029,fynbos,3x3,9,medium (6-30 m2),provisional-plan,true,,5,13,0,0.6989,0.9,0.305,0.2025,0.3654,0.771,0.8692,0.25,0.8889,0.7766,1,497,pool,false,false,true,33,6,stopped early,21,0,0,0,0.8889,true
+W1,S030,mediterranean,12x8,96,large (>=30 m2),provisional-plan,true,,10,38,0,0.8313,0.9,0.1725,0.0325,0.0404,0.899,0.9737,1,1,0.9237,1,529,pool,false,false,true,26,20,stopped early,51,0,0,0,0.8854,false
+W1,S031,cottage,2x3,6,medium (6-30 m2),provisional-plan,true,,4,18,0,0.6701,0.9,0.345,0.145,0.1722,0.9345,0.6,1,1,0.7446,1,400,pool,false,false,true,6,6,stopped early,35,0,0,0,0.8333,true
+W1,S032,undecided,4x2,8,medium (6-30 m2),provisional-plan,true,,5,15,0,0.4682,0.9,0.55,0.49,0.554,0.6838,0.4667,0.5,1,0.5202,1,488,pool,false,false,true,35,6,stopped early,22,0,0,0,0.5,true
+W1,S033,fynbos,6x4,24,medium (6-30 m2),provisional-plan,true,,7,21,0,0.7242,0.9,0.2725,0.145,0.1164,0.8909,0.919,1,1,0.8046,1,443,pool,false,false,true,109,12,stopped early,34,0,0,0,0.875,true
+W1,S034,mediterranean,8x5,40,large (>=30 m2),provisional-plan,true,,9,25,0,0.7769,0.9,0.2325,0.1175,0.1526,0.8303,0.84,0.5,1,0.8633,1,395,pool,false,false,true,38,12,stopped early,48,0,0,0,0.9,true
+W1,S035,cottage,3x3,9,medium (6-30 m2),provisional-plan,true,,5,15,0,0.6807,0.9,0.325,0.065,0.0828,0.8776,0.8,1,1,0.7564,1,401,pool,false,false,true,27,6,stopped early,25,0,0,0,0.8889,true
+W1,S036,undecided,12x8,96,large (>=30 m2),provisional-plan,true,,15,39,0,0.7359,0.9,0.2725,0.1425,0.143,0.9787,0.9692,1,1,0.8176,1,444,pool,false,false,true,137,20,stopped early,63,0,0,0,0.7708,true
+W1,S037,fynbos,2x3,6,medium (6-30 m2),provisional-plan,true,,4,14,0,0.2826,0.9,0.7225,0.7225,0.2299,0.8956,0.8857,1,1,0.314,1,457,pool,false,false,true,352,6,stopped early,9,0,0,0,0,true
+W1,S038,mediterranean,4x2,8,medium (6-30 m2),provisional-plan,true,,5,25,0,0.6081,0.9,0.4075,0.1225,0.1022,0.8382,0.86,0.6667,1,0.6757,1,424,pool,false,false,true,229,6,stopped early,49,0,0,0,0.75,true
+W1,S039,cottage,6x4,24,medium (6-30 m2),provisional-plan,true,,7,29,0,0.6096,0.9,0.4025,0.225,0.2452,0.825,0.9172,0.5,1,0.6774,1,463,pool,false,false,true,76,12,stopped early,44,0,0,0,0.6667,true
+W1,S040,undecided,8x5,40,large (>=30 m2),provisional-plan,true,,9,29,0,0.7967,0.9,0.23,0.0625,0.04,0.8505,0.9759,1,1,0.8852,1,511,pool,false,false,true,358,12,stopped early,59,0,0,0,0.9,true
+W1,S041,fynbos,3x3,9,medium (6-30 m2),provisional-plan,true,,3,9,0,0.6504,0.9,0.3425,0.155,0.1185,0.94,0.9,1,0.7778,0.7227,1,590,pool,false,false,true,1107,6,stopped early,10,0,0,0,0.8889,true
+W1,S042,mediterranean,12x8,96,large (>=30 m2),provisional-plan,true,,13,33,0,0.7217,0.9,0.2825,0.1425,0.2252,0.9408,0.9273,1,1,0.8019,1,707,pool,false,false,true,664,20,stopped early,67,0,0,0,0.7917,true
+W1,S043,cottage,2x3,6,medium (6-30 m2),provisional-plan,true,,3,29,0,0.699,0.9,0.3075,0.16,0.1906,0.8154,0.6828,0.6667,1,0.7767,1,554,pool,false,false,true,159,6,stopped early,73,0,0,0,0.6667,true
+W1,S044,undecided,4x2,8,medium (6-30 m2),provisional-plan,true,,5,15,0,0.6372,0.9,0.365,0.1675,0.1984,0.901,0.8667,1,1,0.708,1,727,pool,false,false,true,1046,6,stopped early,23,0,0,0,0.75,true
+W1,S045,fynbos,6x4,24,medium (6-30 m2),provisional-plan,true,,6,14,0,0.582,0.9,0.415,0.2175,0.0622,0.8891,0.8143,1,0.8889,0.6467,1,794,pool,false,false,true,1417,12,stopped early,9,0,0,0,0.5833,true
+W1,S046,mediterranean,8x5,40,large (>=30 m2),provisional-plan,true,,6,16,0,0.5794,0.9,0.43,0.375,0.4923,0.9519,0.875,1,1,0.6438,1,736,pool,false,false,true,906,12,stopped early,31,0,0,0,0.675,true
+W1,S047,cottage,3x3,9,medium (6-30 m2),provisional-plan,true,,5,19,0,0.7042,0.9,0.3075,0.19,0.3066,0.931,0.7789,1,1,0.7824,1,442,pool,false,false,true,245,6,stopped early,41,0,0,0,0.8889,true
+W1,S048,undecided,12x8,96,large (>=30 m2),provisional-plan,true,,12,32,0,0.7866,0.9,0.2375,0.065,0.0519,0.9172,0.9688,1,1,0.874,1,911,pool,false,false,true,1561,20,stopped early,57,0,0,0,0.8125,true
+W1,S049,fynbos,2x3,6,medium (6-30 m2),provisional-plan,true,,4,30,0,0.3722,0.9,0.6375,0.63,0.5618,0.8451,1,1,1,0.4135,1,741,count,true,false,true,73,6,stopped early,52,0,0,0,0.1667,true
+W1,S050,mediterranean,4x2,8,medium (6-30 m2),provisional-plan,true,,4,22,0,0.6527,0.9,0.3725,0.2575,0.2488,0.8589,0.7,1,1,0.7252,1,477,count,true,false,true,76,6,stopped early,36,0,0,0,0.875,true
+W1,S051,cottage,6x4,24,medium (6-30 m2),provisional-plan,true,,7,49,0,0.7998,0.9,0.235,0.065,0.1015,0.9701,0.8122,1,1,0.8887,1,414,count,true,false,true,20,12,stopped early,105,0,0,0,0.9583,true
+W1,S052,undecided,8x5,40,large (>=30 m2),provisional-plan,true,,8,38,0,0.631,0.9,0.365,0.1725,0.0866,0.9009,0.9737,1,1,0.7011,1,419,pool,false,false,true,91,12,stopped early,71,0,0,0,0.7,false
+W1,S053,fynbos,3x3,9,medium (6-30 m2),provisional-plan,true,,6,20,0,0.6704,0.9,0.3375,0.09,0.0635,0.8713,0.6,1,1,0.7449,1,462,-,false,false,false,188,6,-,45,0,0,0,1,true
+W1,S054,mediterranean,12x8,96,large (>=30 m2),provisional-plan,true,,13,53,0,0.8792,0.9,0.1325,0.0175,0.0402,0.9325,0.934,1,1,0.9769,1,443,pool,false,false,true,148,20,stopped early,90,0,0,0,0.9479,false
+W1,S055,cottage,2x3,6,medium (6-30 m2),provisional-plan,true,,6,22,0,0.6729,0.9,0.3325,0.09,0.0863,0.8693,0.7455,1,1,0.7477,1,380,-,false,false,false,55,6,-,62,0,0,0,1,true
+W1,S056,undecided,4x2,8,medium (6-30 m2),provisional-plan,true,,4,12,0,0.7193,0.9,0.295,0.1625,0.2351,0.9583,0.7833,1,1,0.7992,1,429,pool,false,false,true,176,6,stopped early,18,0,0,0,0.875,true
+W1,S057,fynbos,6x4,24,medium (6-30 m2),provisional-plan,true,,7,19,0,0.7101,0.9,0.2875,0.2,0.209,0.934,0.8368,1,1,0.789,1,652,pool,false,false,true,407,12,stopped early,26,0,0,0,0.7917,true
+W1,S058,mediterranean,8x5,40,large (>=30 m2),provisional-plan,true,,8,24,0,0.6904,0.9,0.3175,0.2325,0.2435,0.9171,0.925,1,1,0.7672,1,572,pool,false,false,true,354,12,stopped early,36,0,0,0,0.75,true
+W1,S059,cottage,3x3,9,medium (6-30 m2),provisional-plan,true,,5,23,0,0.8341,0.9,0.1875,0.0325,0.0586,0.7801,0.9217,0.75,1,0.9267,1,390,pool,false,false,true,92,6,stopped early,64,0,0,0,1,true
+W1,S060,undecided,12x8,96,large (>=30 m2),provisional-plan,true,,15,39,0,0.8444,0.9,0.16,0.04,0.0652,0.9039,0.8923,1,1,0.9382,1,529,pool,false,false,true,475,20,stopped early,96,0,0,0,0.8958,true
+W1,S061,fynbos,2x3,6,medium (6-30 m2),provisional-plan,true,,3,9,0,0.4358,0.9,0.5675,0.5675,0.2153,0.9229,0.7444,1,1,0.4842,1,423,pool,false,false,true,17,6,stopped early,6,0,0,0,0.5,true
+W1,S062,mediterranean,4x2,8,medium (6-30 m2),no-plan,false,,0,0,0,0,0.9,1,1,0,,,,,,,382,-,false,false,false,7,0,-,0,0,0,0,0,false
+W1,S063,cottage,6x4,24,medium (6-30 m2),no-plan,false,,0,0,0,0,0.9,1,1,0,,,,,,,413,-,false,false,false,4,0,-,0,0,0,0,0,false
+W1,S064,undecided,8x5,40,large (>=30 m2),provisional-plan,true,,5,19,0,0.5656,0.9,0.45,0.39,0.5479,0.8416,0.9316,0.75,1,0.6285,1,418,pool,false,false,true,22,12,stopped early,24,0,0,0,0.625,false
+W1,S065,fynbos,3x3,9,medium (6-30 m2),provisional-plan,true,,5,23,0,0.7899,0.9,0.2225,0.11,0.1838,0.835,0.5739,1,1,0.8776,1,380,pool,false,false,true,72,6,stopped early,58,0,0,0,0.8889,false
+W1,S066,mediterranean,12x8,96,large (>=30 m2),provisional-plan,true,,12,40,0,0.8457,0.9,0.1475,0.0325,0.0392,0.9727,0.975,1,1,0.9397,1,404,pool,false,false,true,60,20,stopped early,62,0,0,0,0.8854,false
+W1,S067,cottage,2x3,6,medium (6-30 m2),provisional-plan,true,,4,22,0,0.76,0.9,0.2625,0.06,0.0838,0.7555,0.8,0.5,1,0.8444,1,381,pool,false,false,true,9,6,stopped early,51,0,0,0,1,true
+W1,S068,undecided,4x2,8,medium (6-30 m2),provisional-plan,true,,5,25,0,0.645,0.9,0.3825,0.2125,0.3929,0.6752,0.54,0.3333,1,0.7167,1,419,pool,false,false,true,74,6,stopped early,48,0,0,0,0.75,true
+W1,S069,fynbos,6x4,24,medium (6-30 m2),provisional-plan,true,,8,24,0,0.7783,0.9,0.2275,0.045,0.0623,0.8766,0.9,0.75,1,0.8648,1,392,pool,false,false,true,109,12,stopped early,41,0,0,0,1,true
+W1,S070,mediterranean,8x5,40,large (>=30 m2),provisional-plan,true,,10,30,0,0.7825,0.9,0.2425,0.155,0.1291,0.8879,0.9,1,1,0.8694,1,401,pool,false,false,true,102,12,stopped early,62,0,0,0,0.875,true
+W1,S071,cottage,3x3,9,medium (6-30 m2),provisional-plan,true,,4,14,0,0.7204,0.9,0.2975,0.0975,0.0564,0.9005,0.8,1,1,0.8004,1,367,pool,false,false,true,16,6,stopped early,32,0,0,0,1,true
+W1,S072,undecided,12x8,96,large (>=30 m2),provisional-plan,true,,15,53,0,0.8085,0.9,0.1875,0.06,0.1159,0.9221,0.9264,1,1,0.8983,1,512,pool,false,false,true,144,20,stopped early,92,0,0,0,0.875,true
+W1,S073,fynbos,0.5x0.5,0.25,small (<6 m2),no-plan,false,,0,0,0,0,0.9,1,1,0,,,,,,,493,-,false,false,false,348,0,-,0,0,0,0,0,true
+W1,S074,mediterranean,0.5x30,15,medium (6-30 m2),provisional-plan,true,,10,84,0,0.7284,0.9,0.2675,0.145,0.0566,0.9395,0.9286,1,1,0.8093,1,684,count,true,false,true,348,12,stopped early,60,0,0,0,0.9333,true
+W1,S075,cottage,30x0.5,15,medium (6-30 m2),provisional-plan,true,,10,64,0,0.73,0.9,0.26,0.16,0.1282,0.9264,0.95,1,1,0.8111,1,673,pool,false,false,true,348,12,stopped early,28,0,0,0,0.9,true
+W1,S076,undecided,30x30,900,large (>=30 m2),provisional-plan,true,,20,56,0,0.485,0.9,0.5025,0.38,0.3549,0.8631,0.9964,1,1,0.5389,1,1998,count,true,false,false,1161,20,-,57,0,0,0,0.4844,true
+W1,S077,fynbos,1x1,1,small (<6 m2),provisional-plan,true,,4,10,0,0.6735,0.9,0.32,0.11,0.1667,0.8568,0.5,1,0.8889,0.7483,1,542,pool,false,false,true,451,6,stopped early,32,0,0,0,1,true
+W1,S078,mediterranean,1x10,10,medium (6-30 m2),provisional-plan,true,,6,18,0,0.646,0.9,0.35,0.1325,0.0462,0.9551,0.8333,1,1,0.7177,1,668,pool,false,false,true,821,12,stopped early,14,0,0,0,0.6,true
+W1,S079,cottage,10x1,10,medium (6-30 m2),provisional-plan,true,,6,16,0,0.7082,0.9,0.24,0.105,0.1377,0.9388,0.95,1,0.8889,0.7869,1,709,pool,false,false,true,451,12,stopped early,18,0,0,0,0.9,true
+W1,S080,undecided,0.8x12,9.6,medium (6-30 m2),provisional-plan,true,,6,28,0,0.6549,0.9,0.3025,0.1225,0.0794,0.8218,0.75,1,1,0.7276,1,501,-,false,false,false,349,6,-,36,0,0,0,0.8333,true
+W1,S081,fynbos,2.5x1.5,3.75,small (<6 m2),provisional-plan,true,,3,7,0,0.6178,0.9,0.3875,0.16,0.2514,0.873,0.7,0.75,0.8889,0.6865,1,545,pool,false,false,true,499,6,stopped early,9,0,0,0,0.5,true
+W1,S082,mediterranean,7.25x3.75,27.19,medium (6-30 m2),provisional-plan,true,,6,32,0,0.6398,0.9,0.37,0.2375,0.0753,0.9118,0.9688,1,1,0.7109,1,648,count,true,false,true,662,12,stopped early,42,0,0,0,0.6774,true
+W1,S083,cottage,15x2,30,large (>=30 m2),provisional-plan,true,,7,21,0,0.5794,0.9,0.4275,0.24,0.2176,0.9606,0.9619,1,1,0.6438,1,844,pool,false,false,true,977,12,stopped early,15,0,0,0,0.6333,true
+W1,S084,undecided,2x15,30,large (>=30 m2),provisional-plan,true,,7,19,0,0.6913,0.9,0.3375,0.125,0.0223,0.945,0.9579,1,1,0.7681,1,610,pool,false,false,true,570,12,stopped early,18,0,0,0,0.8,true
+W1,S085,fynbos,20x20,400,large (>=30 m2),provisional-plan,true,,20,58,0,0.6816,0.9,0.3275,0.1425,0.1855,0.9182,0.9931,1,1,0.7573,1,912,-,false,false,false,1161,20,-,97,0,0,0,0.7,true
+W1,S086,mediterranean,25x4,100,large (>=30 m2),provisional-plan,true,,16,42,0,0.5892,0.9,0.41,0.1675,0.1594,0.9232,0.9381,1,1,0.6547,1,1477,pool,false,false,true,1136,20,stopped early,55,0,0,0,0.65,true
+W1,S087,cottage,4x25,100,large (>=30 m2),provisional-plan,true,,11,27,0,0.4418,0.9,0.57,0.3325,0.3107,0.8939,0.8815,1,1,0.4909,1,1437,pool,false,false,true,1136,20,stopped early,37,0,0,0,0.48,true
+W1,S088,undecided,0.6x0.9,0.54,small (<6 m2),provisional-plan,true,,3,9,0,0.7422,0.9,0.25,0.06,0.0422,0.4436,0.8333,1,0.7778,0.8247,1,561,pool,false,false,true,464,6,stopped early,26,0,0,0,1,true
+W1,S089,undecided,8x5,40,large (>=30 m2),provisional-plan,true,,12,36,0,0.7877,0.9,0.22,0.1175,0.1114,0.7087,0.9167,0.75,1,0.8753,1,430,-,false,false,false,29,12,-,74,0,0,0,0.9,true
+W1,S090,fynbos,3x3,9,medium (6-30 m2),no-plan,false,,0,0,0,0,0.9,1,1,0,,,,,,,383,-,false,false,false,3,0,-,0,0,0,0,0,false
+W1,S091,mediterranean,12x8,96,large (>=30 m2),provisional-plan,true,,15,41,0,0.7981,0.9,0.2075,0.0725,0.1151,0.938,0.9805,1,1,0.8868,1,523,pool,false,false,true,247,20,stopped early,90,0,0,0,0.8229,true
+W1,S092,cottage,2x3,6,medium (6-30 m2),provisional-plan,true,,5,15,0,0.6819,0.9,0.33,0.245,0.2376,0.8099,0.8667,0,1,0.7577,1,457,pool,false,false,true,118,6,stopped early,27,0,0,0,0.6667,true
+W1,S093,undecided,4x2,8,medium (6-30 m2),provisional-plan,true,,6,22,0,0.6972,0.9,0.3025,0.1325,0.1614,0.8511,0.7455,1,1,0.7747,1,407,-,false,false,false,118,6,-,50,0,0,0,1,true
+W1,S094,mediterranean,6x4,24,medium (6-30 m2),provisional-plan,true,,10,28,0,0.7693,0.9,0.245,0.1275,0.1265,0.8905,0.7714,1,1,0.8548,1,446,pool,false,false,true,145,12,stopped early,52,0,0,0,0.8333,true
+W1,S095,fynbos,8x5,40,large (>=30 m2),provisional-plan,true,,12,34,0,0.8072,0.9,0.205,0.115,0.0896,0.8979,0.7471,1,1,0.8969,1,582,-,false,false,false,147,12,-,62,0,0,0,0.925,true
+W1,S096,cottage,6x1,6,medium (6-30 m2),provisional-plan,true,,3,7,0,0.665,0.9,0.34,0.1825,0.2116,0.9399,0.7714,1,0.8889,0.7389,1,444,pool,false,false,true,141,6,stopped early,4,0,0,0,0.8333,false
+W1,S097,undecided,12x8,96,large (>=30 m2),provisional-plan,true,,18,48,0,0.8659,0.9,0.1575,0.0475,0.0684,0.8385,0.875,1,1,0.9621,1,424,pool,false,false,true,56,20,stopped early,110,0,0,0,0.9167,true
+W1,S098,fynbos,1x1,1,small (<6 m2),provisional-plan,true,,3,11,0,0.6503,0.9,0.36,0.2575,0.2802,0.7372,0.8455,0.6667,0.7778,0.7226,1,412,pool,false,false,true,141,6,stopped early,38,0,0,0,1,true
+W1,S099,cottage,4x2,8,medium (6-30 m2),provisional-plan,true,,5,13,0,0.5789,0.9,0.435,0.3575,0.3092,0.8691,0.9385,1,0.8889,0.6433,1,552,pool,false,false,true,352,6,stopped early,24,0,0,0,0.625,true
+W1,S100,cottage,20x10,200,large (>=30 m2),provisional-plan,true,,17,73,0,0.8946,0.9,0.1275,0.0125,0.0375,0.9296,0.989,1,1,0.994,1,626,pool,false,false,true,245,20,stopped early,140,0,0,0,0.96,false
+W2,S001,fynbos,2x3,6,medium (6-30 m2),provisional-plan,true,,5,21,0,0.7455,0.9,0.2875,0.1125,0.1155,0.9714,0.8857,1,1,0.8283,1,601,pool,false,false,true,352,6,stopped early,52,0,0,0,1,false
+W2,S002,mediterranean,4x2,8,medium (6-30 m2),provisional-plan,true,,5,15,0,0.6453,0.9,0.3675,0.245,0.1398,0.9498,0.9,1,1,0.717,1,558,pool,false,false,true,229,6,stopped early,27,0,0,0,0.75,true
+W2,S003,cottage,6x4,24,medium (6-30 m2),provisional-plan,true,,11,33,0,0.7784,0.9,0.2525,0.0625,0.0616,0.9358,0.9758,1,1,0.8649,1,413,pool,false,false,true,76,12,stopped early,71,0,0,0,0.9583,true
+W2,S004,undecided,8x5,40,large (>=30 m2),provisional-plan,true,,9,29,0,0.6073,0.9,0.395,0.3275,0.3675,0.8687,0.9724,1,1,0.6748,1,592,pool,false,false,true,423,12,stopped early,54,0,0,0,0.675,true
+W2,S005,fynbos,3x3,9,medium (6-30 m2),provisional-plan,true,,5,15,0,0.639,0.9,0.3625,0.185,0.1734,0.8874,0.7667,1,1,0.71,1,518,pool,false,false,true,656,6,stopped early,20,0,0,0,0.7778,true
+W2,S006,mediterranean,12x8,96,large (>=30 m2),provisional-plan,true,,10,24,0,0.3736,0.9,0.615,0.585,0.7724,0.9129,0.825,1,0.8889,0.4151,1,1299,pool,false,false,true,706,20,stopped early,26,0,0,0,0.375,true
+W2,S007,cottage,2x3,6,medium (6-30 m2),provisional-plan,true,,4,30,0,0.7542,0.9,0.2575,0.1475,0.1104,0.9327,0.8,1,1,0.838,1,568,pool,false,false,true,128,6,stopped early,73,0,0,0,0.8333,false
+W2,S008,undecided,4x2,8,medium (6-30 m2),provisional-plan,true,,5,19,0,0.7069,0.9,0.2825,0.1225,0.1659,0.8629,0.7105,1,1,0.7854,1,683,pool,false,false,true,607,6,stopped early,25,0,0,0,0.75,true
+W2,S009,fynbos,6x4,24,medium (6-30 m2),provisional-plan,true,,5,21,0,0.5017,0.9,0.5075,0.39,0.2174,0.932,0.9381,1,1,0.5575,1,986,count,true,false,true,794,12,stopped early,24,0,0,0,0.5417,true
+W2,S010,mediterranean,8x5,40,large (>=30 m2),provisional-plan,true,,7,19,0,0.653,0.9,0.3625,0.1425,0.2255,0.9033,0.8789,1,1,0.7256,1,686,pool,false,false,true,558,12,stopped early,30,0,0,0,0.75,true
+W2,S011,cottage,3x3,9,medium (6-30 m2),provisional-plan,true,,4,12,0,0.78,0.9,0.24,0.0625,0.0944,0.9567,0.7,1,1,0.8667,1,520,pool,false,false,true,245,6,stopped early,15,0,0,0,1,true
+W2,S012,undecided,12x8,96,large (>=30 m2),provisional-plan,true,,11,27,0,0.7424,0.9,0.265,0.0825,0.0656,0.9229,0.8926,1,1,0.8249,1,778,pool,false,false,true,863,20,stopped early,37,0,0,0,0.7604,true
+W2,S013,fynbos,2x3,6,medium (6-30 m2),provisional-plan,true,,4,10,0,0.7926,0.9,0.225,0.0725,0.0887,0.8862,0.7,1,0.8889,0.8806,1,448,pool,false,false,true,85,6,stopped early,16,0,0,0,1,true
+W2,S014,mediterranean,4x2,8,medium (6-30 m2),provisional-plan,true,,5,45,0,0.6629,0.9,0.3575,0.1675,0.2349,0.8803,0.7222,1,1,0.7366,1,432,count,true,false,true,73,6,stopped early,109,0,0,0,0.875,true
+W2,S015,cottage,6x4,24,medium (6-30 m2),provisional-plan,true,,6,28,0,0.7005,0.9,0.3225,0.085,0.1245,0.8993,0.7714,1,1,0.7784,1,390,pool,false,false,true,22,12,stopped early,35,0,0,0,0.7917,false
+W2,S016,undecided,8x5,40,large (>=30 m2),provisional-plan,true,,9,25,0,0.7809,0.9,0.2275,0.0825,0.1045,0.4808,0.94,1,1,0.8677,1,460,pool,false,false,true,111,12,stopped early,54,0,0,0,0.85,true
+W2,S017,fynbos,3x3,9,medium (6-30 m2),provisional-plan,true,,4,26,0,0.6678,0.9,0.3425,0.16,0.1922,0.9201,0.7,1,1,0.7419,1,623,pool,false,false,true,288,6,stopped early,56,0,0,0,0.6667,true
+W2,S018,mediterranean,12x8,96,large (>=30 m2),provisional-plan,true,,15,39,0,0.8093,0.9,0.2025,0.0525,0.1349,0.9186,0.8846,1,1,0.8992,1,519,pool,false,false,true,148,20,stopped early,82,0,0,0,0.875,true
+W2,S019,cottage,2x3,6,medium (6-30 m2),provisional-plan,true,,6,18,0,0.6545,0.9,0.3425,0.2225,0.2184,0.774,0.9667,0.25,1,0.7272,1,410,-,false,false,false,55,6,-,63,0,0,0,0.6667,true
+W2,S020,undecided,4x2,8,medium (6-30 m2),provisional-plan,true,,6,22,0,0.6391,0.9,0.3725,0.145,0.1543,0.8382,0.9273,1,1,0.7102,1,418,-,false,false,false,275,6,-,47,0,0,0,0.75,false
+W2,S021,fynbos,6x4,24,medium (6-30 m2),provisional-plan,true,,6,16,0,0.7065,0.9,0.3025,0.1575,0.2893,0.9672,0.8875,1,1,0.785,1,476,pool,false,false,true,407,12,stopped early,21,0,0,0,0.75,true
+W2,S022,mediterranean,8x5,40,large (>=30 m2),provisional-plan,true,,9,25,0,0.7278,0.9,0.29,0.15,0.2523,0.9491,0.94,1,1,0.8086,1,530,pool,false,false,true,354,12,stopped early,52,0,0,0,0.775,true
+W2,S023,cottage,3x3,9,medium (6-30 m2),provisional-plan,true,,5,15,0,0.7198,0.9,0.2875,0.0775,0.1503,0.8337,0.8,1,1,0.7998,1,480,pool,false,false,true,92,6,stopped early,26,0,0,0,0.8889,true
+W2,S024,undecided,12x8,96,large (>=30 m2),provisional-plan,true,,15,41,0,0.7755,0.9,0.2425,0.1225,0.175,0.9083,0.8659,1,1,0.8617,1,606,pool,false,false,true,475,20,stopped early,79,0,0,0,0.8229,true
+W2,S025,fynbos,2x3,6,medium (6-30 m2),provisional-plan,true,,4,18,0,0.6086,0.9,0.4125,0.145,0.1538,0.8084,0.9333,1,1,0.6762,1,560,pool,false,false,true,17,6,stopped early,36,0,0,0,0.6667,false
+W2,S026,mediterranean,4x2,8,medium (6-30 m2),no-plan,false,,0,0,0,0,0.9,1,1,0,,,,,,,498,-,false,false,false,15,0,-,0,0,0,0,0,false
+W2,S027,cottage,6x4,24,medium (6-30 m2),no-plan,false,,0,0,0,0,0.9,1,1,0,,,,,,,470,-,false,false,false,3,0,-,0,0,0,0,0,false
+W2,S028,undecided,8x5,40,large (>=30 m2),provisional-plan,true,,10,48,0,0.8507,0.9,0.17,0.0675,0.0983,0.6812,0.9667,0.6667,1,0.9453,1,502,pool,false,false,true,25,12,stopped early,92,0,0,0,0.925,true
+W2,S029,fynbos,3x3,9,medium (6-30 m2),provisional-plan,true,,5,13,0,0.6989,0.9,0.3,0.195,0.374,0.771,0.8692,0.25,0.8889,0.7766,1,504,pool,false,false,true,33,6,stopped early,24,0,0,0,0.8889,true
+W2,S030,mediterranean,12x8,96,large (>=30 m2),provisional-plan,true,,10,38,0,0.8313,0.9,0.165,0.045,0.0711,0.899,0.9737,1,1,0.9237,1,470,pool,false,false,true,26,20,stopped early,58,0,0,0,0.8958,false
+W2,S031,cottage,2x3,6,medium (6-30 m2),provisional-plan,true,,4,18,0,0.6893,0.9,0.3225,0.17,0.2358,0.9366,0.6,1,1,0.7659,1,379,pool,false,false,true,6,6,stopped early,45,0,0,0,0.8333,true
+W2,S032,undecided,4x2,8,medium (6-30 m2),provisional-plan,true,,6,20,0,0.5949,0.9,0.4,0.255,0.4062,0.7234,0.7,1,1,0.661,1,447,-,false,false,false,35,6,-,34,0,0,0,0.75,true
+W2,S033,fynbos,6x4,24,medium (6-30 m2),provisional-plan,true,,10,28,0,0.8053,0.9,0.1975,0.08,0.0814,0.8802,0.9357,1,1,0.8948,1,526,pool,false,false,true,109,12,stopped early,58,0,0,0,0.9583,true
+W2,S034,mediterranean,8x5,40,large (>=30 m2),provisional-plan,true,,8,26,0,0.7642,0.9,0.2775,0.075,0.1243,0.8566,0.8154,0.5,1,0.8491,1,399,pool,false,false,true,38,12,stopped early,37,0,0,0,0.825,true
+W2,S035,cottage,3x3,9,medium (6-30 m2),provisional-plan,true,,4,18,0,0.7337,0.9,0.2775,0.145,0.1266,0.8438,0.8111,1,1,0.8152,1,392,pool,false,false,true,27,6,stopped early,22,0,0,0,1,true
+W2,S036,undecided,12x8,96,large (>=30 m2),provisional-plan,true,,14,40,0,0.7357,0.9,0.3075,0.2175,0.1784,0.9717,0.9,1,1,0.8175,1,450,pool,false,false,true,137,20,stopped early,50,0,0,0,0.75,true
+W2,S037,fynbos,2x3,6,medium (6-30 m2),provisional-plan,true,,6,34,0,0.6819,0.9,0.34,0.1475,0.0652,0.9427,0.9824,1,1,0.7577,1,503,-,false,false,false,352,6,-,69,0,0,0,1,true
+W2,S038,mediterranean,4x2,8,medium (6-30 m2),provisional-plan,true,,5,15,0,0.5927,0.9,0.4125,0.2075,0.2161,0.8544,0.6667,1,1,0.6586,1,494,pool,false,false,true,229,6,stopped early,25,0,0,0,0.5,true
+W2,S039,cottage,6x4,24,medium (6-30 m2),provisional-plan,true,,7,19,0,0.6076,0.9,0.4025,0.2275,0.1288,0.8483,0.7263,0.75,1,0.6751,1,517,pool,false,false,true,76,12,stopped early,19,0,0,0,0.5833,true
+W2,S040,undecided,8x5,40,large (>=30 m2),provisional-plan,true,,9,37,0,0.6443,0.9,0.37,0.3025,0.434,0.7641,0.8811,1,1,0.7158,1,647,pool,false,false,true,358,12,stopped early,79,0,0,0,0.675,true
+W2,S041,fynbos,3x3,9,medium (6-30 m2),provisional-plan,true,,3,9,0,0.6504,0.9,0.35,0.1425,0.1784,0.94,0.9,1,0.7778,0.7227,1,582,pool,false,false,true,1107,6,stopped early,7,0,0,0,0.6667,true
+W2,S042,mediterranean,12x8,96,large (>=30 m2),provisional-plan,true,,13,33,0,0.7217,0.9,0.29,0.105,0.1068,0.9408,0.9273,1,1,0.8019,1,705,pool,false,false,true,664,20,stopped early,56,0,0,0,0.75,true
+W2,S043,cottage,2x3,6,medium (6-30 m2),provisional-plan,true,,4,36,0,0.7179,0.9,0.2875,0.1375,0.0844,0.9079,0.8833,1,1,0.7976,1,541,pool,false,false,true,159,6,stopped early,132,0,0,0,0.8333,true
+W2,S044,undecided,4x2,8,medium (6-30 m2),provisional-plan,true,,4,16,0,0.5727,0.9,0.43,0.275,0.256,0.8719,0.6875,1,0.8889,0.6363,1,799,pool,false,false,true,1046,6,stopped early,20,0,0,0,0.75,true
+W2,S045,fynbos,6x4,24,medium (6-30 m2),provisional-plan,true,,6,16,0,0.5835,0.9,0.4125,0.3475,0.4833,0.8923,0.725,1,1,0.6483,1,859,pool,false,false,true,1417,12,stopped early,14,0,0,0,0.5833,true
+W2,S046,mediterranean,8x5,40,large (>=30 m2),provisional-plan,true,,8,22,0,0.5788,0.9,0.415,0.3375,0.2972,0.957,0.9273,1,1,0.6432,1,769,pool,false,false,true,906,12,stopped early,28,0,0,0,0.575,true
+W2,S047,cottage,3x3,9,medium (6-30 m2),provisional-plan,true,,4,10,0,0.6946,0.9,0.3125,0.1125,0.2024,0.9372,0.9,1,0.8889,0.7718,1,468,pool,false,false,true,245,6,stopped early,18,0,0,0,0.7778,true
+W2,S048,undecided,12x8,96,large (>=30 m2),provisional-plan,true,,13,35,0,0.7866,0.9,0.2275,0.09,0.1202,0.9159,0.9429,1,1,0.874,1,967,pool,false,false,true,1561,20,stopped early,51,0,0,0,0.8438,true
+W2,S049,fynbos,2x3,6,medium (6-30 m2),provisional-plan,true,,5,41,0,0.4537,0.9,0.555,0.5325,0.3324,0.8197,0.9244,0.75,1,0.5041,1,439,pool,false,false,true,73,6,stopped early,122,0,0,0,0.6667,true
+W2,S050,mediterranean,4x2,8,medium (6-30 m2),provisional-plan,true,,5,15,0,0.7004,0.9,0.275,0.095,0.1395,0.8929,0.8,1,1,0.7782,1,423,pool,false,false,true,76,6,stopped early,26,0,0,0,0.75,true
+W2,S051,cottage,6x4,24,medium (6-30 m2),provisional-plan,true,,7,49,0,0.7998,0.9,0.2325,0.0875,0.1072,0.9701,0.8122,1,1,0.8887,1,373,count,true,false,true,20,12,stopped early,105,0,0,0,0.9167,true
+W2,S052,undecided,8x5,40,large (>=30 m2),provisional-plan,true,,12,36,0,0.7159,0.9,0.2975,0.125,0.1849,0.857,0.9444,1,1,0.7954,1,447,-,false,false,false,91,12,-,119,0,1,0,0.85,true
+W2,S053,fynbos,3x3,9,medium (6-30 m2),provisional-plan,true,,6,22,0,0.7821,0.9,0.24,0.0675,0.1089,0.8808,0.5818,1,1,0.869,1,410,-,false,false,false,188,6,-,45,0,0,0,1,true
+W2,S054,mediterranean,12x8,96,large (>=30 m2),provisional-plan,true,,13,55,0,0.8918,0.9,0.12,0.025,0.0197,0.9369,0.9545,1,1,0.9909,1,471,pool,false,false,true,148,20,stopped early,96,0,0,0,0.9896,false
+W2,S055,cottage,2x3,6,medium (6-30 m2),provisional-plan,true,,5,25,0,0.7889,0.9,0.25,0.105,0.0772,0.9113,0.92,1,1,0.8765,1,410,pool,false,false,true,55,6,stopped early,81,0,0,0,1,true
+W2,S056,undecided,4x2,8,medium (6-30 m2),provisional-plan,true,,4,10,0,0.5838,0.9,0.4375,0.225,0.124,0.9438,0.9,1,0.8889,0.6487,1,459,pool,false,false,true,176,6,stopped early,10,0,0,0,0.5,true
+W2,S057,fynbos,6x4,24,medium (6-30 m2),provisional-plan,true,,7,19,0,0.7101,0.9,0.295,0.195,0.2012,0.934,0.8368,1,1,0.789,1,484,pool,false,false,true,407,12,stopped early,27,0,0,0,0.7917,true
+W2,S058,mediterranean,8x5,40,large (>=30 m2),provisional-plan,true,,9,33,0,0.8536,0.9,0.1675,0.04,0.0771,0.907,0.9364,1,1,0.9484,1,478,pool,false,false,true,354,12,stopped early,66,0,0,0,0.95,true
+W2,S059,cottage,3x3,9,medium (6-30 m2),provisional-plan,true,,5,23,0,0.8341,0.9,0.1825,0.025,0.0576,0.7801,0.9217,0.75,1,0.9267,1,512,pool,false,false,true,92,6,stopped early,61,0,0,0,1,true
+W2,S060,undecided,12x8,96,large (>=30 m2),provisional-plan,true,,13,35,0,0.7595,0.9,0.26,0.195,0.221,0.9074,0.8714,1,1,0.8438,1,614,pool,false,false,true,475,20,stopped early,47,0,0,0,0.7708,true
+W2,S061,fynbos,2x3,6,medium (6-30 m2),provisional-plan,true,,5,15,0,0.5602,0.9,0.455,0.27,0.2352,0.9322,0.7,1,1,0.6225,1,441,pool,false,false,true,17,6,stopped early,26,0,0,0,0.6667,true
+W2,S062,mediterranean,4x2,8,medium (6-30 m2),no-plan,false,,0,0,0,0,0.9,1,1,0,,,,,,,385,-,false,false,false,7,0,-,0,0,0,0,0,false
+W2,S063,cottage,6x4,24,medium (6-30 m2),no-plan,false,,0,0,0,0,0.9,1,1,0,,,,,,,387,-,false,false,false,4,0,-,0,0,0,0,0,false
+W2,S064,undecided,8x5,40,large (>=30 m2),provisional-plan,true,,5,19,0,0.5656,0.9,0.4425,0.35,0.4888,0.8416,0.9316,0.75,1,0.6285,1,377,pool,false,false,true,22,12,stopped early,33,0,0,0,0.6,false
+W2,S065,fynbos,3x3,9,medium (6-30 m2),provisional-plan,true,,5,23,0,0.7899,0.9,0.22,0.08,0.092,0.835,0.5739,1,1,0.8776,1,387,pool,false,false,true,72,6,stopped early,64,0,0,0,1,false
+W2,S066,mediterranean,12x8,96,large (>=30 m2),provisional-plan,true,,12,40,0,0.8579,0.9,0.1425,0.015,0.0224,0.9741,0.975,1,1,0.9532,1,412,pool,false,false,true,60,20,stopped early,65,0,0,0,0.9167,false
+W2,S067,cottage,2x3,6,medium (6-30 m2),provisional-plan,true,,4,22,0,0.76,0.9,0.24,0.075,0.0868,0.7555,0.8,0.5,1,0.8444,1,418,pool,false,false,true,9,6,stopped early,56,0,0,0,1,true
+W2,S068,undecided,4x2,8,medium (6-30 m2),provisional-plan,true,,6,24,0,0.6503,0.9,0.38,0.2425,0.4996,0.6463,0.5417,0.3333,1,0.7226,1,443,-,false,false,false,74,6,-,45,0,0,0,0.75,true
+W2,S069,fynbos,6x4,24,medium (6-30 m2),provisional-plan,true,,8,24,0,0.7783,0.9,0.22,0.0875,0.1279,0.8766,0.9,0.75,1,0.8648,1,420,pool,false,false,true,109,12,stopped early,44,0,0,0,0.9167,true
+W2,S070,mediterranean,8x5,40,large (>=30 m2),provisional-plan,true,,10,30,0,0.7825,0.9,0.23,0.1,0.1067,0.8879,0.9,1,1,0.8694,1,437,pool,false,false,true,102,12,stopped early,68,0,0,0,0.825,true
+W2,S071,cottage,3x3,9,medium (6-30 m2),provisional-plan,true,,4,16,0,0.7163,0.9,0.29,0.15,0.1086,0.8854,0.7875,1,1,0.7959,1,363,pool,false,false,true,16,6,stopped early,44,0,0,0,0.8889,true
+W2,S072,undecided,12x8,96,large (>=30 m2),provisional-plan,true,,16,44,0,0.8084,0.9,0.2175,0.0975,0.091,0.8611,0.9273,1,1,0.8982,1,468,pool,false,false,true,144,20,stopped early,67,0,0,0,0.8333,true
+W2,S073,fynbos,0.5x0.5,0.25,small (<6 m2),no-plan,false,,0,0,0,0,0.9,1,1,0,,,,,,,458,-,false,false,false,348,0,-,0,0,0,0,0,true
+W2,S074,mediterranean,0.5x30,15,medium (6-30 m2),no-plan,false,,0,0,0,0,0.9,1,1,0,,,,,,,1197,-,false,false,false,348,0,-,0,0,0,0,0,true
+W2,S075,cottage,30x0.5,15,medium (6-30 m2),provisional-plan,true,,9,45,0,0.4744,0.9,0.5125,0.2625,0.2738,0.8944,1,1,1,0.5272,1,1067,count,true,false,true,348,12,stopped early,28,0,0,0,0.6333,true
+W2,S076,undecided,30x30,900,large (>=30 m2),provisional-plan,true,,18,50,0,0.3173,0.9,0.6775,0.6125,0.7666,0.8474,0.96,1,1,0.3525,1,2817,count,true,false,true,1161,20,stopped early,53,0,0,0,0.3133,true
+W2,S077,fynbos,1x1,1,small (<6 m2),provisional-plan,true,,3,7,0,0.7069,0.9,0.28,0.085,0.1392,0.8714,0.6714,1,0.8889,0.7854,1,565,pool,false,false,true,451,6,stopped early,13,0,0,0,1,true
+W2,S078,mediterranean,1x10,10,medium (6-30 m2),provisional-plan,true,,7,21,0,0.7251,0.9,0.2625,0.1775,0.1361,0.9782,0.9762,1,1,0.8056,1,644,pool,false,false,true,821,12,stopped early,30,0,0,0,1,true
+W2,S079,cottage,10x1,10,medium (6-30 m2),provisional-plan,true,,7,21,0,0.7067,0.9,0.29,0.08,0.0527,0.94,0.9143,1,1,0.7852,1,586,pool,false,false,true,451,12,stopped early,33,0,0,0,0.9,true
+W2,S080,undecided,0.8x12,9.6,medium (6-30 m2),provisional-plan,true,,6,30,0,0.6884,0.9,0.34,0.1525,0.1534,0.8346,0.9,0.6667,0.8889,0.7649,1,627,-,false,false,false,349,6,-,33,0,0,0,0.9167,true
+W2,S081,fynbos,2.5x1.5,3.75,small (<6 m2),provisional-plan,true,,3,7,0,0.6178,0.9,0.3775,0.1225,0.2696,0.873,0.7,0.75,0.8889,0.6865,1,624,pool,false,false,true,499,6,stopped early,9,0,0,0,0.6667,true
+W2,S082,mediterranean,7.25x3.75,27.19,medium (6-30 m2),provisional-plan,true,,8,22,0,0.6394,0.9,0.3625,0.1825,0.2985,0.8675,0.7,1,1,0.7105,1,595,pool,false,false,true,662,12,stopped early,34,0,0,0,0.6452,true
+W2,S083,cottage,15x2,30,large (>=30 m2),provisional-plan,true,,8,26,0,0.716,0.9,0.2825,0.1625,0.1483,0.9711,0.9154,1,1,0.7955,1,764,pool,false,false,true,977,12,stopped early,38,0,0,0,0.8,true
+W2,S084,undecided,2x15,30,large (>=30 m2),provisional-plan,true,,9,25,0,0.7693,0.9,0.265,0.0675,0.0802,0.9357,0.78,1,1,0.8548,1,660,pool,false,false,true,570,12,stopped early,33,0,0,0,0.9667,true
+W2,S085,fynbos,20x20,400,large (>=30 m2),provisional-plan,true,,20,58,0,0.6815,0.9,0.3275,0.14,0.1908,0.9167,0.9448,1,1,0.7572,1,1043,-,false,false,false,1161,20,-,118,3,3,0.02542,0.68,true
+W2,S086,mediterranean,25x4,100,large (>=30 m2),provisional-plan,true,,16,42,0,0.5896,0.9,0.4275,0.1475,0.2696,0.924,0.9762,1,1,0.6551,1,1383,pool,false,false,true,1136,20,stopped early,45,0,0,0,0.62,true
+W2,S087,cottage,4x25,100,large (>=30 m2),provisional-plan,true,,11,29,0,0.3577,0.9,0.64,0.3375,0.2531,0.8519,0.6828,1,0.8889,0.3975,1,1706,count,true,false,true,1136,20,stopped early,46,0,0,0,0.41,true
+W2,S088,undecided,0.6x0.9,0.54,small (<6 m2),provisional-plan,true,,3,9,0,0.6654,0.9,0.31,0.0925,0.0423,0.435,0.8333,1,0.7778,0.7393,1,528,pool,false,false,true,464,6,stopped early,26,0,0,0,1,true
+W2,S089,undecided,8x5,40,large (>=30 m2),provisional-plan,true,,9,27,0,0.7865,0.9,0.2325,0.1175,0.2026,0.7255,0.8333,0.75,1,0.8739,1,470,pool,false,false,true,29,12,stopped early,48,0,0,0,0.825,true
+W2,S090,fynbos,3x3,9,medium (6-30 m2),no-plan,false,,0,0,0,0,0.9,1,1,0,,,,,,,405,-,false,false,false,3,0,-,0,0,0,0,0,false
+W2,S091,mediterranean,12x8,96,large (>=30 m2),provisional-plan,true,,15,41,0,0.7981,0.9,0.2175,0.0875,0.1169,0.938,0.9805,1,1,0.8868,1,683,pool,false,false,true,247,20,stopped early,78,0,0,0,0.8333,true
+W2,S092,cottage,2x3,6,medium (6-30 m2),provisional-plan,true,,3,15,0,0.7552,0.9,0.26,0.1525,0.0497,0.8047,0.7333,0,1,0.8391,1,467,pool,false,false,true,118,6,stopped early,22,0,0,0,1,true
+W2,S093,undecided,4x2,8,medium (6-30 m2),provisional-plan,true,,6,36,0,0.7304,0.9,0.28,0.0875,0.1396,0.8376,0.8056,1,1,0.8115,1,570,-,false,false,false,118,6,-,98,0,0,0,0.875,true
+W2,S094,mediterranean,6x4,24,medium (6-30 m2),provisional-plan,true,,9,39,0,0.6904,0.9,0.315,0.175,0.1732,0.9005,0.9564,1,1,0.7672,1,491,pool,false,false,true,145,12,stopped early,84,0,0,0,0.7917,true
+W2,S095,fynbos,8x5,40,large (>=30 m2),provisional-plan,true,,9,35,0,0.7264,0.9,0.2725,0.115,0.1759,0.9291,0.9857,1,1,0.8071,1,531,pool,false,false,true,147,12,stopped early,52,0,0,0,0.775,true
+W2,S096,cottage,6x1,6,medium (6-30 m2),provisional-plan,true,,5,15,0,0.7416,0.9,0.2875,0.1225,0.1483,0.9624,0.8,1,1,0.824,1,601,pool,false,false,true,141,6,stopped early,24,0,0,0,1,true
+W2,S097,undecided,12x8,96,large (>=30 m2),provisional-plan,true,,18,48,0,0.8659,0.9,0.1325,0.0425,0.0511,0.8385,0.875,1,1,0.9621,1,506,pool,false,false,true,56,20,stopped early,95,0,0,0,0.9375,true
+W2,S098,fynbos,1x1,1,small (<6 m2),provisional-plan,true,,3,9,0,0.6362,0.9,0.3475,0.19,0.2031,0.7467,0.7333,1,0.6667,0.7069,1,467,pool,false,false,true,141,6,stopped early,25,0,0,0,1,true
+W2,S099,cottage,4x2,8,medium (6-30 m2),provisional-plan,true,,6,18,0,0.6493,0.9,0.3575,0.255,0.1611,0.8665,0.8667,1,1,0.7215,1,570,-,false,false,false,352,6,-,43,0,0,0,0.875,true
+W2,S100,cottage,20x10,200,large (>=30 m2),provisional-plan,true,,17,73,0,0.8946,0.9,0.1225,0.0125,0.0306,0.9296,0.989,1,1,0.994,1,666,pool,false,false,true,245,20,stopped early,141,0,0,0,0.95,false

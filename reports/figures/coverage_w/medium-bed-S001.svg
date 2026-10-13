@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="843" height="370" viewBox="0 0 843 370" font-family="Helvetica, Arial, sans-serif">
+<rect width="100%" height="100%" fill="#fbf8ef"/>
+<text x="30" y="22" font-size="13">medium bed - S001: 2 x 3 m. North at the top, 1 m grid, same seed in every panel.</text>
+<text x="30" y="42" font-size="13" font-weight="bold">V0</text>
+<rect x="30" y="50" width="173.33333333333334" height="260" fill="#efe6cf" stroke="#2f3a1e"/>
+<g stroke="#d9d2bd" stroke-width="0.6"><line x1="116.66666666666667" y1="50" x2="116.66666666666667" y2="310"/><line x1="30" y1="136.66666666666669" x2="203.33333333333334" y2="136.66666666666669"/><line x1="30" y1="223.33333333333334" x2="203.33333333333334" y2="223.33333333333334"/></g>
+<circle cx="170.2" cy="258.7" r="24.7" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="133.1" cy="285.3" r="24.7" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="86.6" cy="251.6" r="24.7" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="129.9" cy="237.1" r="24.7" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="168.8" cy="213.0" r="24.7" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="54.7" cy="284.3" r="24.7" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="95.7" cy="206.8" r="24.7" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="51.7" cy="226.3" r="21.7" fill="#4f7a8a" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="57.6" cy="186.7" r="21.7" fill="#4f7a8a" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="90.6" cy="164.0" r="21.7" fill="#4f7a8a" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="192.9" cy="283.4" r="10.4" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="175.6" cy="291.8" r="10.4" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="102.7" cy="299.6" r="10.4" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="90.3" cy="284.9" r="10.4" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="133.8" cy="158.4" r="10.4" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="175.2" cy="164.3" r="28.2" fill="#7b6aa8" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="143.7" cy="122.7" r="28.2" fill="#7b6aa8" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="91.9" cy="117.4" r="28.2" fill="#7b6aa8" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="180.8" cy="93.3" r="22.5" fill="#6d7f3a" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="143.2" cy="75.4" r="22.5" fill="#6d7f3a" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="76.9" cy="72.5" r="22.5" fill="#6d7f3a" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<text x="30" y="328" font-size="11">cover 0.71 · empty 0.33</text>
+<text x="30" y="343" font-size="11">largest gap 0.10 · CV 0.18 · 21 plants</text>
+<text x="233.33333333333334" y="42" font-size="13" font-weight="bold">V2</text>
+<rect x="233.33333333333334" y="50" width="173.33333333333334" height="260" fill="#efe6cf" stroke="#2f3a1e"/>
+<g stroke="#d9d2bd" stroke-width="0.6"><line x1="320" y1="50" x2="320" y2="310"/><line x1="233.33333333333334" y1="136.66666666666669" x2="406.6666666666667" y2="136.66666666666669"/><line x1="233.33333333333334" y1="223.33333333333334" x2="406.6666666666667" y2="223.33333333333334"/></g>
+<circle cx="373.5" cy="258.7" r="24.7" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="328.1" cy="277.2" r="24.7" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="289.9" cy="251.6" r="24.7" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="336.3" cy="232.3" r="24.7" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="258.0" cy="284.3" r="24.7" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="377.8" cy="213.2" r="24.7" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="298.4" cy="206.7" r="24.7" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="255.0" cy="226.3" r="21.7" fill="#4f7a8a" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="260.3" cy="186.6" r="21.7" fill="#4f7a8a" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="293.3" cy="163.9" r="21.7" fill="#4f7a8a" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="396.3" cy="283.4" r="10.4" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="379.0" cy="291.8" r="10.4" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="359.9" cy="289.3" r="10.4" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="303.1" cy="299.6" r="10.4" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="326.4" cy="161.4" r="10.4" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="378.5" cy="164.0" r="28.2" fill="#7b6aa8" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="341.3" cy="127.5" r="28.2" fill="#7b6aa8" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="290.2" cy="117.4" r="28.2" fill="#7b6aa8" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="378.5" cy="91.0" r="28.2" fill="#7b6aa8" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="324.6" cy="78.2" r="28.2" fill="#7b6aa8" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="255.9" cy="84.8" r="22.5" fill="#6d7f3a" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<text x="233.33333333333334" y="328" font-size="11">cover 0.74 · empty 0.27</text>
+<text x="233.33333333333334" y="343" font-size="11">largest gap 0.06 · CV 0.08 · 21 plants</text>
+<text x="436.6666666666667" y="42" font-size="13" font-weight="bold">W1</text>
+<rect x="436.6666666666667" y="50" width="173.33333333333334" height="260" fill="#efe6cf" stroke="#2f3a1e"/>
+<g stroke="#d9d2bd" stroke-width="0.6"><line x1="523.3333333333334" y1="50" x2="523.3333333333334" y2="310"/><line x1="436.6666666666667" y1="136.66666666666669" x2="610" y2="136.66666666666669"/><line x1="436.6666666666667" y1="223.33333333333334" x2="610" y2="223.33333333333334"/></g>
+<circle cx="576.9" cy="258.7" r="24.7" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="539.7" cy="285.3" r="24.7" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="493.3" cy="251.6" r="24.7" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="536.6" cy="237.1" r="24.7" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="575.4" cy="213.0" r="24.7" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="461.4" cy="284.3" r="24.7" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="502.4" cy="206.8" r="24.7" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="458.3" cy="226.3" r="21.7" fill="#4f7a8a" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="464.3" cy="186.7" r="21.7" fill="#4f7a8a" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="497.3" cy="164.0" r="21.7" fill="#4f7a8a" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="599.6" cy="283.4" r="10.4" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="582.3" cy="291.8" r="10.4" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="509.4" cy="299.6" r="10.4" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="496.9" cy="284.9" r="10.4" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="540.4" cy="158.4" r="10.4" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="581.8" cy="164.3" r="28.2" fill="#7b6aa8" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="550.4" cy="122.7" r="28.2" fill="#7b6aa8" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="498.5" cy="117.4" r="28.2" fill="#7b6aa8" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="587.5" cy="93.3" r="22.5" fill="#6d7f3a" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="549.8" cy="75.4" r="22.5" fill="#6d7f3a" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="483.6" cy="72.5" r="22.5" fill="#6d7f3a" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<text x="436.6666666666667" y="328" font-size="11">cover 0.71 · empty 0.33</text>
+<text x="436.6666666666667" y="343" font-size="11">largest gap 0.10 · CV 0.18 · 21 plants</text>
+<text x="640" y="42" font-size="13" font-weight="bold">W2</text>
+<rect x="640" y="50" width="173.33333333333334" height="260" fill="#efe6cf" stroke="#2f3a1e"/>
+<g stroke="#d9d2bd" stroke-width="0.6"><line x1="726.6666666666666" y1="50" x2="726.6666666666666" y2="310"/><line x1="640" y1="136.66666666666669" x2="813.3333333333334" y2="136.66666666666669"/><line x1="640" y1="223.33333333333334" x2="813.3333333333334" y2="223.33333333333334"/></g>
+<circle cx="780.2" cy="258.7" r="24.7" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="734.8" cy="277.2" r="24.7" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="742.9" cy="232.3" r="24.7" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="689.8" cy="285.3" r="24.7" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="697.9" cy="240.3" r="24.7" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="784.4" cy="213.2" r="24.7" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="664.7" cy="209.0" r="24.7" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="714.0" cy="200.3" r="21.7" fill="#4f7a8a" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="686.1" cy="171.5" r="21.7" fill="#4f7a8a" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="751.3" cy="185.6" r="21.7" fill="#4f7a8a" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="669.7" cy="258.5" r="10.4" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="659.6" cy="242.1" r="10.4" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="650.5" cy="259.1" r="10.4" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="657.3" cy="277.1" r="10.4" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="650.4" cy="295.1" r="10.4" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="785.2" cy="153.7" r="28.2" fill="#7b6aa8" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="734.3" cy="142.3" r="28.2" fill="#7b6aa8" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="769.6" cy="103.9" r="28.2" fill="#7b6aa8" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="685.2" cy="125.0" r="28.2" fill="#7b6aa8" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="720.5" cy="86.6" r="28.2" fill="#7b6aa8" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="662.5" cy="83.4" r="22.5" fill="#6d7f3a" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<text x="640" y="328" font-size="11">cover 0.74 · empty 0.29</text>
+<text x="640" y="343" font-size="11">largest gap 0.11 · CV 0.12 · 21 plants</text>
+</svg>

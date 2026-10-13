@@ -1,4 +1,10 @@
 import type { GardenBrief } from "./brief.ts";
+
+/** Said once when the cover floor (SEARCH.coverMinHard) could not be met,
+ * so the plan is the densest mix found rather than a mix that reached the
+ * style's minimum cover. */
+const COVER_SHORT_NOTE =
+  "cover_short: no mix of plants reached this style's minimum planted cover, so this is the densest one we found.";
 import { createRng, type SpeciesInfo } from "./engineData.ts";
 import { RULES } from "./rules.ts";
 import {
@@ -6,6 +12,7 @@ import {
   FAIL_RULE_MAX_RETRIES,
   FAIL_RULE_PACKING_CAP_STEP,
   H7_FOOTPRINT_CAP,
+  SEARCH,
 } from "./engineConfig.ts";
 import { pickedColours } from "./stage1.ts";
 import { rowsAvailable, styleKeyFor, WIND_SITE_FACTOR } from "./stage1Config.ts";
@@ -110,6 +117,9 @@ export function runEngine(
       return false;
     }
     lastSearch = result.trace;
+    if (result.coverShort && !diagnostics.includes(COVER_SHORT_NOTE)) {
+      diagnostics.push(COVER_SHORT_NOTE);
+    }
     selection = new Map(result.selection);
     return true;
   };
@@ -129,7 +139,11 @@ export function runEngine(
     if (
       placement.status === "complete" &&
       evaluation.feasible &&
-      state.complete() &&
+      // baseComplete: the H2 floor and the windward row, which is what this
+      // acceptance test has always meant. The cover floor (SEARCH.
+      // coverMinHard) is a Stage 3 objective with its own documented
+      // fallback, not grounds for throwing away a placed layout.
+      state.baseComplete() &&
       hardPlacementOk
     ) {
       diagnostics.push(...placement.layout.diagnostics);

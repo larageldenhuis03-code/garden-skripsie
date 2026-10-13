@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1350" height="290" viewBox="0 0 1350 290" font-family="Helvetica, Arial, sans-serif">
+<rect width="100%" height="100%" fill="#fbf8ef"/>
+<text x="30" y="22" font-size="13">small bed - S081: 2.5 x 1.5 m. North at the top, 1 m grid, same seed in every panel.</text>
+<text x="30" y="42" font-size="13" font-weight="bold">V0</text>
+<rect x="30" y="50" width="300" height="180" fill="#efe6cf" stroke="#2f3a1e"/>
+<g stroke="#d9d2bd" stroke-width="0.6"><line x1="150" y1="50" x2="150" y2="230"/><line x1="270" y1="50" x2="270" y2="230"/><line x1="30" y1="170" x2="330" y2="170"/></g>
+<circle cx="48.0" cy="212.0" r="18.0" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="168.0" cy="212.0" r="18.0" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="288.0" cy="212.0" r="18.0" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="84.0" cy="104.0" r="54.0" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="175.9" cy="143.2" r="54.0" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="270.8" cy="111.3" r="54.0" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="105.7" cy="180.5" r="30.0" fill="#6d7f3a" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<text x="30" y="248" font-size="11">cover 0.62 · empty 0.38</text>
+<text x="30" y="263" font-size="11">largest gap 0.16 · CV 0.25 · 7 plants</text>
+<text x="360" y="42" font-size="13" font-weight="bold">V2</text>
+<rect x="360" y="50" width="300" height="180" fill="#efe6cf" stroke="#2f3a1e"/>
+<g stroke="#d9d2bd" stroke-width="0.6"><line x1="480" y1="50" x2="480" y2="230"/><line x1="600" y1="50" x2="600" y2="230"/><line x1="360" y1="170" x2="660" y2="170"/></g>
+<circle cx="378.0" cy="212.0" r="18.0" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="498.0" cy="212.0" r="18.0" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="618.0" cy="212.0" r="18.0" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="568.7" cy="192.2" r="37.8" fill="#3f6e4f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="508.6" cy="126.1" r="45.0" fill="#7b6aa8" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="431.4" cy="95.0" r="45.0" fill="#7b6aa8" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="443.1" cy="177.4" r="45.0" fill="#7b6aa8" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<text x="360" y="248" font-size="11">cover 0.49 · empty 0.52</text>
+<text x="360" y="263" font-size="11">largest gap 0.34 · CV 0.42 · 7 plants</text>
+<text x="690" y="42" font-size="13" font-weight="bold">W1</text>
+<rect x="690" y="50" width="300" height="180" fill="#efe6cf" stroke="#2f3a1e"/>
+<g stroke="#d9d2bd" stroke-width="0.6"><line x1="810" y1="50" x2="810" y2="230"/><line x1="930" y1="50" x2="930" y2="230"/><line x1="690" y1="170" x2="990" y2="170"/></g>
+<circle cx="708.0" cy="212.0" r="18.0" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="828.0" cy="212.0" r="18.0" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="948.0" cy="212.0" r="18.0" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="936.0" cy="104.0" r="54.0" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="844.8" cy="144.8" r="54.0" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="753.6" cy="104.0" r="54.0" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="774.0" cy="180.8" r="30.0" fill="#b08d2c" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<text x="690" y="248" font-size="11">cover 0.62 · empty 0.39</text>
+<text x="690" y="263" font-size="11">largest gap 0.16 · CV 0.25 · 7 plants</text>
+<text x="1020" y="42" font-size="13" font-weight="bold">W2</text>
+<rect x="1020" y="50" width="300" height="180" fill="#efe6cf" stroke="#2f3a1e"/>
+<g stroke="#d9d2bd" stroke-width="0.6"><line x1="1140" y1="50" x2="1140" y2="230"/><line x1="1260" y1="50" x2="1260" y2="230"/><line x1="1020" y1="170" x2="1320" y2="170"/></g>
+<circle cx="1038.0" cy="212.0" r="18.0" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="1158.0" cy="212.0" r="18.0" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="1278.0" cy="212.0" r="18.0" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="1074.0" cy="104.0" r="54.0" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="1173.9" cy="104.0" r="54.0" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="1265.5" cy="143.8" r="54.0" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="1123.9" cy="165.8" r="30.0" fill="#4f7a8a" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<text x="1020" y="248" font-size="11">cover 0.62 · empty 0.38</text>
+<text x="1020" y="263" font-size="11">largest gap 0.12 · CV 0.27 · 7 plants</text>
+</svg>

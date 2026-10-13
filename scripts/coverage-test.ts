@@ -23,6 +23,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { plants } from "../app/data/plants.ts";
+import { DATASET_VERSION } from "../app/data/datasetVersion.ts";
 import {
   bandFor,
   buildGardenPlan,
@@ -32,6 +33,7 @@ import {
   PLACEMENT,
   RULES,
   RULES_VERSION,
+  SEARCH,
   speciesInfo,
   type GardenPlan,
 } from "../app/lib/planning/index.ts";
@@ -62,8 +64,18 @@ function setPath(
  * inside the depth band, so the band is never overridden. */
 const EMPTIEST_BLOCK_WEIGHT = 0.25;
 
+/** W2 weight for an in-band contact point: above the largest depth-scatter
+ * penalty inside the band (depth_tol = 0.10 of the span). */
+const DENSE_WEIGHT = 0.15;
+
+/** COVERAGE_COVER=0.9,1.0 sets every style's cover_min and cover_max in
+ * memory for the whole run (every version and the figures). */
+const COVER_ALL = process.env.COVERAGE_COVER
+  ? (process.env.COVERAGE_COVER.split(",").map(Number) as [number, number])
+  : null;
+
 type Version = {
-  id: "V0" | "V1" | "V2" | "V3";
+  id: "V0" | "V1" | "V2" | "V3" | "W1" | "W2" | "W3";
   label: string;
   /** Applies the override; returns the undo. */
   apply: () => () => void;
@@ -76,14 +88,6 @@ const styleRules = RULES.styles as unknown as Record<
   string,
   { coverMin: number; coverMax: number }
 >;
-const BASE_COVER: Record<string, { coverMin: number; coverMax: number }> =
-  Object.fromEntries(
-    Object.entries(styleRules).map(([key, value]) => [
-      key,
-      { coverMin: value.coverMin, coverMax: value.coverMax },
-    ]),
-  );
-
 /** The versions this report compares. COVERAGE_RUN overrides it, e.g.
  * COVERAGE_RUN=V0,V2. V5-V8 (the cover floor and gap fill) were dropped on
  * 13 October 2026; their code and results are in commit 2b784e7. */
@@ -96,7 +100,7 @@ const VERSIONS: Version[] = [
     id: "V0",
     label: "baseline, as imported",
     apply: () => () => {},
-    target: (style) => BASE_COVER[styleKeyOf(style)].coverMin,
+    target: (style) => styleRules[styleKeyOf(style)].coverMin,
   },
   {
     id: "V1",
@@ -117,7 +121,7 @@ const VERSIONS: Version[] = [
     label: "contact-point preference 0",
     apply: () =>
       setPath(PLACEMENT as unknown as Record<string, unknown>, "contactBonus", 0),
-    target: (style) => BASE_COVER[styleKeyOf(style)].coverMin,
+    target: (style) => styleRules[styleKeyOf(style)].coverMin,
   },
   {
     id: "V3",
@@ -130,7 +134,25 @@ const VERSIONS: Version[] = [
       ];
       return () => undo.forEach((undoOne) => undoOne());
     },
-    target: (style) => BASE_COVER[styleKeyOf(style)].coverMin,
+    target: (style) => styleRules[styleKeyOf(style)].coverMin,
+  },
+  {
+    id: "W1",
+    label: "cover_min a hard floor in Stage 2/3 (cover_short fallback), contact bonus 0.05",
+    apply: () => setPath(SEARCH as unknown as Record<string, unknown>, "coverMinHard", true),
+    target: (style) => styleRules[styleKeyOf(style)].coverMin,
+  },
+  {
+    id: "W2",
+    label: `W1 + dense packing: contact points first, in-band contact weight ${DENSE_WEIGHT}`,
+    apply: () => {
+      const undo = [
+        setPath(SEARCH as unknown as Record<string, unknown>, "coverMinHard", true),
+        setPath(PLACEMENT as unknown as Record<string, unknown>, "denseContactWeight", DENSE_WEIGHT),
+      ];
+      return () => undo.forEach((undoOne) => undoOne());
+    },
+    target: (style) => styleRules[styleKeyOf(style)].coverMin,
   },
 ];
 
@@ -180,6 +202,8 @@ type Row = {
   neighbourShare: number;
   /** Share of square metres at least half planted (the layout's own grid). */
   cellsFull: number;
+  /** The cover floor could not be met; this is the densest mix found. */
+  coverShort: boolean;
 };
 
 /**
@@ -448,6 +472,7 @@ function runVersion(version: Version, scenarios: Scenario[]): Row[] {
               cellsAtLeastHalf(layout.placements, layout.bedWidthM, layout.bedLengthM).toFixed(4),
             )
           : 0,
+        coverShort: (plan?.diagnostics ?? []).some((note) => note.startsWith("cover_short")),
       });
     }
   } finally {
@@ -480,6 +505,7 @@ type Metric = { key: string; get: (row: Row) => number | null; dp: number };
 
 const METRICS: Metric[] = [
   { key: "cover", get: (r) => r.cover, dp: 3 },
+  { key: "real cover (1 - empty share)", get: (r) => 1 - r.emptyCellShare, dp: 3 },
   { key: "empty-cell share", get: (r) => r.emptyCellShare, dp: 3 },
   { key: "largest empty patch", get: (r) => r.largestEmptyPatch, dp: 3 },
   { key: "square metres >= 50% planted", get: (r) => r.cellsFull, dp: 3 },
@@ -547,6 +573,13 @@ function table(
     return `${n} / ${rows.length}`;
   });
   lines.push(`| **reached its target cover** | ${reached.join(" | ")} |`);
+  const short = ids.map((id) => {
+    const rows = (rowsByVersion.get(id) ?? []).filter(
+      (row) => row.feasible && (!only || only(row)),
+    );
+    return rows.length === 0 ? "-" : `${rows.filter((row) => row.coverShort).length} / ${rows.length}`;
+  });
+  lines.push(`| **flagged cover_short** | ${short.join(" | ")} |`);
   return lines.join("\n");
 }
 
@@ -601,7 +634,9 @@ function figureScenarios(scenarios: Scenario[]): { label: string; scenario: Scen
     return found ? [{ label, scenario: found }] : [];
   };
   return [
-    ...pick((s) => area(s) < 6, "small bed"),
+    // At least 2 m2: the first bed under 6 m2 (S073, 0.5 x 0.5 m) gets no
+    // plan in any version, so its panel was always empty.
+    ...pick((s) => area(s) >= 2 && area(s) < 6, "small bed"),
     ...pick((s) => area(s) >= 6 && area(s) < 30, "medium bed"),
     ...pick((s) => area(s) >= 30, "large bed"),
     ...pick((s) => s.brief.style === "mediterranean", "mediterranean"),
@@ -620,7 +655,7 @@ type Panel = {
   quadrantCV: number;
   widthM: number;
   lengthM: number;
-  circles: { x: number; y: number; r: number }[];
+  circles: { x: number; y: number; r: number; id: string }[];
 };
 
 function figureData(scenarios: Scenario[]): Panel[] {
@@ -653,6 +688,7 @@ function figureData(scenarios: Scenario[]): Panel[] {
             x: Number(p.xM.toFixed(4)),
             y: Number(p.yM.toFixed(4)),
             r: Number(p.radiusM.toFixed(4)),
+            id: p.plantId,
           })),
         });
       }
@@ -661,6 +697,97 @@ function figureData(scenarios: Scenario[]): Panel[] {
     }
   }
   return panels;
+}
+
+const PALETTE = ["#6d7f3a", "#9c6b3f", "#4f7a8a", "#a2496b", "#7b6aa8", "#b08d2c", "#3f6e4f", "#8a4f3a", "#5a8f7b", "#c07a52", "#6b5b95", "#8f9a3c"];
+
+/** One SVG per figure scenario: every version side by side, same scale,
+ * 1 m grid, each species its own colour (consistent within the figure). */
+function figureSvgs(panels: Panel[]): [string, string][] {
+  const out: [string, string][] = [];
+  const byScenario = new Map<string, Panel[]>();
+  for (const panel of panels) {
+    const key = `${panel.label}|${panel.scenarioId}`;
+    byScenario.set(key, [...(byScenario.get(key) ?? []), panel]);
+  }
+  for (const [key, group] of byScenario) {
+    const [label, scenarioId] = key.split("|");
+    const W = group[0].widthM;
+    const L = group[0].lengthM;
+    const scale = Math.min(300 / W, 260 / L);
+    const pw = W * scale;
+    const ph = L * scale;
+    const gap = 30;
+    const ids = [...new Set(group.flatMap((g) => g.circles.map((c) => c.id)))].sort();
+    const colour = (id: string) => PALETTE[ids.indexOf(id) % PALETTE.length];
+    const width = Math.max(group.length * (pw + gap) + gap, 600);
+    const height = ph + 110;
+    const parts: string[] = [];
+    group.forEach((g, k) => {
+      const ox = gap + k * (pw + gap);
+      const oy = 50;
+      const grid: string[] = [];
+      for (let x = 1; x < W; x += 1) grid.push(`<line x1="${ox + x * scale}" y1="${oy}" x2="${ox + x * scale}" y2="${oy + ph}"/>`);
+      for (let y = 1; y < L; y += 1) grid.push(`<line x1="${ox}" y1="${oy + y * scale}" x2="${ox + pw}" y2="${oy + y * scale}"/>`);
+      parts.push(
+        `<text x="${ox}" y="${oy - 8}" font-size="13" font-weight="bold">${g.version}</text>`,
+        `<rect x="${ox}" y="${oy}" width="${pw}" height="${ph}" fill="#efe6cf" stroke="#2f3a1e"/>`,
+        `<g stroke="#d9d2bd" stroke-width="0.6">${grid.join("")}</g>`,
+        ...g.circles.map(
+          (c) =>
+            `<circle cx="${(ox + c.x * scale).toFixed(1)}" cy="${(oy + c.y * scale).toFixed(1)}" r="${(c.r * scale).toFixed(1)}" fill="${colour(c.id)}" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>`,
+        ),
+        `<text x="${ox}" y="${oy + ph + 18}" font-size="11">cover ${g.cover.toFixed(2)} · empty ${g.emptyCellShare.toFixed(2)}</text>`,
+        `<text x="${ox}" y="${oy + ph + 33}" font-size="11">largest gap ${g.largestEmptyPatch.toFixed(2)} · CV ${g.quadrantCV.toFixed(2)} · ${g.circles.length} plants</text>`,
+      );
+    });
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width.toFixed(0)}" height="${height.toFixed(0)}" viewBox="0 0 ${width.toFixed(0)} ${height.toFixed(0)}" font-family="Helvetica, Arial, sans-serif">
+<rect width="100%" height="100%" fill="#fbf8ef"/>
+<text x="${gap}" y="22" font-size="13">${label} - ${scenarioId}: ${group[0].bed}. North at the top, 1 m grid, same seed in every panel.</text>
+${parts.join("\n")}
+</svg>
+`;
+    out.push([`${label.replace(/\s+/g, "-")}-${scenarioId}.svg`, svg]);
+  }
+  return out;
+}
+
+/** The W close: the agreed decision rule, applied to the measured run. */
+function summariseW(rowsByVersion: Map<string, Row[]>): string {
+  const ids = [...rowsByVersion.keys()];
+  const feasibleRows = (id: string) => (rowsByVersion.get(id) ?? []).filter((row) => row.feasible);
+  const median = (id: string, get: (row: Row) => number | null) =>
+    percentile(feasibleRows(id).map(get).filter((v): v is number => v !== null), 0.5);
+  const violations = (id: string) => (rowsByVersion.get(id) ?? []).filter((row) => row.violations !== "").length;
+  const z0 = median("V0", (r) => r.z);
+  const lines = [
+    "## Decision rule (agreed before the run)",
+    "",
+    "Adopt the simplest variant with median cover >= 0.85, 0 violations, Z no more",
+    "than 0.03 below V0, A1 >= 0.85, and a pass on visual review of the figures.",
+    "",
+    "| version | median cover | median real cover | violations | median Z | dZ vs V0 | median A1 | feasible | cover_short | meets the numeric rule |",
+    "|---|---|---|---|---|---|---|---|---|---|",
+  ];
+  for (const id of ids) {
+    const cover = median(id, (r) => r.cover);
+    const real = median(id, (r) => 1 - r.emptyCellShare);
+    const z = median(id, (r) => r.z);
+    const a1 = median(id, (r) => r.A1);
+    const v = violations(id);
+    const ok = cover >= 0.85 - 1e-9 && v === 0 && z0 - z <= 0.03 + 1e-9 && a1 >= 0.85 - 1e-9;
+    lines.push(
+      `| **${id}** | ${fmt(cover)} | ${fmt(real)} | ${v} | ${fmt(z, 4)} | ${(z - z0 >= 0 ? "+" : "") + fmt(z - z0, 4)} | ${fmt(a1)} | ` +
+        `${feasibleRows(id).length} | ${feasibleRows(id).filter((r) => r.coverShort).length} | ${ok ? "yes" : "no"} |`,
+    );
+  }
+  lines.push(
+    "",
+    "\"cover\" is the engine's figure (summed canopy over bed area, overlaps counted",
+    "twice); \"real cover\" is 1 minus the sampled empty-cell share.",
+    "",
+  );
+  return lines.join("\n");
 }
 
 /** The close: a decision aid, written from the measured figures. */
@@ -781,6 +908,22 @@ function summarise(rowsByVersion: Map<string, Row[]>): string {
 }
 
 function main(): void {
+  const undoCover: (() => void)[] = [];
+  if (COVER_ALL) {
+    for (const key of Object.keys(styleRules)) {
+      const style = styleRules[key] as unknown as Record<string, unknown>;
+      undoCover.push(setPath(style, "coverMin", COVER_ALL[0]));
+      undoCover.push(setPath(style, "coverMax", COVER_ALL[1]));
+    }
+  }
+  try {
+    runStudy();
+  } finally {
+    undoCover.forEach((undoOne) => undoOne());
+  }
+}
+
+function runStudy(): void {
   const scenarios = buildScenarios();
   const rowsByVersion = new Map<string, Row[]>();
   const all: Row[] = [];
@@ -806,18 +949,27 @@ function main(): void {
 
   mkdirSync(FIG, { recursive: true });
   writeFileSync(join(FIG, "panels.json"), JSON.stringify(panels, null, 1), "utf8");
+  for (const [file, svg] of figureSvgs(panels)) writeFileSync(join(FIG, file), svg, "utf8");
   writeFileSync(join(OUT, `${REPORT_NAME}.csv`), toCsv(all), "utf8");
 
   const styles = [...new Set(all.map((row) => row.style))].sort();
   const bands = ["small (<6 m2)", "medium (6-30 m2)", "large (>=30 m2)"];
 
   const md = [
-    "# Coverage test - V0 / V1 / V2",
+    `# Coverage test - ${RUN_IDS.join(" / ")}`,
     "",
     "**Measurement only. No engine change, no rulebook change, nothing deployed.**",
     "",
-    `Rulebook as imported: \`${RULES_VERSION}\`. The workbook on disk was never`,
-    "read or re-imported by this run.",
+    `Rulebook as imported: \`${RULES_VERSION}\`. Dataset: \`${DATASET_VERSION}\`. The workbook`,
+    "on disk was never read or re-imported by this run.",
+    ...(COVER_ALL
+      ? [
+          "",
+          `**Every version, including V0 and V2, runs with cover_min ${COVER_ALL[0]} and cover_max ${COVER_ALL[1]}`,
+          "for every style, set in memory** (the current workbook values; the app is still",
+          "built on the imported rulebook above).",
+        ]
+      : []),
     "",
     "| version | what it changes |",
     "|---|---|",
@@ -872,11 +1024,11 @@ function main(): void {
     "",
     "## Figures",
     "",
-    "`reports/figures/coverage_test/` - one small, one medium and one large",
-    "bed, plus a Mediterranean and a Cottage example, each in V0, V1 and V2",
+    `\`${FIG.replace(/\\/g, "/")}/\` - one small, one medium and one large`,
+    `bed, plus a Mediterranean and a Cottage example, each in ${RUN_IDS.join(", ")}`,
     "on the same seed.",
     "",
-    summarise(rowsByVersion),
+    RUN_IDS.includes("W1") ? summariseW(rowsByVersion) : summarise(rowsByVersion),
   ].join("\n");
 
   writeFileSync(join(OUT, `${REPORT_NAME}.md`), md, "utf8");

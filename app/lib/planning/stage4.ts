@@ -704,12 +704,35 @@ function placeOnce(
       if (any) thirdArea = areas;
     }
     const fullestThird = thirdArea ? Math.max(...thirdArea) : 0;
-    for (let index = 0; index < raw.length; index += 1) {
+    // Dense packing (study seam W2; PLACEMENT.denseContactWeight is 0 in the
+    // shipped engine). Contact points first: when one fits and sits in the
+    // depth band, the random draws are not scored at all.
+    const dense = PLACEMENT.denseContactWeight;
+    const inDepthBand = (x: number, y: number) =>
+      target === null || Math.abs(axis.depthOf(x, y) - target * axis.span) <= tol + EPS;
+    let startIndex = 0;
+    if (dense > 0 && Number.isFinite(firstContact)) {
+      for (let index = firstContact; index < raw.length; index += 1) {
+        const { x, y } = raw[index];
+        if (inDepthBand(x, y) && fits(x, y, r, info) && !breaksP4(info, x, y)) {
+          startIndex = firstContact;
+          break;
+        }
+      }
+    }
+    for (let index = startIndex; index < raw.length; index += 1) {
       const { x, y } = raw[index];
       if (!fits(x, y, r, info) || breaksP4(info, x, y)) continue;
       let pref = rng() * (1e-3 + noise); // seeded tie-break; wider on restarts
-      // Snug contact spots pack the bed (engineConfig PLACEMENT).
-      if (index >= firstContact) pref += PLACEMENT.contactBonus;
+      // Snug contact spots pack the bed (engineConfig PLACEMENT). Under
+      // dense packing only an in-band contact spot gets the (larger) weight.
+      if (index >= firstContact) {
+        if (dense > 0) {
+          if (inDepthBand(x, y)) pref += dense;
+        } else {
+          pref += PLACEMENT.contactBonus;
+        }
+      }
       if (target !== null) {
         const off = Math.abs(axis.depthOf(x, y) - target * axis.span);
         pref -= off / axis.span + 2 * Math.max(0, off - tol) / axis.span; // depth target +- depth_tol

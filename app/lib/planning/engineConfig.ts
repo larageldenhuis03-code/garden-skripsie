@@ -171,6 +171,13 @@ export const CLIMBERS_NEED_L1_HOST = true;
 
 export const SEARCH = {
   /**
+   * STUDY SEAM (W1, owner 13 Oct 2026), off in the shipped engine. Makes
+   * the style's cover_min a hard lower bound on a finished selection, not
+   * only the denominator of goal A4. When no selection reaches it, Stage 3
+   * returns the highest-cover selection it saw and flags cover_short.
+   */
+  coverMinHard: false,
+  /**
    * STUDY SEAM, off in the shipped engine. Ground cover as a MAT (owner,
    * 13 October 2026). Specimen plants stay circles. A true carpeter (layer
    * L6, ground-cover or moss type) is laid as an area between them and
@@ -232,4 +239,21 @@ export const PLACEMENT = {
    * See scripts/coverage-test.ts (V3), which sets it in memory.
    */
   emptiestBlockWeight: 0,
+  /**
+   * STUDY SEAM (W2, owner 13 Oct 2026), 0 in the shipped engine.
+   *
+   * Dense packing. When it is above 0, a plant's candidate spots are the
+   * contact points first: if any contact point fits (P1, P2, P4, P5) and
+   * lies inside the layer's depth band, ONLY contact points are scored and
+   * the random draws are dropped; the random draws are used only when no
+   * contact point qualifies, i.e. to seed an empty area. A contact point
+   * inside the band gets this weight; one outside it gets nothing, so the
+   * weight can never pull a plant out of its band. It replaces
+   * contactBonus while it is on.
+   *
+   * The value studied is 0.15: above the largest depth-scatter penalty a
+   * spot inside the band can carry (depth_tol = 0.10 of the span), so a
+   * snug spot beats a loose one anywhere in the band.
+   */
+  denseContactWeight: 0,
 } as const;
