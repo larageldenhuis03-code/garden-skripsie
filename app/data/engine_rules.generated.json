@@ -8,6 +8,7 @@
       "saved": 0.105,
       "wind": 0.637
     },
+    "colourUnknownScore": 0.5,
     "windSiteFactor": {
       "none": 0.0,
       "protected": 0.5,

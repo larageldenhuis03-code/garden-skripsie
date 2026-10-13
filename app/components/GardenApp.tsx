@@ -2441,7 +2441,7 @@ function BedDiagram({
             {shortName(tip.plant)}
             {tip.plant.heightCm ? ` · ${formatDimension(tip.plant.heightCm)} tall` : ""}
             {tip.saved ? " · saved" : ""}
-            {tip.unknownColour ? " · colour unknown" : ""}
+            {tip.unknownColour ? " · colour not recorded" : ""}
             {tip.estimated ? " · spread estimated" : ""}
           </span>
         </div>
@@ -2756,7 +2756,7 @@ function PlanSummary({
                   {formatDimension(plant.heightCm)} tall ·{" "}
                   {formatDimension(plant.spreadCm)} wide
                   {plant.spreadConfidence !== "original" ? " (estimated)" : ""}
-                  {hasUnknownColour(plant) ? " · colour unknown" : ""}
+                  {hasUnknownColour(plant) ? " · Colour not recorded" : ""}
                   {onExclude && (
                     <button
                       type="button"

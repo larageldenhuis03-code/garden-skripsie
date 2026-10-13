@@ -4,7 +4,9 @@ import test from "node:test";
 import { plants, type Plant } from "../app/data/plants.ts";
 import {
   buildGardenPlan,
+  colourTerm,
   countSurvivingPlants,
+  RULES,
   evaluateHardFilters,
   scorePlantStage1,
   scorePoolStage1,
@@ -207,7 +209,7 @@ test("6. every plant in the dataset scores within [0, 1]", () => {
   }
 });
 
-test("7. blank colour and blank special_features score 0, never an error", () => {
+test("7. blank colour scores colour_unknown_score (D25), blank special_features 0, never an error", () => {
   const brief: GardenBrief = {
     ...baseBrief,
     colour: { mode: "scheme", scheme: "warm" },
@@ -216,9 +218,9 @@ test("7. blank colour and blank special_features score 0, never an error", () =>
   for (const blank of [null, []]) {
     const plant = plantWith({ flowerColour: blank, specialFeatures: blank });
     const result = scorePlantStage1(plant, { brief, savedPlantIds: [] });
-    assert.equal(result.terms.colour.value, 0);
+    assert.equal(result.terms.colour.value, 0.5);
     assert.equal(result.terms.extras.value, 0);
-    assert.equal(result.score, 0);
+    assert.ok(result.score > 0 && result.score < 1);
   }
 
   // And real catalogue records with blanks behave the same.
@@ -227,7 +229,7 @@ test("7. blank colour and blank special_features score 0, never an error", () =>
   assert.ok(noColour && noFeatures);
   assert.equal(
     scorePlantStage1(noColour, { brief, savedPlantIds: [] }).terms.colour.value,
-    0,
+    0.5,
   );
   assert.equal(
     scorePlantStage1(noFeatures, { brief, savedPlantIds: [] }).terms.extras.value,
@@ -251,6 +253,20 @@ test("saved plants and wind cannot bring back a plant Stage 0 removed", () => {
   assert.equal(assessment?.status, "excluded");
   assert.equal(assessment?.stage1, null, "a removed plant is never scored");
   assert.equal(assessment?.suitability, 0);
+});
+
+test("D25: known match > unknown colour > known mismatch, and the score comes from the rulebook", () => {
+  assert.equal(RULES.stage1.colourUnknownScore, 0.5);
+  const picked = ["Red"];
+  const match = colourTerm(plantWith({ flowerColour: ["Red"] }), picked);
+  const unknown = colourTerm(plantWith({ flowerColour: null }), picked);
+  const mismatch = colourTerm(plantWith({ flowerColour: ["Blue"] }), picked);
+  assert.equal(match, 1);
+  assert.equal(unknown, 0.5);
+  assert.equal(mismatch, 0);
+  assert.ok(match > unknown && unknown > mismatch);
+  // No colours chosen: the term is off, recorded or not.
+  assert.equal(colourTerm(plantWith({ flowerColour: null }), []), 0);
 });
 
 test("every Stage 1 weight comes from the single config", () => {

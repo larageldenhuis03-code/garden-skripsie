@@ -720,7 +720,9 @@ function assessPlant(
     if (terms.wind.active && terms.wind.value === 1) {
       reasons.push("copes with wind");
     }
-    if (terms.colour.active && terms.colour.value > 0) {
+    // Only a recorded colour can match: since D25 an unrecorded one scores
+    // 0.5, which is not a match.
+    if (terms.colour.active && terms.colour.value > 0 && (plant.flowerColour?.length ?? 0) > 0) {
       reasons.push("matches your colour choice");
     }
     for (const extra of brief.extras) {

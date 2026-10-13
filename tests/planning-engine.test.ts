@@ -623,7 +623,8 @@ test("a missing flower colour is neutral, never a mismatch", () => {
   const colourless = plants.find((plant) => hasUnknownColour(plant));
   assert.ok(colourless, "expected a plant with no recorded colour");
   const warm = pickedColours({ mode: "scheme", scheme: "warm" });
-  assert.equal(colourTerm(colourless, warm), 0);
+  // D25: colour_unknown_score from the rulebook (0.5).
+  assert.equal(colourTerm(colourless, warm), 0.5);
   assert.equal(colourTerm(colourless, pickedColours({ mode: "none" })), 0);
 
   // colour_i = matches / colours picked.

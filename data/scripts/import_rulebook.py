@@ -397,6 +397,9 @@ def build(path: Path) -> dict:
                 "wind": num(p, "b_wind"),
                 # No shade weight: the shade bonus is future work.
             },
+            # D25: colour_i for a species with no recorded flower colour,
+            # when the user chose colours.
+            "colourUnknownScore": num(p, "colour_unknown_score"),
             "windSiteFactor": {
                 "none": num(p, "W_site (No wind)"),
                 "protected": num(p, "W_site (Protected from wind)"),

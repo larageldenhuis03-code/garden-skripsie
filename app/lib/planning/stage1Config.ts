@@ -27,6 +27,10 @@ import { ROW_PITCH_M } from "./engineConfig.ts";
  * AGREED). */
 export const STAGE1_WEIGHTS = RULES.stage1.weights;
 
+/** 1_Parameters colour_unknown_score (D25, ASSUMPTION): an unrecorded
+ * flower colour is neither rewarded nor penalised. */
+export const COLOUR_UNKNOWN_SCORE = RULES.stage1.colourUnknownScore;
+
 /** 1_Parameters: W_site per wind answer (AGREED, R012). */
 export const WIND_SITE_FACTOR: Record<Wind, number> = RULES.stage1.windSiteFactor;
 

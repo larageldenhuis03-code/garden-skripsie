@@ -5,6 +5,7 @@ import {
   COLOUR_SCHEMES,
   EXTRA_TAGS,
   STAGE1_WEIGHTS,
+  COLOUR_UNKNOWN_SCORE,
   STYLE_FIT,
 } from "./stage1Config.ts";
 import { isWindResilient, windSiteFactor } from "./windRules.ts";
@@ -87,10 +88,12 @@ export function toleratesShade(plant: Plant): boolean {
   return (plant.sun ?? []).some((sun) => sun === "part" || sun === "sheltered");
 }
 
-/** matches / colours picked. A plant with no recorded colour scores 0. */
+/** matches / colours picked. D25: a plant with no recorded colour scores
+ * colour_unknown_score (0.5), so known match > unknown > known mismatch. */
 export function colourTerm(plant: Plant, picked: readonly string[]): number {
   if (picked.length === 0) return 0;
   const plantColours = plant.flowerColour ?? [];
+  if (plantColours.length === 0) return COLOUR_UNKNOWN_SCORE;
   const matches = picked.filter((colour) => plantColours.includes(colour));
   return matches.length / picked.length;
 }

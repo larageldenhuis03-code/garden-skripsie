@@ -29,6 +29,9 @@ export type LayerId = "L1" | "L2" | "L3" | "L4" | "L5" | "L6" | "L7";
 export type EngineRules = {
   source: string;
   stage1: {
+    /** colour_unknown_score (D25): colour_i when colours were chosen and
+     * the species has no recorded flower colour. */
+    colourUnknownScore: number;
     weights: {
       style: number;
       colour: number;
