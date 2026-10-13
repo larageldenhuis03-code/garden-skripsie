@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="690" height="260" viewBox="0 0 690 260" font-family="Helvetica, Arial, sans-serif">
+<rect width="100%" height="100%" fill="#fbf8ef"/>
+<text x="30" y="22" font-size="13">mediterranean - S002: 4 x 2 m. North at the top, 1 m grid, same seed in every panel.</text>
+<text x="30" y="42" font-size="13" font-weight="bold">V0</text>
+<rect x="30" y="50" width="300" height="150" fill="#efe6cf" stroke="#2f3a1e"/>
+<g stroke="#d9d2bd" stroke-width="0.6"><line x1="105" y1="50" x2="105" y2="200"/><line x1="180" y1="50" x2="180" y2="200"/><line x1="255" y1="50" x2="255" y2="200"/><line x1="30" y1="125" x2="330" y2="125"/></g>
+<circle cx="53.6" cy="176.4" r="23.6" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="132.4" cy="176.4" r="23.6" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="211.1" cy="176.4" r="23.6" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="289.9" cy="176.4" r="23.6" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="306.4" cy="97.6" r="23.6" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="93.0" cy="135.5" r="23.6" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="171.8" cy="135.5" r="23.6" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="250.5" cy="162.4" r="21.4" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="221.2" cy="135.8" r="21.4" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="279.8" cy="135.8" r="21.4" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="250.5" cy="109.3" r="21.4" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="212.9" cy="97.2" r="21.4" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="271.0" cy="75.4" r="21.4" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="173.5" cy="93.7" r="21.4" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="52.5" cy="121.8" r="22.5" fill="#b08d2c" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="83.3" cy="93.8" r="22.5" fill="#b08d2c" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="132.2" cy="112.1" r="22.5" fill="#b08d2c" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="93.1" cy="181.3" r="18.8" fill="#6d7f3a" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="171.6" cy="181.3" r="18.8" fill="#6d7f3a" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="48.8" cy="68.8" r="18.8" fill="#6d7f3a" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="275.4" cy="101.2" r="5.6" fill="#4f7a8a" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="246.1" cy="83.5" r="5.6" fill="#4f7a8a" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="244.9" cy="73.1" r="5.6" fill="#4f7a8a" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="247.9" cy="63.2" r="5.6" fill="#4f7a8a" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="296.7" cy="70.9" r="5.6" fill="#4f7a8a" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="118.7" cy="73.8" r="21.4" fill="#7b6aa8" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<text x="30" y="218" font-size="11">cover 0.72 · empty 0.28</text>
+<text x="30" y="233" font-size="11">largest gap 0.11 · CV 0.06 · 26 plants</text>
+<text x="360" y="42" font-size="13" font-weight="bold">W2p</text>
+<rect x="360" y="50" width="300" height="150" fill="#efe6cf" stroke="#2f3a1e"/>
+<g stroke="#d9d2bd" stroke-width="0.6"><line x1="435" y1="50" x2="435" y2="200"/><line x1="510" y1="50" x2="510" y2="200"/><line x1="585" y1="50" x2="585" y2="200"/><line x1="360" y1="125" x2="660" y2="125"/></g>
+<circle cx="383.6" cy="176.4" r="23.6" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="462.4" cy="176.4" r="23.6" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="541.1" cy="176.4" r="23.6" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="619.9" cy="176.4" r="23.6" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="636.4" cy="97.6" r="23.6" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="423.0" cy="135.5" r="23.6" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="501.8" cy="135.5" r="23.6" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="580.5" cy="162.4" r="21.4" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="543.5" cy="134.7" r="21.4" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="617.0" cy="134.7" r="21.4" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="580.3" cy="120.1" r="21.4" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="549.3" cy="95.5" r="21.4" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="586.0" cy="80.9" r="21.4" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="509.8" cy="94.4" r="21.4" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="382.5" cy="121.8" r="22.5" fill="#b08d2c" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="413.3" cy="93.8" r="22.5" fill="#b08d2c" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="453.3" cy="105.3" r="22.5" fill="#b08d2c" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="423.0" cy="180.2" r="18.8" fill="#6d7f3a" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="501.6" cy="181.3" r="18.8" fill="#6d7f3a" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="378.8" cy="68.8" r="18.8" fill="#6d7f3a" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="608.1" cy="95.0" r="5.6" fill="#4f7a8a" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="600.1" cy="103.0" r="5.6" fill="#4f7a8a" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="610.5" cy="109.4" r="5.6" fill="#4f7a8a" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="612.1" cy="82.8" r="5.6" fill="#4f7a8a" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="619.1" cy="75.1" r="5.6" fill="#4f7a8a" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="477.6" cy="71.4" r="21.4" fill="#7b6aa8" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<text x="360" y="218" font-size="11">cover 0.72 · empty 0.28</text>
+<text x="360" y="233" font-size="11">largest gap 0.09 · CV 0.05 · 26 plants</text>
+</svg>

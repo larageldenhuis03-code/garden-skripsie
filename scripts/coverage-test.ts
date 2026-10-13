@@ -75,7 +75,7 @@ const COVER_ALL = process.env.COVERAGE_COVER
   : null;
 
 type Version = {
-  id: "V0" | "V1" | "V2" | "V3" | "W1" | "W2" | "W3";
+  id: "V0" | "V1" | "V2" | "V3" | "W1" | "W2" | "W2p" | "W3";
   label: string;
   /** Applies the override; returns the undo. */
   apply: () => () => void;
@@ -152,6 +152,12 @@ const VERSIONS: Version[] = [
       ];
       return () => undo.forEach((undoOne) => undoOne());
     },
+    target: (style) => styleRules[styleKeyOf(style)].coverMin,
+  },
+  {
+    id: "W2p",
+    label: `V0 settings (book cover values, no floor, contact bonus 0.05) + the W2 sweep packing, in-band contact weight ${DENSE_WEIGHT}`,
+    apply: () => setPath(PLACEMENT as unknown as Record<string, unknown>, "denseContactWeight", DENSE_WEIGHT),
     target: (style) => styleRules[styleKeyOf(style)].coverMin,
   },
 ];

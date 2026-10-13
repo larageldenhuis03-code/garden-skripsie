@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="370" viewBox="0 0 600 370" font-family="Helvetica, Arial, sans-serif">
+<rect width="100%" height="100%" fill="#fbf8ef"/>
+<text x="30" y="22" font-size="13">medium bed - S001: 2 x 3 m. North at the top, 1 m grid, same seed in every panel.</text>
+<text x="30" y="42" font-size="13" font-weight="bold">V0</text>
+<rect x="30" y="50" width="173.33333333333334" height="260" fill="#efe6cf" stroke="#2f3a1e"/>
+<g stroke="#d9d2bd" stroke-width="0.6"><line x1="116.66666666666667" y1="50" x2="116.66666666666667" y2="310"/><line x1="30" y1="136.66666666666669" x2="203.33333333333334" y2="136.66666666666669"/><line x1="30" y1="223.33333333333334" x2="203.33333333333334" y2="223.33333333333334"/></g>
+<circle cx="147.0" cy="244.9" r="24.7" fill="#7b6aa8" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="125.6" cy="285.3" r="24.7" fill="#7b6aa8" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="82.7" cy="259.8" r="24.7" fill="#7b6aa8" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="107.7" cy="221.6" r="24.7" fill="#7b6aa8" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="178.6" cy="285.3" r="24.7" fill="#7b6aa8" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="74.7" cy="227.3" r="10.4" fill="#b08d2c" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="58.1" cy="237.0" r="10.4" fill="#b08d2c" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="57.9" cy="217.8" r="10.4" fill="#b08d2c" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="75.1" cy="164.1" r="45.1" fill="#6d7f3a" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="154.7" cy="168.1" r="34.7" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="126.7" cy="110.4" r="34.7" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="64.7" cy="84.7" r="34.7" fill="#9c6b3f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<text x="30" y="328" font-size="11">cover 0.63 · empty 0.36</text>
+<text x="30" y="343" font-size="11">largest gap 0.23 · CV 0.21 · 12 plants</text>
+<text x="233.33333333333334" y="42" font-size="13" font-weight="bold">W2p</text>
+<rect x="233.33333333333334" y="50" width="173.33333333333334" height="260" fill="#efe6cf" stroke="#2f3a1e"/>
+<g stroke="#d9d2bd" stroke-width="0.6"><line x1="320" y1="50" x2="320" y2="310"/><line x1="233.33333333333334" y1="136.66666666666669" x2="406.6666666666667" y2="136.66666666666669"/><line x1="233.33333333333334" y1="223.33333333333334" x2="406.6666666666667" y2="223.33333333333334"/></g>
+<circle cx="260.6" cy="282.7" r="27.3" fill="#3f6e4f" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="363.3" cy="266.7" r="43.3" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="363.3" cy="186.5" r="43.3" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="363.3" cy="106.3" r="43.3" fill="#a2496b" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="302.6" cy="146.4" r="34.7" fill="#4f7a8a" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="268.0" cy="200.4" r="34.7" fill="#4f7a8a" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<circle cx="285.2" cy="84.7" r="34.7" fill="#4f7a8a" fill-opacity="0.78" stroke="#2f3a1e" stroke-width="0.7"/>
+<text x="233.33333333333334" y="328" font-size="11">cover 0.70 · empty 0.30</text>
+<text x="233.33333333333334" y="343" font-size="11">largest gap 0.14 · CV 0.19 · 7 plants</text>
+</svg>
