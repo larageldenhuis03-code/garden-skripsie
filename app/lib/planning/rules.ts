@@ -35,7 +35,6 @@ export type EngineRules = {
       extras: number;
       saved: number;
       wind: number;
-      shade: number;
     };
     windSiteFactor: { none: number; protected: number; affected: number };
     lowShrubMaxHeightCm: number;

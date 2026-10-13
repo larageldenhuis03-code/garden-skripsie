@@ -1,5 +1,5 @@
 {
- "version": "2026-09-30T11:45:34.193Z",
+ "version": "2026-10-13T17:34:43.311Z",
  "spec": {
   "sources": [
    {
@@ -363,7 +363,7 @@
   ],
   "pdfSources": [
    {
-    "sourceId": null,
+    "sourceId": "P01",
     "fileName": "July-2025-Availability-List.pdf",
     "nursery": "Garden Route Botanical Garden — Indigenous Plant Nursery (George)",
     "channel": "retail",
@@ -372,7 +372,7 @@
     "row": 4
    },
    {
-    "sourceId": null,
+    "sourceId": "P02",
     "fileName": "KRAAIBOSCH-AVAILABILITY-LIST-18-Sep-2026-WEB.pdf",
     "nursery": "Kraaibosch (George)",
     "channel": "wholesale",
@@ -381,7 +381,7 @@
     "row": 5
    },
    {
-    "sourceId": null,
+    "sourceId": "P03",
     "fileName": "wk39-plugs.pdf",
     "nursery": "Samgro (Wellington)",
     "channel": "wholesale",
@@ -390,7 +390,7 @@
     "row": 6
    },
    {
-    "sourceId": null,
+    "sourceId": "P04",
     "fileName": "AVAILABILITY-OCT.pdf",
     "nursery": "Prime Trees",
     "channel": "wholesale",

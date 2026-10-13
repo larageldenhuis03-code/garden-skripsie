@@ -48,3 +48,33 @@ The contact bonus (D26) is still open: see below.
 The importer also does not yet read `colour_unknown_score` or
 `viewer_option_count` as values (only their status); that is expected and
 belongs to Steps 4 and 5.
+
+## Final import, 13 October 2026 (owner decisions of 19:10 and 19:20)
+
+The owner authorised one edit of each workbook (19:20). Backups:
+`Algorithm_rulebook_backup_2026-10-13_1920.xlsx` (`313de68beada`) and
+`Nursery_Sourcing_Search_Spec_backup_2026-10-13_1920.xlsx` (`854bbdb47117`).
+The rulebook was edited in its XML (sheets 1_Parameters and Change_Log only;
+the other 77 package parts byte-identical, all 23 comment/drawing parts kept,
+0 formula-error cells, sheet names, headers and the 139 existing parameter IDs
+unchanged). The sourcing workbook was replaced by the PROPOSED copy.
+
+Imported: rulebook **`4722b1c43a87`**, dataset `6c081d3d2f60`, sourcing
+workbook `81d75c295190` (snapshot 2026-10-13T17:34:43Z).
+
+| check | value | |
+|---|---|---|
+| cover_min / cover_max, every style | 0.90 / 1.0, AGREED (D23 final) | ok |
+| contact_bonus (row 139) | 0, AGREED (D26 adopted) | ok |
+| sweep_weight (row 140, new) | 0.15, AGREED (D27) | ok |
+| colour_unknown_score | 0.5 | ok |
+| viewer_option_count / viewer_windbreak_edge | SUPERSEDED / SUPERSEDED | ok |
+| P3, P16, C18, C32, D95 | option C wording (Change_Log 13 Oct) | ok |
+| b_shade | absent | ok |
+| lambda, goal weights, Stage 1 weights | 0.5; 0.2 x 5; 0.637 / 0.105 / 0.258 / 0.105 / 0.637 | unchanged |
+| N_min, delta, depth_tol, alpha, iterations | 15, 0.15, 0.10, 0.95, 2000 | unchanged |
+| H2 bands, H3 sizes, size_var_min | unchanged | unchanged |
+| 3_PDF_Sources source ids | P01, P02, P03, P04 | ok |
+
+Brief fingerprints after this import (engine still has contact 0.05 hard-coded
+until Step 3.2): 07cd4b79d1fac576 / 766bb36011b209c6 - unchanged.

@@ -6,8 +6,7 @@
       "colour": 0.105,
       "extras": 0.258,
       "saved": 0.105,
-      "wind": 0.637,
-      "shade": 0.105
+      "wind": 0.637
     },
     "windSiteFactor": {
       "none": 0.0,
@@ -76,7 +75,7 @@
       "tMin": 3.0,
       "rMax": 0.15,
       "structMin": 1.0,
-      "status": "CHANGED"
+      "status": "AGREED"
     },
     "mediterranean": {
       "label": "Mediterranean",
@@ -103,7 +102,7 @@
       "tMin": 3.0,
       "rMax": 0.2,
       "structMin": 1.0,
-      "status": "CHANGED"
+      "status": "AGREED"
     },
     "cottage": {
       "label": "Cottage",
@@ -132,7 +131,7 @@
       "tMin": 3.0,
       "rMax": 0.2,
       "structMin": 0.0,
-      "status": "CHANGED"
+      "status": "AGREED"
     },
     "generic": {
       "label": "Generic (Undecided)",
@@ -153,7 +152,7 @@
       "tMin": 3.0,
       "rMax": 0.25,
       "structMin": 1.0,
-      "status": "CHANGED"
+      "status": "AGREED"
     }
   },
   "stage2": {
@@ -317,9 +316,7 @@
     "windbreakPrefLengthRatio": 24.0,
     "shelterDepthH": 10.0,
     "maxWindAngleDev": 30.0,
-    "minGroupWindbreakRow": 5,
-    "shadeOffset": 1.0,
-    "shadeRadius": 1.0
+    "minGroupWindbreakRow": 5
   },
   "status": {
     "w_style": "AGREED",
@@ -402,8 +399,8 @@
     "spread_P67 (band 2 / 3 boundary)": "DERIVED",
     "footprint_cap (φ)": "ASSUMPTION",
     "viewing_edge": "CHANGED",
-    "viewer_option_count": "CHANGED",
-    "viewer_depth_set": "AGREED",
+    "viewer_option_count": "SUPERSEDED 2026-10-13 (D24 option C)",
+    "viewer_depth_set": "CHANGED",
     "viewer_windbreak_edge": "SUPERSEDED 2026-10-12 (D24)",
     "band_min_L1": "SUPERSEDED 2026-09-29",
     "band_min_L4": "SUPERSEDED 2026-09-29",
@@ -423,6 +420,8 @@
     "n_ladder_ext": "ASSUMPTION",
     "n_small_max": "ASSUMPTION",
     "small_density": "ASSUMPTION",
-    "w_lateral": "ASSUMPTION"
+    "w_lateral": "ASSUMPTION",
+    "contact_bonus": "AGREED",
+    "sweep_weight": "AGREED"
   }
 }

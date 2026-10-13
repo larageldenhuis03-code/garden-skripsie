@@ -262,6 +262,7 @@ test("every Stage 1 weight comes from the single config", () => {
     extras: 0.258,
     saved: 0.105,
     wind: 0.637,
-    shade: 0.105,
   });
+  // No shade weight: b_shade was removed (Step 3a, 13 Oct 2026); the shade
+  // bonus is future work.
 });
