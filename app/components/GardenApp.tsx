@@ -2773,6 +2773,9 @@ function PlanSummary({
             ))}
             </div>
           </div>
+          <p className="plan-view-note">
+            Shown at mature size. Mulch open ground, and fill gaps with annuals while plants grow (2–3 years).
+          </p>
           {windNote(plan.brief) ? <p className="plan-view-note">{windNote(plan.brief)}</p> : null}
           {layeringNote(layout, plan.brief) ? (
             <p className="plan-view-note">{layeringNote(layout, plan.brief)}</p>

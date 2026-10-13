@@ -28,6 +28,17 @@ import { spreadMetrics } from "./batch-test/metrics.ts";
 import { bindingLimit, neighbourPairs } from "./batch-test/plan-metrics.ts";
 
 const OUT = join("reports", `${process.env.FINAL_OUT ?? "final_run"}.csv`);
+
+/** FINAL_SET="stage4.contactBonus=0.05,stage4.sweepWeight=0" overrides
+ * rulebook values in memory for an ablation run (never written back). */
+for (const pair of (process.env.FINAL_SET ?? "").split(",").filter(Boolean)) {
+  const [path, value] = pair.split("=");
+  const keys = path.split(".");
+  let target = RULES as unknown as Record<string, unknown>;
+  for (const key of keys.slice(0, -1)) target = target[key] as Record<string, unknown>;
+  target[keys.at(-1)!] = Number(value);
+  console.error(`in memory: ${path} = ${value}`);
+}
 const BANDS = ["small", "medium", "large"];
 const byId = new Map(plants.map((plant) => [plant.id, plant]));
 const styleKey = (style: string) => (style === "undecided" ? "generic" : style);
@@ -138,6 +149,8 @@ for (const scenario of buildScenarios()) {
       wind_profile: plan.engine?.windProfile ?? "",
       hard_failures: feasible ? hardFailures(plan).join("+") : "",
       unplaced: layout?.unplaced.length ?? 0,
+      band_fallbacks: plan.diagnostics.filter((d) => /moved forward to the middle band/.test(d)).length,
+      cover_short: plan.diagnostics.some((d) => d.startsWith("cover_short")),
       neighbour_pairs: layout ? neighbourPairs(layout).pairs : "",
       binding_limit: limit && cover !== null && cover < target - 1e-9 ? limit.limit : "-",
       pool_reason: limit?.poolReason ?? "-",
