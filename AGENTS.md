@@ -178,8 +178,10 @@ The engine, one file per stage:
 - Stage 2 `stage2.ts`: H1-H5, goals A1-A5, Z.
 - Stage 3 `stage3.ts`: greedy start, local improvement, annealing (T0
   derived: a 5%-worse move accepted half the time at the start).
-- Stage 4 `stage4.ts`: layered placement, Option C wind profile (no wind =
-  L1 at the back, owner decision), P1-P13 (P14, the shade footprints, is
+- Stage 4 `stage4.ts`: layered placement; D24 option C (13 Oct 2026): the
+  view beats the wind - every option and profile measures depth from the
+  viewing edge (tall at the back) and no windbreak row stands on the
+  viewing edge; P1-P13 (P14, the shade footprints, is
   future work with the shade bonus).
 - `engine.ts` runs Stages 2-4 with the fail rule; `gardenPlan.ts` shows the
   three best distinct results by Z.

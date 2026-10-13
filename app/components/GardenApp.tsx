@@ -2205,6 +2205,23 @@ function briefChips(brief: GardenBrief): { label: string; value: string }[] {
  * where she stands and says what is there - and, when it is the wind,
  * says that.
  */
+/**
+ * D24 option C: the view comes first, so on a windy site the layout may
+ * leave plants more exposed than a wind-first layout would. Said only
+ * when it applies.
+ */
+function windNote(brief: GardenBrief): string | null {
+  if (WIND_SITE_FACTOR[brief.wind] <= 0) return null;
+  const edge = brief.viewingEdge;
+  if (edge === "south" || edge === "east") {
+    return `Wind: you look at this bed from the ${edge}, which is also a side the wind comes from. To keep your view open there is no windbreak along that edge, so the plants nearest you may take the most wind.`;
+  }
+  if (rowsAvailable(brief.bedLengthM) >= 3) {
+    return "Wind: this layout puts your view first, so the tallest plants stand at the back, which here is the windward south or east side. They may take more wind than a layout built around the wind would give them.";
+  }
+  return null;
+}
+
 function layeringNote(
   layout: { bedWidthM: number; bedLengthM: number; placements: { plantId: string; xM: number; yM: number }[] },
   brief: GardenBrief,
@@ -2228,13 +2245,7 @@ function layeringNote(
     return `The taller plants sit towards the back of this bed, away from the ${edge} side where you stand.`;
   }
   if (share < 0.45) {
-    // The same test the engine uses to choose the ramp (engineSite +
-    // windProfile): any wind, and room for three rows or more.
-    const windyAndDeep =
-      WIND_SITE_FACTOR[brief.wind] > 0 && rowsAvailable(brief.bedLengthM) >= 3;
-    return windyAndDeep
-      ? `In a windy bed this deep, the planting steps up away from the south and east wind rather than away from you, so the taller plants sit nearer the ${edge} side.`
-      : `The taller plants in this layout ended up nearer the ${edge} side, where you stand. Regenerate for one that banks them at the back.`;
+    return `The taller plants in this layout ended up nearer the ${edge} side, where you stand. Regenerate for one that banks them at the back.`;
   }
   return "The taller plants are spread through this bed rather than banked at the back.";
 }
@@ -2762,6 +2773,7 @@ function PlanSummary({
             ))}
             </div>
           </div>
+          {windNote(plan.brief) ? <p className="plan-view-note">{windNote(plan.brief)}</p> : null}
           {layeringNote(layout, plan.brief) ? (
             <p className="plan-view-note">{layeringNote(layout, plan.brief)}</p>
           ) : null}

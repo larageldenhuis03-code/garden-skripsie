@@ -139,7 +139,10 @@ export function depthAxisFor(
   W: number,
   L: number,
 ) {
-  return viewingAxis(profile === "ramp" ? "north" : frontEdge, W, L);
+  // D24 option C (owner, 13 Oct 2026): the view beats the wind. Every
+  // profile, the ramp included, measures depth from the viewing edge.
+  void profile;
+  return viewingAxis(frontEdge, W, L);
 }
 
 export function windProfile(site: PlacementSite): WindProfile {
@@ -152,11 +155,13 @@ export function windProfile(site: PlacementSite): WindProfile {
 export function targetDepth(layer: LayerId, profile: WindProfile): number | null {
   const depth = RULES.stage4.depth[layer];
   if (depth === null) return null;
-  if (profile !== "ramp") return depth;
-  // Ramp: L1 sits on the front (north) edge, furthest from the windward
-  // south edge; the rest of the depth column inverts with it (10_Open_Items
-  // row 47: "if the ramp wins, the whole depth column inverts").
-  return layer === "L1" ? 0 : 1 - depth;
+  // D24 option C (owner, 13 Oct 2026): the view beats the wind, so the
+  // ramp no longer inverts the depth column (10_Open_Items row 47). Short
+  // plants stand in front of the viewer and tall ones behind, in every
+  // profile; wind is handled by the Stage 1 wind bonus, P13 and the
+  // windbreak rows on the other windward edges, and the plan says so.
+  void profile;
+  return depth;
 }
 
 const LAYER_ORDER: LayerId[] = ["L1", "L2", "L3", "L4", "L5", "L6", "L7"];
@@ -272,23 +277,40 @@ function placeOnce(
       // The row runs along the south edge and on up the east edge (the two
       // windward edges); leftover plants form further south rows, each
       // stepped leeward and offset by half the spacing (P8 stagger).
+      // D24 option C (owner, 13 Oct 2026): no windbreak on the viewing
+      // edge. If the gardener stands on the south or east edge, that edge
+      // gets no row; and every row stops one spacing short of the viewing
+      // edge, so not even a corner plant of a windbreak stands on it.
+      const view = site.frontEdge ?? "north";
+      const southRow = view !== "south";
+      const eastRow = view !== "east";
+      const southStart = view === "west" ? d / 2 + spacing : d / 2;
+      const southEnd = eastRow ? W - d / 2 : W - d / 2 - spacing;
+      const eastEnd = view === "north" ? d / 2 + spacing : d / 2;
       const spots: { x: number; y: number; edge: "south" | "east" }[] = [];
-      for (let x = d / 2; x <= W - d / 2 + EPS; x += spacing) {
-        spots.push({ x, y: L - d / 2, edge: "south" });
+      if (southRow) {
+        for (let x = southStart; x <= southEnd + EPS; x += spacing) {
+          spots.push({ x, y: L - d / 2, edge: "south" });
+        }
       }
-      const lastSouthX = spots.length > 0 ? spots[spots.length - 1].x : null;
-      const eastStart = lastSouthX !== null && Math.abs(lastSouthX - (W - d / 2)) < EPS
-        ? L - d / 2 - spacing
-        : L - d / 2;
-      for (let y = eastStart; y >= d / 2 - EPS; y -= spacing) {
-        spots.push({ x: W - d / 2, y, edge: "east" });
+      if (eastRow) {
+        const lastSouthX = spots.length > 0 ? spots[spots.length - 1].x : null;
+        const eastStart = !southRow
+          ? L - d / 2 - spacing
+          : lastSouthX !== null && Math.abs(lastSouthX - (W - d / 2)) < EPS
+            ? L - d / 2 - spacing
+            : L - d / 2;
+        for (let y = eastStart; y >= eastEnd - EPS; y -= spacing) {
+          spots.push({ x: W - d / 2, y, edge: "east" });
+        }
       }
       const rowDrop = Math.max(
         d * Math.sin(Math.PI / 3),
         Math.sqrt(Math.max(0, minCentreDistance(d / 2, d / 2) ** 2 - (spacing / 2) ** 2)),
       );
-      for (let row = 1; L - d / 2 - row * rowDrop >= d / 2 - EPS; row += 1) {
-        for (let x = d / 2 + (row % 2 === 1 ? spacing / 2 : 0); x <= W - d / 2 + EPS; x += spacing) {
+      // Further rows stacked leeward of the south row belong to it.
+      for (let row = 1; southRow && L - d / 2 - row * rowDrop >= d / 2 - EPS; row += 1) {
+        for (let x = southStart + (row % 2 === 1 ? spacing / 2 : 0); x <= southEnd + EPS; x += spacing) {
           spots.push({ x, y: L - d / 2 - row * rowDrop, edge: "south" });
         }
       }

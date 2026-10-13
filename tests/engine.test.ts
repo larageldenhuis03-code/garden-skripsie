@@ -332,8 +332,10 @@ test("wind profile follows Option C, with L1 at the back when there is no wind",
   assert.equal(windProfile({ widthM: 4, depthM: 2, windSite: 1, rowsAvailable: 1 }), "windbreak");
   assert.equal(targetDepth("L1", "standard"), 0.8);
   assert.equal(targetDepth("L1", "windbreak"), 0.8);
-  assert.equal(targetDepth("L1", "ramp"), 0);
-  assert.equal(targetDepth("L6", "ramp"), 0.8); // depth column inverts
+  // D24 option C: the view beats the wind, so the ramp no longer inverts
+  // the depth column - tall at the back, as in every other profile.
+  assert.equal(targetDepth("L1", "ramp"), 0.8);
+  assert.equal(targetDepth("L6", "ramp"), 0.2);
   assert.equal(targetDepth("L3", "standard"), null);
 });
 
@@ -666,28 +668,89 @@ test("every option is laid out from the viewing edge, not only one", () => {
   }
 });
 
-test("the wind ramp keeps the wind's axis, whatever the viewing edge", () => {
-  // The aerodynamic ramp is a WIND rule: low plants on the windward south
-  // and east side, rising to tall away from it. targetDepth writes that as
-  // depth 0 on the north axis. If it were measured from the viewer, a
-  // south-facing gardener would get the tallest plants ON the windward
-  // edge - the opposite of the rule. So under the ramp, depth is measured
-  // from north for every edge; under every other profile, from the viewer.
+test("D24 option C: every profile, the ramp included, measures depth from the viewer", () => {
   const W = 8;
   const L = 6;
-  const x = 2;
-  const y = 1.5;
   for (const edge of ["north", "east", "south", "west"] as const) {
-    assert.ok(
-      Math.abs(depthAxisFor("ramp", edge, W, L).depthOf(x, y) - y) < 1e-9,
-      `ramp, ${edge} viewer: depth must be measured from the north edge`,
-    );
     const viewer = viewingAxis(edge, W, L);
-    for (const profile of ["standard", "windbreak"] as const) {
+    for (const profile of ["standard", "ramp", "windbreak"] as const) {
       assert.ok(
-        Math.abs(depthAxisFor(profile, edge, W, L).depthOf(x, y) - viewer.depthOf(x, y)) < 1e-9,
+        Math.abs(depthAxisFor(profile, edge, W, L).depthOf(2, 1.5) - viewer.depthOf(2, 1.5)) < 1e-9,
         `${profile}, ${edge} viewer: depth must be measured from the viewer`,
       );
+    }
+  }
+});
+
+/** Distance from a canopy's edge to a bed edge (0 = touching). */
+function gapToEdge(p: { xM: number; yM: number; radiusM: number }, edge: "north" | "east" | "south" | "west", W: number, L: number) {
+  return edge === "north" ? p.yM - p.radiusM
+    : edge === "south" ? L - (p.yM + p.radiusM)
+    : edge === "west" ? p.xM - p.radiusM
+    : W - (p.xM + p.radiusM);
+}
+
+test("D24 (a): no windbreak plant stands on the viewing edge, in any option", () => {
+  for (const edge of ["north", "east", "south", "west"] as const) {
+    const brief: GardenBrief = { ...baseBrief, bedWidthM: 8, bedLengthM: 2, wind: "affected", viewingEdge: edge };
+    for (const plan of buildGardenPlanVariants(plants, brief)) {
+      const layout = plan.layout;
+      if (!layout) continue;
+      const row = layout.placements.filter((p) => (p as { windbreakRow?: boolean }).windbreakRow);
+      for (const p of row) {
+        assert.ok(
+          gapToEdge(p, edge, layout.bedWidthM, layout.bedLengthM) > 1e-6,
+          `${edge} ${plan.character}: windbreak plant ${p.instanceId} stands on the viewing edge`,
+        );
+      }
+    }
+  }
+});
+
+test("D24 (b): layering from the viewing edge holds in every option, the windy ramp included", () => {
+  const byId = new Map(plants.map((plant) => [plant.id, plant]));
+  for (const edge of ["north", "east", "south", "west"] as const) {
+    const brief: GardenBrief = { ...baseBrief, bedWidthM: 8, bedLengthM: 6, style: "fynbos", wind: "affected", viewingEdge: edge };
+    const variants = buildGardenPlanVariants(plants, brief);
+    for (const plan of variants) {
+      const layout = plan.layout;
+      assert.ok(layout, `${edge} ${plan.character}: no layout`);
+      assert.equal(plan.engine?.windProfile, "ramp");
+      const axis = viewingAxis(edge, layout.bedWidthM, layout.bedLengthM);
+      const meanDepth = (test: (heightCm: number) => boolean) => {
+        const picked = layout.placements.filter((p) => {
+          const height = byId.get(p.plantId)?.heightCm;
+          return height !== null && height !== undefined && test(height);
+        });
+        return picked.length === 0 ? null : picked.reduce((sum, p) => sum + axis.depthOf(p.xM, p.yM), 0) / picked.length;
+      };
+      const tall = meanDepth((h) => h >= 100);
+      const short = meanDepth((h) => h < 50);
+      if (tall !== null && short !== null) {
+        assert.ok(tall > short, `${edge} ${plan.character}: tall ${tall.toFixed(2)} m, short ${short.toFixed(2)} m from the viewer`);
+      }
+    }
+  }
+});
+
+test("D24 (c): at an exposed site the windbreak stays, on the windward edges that are not the viewing edge", () => {
+  for (const edge of ["north", "east", "south", "west"] as const) {
+    const brief: GardenBrief = { ...baseBrief, bedWidthM: 8, bedLengthM: 2, wind: "affected", viewingEdge: edge };
+    for (const plan of buildGardenPlanVariants(plants, brief)) {
+      const layout = plan.layout;
+      if (!layout) continue;
+      assert.equal(plan.engine?.windProfile, "windbreak");
+      const p3 = plan.engine?.placementChecks.find((c) => c.id === "P3");
+      assert.ok(p3?.pass, `${edge} ${plan.character}: P3 ${p3?.detail}`);
+      const row = layout.placements.filter((p) => (p as { windbreakRow?: boolean }).windbreakRow);
+      assert.ok(row.length > 0, `${edge} ${plan.character}: no windbreak`);
+      const windward = (["south", "east"] as const).filter((e) => e !== edge);
+      for (const p of row) {
+        assert.ok(
+          windward.some((e) => gapToEdge(p, e, layout.bedWidthM, layout.bedLengthM) < 1e-6),
+          `${edge} ${plan.character}: ${p.instanceId} is not on a windward edge other than the viewing edge`,
+        );
+      }
     }
   }
 });
