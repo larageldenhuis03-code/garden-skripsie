@@ -17,32 +17,18 @@ export const GRID = 20;
 
 export type Circle = { xM: number; yM: number; radiusM: number };
 
-/** A ground-cover mat on its own raster (layout.mat): a sample point is
- * planted when the mat cell it falls in is part of the mat. */
-export type MatMask = { grid: number; cells: readonly number[] };
-
 /** Which cells have a canopy over their centre. Row-major, GRID x GRID. */
 export function plantedCells(
   circles: readonly Circle[],
   widthM: number,
   lengthM: number,
-  mat?: MatMask,
 ): boolean[] {
-  const matCells = mat ? new Set(mat.cells) : null;
   const cells = new Array<boolean>(GRID * GRID).fill(false);
   if (widthM <= 0 || lengthM <= 0) return cells;
   for (let row = 0; row < GRID; row += 1) {
     const y = ((row + 0.5) / GRID) * lengthM;
     for (let col = 0; col < GRID; col += 1) {
       const x = ((col + 0.5) / GRID) * widthM;
-      if (matCells && mat) {
-        const mc = Math.min(mat.grid - 1, Math.floor((x / widthM) * mat.grid));
-        const mr = Math.min(mat.grid - 1, Math.floor((y / lengthM) * mat.grid));
-        if (matCells.has(mr * mat.grid + mc)) {
-          cells[row * GRID + col] = true;
-          continue;
-        }
-      }
       for (const c of circles) {
         const dx = x - c.xM;
         const dy = y - c.yM;
@@ -131,9 +117,8 @@ export function spreadMetrics(
   circles: readonly Circle[],
   widthM: number,
   lengthM: number,
-  mat?: MatMask,
 ): { emptyCellShare: number; largestEmptyPatch: number; quadrantCV: number } {
-  const cells = plantedCells(circles, widthM, lengthM, mat);
+  const cells = plantedCells(circles, widthM, lengthM);
   return {
     emptyCellShare: emptyCellShare(cells),
     largestEmptyPatch: largestEmptyPatch(cells),
