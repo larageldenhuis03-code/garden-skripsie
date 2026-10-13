@@ -44,6 +44,7 @@ import {
   SINGLETON_K_BY_BAND,
 } from "../../app/lib/planning/index.ts";
 import { buildScenarios, LOCATION_COUNT, type Scenario } from "./scenarios.ts";
+import { spreadMetrics } from "./metrics.ts";
 
 const OUT_DIR = join(dirname(fileURLToPath(import.meta.url)), "results");
 
@@ -90,6 +91,10 @@ type Row = {
   unplaced: number;
   coverRatio: number;
   coverLimit: number;
+  /** How evenly the cover is spread - see metrics.ts. Measurement only. */
+  emptyCellShare: number;
+  largestEmptyPatch: number;
+  quadrantCV: number;
   z: number | null;
   options: number;
   maxSimilarity: number | null;
@@ -232,6 +237,9 @@ function runOne(scenario: Scenario): Row {
     unplaced: 0,
     coverRatio: 0,
     coverLimit: 0,
+    emptyCellShare: 1,
+    largestEmptyPatch: 1,
+    quadrantCV: 0,
     z: null,
     options: 0,
     maxSimilarity: null,
@@ -285,6 +293,16 @@ function runOne(scenario: Scenario): Row {
       unplaced: plan.layout?.unplaced.length ?? 0,
       coverRatio: Number((1 - plan.openSpaceRatio).toFixed(3)),
       coverLimit: Number(coverLimitFor(plan).toFixed(3)),
+      ...(() => {
+        const layout = plan.layout;
+        if (!layout) return { emptyCellShare: 1, largestEmptyPatch: 1, quadrantCV: 0 };
+        const m = spreadMetrics(layout.placements, layout.bedWidthM, layout.bedLengthM);
+        return {
+          emptyCellShare: Number(m.emptyCellShare.toFixed(3)),
+          largestEmptyPatch: Number(m.largestEmptyPatch.toFixed(3)),
+          quadrantCV: Number(m.quadrantCV.toFixed(3)),
+        };
+      })(),
       z: plan.engine ? Number(plan.engine.z.toFixed(4)) : null,
       options: variants.length,
       maxSimilarity: maxSimilarity === null ? null : Number(maxSimilarity.toFixed(3)),
