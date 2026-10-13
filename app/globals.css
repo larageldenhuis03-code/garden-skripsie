@@ -6630,3 +6630,86 @@ details.brief-strip[open] .brief-strip-hint { visibility: hidden; }
   font-size: var(--hand-section);
   line-height: 1.1;
 }
+
+/* ---------------------------------------------------------------------
+   North-up plan (13 Oct 2026). The drawing is never turned, so its
+   labels follow the bed-size preview: the width along the top, the length
+   down the left side, reading upwards. A viewer on the north edge stands
+   three-quarters along the top, clear of the width label, as on the
+   preview; the frame makes room above for whichever is there.
+   --------------------------------------------------------------------- */
+.plan-bed-frame {
+  margin-top: 28px;
+}
+
+.plan-measure-width {
+  top: 0;
+  right: 0;
+  bottom: auto;
+  left: 0;
+  text-align: center;
+  transform: translateY(calc(-100% - 4px));
+}
+
+.plan-measure-length {
+  top: 50%;
+  bottom: auto;
+  left: 0;
+  writing-mode: vertical-rl;
+  transform: translate(calc(-100% - 6px), -50%) rotate(180deg);
+}
+
+.plan-viewer.is-north {
+  left: 75%;
+}
+
+.plan-bed-wrap.viewer-north .plan-bed-frame {
+  margin-top: 46px;
+}
+
+/* A saved-garden card hides the dimension labels, so it needs no room
+   above the drawing for them. */
+.saved-layout-card .plan-bed-frame {
+  margin-top: 0;
+}
+
+.saved-layout-card .plan-bed-wrap.viewer-north .plan-bed-frame {
+  margin-top: 36px;
+}
+
+/* The length label is flipped to read upwards; an earlier rule pinned its
+   transform origin to a corner, which swung it off the side of the page. */
+.plan-measure-length {
+  transform-origin: center;
+}
+
+/* The viewer figure is placed against an overlay exactly the size of the
+   bed (full width, the bed's own aspect ratio), not against the frame,
+   which also holds the scale bar below the bed. */
+.plan-bed-edges {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  aspect-ratio: var(--bed-aspect, 1);
+  pointer-events: none;
+}
+
+.plan-bed-edges .plan-viewer {
+  pointer-events: auto;
+}
+
+/* Standing on the south edge: the figure takes the middle of the bottom
+   edge, as the width label has moved to the top, and the scale bar moves
+   down below it. */
+.plan-viewer.is-south {
+  left: 50%;
+}
+
+.plan-bed-wrap.viewer-south .plan-scale {
+  margin-top: 46px;
+}
+
+.plan-bed-wrap.viewer-south .plan-bed-frame {
+  margin-bottom: 36px;
+}

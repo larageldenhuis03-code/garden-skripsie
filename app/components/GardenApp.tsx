@@ -66,6 +66,7 @@ import { SourcingPanel } from "./SourcingPanel";
 import { traceEnabled, tracePlan } from "../lib/planning/trace.ts";
 import { PlantTypeSymbol } from "./PlantTypeSymbol";
 import { isFeaturePlant, roleTypeOf } from "../lib/planning/engineData.ts";
+import { bedDrawing } from "./bedDrawing.ts";
 import { DATASET_VERSION } from "../data/datasetVersion";
 import {
   createLayoutId,
@@ -2305,23 +2306,11 @@ function BedDiagram({
       }),
     ),
   ];
-  const rotated = lengthM > widthM;
-  const displayWidthM = rotated ? lengthM : widthM;
-  const displayLengthM = rotated ? widthM : lengthM;
-  // A bed longer than it is wide is drawn a quarter-turn round, so it
-  // fills the width of the page. Then north is on the LEFT of the drawing,
-  // east at the top, south on the right and west at the bottom (from
-  // displayX = y and displayY = W - x below). The compass, the viewpoint
-  // mark and the label must turn with it; they did not, so on a long bed
-  // all three pointed at the wrong edge of the real garden.
-  // The mark's CSS classes are named for the side of the DRAWING they sit
-  // on (is-north = top, is-east = right, ...), so this maps an edge of the
-  // bed to the class for wherever that edge is drawn.
-  const drawnSide = (edge: ViewingEdge): ViewingEdge =>
-    rotated
-      ? ({ north: "west", east: "north", south: "east", west: "south" } as const)[edge]
-      : edge;
-  const viewerSide = viewingEdge ? drawnSide(viewingEdge) : null;
+  // Always north-up, in Stage 4's own coordinates (x west -> east, y north
+  // -> south): a long bed is drawn tall rather than turned on its side, so
+  // the compass, the viewer figure and the labels never need translating.
+  const drawing = bedDrawing(widthM, lengthM, viewingEdge);
+  const viewerSide = drawing.viewerSide;
   // Names are no longer printed inside the circles - at planting scale they
   // stacked into unreadable noise. The name is disclosed on hover or
   // keyboard focus instead, and a tap opens the full plant profile.
@@ -2329,10 +2318,8 @@ function BedDiagram({
   const markers = placements.flatMap((placement, index) => {
     const plant = plantsById.get(placement.plantId);
     if (!plant) return [];
-    const displayX = rotated ? placement.yM : placement.xM;
-    const displayY = rotated ? widthM - placement.xM : placement.yM;
     return [{
-      placement, plant, index, displayX, displayY,
+      placement, plant, index, at: drawing.toPercent(placement.xM, placement.yM),
       unknownColour: hasUnknownColour(plant),
       estimated: plant.spreadConfidence !== "original",
       saved: savedIds.includes(plant.id),
@@ -2348,35 +2335,35 @@ function BedDiagram({
        measured off that, so none of them can drift. */
     <div
       className={`plan-bed-wrap${viewerSide ? ` viewer-${viewerSide}` : ""}`}
-      style={{ "--bed-aspect": displayWidthM / displayLengthM } as CSSProperties}
+      style={{ "--bed-aspect": drawing.aspect } as CSSProperties}
     >
       {controlledView === undefined ? (
         <LayoutViewSwitch view={view} onChange={setView} />
       ) : null}
       <div className="plan-north" aria-hidden="true">
-        {rotated ? "N ←" : "N ↑"}
+        N ↑
       </div>
       <div className="plan-bed-frame">
       <div
         className={`plan-bed${view === "real-life" ? " is-real-life" : ""}`}
         style={
           {
-            aspectRatio: `${displayWidthM} / ${displayLengthM}`,
+            aspectRatio: `${widthM} / ${lengthM}`,
             // One grid square = one square metre, so the drawing can be
             // paced out in the real bed. It used to be a tenth of the bed
             // whatever the bed measured, which told the gardener nothing.
-            "--bed-cols": displayWidthM,
-            "--bed-rows": displayLengthM,
+            "--bed-cols": widthM,
+            "--bed-rows": lengthM,
           } as CSSProperties
         }
-        aria-label={`${widthM} by ${lengthM} metre planting layout, north at the ${rotated ? "left" : "top"}`}
+        aria-label={`${widthM} by ${lengthM} metre planting layout, north at the top`}
       >
-        {markers.map(({ placement, plant, index, displayX, displayY, unknownColour, estimated, tier }) => {
+        {markers.map(({ placement, plant, index, at, unknownColour, estimated, tier }) => {
           const style: CSSProperties = {
-            left: `${((displayX - placement.radiusM) / displayWidthM) * 100}%`,
-            top: `${((displayY - placement.radiusM) / displayLengthM) * 100}%`,
-            width: `${((placement.radiusM * 2) / displayWidthM) * 100}%`,
-            height: `${((placement.radiusM * 2) / displayLengthM) * 100}%`,
+            left: `${at.left - (placement.radiusM / widthM) * 100}%`,
+            top: `${at.top - (placement.radiusM / lengthM) * 100}%`,
+            width: `${((placement.radiusM * 2) / widthM) * 100}%`,
+            height: `${((placement.radiusM * 2) / lengthM) * 100}%`,
             background: markerBackground(plant),
           };
           return (
@@ -2412,15 +2399,19 @@ function BedDiagram({
           just outside the edge, with a small arrow pointing into the bed.
           It sits in the frame, not the bed, which clips its contents. */}
       {viewerSide ? (
-        <span
-          className={`plan-viewer is-${viewerSide}`}
-          role="img"
-          aria-label={`You stand on the ${viewingEdge} side`}
-          title="You stand on this side"
-        >
-          <ViewerFigure />
-          <span className="plan-viewer-look" aria-hidden="true" />
-        </span>
+        // An overlay exactly the size of the bed, so the figure is placed
+        // against the bed's own edge - the frame also holds the scale bar.
+        <div className="plan-bed-edges">
+          <span
+            className={`plan-viewer is-${viewerSide}`}
+            role="img"
+            aria-label={`You stand on the ${viewingEdge} side`}
+            title="You stand on this side"
+          >
+            <ViewerFigure />
+            <span className="plan-viewer-look" aria-hidden="true" />
+          </span>
+        </div>
       ) : null}
       {/* Sits outside .plan-bed, which clips its children, so a name near
           an edge is never cut in half. Purely decorative: the same text is
@@ -2430,10 +2421,10 @@ function BedDiagram({
           <span
             className="plan-tip"
             style={{
-              left: `${(tip.displayX / displayWidthM) * 100}%`,
+              left: `${tip.at.left}%`,
               // Half a radius above centre, not a full one: the label used
               // to float a whole circle away from the pointer.
-              top: `${((tip.displayY - tip.placement.radiusM / 2) / displayLengthM) * 100}%`,
+              top: `${tip.at.top - (tip.placement.radiusM / 2 / lengthM) * 100}%`,
             }}
           >
             {shortName(tip.plant)}
@@ -2445,11 +2436,13 @@ function BedDiagram({
         </div>
       ) : null}
       <div className="plan-scale" aria-hidden="true">
-        <span className="plan-scale-bar" style={{ width: `${(1 / displayWidthM) * 100}%` }} />
+        <span className="plan-scale-bar" style={{ width: `${(1 / widthM) * 100}%` }} />
         <span>1 m</span>
       </div>
-      <div className="plan-measure plan-measure-width">{displayWidthM} m</div>
-      <div className="plan-measure plan-measure-length">{displayLengthM} m</div>
+      {/* As on the bed-size preview: width along the top, length down the
+          left side. */}
+      <div className="plan-measure plan-measure-width">{widthM} m</div>
+      <div className="plan-measure plan-measure-length">{lengthM} m</div>
       </div>
       {view === "sketchbook" && symbolTypes.length > 0 ? (
         <ul className="symbol-key" aria-label="Plant type symbols">
@@ -2676,9 +2669,9 @@ function PlanSummary({
         className="plan-output-grid"
         style={
           {
-            "--bed-aspect":
-              Math.max(layout.bedWidthM, layout.bedLengthM) /
-              Math.min(layout.bedWidthM, layout.bedLengthM),
+            // Width / length: the drawing is north-up, so a long bed is
+            // tall, and its height is capped by the same viewport budget.
+            "--bed-aspect": layout.bedWidthM / layout.bedLengthM,
           } as CSSProperties
         }
       >
