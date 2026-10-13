@@ -3,7 +3,15 @@ import type { ParsedCatalogue } from "./catalogues.ts";
 import { geocodeBranch } from "./geo.ts";
 import type { PoliteClient } from "./http.ts";
 import { buildNameIndex, type NameIndex } from "./matching.ts";
-import { runSourcing, type SourcingReport } from "./run.ts";
+import {
+  gatherBase,
+  gatherNursery,
+  liveNurseries,
+  runSourcing,
+  type BasePart,
+  type NurseryPart,
+  type SourcingReport,
+} from "./run.ts";
 import type { SourcingSpec } from "./spec.ts";
 
 /**
@@ -11,33 +19,57 @@ import type { SourcingSpec } from "./spec.ts";
  * this laptop) and the deployed worker (workbook snapshot from the last
  * build). It only needs the layout's species and quantities - sourcing runs
  * AFTER the layout and never changes it.
+ *
+ * Modes (the deployed worker allows 50 subrequests per request, so the
+ * panel splits a run - see orchestrate.ts):
+ *   "spec"     the settings and the list of live nurseries, no network;
+ *   "base"     the geocode, nursery distances and the PDF lists;
+ *   "nursery"  one live nursery (sourceIds: [id]) for the given plants;
+ *   (none)     the whole run in one request, as before - dev server only.
  */
 
 export type SourcingRequest = {
   items: { plantId: string; n: number }[];
   place: string | null;
+  mode?: "spec" | "base" | "nursery";
+  sourceIds?: string[];
 };
 
 export type SourcingResponse =
   | { ok: true; report: SourcingReport; specVersion: string; specWarning: string | null }
   | { ok: false; error: string; specWarning: string | null };
 
+export type SpecResponse =
+  | { ok: true; spec: SourcingSpec; nurseries: { id: string; nursery: string }[]; specVersion: string; specWarning: string | null }
+  | { ok: false; error: string; specWarning: string | null };
+
+export type PartResponse<T> = { ok: true; part: T } | { ok: false; error: string; specWarning: string | null };
+
 let index: NameIndex | null = null;
 const plantsById = new Map(plants.map((plant) => [plant.id, plant]));
 
+type Deps = {
+  spec: SourcingSpec | null;
+  specVersion: string;
+  specWarning: string | null;
+  catalogues: Map<string, ParsedCatalogue>;
+  client: PoliteClient;
+  now?: Date;
+};
+
+export async function handleSourcing(request: SourcingRequest & { mode: "spec" }, deps: Deps): Promise<SpecResponse>;
+export async function handleSourcing(request: SourcingRequest & { mode: "base" }, deps: Deps): Promise<PartResponse<BasePart>>;
+export async function handleSourcing(request: SourcingRequest & { mode: "nursery" }, deps: Deps): Promise<PartResponse<NurseryPart>>;
+export async function handleSourcing(request: SourcingRequest, deps: Deps): Promise<SourcingResponse>;
 export async function handleSourcing(
   request: SourcingRequest,
-  deps: {
-    spec: SourcingSpec | null;
-    specVersion: string;
-    specWarning: string | null;
-    catalogues: Map<string, ParsedCatalogue>;
-    client: PoliteClient;
-    now?: Date;
-  },
-): Promise<SourcingResponse> {
+  deps: Deps,
+): Promise<SourcingResponse | SpecResponse | PartResponse<BasePart> | PartResponse<NurseryPart>> {
   if (!deps.spec) {
     return { ok: false, error: "No valid sourcing settings are available yet.", specWarning: deps.specWarning };
+  }
+  if (request?.mode === "spec") {
+    return { ok: true, spec: deps.spec, nurseries: liveNurseries(deps.spec), specVersion: deps.specVersion, specWarning: deps.specWarning };
   }
   if (!Array.isArray(request?.items)) return { ok: false, error: "Bad request.", specWarning: deps.specWarning };
   index ??= buildNameIndex(plants);
@@ -47,10 +79,17 @@ export async function handleSourcing(
       ? [{ plantId: plant.id, scientificName: plant.scientificName, commonName: plant.commonName, plantType: plant.plantType, n: item.n }]
       : [];
   });
-  const report = await runSourcing(
-    { species, place: request.place?.trim() || null },
-    { spec: deps.spec, catalogues: deps.catalogues, client: deps.client, index, now: deps.now ?? new Date() },
-  );
+  const ctx = { spec: deps.spec, catalogues: deps.catalogues, client: deps.client, index, now: deps.now ?? new Date() };
+  const place = request.place?.trim() || null;
+  if (request.mode === "base") {
+    return { ok: true, part: await gatherBase({ species, place }, ctx) };
+  }
+  if (request.mode === "nursery") {
+    const [sourceId] = request.sourceIds ?? [];
+    if (!sourceId) return { ok: false, error: "Bad request: no nursery given.", specWarning: deps.specWarning };
+    return { ok: true, part: await gatherNursery({ species }, sourceId, ctx) };
+  }
+  const report = await runSourcing({ species, place }, ctx);
   return { ok: true, report, specVersion: deps.specVersion, specWarning: deps.specWarning };
 }
 

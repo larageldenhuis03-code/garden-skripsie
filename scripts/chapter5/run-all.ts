@@ -50,6 +50,8 @@ import {
 } from "../../app/lib/planning/index.ts";
 import { STAGE1_WEIGHTS } from "../../app/lib/planning/stage1Config.ts";
 import { readWorkbook } from "../../app/lib/sourcing/xlsx.ts";
+import { budgetPrices, type SourcingReport } from "../../app/lib/sourcing/summary.ts";
+import type { SourcingSpec } from "../../app/lib/sourcing/spec.ts";
 import { buildScenarios, type Scenario } from "../batch-test/scenarios.ts";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
@@ -382,27 +384,119 @@ function t2(plansForLater: { scenario: Scenario; plan: GardenPlan }[]) {
 }
 
 // ----------------------------------------------------------------- T3
-function t3(plansForLater: { scenario: Scenario; plan: GardenPlan }[]) {
+/**
+ * T3 Sourcing coverage: a REAL run against the dev server (npm run dev),
+ * which has no request cap, keeps its 7-day cache, and holds every site to
+ * one request a second. First every unique species in the T1 plans is
+ * checked, a few at a time (so no HTTP call waits minutes for an answer);
+ * then each T1 plan is summarised, from the cache that pass filled.
+ *
+ * Set CH5_SKIP_T3=1 to leave it out; SOURCING_URL to point elsewhere.
+ */
+const SOURCING_URL = process.env.SOURCING_URL ?? "http://localhost:3000/api/sourcing";
+const T3_CHUNK = 15;
+
+async function t3(plansForLater: { scenario: Scenario; plan: GardenPlan }[]) {
   say("## T3 Sourcing coverage");
   say();
   const species = new Set<string>();
   for (const { plan } of plansForLater) for (const q of plan.quantities?.quantities ?? []) species.add(q.id);
   say(`${species.size} unique species were recommended across the T1 plans.`);
   say();
-  say("**Not run.** Sourcing is live: `app/lib/sourcing/run.ts` fetches each nursery over HTTP at");
-  say("request time (robots-respecting, 1 request/second/host), and prices are never stored as a");
-  say("dataset. Measuring listing and price coverage for every recommended species would mean");
-  say("thousands of live requests against real nurseries, which the politeness budget forbids and");
-  say("which this environment cannot reach. The shares below therefore cannot be produced offline:");
+  const post = async (body: unknown) => {
+    const response = await fetch(SOURCING_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    return response.json() as Promise<any>; // eslint-disable-line @typescript-eslint/no-explicit-any
+  };
+  const notRun = (reason: string) => {
+    say(`**Not run:** ${reason}`);
+    say();
+    raw.t3 = { uniqueSpecies: species.size, run: false, reason };
+  };
+  if (process.env.CH5_SKIP_T3) return notRun("CH5_SKIP_T3 is set.");
+  let settings: { ok: boolean; spec?: SourcingSpec; specVersion?: string };
+  try {
+    settings = await post({ mode: "spec", items: [], place: null });
+  } catch {
+    return notRun(`the dev server is not reachable at ${SOURCING_URL} - start it with npm run dev.`);
+  }
+  if (!settings.ok || !settings.spec) return notRun("the dev server has no valid sourcing settings.");
+  const spec = settings.spec;
+
+  // 1. Every unique species, a chunk at a time.
+  const started = Date.now();
+  const ids = [...species];
+  const perSpecies = new Map<string, { listing: boolean; priced: boolean }>();
+  const statusNotes = new Map<string, Set<string>>();
+  for (let i = 0; i < ids.length; i += T3_CHUNK) {
+    const chunk = ids.slice(i, i + T3_CHUNK);
+    const result = await post({ items: chunk.map((plantId) => ({ plantId, n: 1 })), place: null });
+    if (!result.ok) return notRun(`the sourcing run failed: ${result.error}`);
+    const report = result.report as SourcingReport;
+    for (const line of report.species) {
+      perSpecies.set(line.plantId, {
+        listing: line.offers.length > 0,
+        priced: budgetPrices(line.offers, spec).perNursery.length > 0,
+      });
+    }
+    for (const status of report.sources) {
+      if (status.status !== "checked" || status.detail) {
+        const set = statusNotes.get(status.nursery) ?? new Set<string>();
+        set.add(`${status.status}${status.detail ? `: ${status.detail}` : ""}`);
+        statusNotes.set(status.nursery, set);
+      }
+    }
+    console.error(`[T3] ${Math.min(i + T3_CHUNK, ids.length)} / ${ids.length} species, ${Math.round((Date.now() - started) / 1000)} s`);
+  }
+  const checkSeconds = Math.round((Date.now() - started) / 1000);
+
+  // 2. Each plan, summarised from the cache the first pass filled.
+  const budgets: { low: number; typical: number; high: number; estimatedOrOutdated: number }[] = [];
+  for (const { plan } of plansForLater) {
+    const items = (plan.quantities?.quantities ?? []).map((q) => ({ plantId: q.id, n: q.quantity }));
+    if (items.length === 0) continue;
+    const result = await post({ items, place: null });
+    if (!result.ok) continue;
+    const report = result.report as SourcingReport;
+    let flagged = 0;
+    report.budget.lines.forEach((line, k) => {
+      if (line.pMed === null) return;
+      const outdated = budgetPrices(report.species[k].offers, spec).perNursery.some((o) => o.outdated);
+      if (line.status === "Estimated" || outdated) flagged += line.n * line.pMed;
+    });
+    budgets.push({
+      low: report.budget.low, typical: report.budget.typical, high: report.budget.high,
+      estimatedOrOutdated: report.budget.typical > 0 ? flagged / report.budget.typical : 0,
+    });
+  }
+  const totalSeconds = Math.round((Date.now() - started) / 1000);
+
+  const n = perSpecies.size;
+  const listing = [...perSpecies.values()].filter((v) => v.listing).length;
+  const priced = [...perSpecies.values()].filter((v) => v.priced).length;
+  const rand = (x: number) => `R${Math.round(x).toLocaleString("en-ZA").replace(/\s/g, ",")}`;
+  say(`Run against ${SOURCING_URL} (sourcing settings ${settings.specVersion ?? "?"}): ${checkSeconds} s to check the species, ${totalSeconds} s in all.`);
   say();
-  say("- share with at least one nursery listing;");
-  say("- share with an indicative price;");
-  say("- mean share per plan.");
+  say("| measure | value |");
+  say("|---|---|");
+  say(`| species with at least one listing | ${listing} / ${n} (${f((listing / n) * 100, 1)}%) |`);
+  say(`| species with a price (retail, Found, budget class) | ${priced} / ${n} (${f((priced / n) * 100, 1)}%) |`);
+  say(`| median share of a plan's budget that is estimated or outdated | ${f(median(budgets.map((b) => b.estimatedOrOutdated)) * 100, 1)}% (over ${budgets.length} plans) |`);
+  say(`| median bed budget, Low / Typical / High | ${rand(median(budgets.map((b) => b.low)))} / ${rand(median(budgets.map((b) => b.typical)))} / ${rand(median(budgets.map((b) => b.high)))} |`);
   say();
-  say("To run it: start the dev server and POST each plan to `/api/sourcing`, or extend");
-  say("`scripts/batch-test/` with a sourcing pass and a much longer time budget.");
-  say();
-  raw.t3 = { uniqueSpecies: species.size, run: false, reason: "sourcing is live HTTP; not runnable offline within the politeness budget" };
+  if (statusNotes.size > 0) {
+    say("Nurseries not fully checked on every request:");
+    say();
+    for (const [nursery, notes] of statusNotes) say(`- ${nursery}: ${[...notes].join("; ")}`);
+    say();
+  }
+  raw.t3 = {
+    uniqueSpecies: n, run: true, url: SOURCING_URL, specVersion: settings.specVersion, checkSeconds, totalSeconds,
+    withListing: listing, withPrice: priced,
+    medianEstimatedOrOutdatedShare: median(budgets.map((b) => b.estimatedOrOutdated)),
+    medianBudget: { low: median(budgets.map((b) => b.low)), typical: median(budgets.map((b) => b.typical)), high: median(budgets.map((b) => b.high)) },
+    plans: budgets.length,
+    nurseryNotes: Object.fromEntries([...statusNotes].map(([k, v]) => [k, [...v]])),
+  };
 }
 
 // ----------------------------------------------------------------- T4
@@ -1300,12 +1394,12 @@ function t10(plansForLater: { scenario: Scenario; plan: GardenPlan }[]) {
 }
 
 // ----------------------------------------------------------------- main
-function main(): void {
+async function main(): Promise<void> {
   const scenarios = buildScenarios();
   header();
   const plansForLater = t1(scenarios);
   t2(plansForLater);
-  t3(plansForLater);
+  await t3(plansForLater);
   t4(scenarios);
   t5();
   t6();
@@ -1322,4 +1416,4 @@ function main(): void {
   console.log(`\nWritten to ${join(REPORTS, "chapter5_results.md")} and .json`);
 }
 
-main();
+await main();
