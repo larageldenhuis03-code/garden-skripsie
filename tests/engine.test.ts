@@ -79,6 +79,8 @@ test("engine numbers are read from the rulebook", () => {
   // was 0.85 for cottage). cover_max is 1.0 for every style.
   assert.equal(RULES.styles.cottage.coverMin, 0.9);
   assert.equal(RULES.styles.cottage.coverMax, 1);
+  // D26: the contact bonus is a rulebook value, not a constant in stage4.ts.
+  assert.equal(RULES.stage4.contactBonus, 0);
   assert.equal(RULES.styles.fynbos.structMin, 1);
   assert.equal(RULES.styles.cottage.structMin, 0);
 });

@@ -464,6 +464,9 @@ def build(path: Path) -> dict:
             "placementRestarts": int(num(p, "placement_restarts")),
             **random_draws(p),
             "overlapDelta": num(p, "delta (canopy overlap)"),
+            # D26: preference for a candidate spot touching a placed plant
+            # (was +0.05 hard-coded in stage4.ts).
+            "contactBonus": num(p, "contact_bonus"),
             "hedgeSpacingFormalCm": [num(p, "hedge_spacing_formal_min"), num(p, "hedge_spacing_formal_max")],
             "hedgeSpacingInformalCm": [num(p, "hedge_spacing_informal_min"), num(p, "hedge_spacing_informal_max")],
             "windbreakPorosity": {

@@ -504,7 +504,10 @@ function placeOnce(
       const { x, y } = raw[index];
       if (!fits(x, y, r, info) || breaksP4(info, x, y)) continue;
       let pref = rng() * (1e-3 + noise); // seeded tie-break; wider on restarts
-      if (index >= firstContact) pref += 0.05; // snug contact spots pack the bed
+      // contact_bonus (D26, rulebook): a snug contact spot packs the bed,
+      // but the preference also pulls plants into clumps. It was a bare
+      // +0.05 here until 13 Oct 2026; the rulebook now sets it (0).
+      if (index >= firstContact) pref += RULES.stage4.contactBonus;
       if (target !== null) {
         const off = Math.abs(axis.depthOf(x, y) - target * axis.span);
         pref -= off / axis.span + 2 * Math.max(0, off - tol) / axis.span; // depth target +- depth_tol

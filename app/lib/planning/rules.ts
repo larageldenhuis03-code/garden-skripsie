@@ -85,6 +85,9 @@ export type EngineRules = {
   stage4: {
     depth: Record<LayerId, number | null>;
     depthTol: number;
+    /** contact_bonus (D26): placement preference for a candidate spot
+     * touching the bed edge or an already-placed plant. */
+    contactBonus: number;
     hedgeSpacingFormalCm: [number, number];
     hedgeSpacingInformalCm: [number, number];
     windbreakPorosity: { min: number; max: number; target: number };
