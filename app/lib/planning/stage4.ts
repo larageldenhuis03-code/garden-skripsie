@@ -200,6 +200,8 @@ function placeOnce(
   const realised: Selection = new Map();
   const checks: PlacementCheck[] = [];
   const diagnostics: string[] = [];
+  /** Back-layer species that used the D28 middle-band fallback. */
+  const bandFallbacks = new Set<string>();
   const unplaced: UnplacedCanopy[] = [];
   // The windward row bands: one row pitch in from the south and east edges.
   const inWindwardBand = (x: number, y: number): boolean =>
@@ -474,6 +476,54 @@ function placeOnce(
       const contacts = contactCandidates(r, near);
       firstContact = raw.length;
       raw.push(...contacts);
+    }
+
+    // D28 (owner, 13 Oct 2026): a back-layer plant never lands in front.
+    // It may sit anywhere from the front edge of its own band to the back
+    // of the bed; if no spot there fits, it steps forward ONE band - to
+    // the middle layer's band - and no further. With no valid spot in
+    // either, choose() returns null and the existing fail rule takes over
+    // (shrink the group, then drop the species). Climbers stay with their
+    // host and band-less layers (L2, L3, L7) are untouched.
+    const middle = targetDepth("L4", profile);
+    if (
+      info.layer === "L1" &&
+      target !== null &&
+      middle !== null &&
+      !override &&
+      target > middle
+    ) {
+      const usable = (spot: { x: number; y: number }, from: number) =>
+        axis.depthOf(spot.x, spot.y) >= from - EPS && fits(spot.x, spot.y, r, info) && !breaksP4(info, spot.x, spot.y);
+      const backFrom = target * axis.span - tol;
+      const middleFrom = middle * axis.span - tol;
+      const keep = (from: number) => {
+        const draws = raw.slice(0, firstContact).filter((spot) => axis.depthOf(spot.x, spot.y) >= from - EPS);
+        const snug = raw.slice(firstContact).filter((spot) => axis.depthOf(spot.x, spot.y) >= from - EPS);
+        raw.length = 0;
+        raw.push(...draws, ...snug);
+        firstContact = draws.length;
+      };
+      if (raw.some((spot) => usable(spot, backFrom))) {
+        keep(backFrom);
+      } else {
+        // The back band is full: look one band forward, with fresh draws
+        // spread over the whole allowed depth so the search is fair.
+        const extra: { x: number; y: number }[] = [];
+        for (let k = 0; k < PLACEMENT.randomDraws; k += 1) {
+          const across = r + rng() * Math.max(0, axis.across - 2 * r);
+          const depth = Math.max(middleFrom, r) + rng() * Math.max(0, axis.span - r - Math.max(middleFrom, r));
+          extra.push(axis.pointAt(depth, across));
+        }
+        raw.splice(firstContact, 0, ...extra);
+        firstContact += extra.length;
+        keep(middleFrom);
+        if (!raw.some((spot) => usable(spot, middleFrom))) return null;
+        if (!bandFallbacks.has(info.id)) {
+          bandFallbacks.add(info.id);
+          diagnostics.push(`${info.id}: its back band was full, so it moved forward to the middle band (D28), never to the front.`);
+        }
+      }
     }
 
     let best: { x: number; y: number; pref: number } | null = null;
