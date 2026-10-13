@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { Offer, SourcingReport, SpeciesReport } from "../lib/sourcing/run.ts";
-import type { SourcingResponse } from "../lib/sourcing/server.ts";
+import { runSplitSourcing } from "../lib/sourcing/orchestrate.ts";
+import type { Offer, SourcingReport, SpeciesReport } from "../lib/sourcing/summary.ts";
 
 /**
  * "Where to buy" - the live nursery sourcing panel (workbook tab 9_Output).
@@ -134,19 +134,27 @@ export function SourcingPanel({
     | { key: string; status: "done"; report: SourcingReport; specWarning: string | null }
     | null
   >(null);
+  // "Checked 3 of 5 nurseries…" while a run is under way.
+  const [progress, setProgress] = useState<{ key: string; checked: number; total: number } | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     const key = requestKey;
-    fetch("/api/sourcing", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        items: (JSON.parse(signature) as [string, number][]).map(([plantId, n]) => ({ plantId, n })),
-        place: town || null,
-      }),
-    })
-      .then((response) => response.json() as Promise<SourcingResponse>)
+    // One request per nursery, in parallel, merged and summarised here:
+    // the deployed worker may only make 50 requests of its own per call.
+    runSplitSourcing(
+      (JSON.parse(signature) as [string, number][]).map(([plantId, n]) => ({ plantId, n })),
+      town || null,
+      async (body) => {
+        const response = await fetch("/api/sourcing", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        return response.json();
+      },
+      { onProgress: ({ checked, total }) => !cancelled && setProgress({ key, checked, total }) },
+    )
       .then((response) => {
         if (cancelled) return;
         if (response.ok) {
@@ -233,7 +241,12 @@ export function SourcingPanel({
       </div>
       {(state.status !== "loading" && state.specWarning) && <p className="sourcing-warning">{state.specWarning}</p>}
       {state.status === "loading" && (
-        <p className="sourcing-loading">Checking nurseries live… the first check can take up to a minute.</p>
+        <p className="sourcing-loading">
+          {progress && progress.key === requestKey && progress.total > 0
+            ? `Checked ${progress.checked} of ${progress.total} nurseries…`
+            : "Checking nurseries live…"}{" "}
+          the first check can take up to a minute.
+        </p>
       )}
       {state.status === "error" && <p className="sourcing-warning">{state.message}</p>}
       {report && (

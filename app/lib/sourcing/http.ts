@@ -11,6 +11,11 @@ export const USER_AGENT =
   "SillyGooseGardenPlanner/0.1 (Stellenbosch University skripsie; garden bed planner)";
 export const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
+/** The error a capped client returns instead of sending a request that
+ * would take it past maxRequests. Callers treat it as "not checked this
+ * time", never as a failure of the nursery. */
+export const OUT_OF_REQUESTS = "request limit reached";
+
 export type CacheEntry = { at: number; value: unknown };
 
 export interface SourcingCache {
@@ -101,6 +106,13 @@ export type PoliteClientOptions = {
   now?: () => number;
   /** Skips the per-host wait (tests with a mocked fetch). */
   noDelay?: boolean;
+  /**
+   * The most network requests this client may send, robots.txt included.
+   * A Cloudflare worker on the free plan may make 50 subrequests per
+   * incoming request, so the deployed route gives every request its own
+   * capped client. Unset (the dev server, scripts) means no cap.
+   */
+  maxRequests?: number;
 };
 
 export class PoliteClient {
@@ -111,6 +123,13 @@ export class PoliteClient {
   private readonly ttlMs: number;
   private readonly now: () => number;
   private readonly noDelay: boolean;
+  private readonly maxRequests: number;
+  /** Requests promised to callers that passed the cap check, so parallel
+   * callers cannot all pass it at once. */
+  private planned = 0;
+  private readonly robotsPlanned = new Set<string>();
+  /** Set once a request has been refused because of the cap. */
+  outOfRequests = false;
   private readonly queues = new Map<string, Promise<unknown>>();
   private readonly lastStart = new Map<string, number>();
   private readonly robots = new Map<string, Promise<Robots>>();
@@ -133,6 +152,7 @@ export class PoliteClient {
     this.ttlMs = options.ttlMs ?? CACHE_TTL_MS;
     this.now = options.now ?? Date.now;
     this.noDelay = options.noDelay ?? false;
+    this.maxRequests = options.maxRequests ?? Number.POSITIVE_INFINITY;
   }
 
   /** Runs `task` in the host's queue, at least minIntervalMs after the
@@ -202,6 +222,15 @@ export class PoliteClient {
       return { ok: true, data: cached.value as T, at: cached.at, fromCache: true };
     }
     const { origin, host } = new URL(url);
+    // The cap: this fetch, plus robots.txt if this origin has not had it.
+    const needsRobots = !url.includes("nominatim.openstreetmap.org") && !this.robotsPlanned.has(origin);
+    const cost = 1 + (needsRobots ? 1 : 0);
+    if (this.planned + cost > this.maxRequests) {
+      this.outOfRequests = true;
+      return { ok: false, error: OUT_OF_REQUESTS };
+    }
+    this.planned += cost;
+    if (needsRobots) this.robotsPlanned.add(origin);
     if (!url.includes("nominatim.openstreetmap.org")) {
       const robots = await this.robotsFor(origin);
       if (robots === "none") {

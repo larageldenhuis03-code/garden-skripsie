@@ -13,7 +13,7 @@
     "build": "vinext build",
     "start": "vinext start",
     "test": "npm run test:unit && npm run test:render",
-    "test:unit": "node --experimental-strip-types --test tests/planning-engine.test.ts tests/stage1.test.ts tests/engine.test.ts tests/data-foundation.test.ts tests/sourcing.test.ts",
+    "test:unit": "node --experimental-strip-types --test tests/planning-engine.test.ts tests/stage1.test.ts tests/engine.test.ts tests/data-foundation.test.ts tests/sourcing.test.ts tests/sourcing-split.test.ts",
     "test:render": "npm run build && node --test tests/rendered-html.test.mjs",
     "test:batch": "node --experimental-strip-types scripts/batch-test/run-batch.ts",
     "study:nmin": "node --experimental-strip-types scripts/nmin-study.ts",
