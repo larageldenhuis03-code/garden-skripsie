@@ -12,7 +12,6 @@ import {
   FAIL_RULE_MAX_RETRIES,
   FAIL_RULE_PACKING_CAP_STEP,
   H7_FOOTPRINT_CAP,
-  SEARCH,
 } from "./engineConfig.ts";
 import { pickedColours } from "./stage1.ts";
 import { rowsAvailable, styleKeyFor, WIND_SITE_FACTOR } from "./stage1Config.ts";
