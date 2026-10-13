@@ -1,10 +1,4 @@
 import type { GardenBrief } from "./brief.ts";
-
-/** Said once when the cover floor (SEARCH.coverMinHard) could not be met,
- * so the plan is the densest mix found rather than a mix that reached the
- * style's minimum cover. */
-const COVER_SHORT_NOTE =
-  "cover_short: no mix of plants reached this style's minimum planted cover, so this is the densest one we found.";
 import { createRng, type SpeciesInfo } from "./engineData.ts";
 import { RULES } from "./rules.ts";
 import {
@@ -12,7 +6,6 @@ import {
   FAIL_RULE_MAX_RETRIES,
   FAIL_RULE_PACKING_CAP_STEP,
   H7_FOOTPRINT_CAP,
-  SEARCH,
 } from "./engineConfig.ts";
 import { pickedColours } from "./stage1.ts";
 import { rowsAvailable, styleKeyFor, WIND_SITE_FACTOR } from "./stage1Config.ts";
@@ -27,7 +20,7 @@ import {
   type SelectionEvaluation,
 } from "./stage2.ts";
 import { searchSelection, type SearchTrace } from "./stage3.ts";
-import { gapFill, groundCoverFill, placeSelection, type PlacementResult } from "./stage4.ts";
+import { placeSelection, type PlacementResult } from "./stage4.ts";
 
 /**
  * Runs Stages 2-4 for one seed: search (Stage 3) for the best feasible mix,
@@ -117,9 +110,6 @@ export function runEngine(
       return false;
     }
     lastSearch = result.trace;
-    if (result.coverShort && !diagnostics.includes(COVER_SHORT_NOTE)) {
-      diagnostics.push(COVER_SHORT_NOTE);
-    }
     selection = new Map(result.selection);
     return true;
   };
@@ -129,46 +119,6 @@ export function runEngine(
   for (let attempt = 0; attempt < FAIL_RULE_MAX_RETRIES && selection; attempt += 1) {
     const current: Selection = selection;
     const placement = placeSelection(current, infos, site, rng);
-    // Gap fill (study seam) runs before the selection is evaluated, so the
-    // plants it adds are checked by H1 and H5 like any others.
-    if (SEARCH.gapFill && placement.status === "complete") {
-      // H5 as the engine actually applies it: rMaxEffective, which lifts
-      // the style's r_max by the k_headroom allowance for small species
-      // counts. Using the raw style value here would enforce a stricter
-      // H5 than the plan itself was built under.
-      const before = stateFrom(placement.realised, infos, site);
-      const fill = gapFill(placement.layout, placement.realised, infos, site, {
-        // coverCapM2(), not style.coverMax x area: after a failed placement
-        // the fail rule retries under a tighter packing cap, and H1 is
-        // applied at that tighter cap. Using the rulebook cap here let gap
-        // fill overshoot it, which failed the selection and sent the whole
-        // plan back round the retry loop with a worse result.
-        coverCapM2: before.coverCapM2(),
-        rMax: before.rMaxEffective(),
-        featureExemptH5: RULES.stage2.featureExemptH5,
-      });
-      if (fill.added > 0) {
-        diagnostics.push(
-          `Gap fill added ${fill.added} more ${fill.speciesId} across ${fill.cellsTouched} sparse square metre${fill.cellsTouched === 1 ? "" : "s"}.`,
-        );
-      }
-    }
-    // Ground-cover fill (study seam): close the gaps the packer leaves,
-    // before the selection is evaluated, so every plant it adds is checked
-    // by the same hard rules as the rest.
-    if (SEARCH.groundCoverFill && placement.status === "complete") {
-      const before = stateFrom(placement.realised, infos, site);
-      const fill = groundCoverFill(placement.layout, placement.realised, infos, site, {
-        coverCapM2: before.coverCapM2(),
-        rMax: before.rMaxEffective(),
-        sMax: site.sMax,
-      });
-      if (fill.added > 0) {
-        diagnostics.push(
-          `Ground cover: ${fill.added} more ${fill.speciesId}${fill.addedSpecies ? " (added to the plan)" : ""} planted into the gaps, taking real cover from ${Math.round(fill.coverBefore * 100)}% to ${Math.round(fill.coverAfter * 100)}%.`,
-        );
-      }
-    }
     lastPlacement = placement;
 
     const state = stateFrom(placement.realised, infos, site);
@@ -179,11 +129,7 @@ export function runEngine(
     if (
       placement.status === "complete" &&
       evaluation.feasible &&
-      // baseComplete: the H2 floor and the windward row, which is what this
-      // acceptance test has always meant. The cover floor (SEARCH.
-      // coverMinHard) is a Stage 3 objective with its own documented
-      // fallback, not grounds for throwing away a placed layout.
-      state.baseComplete() &&
+      state.complete() &&
       hardPlacementOk
     ) {
       diagnostics.push(...placement.layout.diagnostics);

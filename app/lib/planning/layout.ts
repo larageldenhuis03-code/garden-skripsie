@@ -23,7 +23,40 @@ export type UnplacedCanopy = {
   reason: string;
 };
 
+/** Ground cover laid as a mat (SEARCH.matModel): an area and a planting
+ * density, not a set of circles. */
+export type GroundCoverMat = {
+  /** Each mat species: its area (sun patch + shade patch), its planting
+   * density and the plants that takes. */
+  species: {
+    plantId: string;
+    areaM2: number;
+    sunAreaM2: number;
+    shadeAreaM2: number;
+    densityPerM2: number;
+    count: number;
+  }[];
+  /** The sun mat: the open ground it covers. */
+  areaM2: number;
+  /** The shade patch under L1 canopies (already under canopy, so it adds
+   * plants but not cover). */
+  shadeAreaM2: number;
+  /** Carpeters the search itself chose, and those the mat rules left out
+   * of the plan. */
+  chosenBySearch: string[];
+  removedFromPlan: string[];
+  /** The mat's shape: cells of a grid x grid raster over the bed, and for
+   * each cell the index into species of the carpeter that covers it. */
+  grid: number;
+  cells: number[];
+  owners: number[];
+  /** The style's open_min, kept as bare ground. */
+  openMin: number;
+};
+
 export type RectangularLayout = {
+  /** Present only when the plan's ground cover is laid as a mat. */
+  mat?: GroundCoverMat;
   status: "complete" | "partial";
   bedWidthM: number;
   bedLengthM: number;

@@ -7,7 +7,6 @@ import {
   MIN_GROUPED_SHARE,
   SINGLETON_K_BY_BAND,
   SIZE_VAR_MIN,
-  SEARCH,
 } from "./engineConfig.ts";
 
 /**
@@ -52,11 +51,6 @@ export type EngineSite = {
 };
 
 export type Selection = Map<string, number>;
-
-/** Ground cover and matrix: the base layer a bed is closed with. */
-export function isBaseLayer(info: { layer: string }): boolean {
-  return info.layer === "L6" || info.layer === "L3";
-}
 
 export type Goals = { A1: number; A2: number; A3: number; A4: number; A5: number };
 
@@ -320,7 +314,6 @@ export class SelectionState {
     let largest = 0;
     for (const [id, n] of this.counts) {
       if (RULES.stage2.featureExemptH5 && this.info(id).feature) continue;
-      if (SEARCH.fillExemptH5 && isBaseLayer(this.info(id))) continue;
       largest = Math.max(largest, n / this.totalPlants);
     }
     return largest;
@@ -353,30 +346,12 @@ export class SelectionState {
     );
   }
 
-  /** The style's cover_min as an area, i.e. what goal A4 measures against
-   * and what SEARCH.coverMinHard turns into a floor. */
-  coverFloorM2(): number {
-    return this.site.style.coverMin * this.site.widthM * this.site.depthM;
-  }
-
   /** Conditions only a finished selection must meet: the H2 floor, and a
-   * windward-row species when P3 applies. Unaffected by the cover floor,
-   * so Stage 3 can still tell "no mix exists" from "no mix is dense
-   * enough". */
-  baseComplete(): boolean {
+   * windward-row species when P3 applies. */
+  complete(): boolean {
     return (
       this.speciesCount >= this.site.sMin &&
       (!this.site.windbreakRequired || this.windbreakSpecies > 0)
-    );
-  }
-
-  /** As baseComplete, plus the cover floor when the study seam is on. */
-  complete(): boolean {
-    return (
-      this.baseComplete() &&
-      (!SEARCH.coverMinHard ||
-        this.site.widthM * this.site.depthM < SEARCH.coverMinHardFromM2 ||
-        this.plantedAreaM2 >= this.coverFloorM2() - 1e-9)
     );
   }
 }
@@ -401,9 +376,7 @@ export function evaluateSelection(state: SelectionState): SelectionEvaluation {
   const rEff = state.rMaxEffective();
   const share = state.largestCappedShare();
   const badGroups = [...state.counts].filter(
-    ([id, n]) =>
-      !(SEARCH.fillExemptH3 && isBaseLayer(state.info(id))) &&
-      !state.info(id).allowedN.includes(n),
+    ([id, n]) => !state.info(id).allowedN.includes(n),
   );
   const hard: HardCheck[] = [
     {

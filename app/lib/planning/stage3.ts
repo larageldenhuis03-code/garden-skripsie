@@ -41,15 +41,7 @@ export type SearchTrace = {
 };
 
 export type SearchResult =
-  | {
-      status: "found";
-      selection: Selection;
-      z: number;
-      trace: SearchTrace;
-      /** SEARCH.coverMinHard was on and nothing reached the floor, so this
-       * is the densest selection the search saw. */
-      coverShort?: boolean;
-    }
+  | { status: "found"; selection: Selection; z: number; trace: SearchTrace }
   | { status: "infeasible"; reason: string };
 
 type Move = { apply: () => void; undo: () => void };
@@ -88,11 +80,7 @@ function makeSwap(state: SelectionState, outId: string, incoming: SpeciesInfo, n
  * otherwise undoes it and returns null. */
 function tryMove(state: SelectionState, move: Move, requireComplete: boolean): number | null {
   move.apply();
-  // baseComplete: a move is valid if the mix is still legal. Gating on the
-  // cover floor here would reject every state on the way to reaching it,
-  // which is a trap rather than a push. The floor steers the search
-  // through the ranking below instead, and has an explicit fallback.
-  if (state.withinLimits() && (!requireComplete || state.baseComplete())) {
+  if (state.withinLimits() && (!requireComplete || state.complete())) {
     return state.z();
   }
   move.undo();
@@ -117,17 +105,12 @@ function withinHeightTolerance(left: SpeciesInfo, right: SpeciesInfo): boolean {
  * a look-ahead so the greedy start never takes a step that makes the
  * floor unreachable. Leaves the state unchanged. */
 function completable(state: SelectionState, bySmallest: readonly SpeciesInfo[]): boolean {
-  // baseComplete, not complete: this look-ahead asks whether the H2 floor
-  // and the windward row are still reachable by adding the SMALLEST groups
-  // that fit. Those add the least area of any legal move, so judging them
-  // against a cover floor would answer "no" almost always and stop the
-  // greedy start from taking steps it should take.
-  if (state.baseComplete()) return true;
+  if (state.complete()) return true;
   const added: string[] = [];
   const needsWindbreak = () => state.site.windbreakRequired && state.windbreakSpecies === 0;
   for (const pass of [true, false]) {
     for (const info of bySmallest) {
-      if (state.baseComplete()) break;
+      if (state.complete()) break;
       if (state.has(info.id)) continue;
       if (pass && !(needsWindbreak() && canFormWindbreak(info))) continue;
       state.set(info, Math.min(...info.allowedN));
@@ -135,7 +118,7 @@ function completable(state: SelectionState, bySmallest: readonly SpeciesInfo[]):
       else state.remove(info.id);
     }
   }
-  const ok = state.baseComplete();
+  const ok = state.complete();
   for (const id of added) state.remove(id);
   return ok;
 }
@@ -281,7 +264,7 @@ export function searchSelection(
 
   const state = new SelectionState(site);
   greedyStart(state, ordered);
-  if (!state.baseComplete()) {
+  if (!state.complete()) {
     const reasons = [];
     if (state.speciesCount < site.sMin) {
       reasons.push(
@@ -295,19 +278,7 @@ export function searchSelection(
   }
   const greedyZ = state.z();
 
-  // The densest selection seen anywhere in the search, used only when the
-  // cover floor is on and nothing reaches it.
-  let densest: Selection = state.snapshot();
-  let densestArea = state.plantedAreaM2;
-  const noteDensity = (candidate: SelectionState) => {
-    if (candidate.baseComplete() && candidate.plantedAreaM2 > densestArea) {
-      densestArea = candidate.plantedAreaM2;
-      densest = candidate.snapshot();
-    }
-  };
-
   localImprovement(state, ordered, rng);
-  noteDensity(state);
   const improvedZ = state.z();
 
   // Simulated annealing. T0 "to tune" in the rulebook: set so that a move
@@ -334,7 +305,6 @@ export function searchSelection(
             bestZ = z;
             best = state.snapshot();
           }
-          noteDensity(state);
         } else {
           move.undo();
         }
@@ -346,19 +316,12 @@ export function searchSelection(
 
   const finalState = stateFrom(best, infos, site);
   localImprovement(finalState, ordered, rng);
-  noteDensity(finalState);
   const finalZ = finalState.z();
-
-  // Cover floor on and still not met: hand back the densest mix found and
-  // say so, rather than reporting no plan for a bed that has one.
-  const coverShort = !finalState.complete() && finalState.baseComplete();
-  const chosen = coverShort ? stateFrom(densest, infos, site) : finalState;
 
   return {
     status: "found",
-    selection: chosen.snapshot(),
-    z: coverShort ? chosen.z() : finalZ,
-    ...(coverShort ? { coverShort: true } : {}),
+    selection: finalState.snapshot(),
+    z: finalZ,
     trace: {
       greedyZ,
       improvedZ,

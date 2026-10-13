@@ -36,7 +36,7 @@ import {
   type GoalProgramEvaluation,
 } from "./goalProgramming.ts";
 import type { RectangularLayout } from "./layout.ts";
-import type { QuantityAllocation } from "./quantities.ts";
+import type { PlantQuantity, QuantityAllocation } from "./quantities.ts";
 import {
   computeHeightTiers,
   computeSpreadBands,
@@ -51,11 +51,12 @@ import { DATASET_VERSION } from "../../data/datasetVersion.ts";
 import { shadeTermActive } from "./stage1Config.ts";
 import type { Goals, HardCheck } from "./stage2.ts";
 import type { SearchTrace } from "./stage3.ts";
-import type { PlacementCheck, WindProfile } from "./stage4.ts";
+import { groundCoverMat, type PlacementCheck, type WindProfile } from "./stage4.ts";
 import {
   MAX_RESULT_SEEDS,
   MIN_LAYOUT_CANOPY_DIAMETER_M,
   MINIMUM_VIABLE_POOL,
+  SEARCH,
 } from "./engineConfig.ts";
 import {
   F4_NEMBA_SPECIES,
@@ -938,9 +939,31 @@ function planFromRun(
   }
 
   const infos = new Map(prepared.pool.map((info) => [info.id, info]));
-  const quantities = [...run.selection]
-    .map(([id, quantity]) => {
+  // A carpeter laid as a mat is bought by area x density, not by the
+  // group size the search chose for it as circles.
+  const groundMat = run.placement.layout.mat;
+  const matBy = new Map((groundMat?.species ?? []).map((s) => [s.plantId, s]));
+  // With a mat, the search's carpeters give way to the mat species the
+  // mat rules chose; every other plant is the search's own.
+  const entries: [string, number][] = groundMat
+    ? [
+        ...[...run.selection].filter(([id]) => !groundMat.chosenBySearch.includes(id)),
+        ...groundMat.species.map((s): [string, number] => [s.plantId, s.count]),
+      ]
+    : [...run.selection];
+  const quantities = entries
+    .map(([id, quantity]): PlantQuantity => {
       const each = (infos.get(id) as SpeciesInfo).areaM2;
+      const mat = matBy.get(id);
+      if (mat) {
+        return {
+          id,
+          quantity: mat.count,
+          canopyAreaEachM2: each,
+          allocatedCanopyAreaM2: mat.areaM2,
+          mat: { areaM2: mat.areaM2, shadeAreaM2: mat.shadeAreaM2, densityPerM2: mat.densityPerM2 },
+        };
+      }
       return { id, quantity, canopyAreaEachM2: each, allocatedCanopyAreaM2: each * quantity };
     })
     .sort((left, right) => left.id.localeCompare(right.id));
@@ -979,6 +1002,37 @@ function planFromRun(
   };
 }
 
+/**
+ * Ground cover as a mat (SEARCH.matModel study seam; does nothing when it
+ * is off). Lays the mat on an accepted run's layout and adds the species
+ * it used to `used`. The tie-break seed is the plan seed with wind left
+ * out, like every other tie-break: wind moves a plan only through Stage 1.
+ */
+function layMat(
+  prepared: Prepared,
+  run: EngineRun | null,
+  brief: GardenBrief,
+  options: PlanOptions,
+  used: Set<string>,
+): void {
+  if (!SEARCH.matModel || run?.status !== "plan" || !run.placement) return;
+  const site = engineSite(brief);
+  const seed = `${planSeed({ ...brief, wind: "none" }, options.savedPlantIds, options.variationCounter, options.excludedPlantIds)}-mat`;
+  const mat = groundCoverMat(
+    run.placement.layout,
+    run.selection,
+    new Map(prepared.pool.map((info) => [info.id, info])),
+    site,
+    site.style.openMin,
+    { seed, avoid: used },
+  );
+  if (!mat) return;
+  for (const s of mat.species) used.add(s.plantId);
+  run.diagnostics.push(
+    `Ground cover laid as a mat: ${mat.species.map((s) => `${s.count} ${s.plantId} over ${s.areaM2.toFixed(1)} m2`).join(", ")}${mat.shadeAreaM2 > 0 ? ` (${mat.shadeAreaM2.toFixed(1)} m2 of it in shade under trees)` : ""}.`,
+  );
+}
+
 /** One result: Stages 0-4 for the brief's seed. */
 export function buildGardenPlan(
   plants: readonly Plant[],
@@ -989,6 +1043,7 @@ export function buildGardenPlan(
   const seed = `${prepared.seed}-0`;
   const run =
     prepared.pool.length > 0 ? runEngine(prepared.pool, engineSite(brief), seed) : null;
+  layMat(prepared, run, brief, options, new Set());
   return planFromRun(prepared, run, "Option 1", seed);
 }
 
@@ -1224,6 +1279,11 @@ export function buildGardenPlanVariants(
     const run = runEngine(prepared.pool, viewerSite, seed);
     if (run.status === "plan") found[viewerIndex] = { run, seed };
   }
+
+  // Mats are laid once the options are final and in order, so each later
+  // option can avoid the mat species an earlier one used.
+  const matUsed = new Set<string>();
+  for (const { run } of found) layMat(prepared, run, brief, options, matUsed);
 
   return found.map(({ run, seed }, index) =>
     planFromRun(

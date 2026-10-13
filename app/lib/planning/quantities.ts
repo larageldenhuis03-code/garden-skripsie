@@ -15,6 +15,9 @@ export type PlantQuantity = {
   quantity: number;
   canopyAreaEachM2: number;
   allocatedCanopyAreaM2: number;
+  /** Laid as a ground-cover mat (SEARCH.matModel): the mat's area for
+   * this plant, and the planting density its quantity came from. */
+  mat?: { areaM2: number; shadeAreaM2: number; densityPerM2: number };
 };
 
 export type QuantityAllocation = {

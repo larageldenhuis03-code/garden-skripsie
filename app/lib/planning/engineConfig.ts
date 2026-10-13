@@ -169,69 +169,25 @@ export const P11_ANGLE_TEST = false;
  * exists for them to climb. */
 export const CLIMBERS_NEED_L1_HOST = true;
 
-/** Placement retry budget (6_Stage3_4_Rules step 8). */
-/**
- * STUDY SEAMS for the coverage test, both off in the shipped engine.
- *
- * `coverMinHard` makes the style's cover_min a hard lower bound on a
- * finished selection instead of only the denominator of goal A4. When no
- * selection reaches it, Stage 3 returns the highest-cover selection it
- * saw and says so, rather than failing.
- *
- * `gapFill` runs a pass after Stage 4 that tops up the emptiest square
- * metres with more of a ground-cover or matrix species already in the
- * plan. It never introduces a species and never breaks H1, H5, P1 or P2.
- *
- * See scripts/coverage-test.ts (V5 and V6), which set them in memory.
- */
 export const SEARCH = {
-  coverMinHard: false,
-  /** The floor applies only to beds at least this big, in m2. 0 means
-   * every bed, which is what V5 measured; V7 sets 6, so small beds - where
-   * V5 made the spread clearly worse - have no floor. */
-  coverMinHardFromM2: 0,
-  gapFill: false,
   /**
-   * Whether gap fill keeps the filler inside its layer's depth band.
-   *
-   * True is the brief as written. It is also very restrictive: a ground
-   * cover's band is depth_tol either side of its target, which on a 4 m
-   * bed is 0.40-1.20 m - a fifth of the depth - so the pass can only
-   * reach a strip at the front. False lets it fill any square metre that
-   * P1 and P2 allow. Measured both ways; see reports/coverage_test.md.
+   * STUDY SEAM, off in the shipped engine. Ground cover as a MAT (owner,
+   * 13 October 2026). Specimen plants stay circles. A true carpeter (layer
+   * L6, ground-cover or moss type) is laid as an area between them and
+   * bought by density, the way a designer specifies it - see
+   * stage4.groundCoverMat. The selection is not changed.
    */
-  gapFillRespectBand: true,
-  /** A square metre counts as filled at this much canopy. */
-  cellFullAt: 0.5,
+  matModel: false,
   /**
-   * Ground-cover fill (V9, owner 13 October 2026): after placement, plant
-   * the plan's ground cover - or its matrix species - into the biggest
-   * gaps anywhere in the bed, until the bed's real cover reaches
-   * fillTargetCover or nothing more fits. This is what lets a bed pass the
-   * ~69% the packer reaches on its own, without the fail rule's cut-back.
+   * D-MAT-1 (rulebook-style parameter, in memory only for now).
+   * ASSUMPTION, not sourced: carpeters are planted at this fraction of
+   * their mature spread so the mat closes. To be confirmed against a
+   * horticultural source before it moves into the rulebook.
    */
-  groundCoverFill: false,
-  fillTargetCover: 0.9,
-  /** Candidate rule changes, measured one at a time. Each exempts the base
-   * layer (ground cover L6 and matrix L3) - the plants a designer uses in
-   * large drifts to close a bed - from one Stage 2 rule: H5, the cap on
-   * any one species' share of the plants; H3, the ladder of allowed group
-   * sizes. Feature plants already have an H5 exemption of the same kind. */
-  fillExemptH5: false,
-  fillExemptH3: false,
-  /** If the plan has no ground cover or matrix species, add the best-
-   * scoring ground cover from its own filtered pool - one that has passed
-   * every survival check for this bed - provided H2 still allows one more
-   * species. */
-  fillAddSpecies: false,
-  /** How far a ground-cover filler may tuck under the edge of a TALLER
-   * plant, as P2's delta: 0.15 is P2 as it stands; 1.0 lets the filler's
-   * centre reach the taller plant's canopy edge. Between two base-layer
-   * plants P2 is unchanged. Real ground cover grows under shrub edges;
-   * P2 as written treats it like any other plant. */
-  fillUnderDelta: 0.15,
+  matSpacingFactor: 0.6,
 } as const;
 
+/** Placement retry budget (6_Stage3_4_Rules step 8). */
 export const PLACEMENT = {
   /**
    * random_draws_per_plant (1_Parameters C91). The number of random

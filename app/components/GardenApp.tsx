@@ -54,7 +54,10 @@ import {
   type Wind,
   type ViewingEdge,
   type PlantAssessment,
+  type GroundCoverMat,
+  SEARCH,
 } from "../lib/planning";
+
 import bioregionMapData from "../data/bioregion_map.generated.json" with { type: "json" };
 import { isEstimatedBioregion, places, type Place } from "../data/places";
 import { SourcingPanel } from "./SourcingPanel";
@@ -74,6 +77,13 @@ type View = "home" | "finder" | "results" | "browse" | "saved" | "method";
 
 /** The answers the finder opens with. Not a test fixture: the engine's
  * regression briefs live in tests/engine.test.ts. */
+// STUDY BRANCH ONLY (coverage-test): add ?mat to the address to lay the
+// plan's true carpeters as a ground-cover mat. Off otherwise, so every
+// other page and test sees the shipped engine.
+if (typeof window !== "undefined" && new URLSearchParams(window.location.search).has("mat")) {
+  (SEARCH as { matModel: boolean }).matModel = true;
+}
+
 const defaultBrief: GardenBrief = {
   biomes: [],
   bioregion: "Southwest Fynbos Bioregion",
@@ -2035,6 +2045,95 @@ function SavedHeart() {
 
 /** The planting plan: every plant as a circle at its position, north at the
  * top. Used for the live layout and for saved gardens alike. */
+/** The ground-cover mat: its raster cells merged into row runs, drawn as
+ * a texture under the circles, one texture per carpeter. Uses the same
+ * rotation as the markers (display x = map y, display y = W - map x). */
+function MatLayer({
+  mat,
+  widthM,
+  lengthM,
+  rotated,
+  openPlant,
+  plantsById,
+}: {
+  mat: GroundCoverMat;
+  widthM: number;
+  lengthM: number;
+  rotated: boolean;
+  openPlant: (plant: Plant) => void;
+  plantsById: ReadonlyMap<string, Plant>;
+}) {
+  const G = mat.grid;
+  const cw = widthM / G;
+  const cl = lengthM / G;
+  const owner = new Map(mat.cells.map((cell, k) => [cell, mat.owners[k]]));
+  const runs: { k: number; x0: number; x1: number; y0: number; y1: number }[] = [];
+  for (let row = 0; row < G; row += 1) {
+    let col = 0;
+    while (col < G) {
+      const k = owner.get(row * G + col);
+      if (k === undefined) {
+        col += 1;
+        continue;
+      }
+      let end = col;
+      while (end + 1 < G && owner.get(row * G + end + 1) === k) end += 1;
+      runs.push({ k, x0: col * cw, x1: (end + 1) * cw, y0: row * cl, y1: (row + 1) * cl });
+      col = end + 1;
+    }
+  }
+  const displayW = rotated ? lengthM : widthM;
+  const displayL = rotated ? widthM : lengthM;
+  const tile = Math.max(displayW, displayL) / 45;
+  const pad = Math.min(cw, cl) * 0.04; // closes hairline seams between runs
+  return (
+    <svg
+      className="plan-mat"
+      viewBox={`0 0 ${displayW} ${displayL}`}
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
+      <defs>
+        <pattern id="mat-tex-0" width={tile} height={tile} patternUnits="userSpaceOnUse">
+          <rect width={tile} height={tile} className="plan-mat-ground-0" />
+          <path
+            d={`M${tile * 0.15} ${tile * 0.85} L${tile * 0.4} ${tile * 0.3} M${tile * 0.55} ${tile * 0.85} L${tile * 0.8} ${tile * 0.4}`}
+            className="plan-mat-stroke"
+            strokeWidth={tile * 0.09}
+          />
+        </pattern>
+        <pattern id="mat-tex-2" width={tile} height={tile} patternUnits="userSpaceOnUse">
+          <rect width={tile} height={tile} className="plan-mat-ground-0" />
+          <path d={`M0 ${tile * 0.5} L${tile} ${tile * 0.5}`} className="plan-mat-stroke" strokeWidth={tile * 0.08} />
+        </pattern>
+        <pattern id="mat-tex-1" width={tile} height={tile} patternUnits="userSpaceOnUse">
+          <rect width={tile} height={tile} className="plan-mat-ground-1" />
+          <circle cx={tile * 0.3} cy={tile * 0.3} r={tile * 0.12} className="plan-mat-dot" />
+          <circle cx={tile * 0.75} cy={tile * 0.7} r={tile * 0.12} className="plan-mat-dot" />
+        </pattern>
+      </defs>
+      {runs.map((run, index) => {
+        const x = rotated ? run.y0 : run.x0;
+        const y = rotated ? widthM - run.x1 : run.y0;
+        const w = rotated ? run.y1 - run.y0 : run.x1 - run.x0;
+        const h = rotated ? run.x1 - run.x0 : run.y1 - run.y0;
+        const plant = plantsById.get(mat.species[run.k]?.plantId ?? "");
+        return (
+          <rect
+            key={index}
+            x={x - pad}
+            y={y - pad}
+            width={w + 2 * pad}
+            height={h + 2 * pad}
+            fill={`url(#mat-tex-${run.k % 3})`}
+            onClick={plant ? () => openPlant(plant) : undefined}
+          />
+        );
+      })}
+    </svg>
+  );
+}
+
 function BedDiagram({
   widthM,
   lengthM,
@@ -2042,7 +2141,10 @@ function BedDiagram({
   openPlant,
   savedIds = [],
   viewingEdge,
+  mat,
 }: {
+  /** Ground cover laid as a mat, drawn under the circles. */
+  mat?: GroundCoverMat;
   widthM: number;
   lengthM: number;
   placements: { plantId: string; xM: number; yM: number; radiusM: number; instanceId?: string; sequence?: number }[];
@@ -2110,6 +2212,16 @@ function BedDiagram({
         style={{ aspectRatio: `${displayWidthM} / ${displayLengthM}` }}
         aria-label={`${widthM} by ${lengthM} metre planting layout, north at the top`}
       >
+        {mat ? (
+          <MatLayer
+            mat={mat}
+            widthM={widthM}
+            lengthM={lengthM}
+            rotated={rotated}
+            openPlant={openPlant}
+            plantsById={plantsById}
+          />
+        ) : null}
         {markers.map(({ placement, plant, index, displayX, displayY, unknownColour, estimated }) => {
           const style: CSSProperties = {
             left: `${((displayX - placement.radiusM) / displayWidthM) * 100}%`,
@@ -2323,6 +2435,7 @@ function PlanSummary({
             openPlant={openPlant}
             savedIds={savedIds}
             viewingEdge={plan.brief.viewingEdge}
+            mat={layout.mat}
           />
         </div>
 
@@ -2349,6 +2462,13 @@ function PlanSummary({
                 </span>
                 <b>× {quantity.quantity}</b>
               </button>
+              {quantity.mat ? (
+                <p className="legend-measure legend-mat">
+                  Ground-cover mat: {quantity.mat.areaM2.toFixed(1)} m²
+                  {quantity.mat.shadeAreaM2 > 0 ? ` (${quantity.mat.shadeAreaM2.toFixed(1)} m² of it under trees)` : ""} at about{" "}
+                  {Math.round(quantity.mat.densityPerM2)} plants per m² (spacing an assumption)
+                </p>
+              ) : null}
               <p className="legend-measure">
                 {formatDimension(plant.heightCm)} tall ·{" "}
                 {formatDimension(plant.spreadCm)} wide
@@ -2443,7 +2563,10 @@ function PlanSummary({
               <dl>
                 <div>
                   <dt>Quantity</dt>
-                  <dd>× {quantity.quantity}</dd>
+                  <dd>
+                    × {quantity.quantity}
+                    {quantity.mat ? ` · ${quantity.mat.areaM2.toFixed(1)} m² mat` : ""}
+                  </dd>
                 </div>
                 <div>
                   <dt>Height</dt>
