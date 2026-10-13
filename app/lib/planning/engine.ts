@@ -27,7 +27,7 @@ import {
   type SelectionEvaluation,
 } from "./stage2.ts";
 import { searchSelection, type SearchTrace } from "./stage3.ts";
-import { gapFill, placeSelection, type PlacementResult } from "./stage4.ts";
+import { gapFill, groundCoverFill, placeSelection, type PlacementResult } from "./stage4.ts";
 
 /**
  * Runs Stages 2-4 for one seed: search (Stage 3) for the best feasible mix,
@@ -150,6 +150,22 @@ export function runEngine(
       if (fill.added > 0) {
         diagnostics.push(
           `Gap fill added ${fill.added} more ${fill.speciesId} across ${fill.cellsTouched} sparse square metre${fill.cellsTouched === 1 ? "" : "s"}.`,
+        );
+      }
+    }
+    // Ground-cover fill (study seam): close the gaps the packer leaves,
+    // before the selection is evaluated, so every plant it adds is checked
+    // by the same hard rules as the rest.
+    if (SEARCH.groundCoverFill && placement.status === "complete") {
+      const before = stateFrom(placement.realised, infos, site);
+      const fill = groundCoverFill(placement.layout, placement.realised, infos, site, {
+        coverCapM2: before.coverCapM2(),
+        rMax: before.rMaxEffective(),
+        sMax: site.sMax,
+      });
+      if (fill.added > 0) {
+        diagnostics.push(
+          `Ground cover: ${fill.added} more ${fill.speciesId}${fill.addedSpecies ? " (added to the plan)" : ""} planted into the gaps, taking real cover from ${Math.round(fill.coverBefore * 100)}% to ${Math.round(fill.coverAfter * 100)}%.`,
         );
       }
     }

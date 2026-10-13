@@ -64,7 +64,7 @@ function setPath(
 const EMPTIEST_BLOCK_WEIGHT = 0.25;
 
 type Version = {
-  id: "V0" | "V1" | "V2" | "V3" | "V5" | "V6" | "V7";
+  id: "V0" | "V1" | "V2" | "V3" | "V5" | "V6" | "V7" | "V8";
   label: string;
   /** Applies the override; returns the undo. */
   apply: () => () => void;
@@ -175,6 +175,23 @@ const VERSIONS: Version[] = [
       return () => undo.forEach((undoOne) => undoOne());
     },
     target: (style) => BASE_COVER[styleKeyOf(style)].coverMin,
+  },
+  {
+    id: "V8",
+    label: "contact 0, every style cover_min 0.80 as a hard floor, cover_max 1.0",
+    apply: () => {
+      const undo: (() => void)[] = [
+        setPath(PLACEMENT as unknown as Record<string, unknown>, "contactBonus", 0),
+        setPath(SEARCH as unknown as Record<string, unknown>, "coverMinHard", true),
+      ];
+      for (const key of Object.keys(styleRules)) {
+        const style = styleRules[key] as unknown as Record<string, unknown>;
+        undo.push(setPath(style, "coverMin", 0.8));
+        undo.push(setPath(style, "coverMax", 1.0));
+      }
+      return () => undo.forEach((undoOne) => undoOne());
+    },
+    target: () => 0.8,
   },
 ];
 
@@ -834,12 +851,17 @@ function summarise(rowsByVersion: Map<string, Row[]>): string {
     "",
     "## What stops a bed reaching its target cover",
     "",
-    "`placement` and `pool: exhausted` are zero in every version: Stage 4",
-    "fits what it is given, and the candidate pool never runs out. Almost",
-    "every short plan is `pool: stopped early` - more species were available",
-    "than H2 allows, and the selection used fewer. The limit on cover is in",
-    "what Stage 2 and Stage 3 choose, not in the cover rule, the packer or",
-    "the pool. That is why V1 changes nothing and V5 changes little.",
+    "**Corrected 13 October.** This section used to say Stage 4 fits what",
+    "it is given. That was wrong: the `placement` check looked only at each",
+    "plan's final mix, which the fail rule had already cut down, so it hid",
+    "every failed attempt. Measured directly (scripts/coverage-wall.ts), the",
+    "packer cannot fit the first mix the search picks in 57 of 95 plans",
+    "under today's rules, and in 71 of 93 with every style forced to an 80%",
+    "floor. Each time, the fail rule lowers the cover ceiling and searches",
+    "again, so the plan comes out sparser than the search intended. Turning",
+    "off H5 or doubling H2 does not help. The limit on cover is the packer",
+    "and the fail rule's response to it - which is why V1, which only raises",
+    "the target, changes nothing. The candidate pool never runs out.",
     "",
     "## V4 was not run",
     "",

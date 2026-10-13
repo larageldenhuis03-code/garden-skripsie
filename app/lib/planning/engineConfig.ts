@@ -203,6 +203,33 @@ export const SEARCH = {
   gapFillRespectBand: true,
   /** A square metre counts as filled at this much canopy. */
   cellFullAt: 0.5,
+  /**
+   * Ground-cover fill (V9, owner 13 October 2026): after placement, plant
+   * the plan's ground cover - or its matrix species - into the biggest
+   * gaps anywhere in the bed, until the bed's real cover reaches
+   * fillTargetCover or nothing more fits. This is what lets a bed pass the
+   * ~69% the packer reaches on its own, without the fail rule's cut-back.
+   */
+  groundCoverFill: false,
+  fillTargetCover: 0.9,
+  /** Candidate rule changes, measured one at a time. Each exempts the base
+   * layer (ground cover L6 and matrix L3) - the plants a designer uses in
+   * large drifts to close a bed - from one Stage 2 rule: H5, the cap on
+   * any one species' share of the plants; H3, the ladder of allowed group
+   * sizes. Feature plants already have an H5 exemption of the same kind. */
+  fillExemptH5: false,
+  fillExemptH3: false,
+  /** If the plan has no ground cover or matrix species, add the best-
+   * scoring ground cover from its own filtered pool - one that has passed
+   * every survival check for this bed - provided H2 still allows one more
+   * species. */
+  fillAddSpecies: false,
+  /** How far a ground-cover filler may tuck under the edge of a TALLER
+   * plant, as P2's delta: 0.15 is P2 as it stands; 1.0 lets the filler's
+   * centre reach the taller plant's canopy edge. Between two base-layer
+   * plants P2 is unchanged. Real ground cover grows under shrub edges;
+   * P2 as written treats it like any other plant. */
+  fillUnderDelta: 0.15,
 } as const;
 
 export const PLACEMENT = {

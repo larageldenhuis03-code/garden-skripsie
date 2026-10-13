@@ -53,6 +53,11 @@ export type EngineSite = {
 
 export type Selection = Map<string, number>;
 
+/** Ground cover and matrix: the base layer a bed is closed with. */
+export function isBaseLayer(info: { layer: string }): boolean {
+  return info.layer === "L6" || info.layer === "L3";
+}
+
 export type Goals = { A1: number; A2: number; A3: number; A4: number; A5: number };
 
 export type HardCheck = {
@@ -315,6 +320,7 @@ export class SelectionState {
     let largest = 0;
     for (const [id, n] of this.counts) {
       if (RULES.stage2.featureExemptH5 && this.info(id).feature) continue;
+      if (SEARCH.fillExemptH5 && isBaseLayer(this.info(id))) continue;
       largest = Math.max(largest, n / this.totalPlants);
     }
     return largest;
@@ -395,7 +401,9 @@ export function evaluateSelection(state: SelectionState): SelectionEvaluation {
   const rEff = state.rMaxEffective();
   const share = state.largestCappedShare();
   const badGroups = [...state.counts].filter(
-    ([id, n]) => !state.info(id).allowedN.includes(n),
+    ([id, n]) =>
+      !(SEARCH.fillExemptH3 && isBaseLayer(state.info(id))) &&
+      !state.info(id).allowedN.includes(n),
   );
   const hard: HardCheck[] = [
     {
