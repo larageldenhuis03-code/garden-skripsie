@@ -21,12 +21,17 @@ const CONFIGS: [string, Partial<typeof LAYOUT_V2B>][] = [
   ["D29b + curve", { d29b: true, treeHard: true, curve: true, order: false, fill: true, driftSplit: false }],
 ];
 
+// The D33 force pass exactly as it was built; D33b's variants have their
+// own test (relax-d33b.test.ts).
+const D33 = { method: "force" as const, edgeGuard: false, swaps: false, shortClamp: false, gapFill: false };
+
 function run(brief: GardenBrief, relax: boolean): GardenPlan[] {
-  RELAX.on = relax;
+  const saved = { ...RELAX };
+  Object.assign(RELAX, D33, { on: relax });
   try {
     return buildGardenPlanVariants(plants, brief);
   } finally {
-    RELAX.on = false;
+    Object.assign(RELAX, saved);
   }
 }
 

@@ -242,4 +242,38 @@ export const RELAX = {
   sameGroupFactor: 0.5,
   maxStepFraction: 0.5,
   grid: 20,
+  /**
+   * D33b (owner prompt, 14 Oct 2026), config only, each part a flag:
+   *   method      "force" (D33) or "lloyd" (v1: power-diagram Lloyd steps,
+   *               each plant towards the centroid of its radius-weighted
+   *               cell, sampled on about lloydSamples points)
+   *   edgeGuard   v1+: a move that crosses a bed edge is projected back
+   *               inside (so the plant slides along the wall) before the
+   *               other clamps; a move that still breaks one is shortened
+   *   swaps       v2: two plants within swapHeightCm of each other swap
+   *               places when the larger-spread one stands in the fuller
+   *               1 m cell; kept only if the 1 m-cell cover variance drops
+   *   shortClamp  v3: depth clamp +-shortDepthTol for plants under
+   *               shortHeightCm (others +-depth_tol)
+   *   gapFill     v4: in each of the gapFillCount largest gaps, one more
+   *               plant of a species already selected (n + 1 <= its H3
+   *               maximum, H5 cap held, no new species)
+   * The 20 cm, 0.15, 50 cm and 3 are the owner's numbers; lloydSamples
+   * and maxSwapTries are IMPLEMENTATION bounds. Defaults on layout-v2d:
+   * v4' - Lloyd, edge guard, swaps and gap fill, without the short-plant
+   * clamp (v3 breaks the B1223/B1172 layering test) or the drift split
+   * (breaks the 12-case) - the best variant that passes every test
+   * (reports/layout_v2d_comparison.md).
+   */
+  method: "lloyd" as "force" | "lloyd",
+  edgeGuard: true,
+  lloydSamples: 3000,
+  swaps: true,
+  swapHeightCm: 20,
+  maxSwapTries: 60,
+  shortClamp: false,
+  shortHeightCm: 50,
+  shortDepthTol: 0.15,
+  gapFill: true,
+  gapFillCount: 3,
 };

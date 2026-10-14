@@ -935,7 +935,11 @@ function planFromRun(
   }
 
   const infos = new Map(prepared.pool.map((info) => [info.id, info]));
-  const quantities = [...run.selection]
+  // D33b v4: plants the gap fill added are planted too, so they join the
+  // list; Z and H1-H7 stay those of the Stage 2/3 selection.
+  const planted = new Map(run.selection);
+  for (const [id, extra] of run.added ?? []) planted.set(id, (planted.get(id) ?? 0) + extra);
+  const quantities = [...planted]
     .map(([id, quantity]) => {
       const each = (infos.get(id) as SpeciesInfo).areaM2;
       return { id, quantity, canopyAreaEachM2: each, allocatedCanopyAreaM2: each * quantity };

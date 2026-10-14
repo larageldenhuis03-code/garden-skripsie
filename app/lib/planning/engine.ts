@@ -39,6 +39,8 @@ export type EngineRun = {
   placement: PlacementResult | null;
   /** Species the fail rule left out, in order. */
   dropped: string[];
+  /** D33b v4: plants the gap fill added after placement, per species. */
+  added: Selection;
   diagnostics: string[];
 };
 
@@ -123,7 +125,9 @@ export function runEngine(
 
   for (let attempt = 0; attempt < FAIL_RULE_MAX_RETRIES && selection; attempt += 1) {
     const current: Selection = selection;
-    const placement = placeSelection(current, infos, site, rng);
+    // D33b v4 needs the H5 cap of this selection for its gap fill.
+    const h5Cap = stateFrom(current, infos, site).rMaxEffective();
+    const placement = placeSelection(current, infos, { ...site, h5Cap }, rng);
     lastPlacement = placement;
 
     const state = stateFrom(placement.realised, infos, site);
@@ -145,6 +149,7 @@ export function runEngine(
         search: lastSearch,
         placement,
         dropped,
+        added: placement.added ?? new Map(),
         diagnostics,
       };
     }
@@ -186,6 +191,7 @@ export function runEngine(
       search: lastSearch,
       placement: lastPlacement,
       dropped,
+      added: new Map(),
       diagnostics,
     };
   }

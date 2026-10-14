@@ -16,7 +16,7 @@ import {
   RELAX,
   ROW_PITCH_M,
 } from "./engineConfig.ts";
-import { relaxLayout, type RelaxPlant } from "./relax.ts";
+import { emptyGaps, relaxLayout, type RelaxPlant } from "./relax.ts";
 import { canFormWindbreak, type Selection } from "./stage2.ts";
 
 /**
@@ -49,7 +49,7 @@ export type PlacementCheck = {
   detail: string;
 };
 
-export type Placement = CanopyPlacement & { layer: LayerId; windbreakRow?: boolean };
+export type Placement = CanopyPlacement & { layer: LayerId; windbreakRow?: boolean; gapFill?: boolean };
 
 export type PlacementResult = {
   status: "complete" | "failed";
@@ -61,6 +61,9 @@ export type PlacementResult = {
   layout: RectangularLayout;
   profile: WindProfile;
   checks: PlacementCheck[];
+  /** D33b v4: plants the gap fill added, per species. Not in `realised`,
+   * which stays the Stage 2/3 selection that Z and H1-H7 are scored on. */
+  added?: Selection;
 };
 
 export type PlacementSite = {
@@ -78,6 +81,9 @@ export type PlacementSite = {
    * against the current one through the real placer rather than a copy.
    */
   bands?: Partial<Record<LayerId, { lo: number; hi: number }>>;
+  /** D33b v4: the H5 cap (r_max_effective) the gap fill must keep; the
+   * engine passes it. Without it the gap fill does not run. */
+  h5Cap?: number;
   /** Which edge the gardener looks from, and therefore which way the
    * layers step up in height. The rulebook assumes north, so that stays
    * the default. It moves ONLY the height ordering: the windward row and
@@ -173,6 +179,9 @@ const LAYER_ORDER: LayerId[] = ["L1", "L2", "L3", "L4", "L5", "L6", "L7"];
  * unlucky early spot can block a group that would otherwise fit. The whole
  * layer build is retried with growing randomness in the soft preferences
  * before the rulebook's fallbacks (shrink, then drop) are used. */
+const placedByStage4 = (result: PlacementResult): number =>
+  result.layout.placements.filter((p) => !(p as Placement).gapFill).length;
+
 export function placeSelection(
   selection: Selection,
   infos: ReadonlyMap<string, SpeciesInfo>,
@@ -193,7 +202,9 @@ export function placeSelection(
     if (
       !best ||
       (result.status === "complete" && best.status !== "complete") ||
-      (result.status === best.status && result.layout.placements.length > best.layout.placements.length)
+      // Plants Stage 4 placed itself: D33b gap-fill additions must not
+      // decide which restart is kept.
+      (result.status === best.status && placedByStage4(result) > placedByStage4(best))
     ) {
       best = result;
     }
@@ -213,6 +224,8 @@ function placeOnce(
   const profile = windProfile(site);
   const placed: Placement[] = [];
   const realised: Selection = new Map();
+  /** D33b v4: plants added by the gap fill (not in realised). */
+  const added: Selection = new Map();
   const checks: PlacementCheck[] = [];
   const diagnostics: string[] = [];
   /** Back-layer species that used the D28 middle-band fallback. */
@@ -883,6 +896,7 @@ function placeOnce(
         target,
         tree: info.types.includes("tree"),
         shade: info.shade,
+        heightCm: info.heightCm,
       };
     });
     const result = relaxLayout(plants, {
@@ -904,8 +918,58 @@ function placeOnce(
       });
     }
     diagnostics.push(
-      `D33 relax: ${result.accepted ? "accepted" : "rejected"}; patch ${result.patchBefore.toFixed(3)} -> ${result.patchAfter.toFixed(3)}; median move ${result.medianMoveCm.toFixed(1)} cm; moved ${result.movedCount} plants, median ${result.medianMovedCm.toFixed(1)} cm; iterations ${result.iterations}; target gap ${(result.targetGapM * 100).toFixed(1)} cm; ${result.reason}`,
+      `D33 relax: ${result.accepted ? "accepted" : "rejected"}; patch ${result.patchBefore.toFixed(3)} -> ${result.patchAfter.toFixed(3)}; median move ${result.medianMoveCm.toFixed(1)} cm; moved ${result.movedCount} plants, median ${result.medianMovedCm.toFixed(1)} cm; swaps ${result.swaps ?? 0}; iterations ${result.iterations}; target gap ${(result.targetGapM * 100).toFixed(1)} cm; ${result.reason}`,
     );
+    if (RELAX.gapFill && site.h5Cap !== undefined) gapFill(site.h5Cap);
+  }
+
+  /** D33b v4: in each of the gapFillCount largest gaps, one more plant of a
+   * species already selected, at the roomiest point of the gap that one
+   * fits. n + 1 must stay within the species' H3 maximum and its share
+   * within the H5 cap; no new species, no feature plant (H4), no climber,
+   * no extra windbreak plant. The plant must not touch any other (gap >= 0,
+   * so P2 and P5 hold), must keep every hard rule and must stand within
+   * its depth tolerance. */
+  function gapFill(h5Cap: number): void {
+    const counts = new Map(realised);
+    let total = [...counts.values()].reduce((s, n) => s + n, 0);
+    const candidates = [...counts.keys()]
+      .map((id) => infos.get(id) as SpeciesInfo)
+      .filter((info) => !info.feature && info.layer !== "L2" && info.id !== windbreakId)
+      .sort((a, b) => b.diameterM - a.diameterM || a.id.localeCompare(b.id));
+    const gaps = emptyGaps(placed.map((p) => ({ x: p.xM, y: p.yM, r: p.radiusM })), W, L).slice(0, RELAX.gapFillCount);
+    const room = (x: number, y: number) =>
+      Math.min(x, W - x, y, L - y, ...placed.map((p) => Math.hypot(p.xM - x, p.yM - y) - p.radiusM));
+    gaps.forEach((cells, k) => {
+      const spots = cells
+        .map((c) => ({ ...c, room: room(c.x, c.y) }))
+        .sort((a, b) => b.room - a.room || a.y - b.y || a.x - b.x)
+        .slice(0, 12);
+      for (const spot of spots) {
+        for (const info of candidates) {
+          const n = counts.get(info.id) ?? 0;
+          if (n + 1 > Math.max(...info.allowedN)) continue; // H3 max
+          if ((n + 1) / (total + 1) > h5Cap + 1e-9) continue; // H5 cap
+          const r = info.diameterM / 2;
+          const x = Math.min(Math.max(spot.x, r), W - r);
+          const y = Math.min(Math.max(spot.y, r), L - r);
+          if (placed.some((p) => Math.hypot(p.xM - x, p.yM - y) < p.radiusM + r - EPS)) continue; // touches nothing
+          if (!fits(x, y, r, info) || breaksP4(info, x, y) || treeInFront(info, x, y)) continue;
+          const target = v2b ? (dStar.get(info.id) ?? null) : targetDepth(info.layer, profile);
+          if (target !== null) {
+            const tol = RELAX.shortClamp && info.heightCm < RELAX.shortHeightCm ? RELAX.shortDepthTol : RULES.stage4.depthTol;
+            const depth = v2b ? effDepthM(x, y) : viewer.depthOf(x, y);
+            if (Math.abs(depth - target * viewer.span) > tol * viewer.span + EPS) continue;
+          }
+          record(info, x, y, n, { gapFill: true });
+          counts.set(info.id, n + 1);
+          total += 1;
+          added.set(info.id, (added.get(info.id) ?? 0) + 1);
+          diagnostics.push(`D33b gap fill: added ${info.id} (${n} -> ${n + 1}) in gap ${k + 1}.`);
+          return;
+        }
+      }
+    });
   }
 
   /** D33 runs only on a layout that would be output as it stands -
@@ -919,7 +983,26 @@ function placeOnce(
     const asPlaced = finishWith(status, failedSpeciesId);
     if (!asPlaced.checks.every((check) => check.kind !== "hard" || check.pass)) return asPlaced;
     diagnostics.length = mark; // its measures line is taken again below
+    const before = placed.length;
+    const saved = placed.map((p) => ({ x: p.xM, y: p.yM }));
     relaxPlaced();
+    const markAfter = diagnostics.length;
+    const relaxed = finishWith(status, failedSpeciesId);
+    const counts = `D33 counts: before=${before}; after=${placed.length}; added=${placed.length - before}; removed=${Math.max(0, before - placed.length)}`;
+    if (relaxed.checks.every((check) => check.kind !== "hard" || check.pass)) {
+      diagnostics.push(counts);
+      return relaxed;
+    }
+    // Never a reason to fail: put the layout back exactly as placed.
+    diagnostics.length = markAfter;
+    placed.length = before;
+    saved.forEach((pos, k) => {
+      placed[k].xM = pos.x;
+      placed[k].yM = pos.y;
+    });
+    added.clear();
+    diagnostics.push("D33: a hard check failed after relaxation, so the layout as placed is kept.");
+    diagnostics.push(`D33 counts: before=${before}; after=${placed.length}; added=0; removed=0`);
     return finishWith(status, failedSpeciesId);
   }
 
@@ -980,6 +1063,7 @@ function placeOnce(
       status,
       failedSpeciesId,
       realised,
+      added: new Map(added),
       profile,
       checks: allChecks,
       layout: {
