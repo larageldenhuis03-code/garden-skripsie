@@ -181,8 +181,11 @@ export function placeSelection(
   rng: () => number,
 ): PlacementResult {
   let best: PlacementResult | null = null;
+  // D30 R8: one asymmetry a ~ U(-asym_max, asym_max) per plan seed, drawn
+  // only when the curve is on (so it never shifts the random stream otherwise).
+  const asym = LAYOUT_V2.curve ? (rng() * 2 - 1) * RULES.stage4.heightBands.curveAsymMax : 0;
   for (let attempt = 0; attempt < PLACEMENT.restarts; attempt += 1) {
-    const result = placeOnce(selection, infos, site, rng, attempt * PLACEMENT.noiseStep);
+    const result = placeOnce(selection, infos, site, rng, attempt * PLACEMENT.noiseStep, asym);
     const shrunk = [...selection].some(([id, n]) => (result.realised.get(id) ?? 0) < n);
     if (result.status === "complete" && !shrunk) return result;
     if (
@@ -202,6 +205,7 @@ function placeOnce(
   site: PlacementSite,
   rng: () => number,
   noise: number,
+  asym = 0,
 ): PlacementResult {
   const { widthM: W, depthM: L } = site;
   const profile = windProfile(site);
@@ -327,6 +331,40 @@ function placeOnce(
   }
   /** Depth of a point from the viewing edge, as a fraction of the bed. */
   const depthFraction = (x: number, y: number) => viewer.depthOf(x, y) / viewer.span;
+  // D30 R8: curved band edges. d_eff = d + k_s u^2, u = |x - x_c| / (W/2)
+  // along the viewing edge, k_s = k(1 + a) on the left half, k(1 - a) on
+  // the right. Used for band membership and depth scoring; the hard rules
+  // keep the real depth.
+  const curveK = LAYOUT_V2.curve ? hb.curveK : 0;
+  const curveLift = (across: number): number => {
+    if (!curveK || viewer.across <= 0) return 0;
+    const c = viewer.across / 2;
+    const u = Math.abs(across - c) / c;
+    return (across < c ? curveK * (1 + asym) : curveK * (1 - asym)) * u * u;
+  };
+  const effDepth = (x: number, y: number) => depthFraction(x, y) + curveLift(viewer.acrossOf(x, y));
+  const BAND_ORDER: BandName[] = ["front", "middle", "back"];
+  const bandAt = (d: number): BandName => (d < hb.edgeFrontMid ? "front" : d < hb.edgeMidBack ? "middle" : "back");
+  /** R10: the heights each band is meant for. */
+  const inRange = (h: number, band: BandName) =>
+    band === "front" ? h <= hb.hFrontMax : band === "middle" ? h >= hb.hMiddleMin && h <= hb.hMiddleMax : h >= hb.hBackMin;
+  /** R11 zones in sweep order: back corners, sides, back centre, middle,
+   * front centre. "Corners" and "sides" are the outer thirds of the width
+   * (the same thirds P17 balances). */
+  const zoneOf = (x: number, y: number): number => {
+    const across = viewer.acrossOf(x, y);
+    const outer = viewer.across > 0 && Math.abs(across - viewer.across / 2) >= viewer.across / 6;
+    const b = bandAt(effDepth(x, y));
+    return outer ? (b === "back" ? 0 : 1) : b === "back" ? 2 : b === "middle" ? 3 : 4;
+  };
+  /** R12: a 3 x 3 grid over the bed, for measuring only. */
+  const cellOf = (x: number, y: number): number => {
+    const col = Math.min(2, Math.floor((viewer.acrossOf(x, y) / viewer.across) * 3));
+    const row = Math.min(2, Math.floor(depthFraction(x, y) * 3));
+    return row * 3 + col;
+  };
+  /** Plants that met no modifier and took their skeleton position (R15). */
+  const modifierFallbacks = new Set<string>();
   // Hard rules, before anything else (R15): R2 nothing over h_back_min
   // centred in the front band; R14 a feature plant over h_front_max never in
   // the front band; R6 grasses and restios over h_grass_front_half_max stay
@@ -600,7 +638,10 @@ function placeOnce(
           : band
             ? lo + rng() * Math.max(0, hi - lo)
             : r + rng() * Math.max(0, axis.span - 2 * r);
-        raw.push(axis.pointAt(depth, across));
+        // With the curve on, the draw is a d_eff depth; the real depth sits
+        // that much nearer the viewer at the sides.
+        const real = band ? Math.min(Math.max(depth - curveLift(across) * axis.span, r), axis.span - r) : depth;
+        raw.push(axis.pointAt(real, across));
       }
       // Contact points: around the drift for drift members, else anywhere.
       const near = drift.length > 0
@@ -615,12 +656,45 @@ function placeOnce(
     // in the depths it is allowed; if no spot there fits, choose() returns
     // null and the existing fail rule takes over.
     const [allowLo, allowHi] = band ? allowedFor(info, band, fillPass) : [0, 1];
-    const inAllowed = (x: number, y: number) => {
-      const d = depthFraction(x, y);
-      return d >= allowLo - 1e-9 && d <= allowHi + 1e-9;
+    const inAllowedAt = (d: number) => d >= allowLo - 1e-9 && d <= allowHi + 1e-9;
+    // The skeleton: straight bands, the real depth.
+    const skeletonOk = (x: number, y: number) => !band || inAllowedAt(depthFraction(x, y));
+    // The modifiers (D30): curved membership (R8), straddle (R9), shares (R10).
+    const h = heightOf(info);
+    const bandCounts = new Map<BandName, { inRange: number; total: number }>();
+    if (LAYOUT_V2.shares) {
+      for (const b of BAND_ORDER) bandCounts.set(b, { inRange: 0, total: 0 });
+      for (const p of placed) {
+        const hp = infos.get(p.plantId)?.heightCm ?? 0;
+        const c = bandCounts.get(bandAt(effDepth(p.xM, p.yM))) as { inRange: number; total: number };
+        c.total += 1;
+        if (inRange(hp, bandAt(effDepth(p.xM, p.yM)))) c.inRange += 1;
+      }
+    }
+    const modifiersOk = (x: number, y: number): boolean => {
+      const de = effDepth(x, y);
+      if (band && !inAllowedAt(de)) return false; // R8: membership by d_eff
+      if (LAYOUT_V2.straddle && band) {
+        const idx = BAND_ORDER.indexOf(band);
+        const reach = BAND_EDGES[BAND_ORDER[Math.max(0, idx - hb.canopyOverlapMax)]][0];
+        if (de - r / viewer.span < reach - 1e-9) return false; // R9
+      }
+      if (LAYOUT_V2.shares && h !== null) {
+        const b = bandAt(de);
+        if (!inRange(h, b)) {
+          const ib = BAND_ORDER.indexOf(b);
+          const adjacent = BAND_ORDER.some((o, io) => Math.abs(io - ib) === 1 && inRange(h, o));
+          if (!adjacent) return false;
+          if (b === "front" && h > hb.hBackMin) return false;
+          const c = bandCounts.get(b) as { inRange: number; total: number };
+          if (c.inRange / (c.total + 1) < hb.shareMin - 1e-9) return false; // R10
+        }
+      }
+      return true;
     };
 
     let best: { x: number; y: number; pref: number } | null = null;
+    const scored: { x: number; y: number; pref: number; modOk: boolean; zone: number; cell: number }[] = [];
     const cx = drift.length > 0 ? drift.reduce((sum, p) => sum + p.xM, 0) / drift.length : 0;
     const cy = drift.length > 0 ? drift.reduce((sum, p) => sum + p.yM, 0) / drift.length : 0;
     const scale = Math.max(W, L);
@@ -670,7 +744,8 @@ function placeOnce(
       const { x, y } = raw[index];
       if (!fits(x, y, r, info) || breaksP4(info, x, y)) continue;
       if (!hardOk(info, x, y)) continue; // R2, R14, R6
-      if (band && !inAllowed(x, y)) continue; // skeleton
+      const modOk = modifiersOk(x, y);
+      if (!modOk && !skeletonOk(x, y)) continue; // neither the curved nor the straight band
       let pref = rng() * (1e-3 + noise); // seeded tie-break; wider on restarts
       // contact_bonus (D26, rulebook): a snug contact spot packs the bed,
       // but the preference also pulls plants into clumps. It was a bare
@@ -685,7 +760,7 @@ function placeOnce(
         }
       }
       if (target !== null) {
-        const off = Math.abs(axis.depthOf(x, y) - target * axis.span);
+        const off = Math.abs((band ? effDepth(x, y) * axis.span : axis.depthOf(x, y)) - target * axis.span);
         pref -= off / axis.span + 2 * Math.max(0, off - tol) / axis.span; // depth target +- depth_tol
       }
       if (drift.length > 0) {
@@ -706,8 +781,32 @@ function placeOnce(
       if (site.windSite > 0 && inWindwardBand(x, y)) {
         pref += info.windres ? 0.5 : -0.5; // P13: exposed band takes windres forms
       }
-      if (!best || pref > best.pref) best = { x, y, pref };
+      scored.push({ x, y, pref, modOk, zone: zoneOf(x, y), cell: cellOf(x, y) });
     }
+    if (scored.length === 0) return null;
+    // R15: modifiers first; if none can be met, the skeleton position.
+    let pool = scored.filter((s) => s.modOk);
+    if (pool.length === 0) {
+      pool = scored;
+      if (!modifierFallbacks.has(info.id)) {
+        modifierFallbacks.add(info.id);
+        diagnostics.push(`D30: ${info.id} could not meet the band modifiers, so it took its skeleton position (R15).`);
+      }
+    }
+    // R11: a group's first plant takes the earliest zone of the sweep that
+    // still has room; its group then clusters round it as before.
+    if (LAYOUT_V2.order && d29 && drift.length === 0 && !fillPass) {
+      const first = Math.min(...pool.map((s) => s.zone));
+      pool = pool.filter((s) => s.zone === first);
+    }
+    // R12: the fill pass starts each group in the emptiest of 9 cells.
+    if (LAYOUT_V2.fill && d29 && fillPass && drift.length === 0) {
+      const canopy = new Array<number>(9).fill(0);
+      for (const p of placed) canopy[cellOf(p.xM, p.yM)] += Math.PI * p.radiusM ** 2;
+      const emptiest = Math.min(...pool.map((s) => canopy[s.cell]));
+      pool = pool.filter((s) => canopy[s.cell] === emptiest);
+    }
+    for (const s of pool) if (!best || s.pref > best.pref) best = { x: s.x, y: s.y, pref: s.pref };
     return best;
   };
 
@@ -830,6 +929,37 @@ function placeOnce(
   }
 
   function finish(status: "complete" | "failed", failedSpeciesId: string | null): PlacementResult {
+    if (d29) {
+      // layout-v2 measures, for the comparison (one parseable line).
+      let straddling = 0;
+      const perBand = new Map<BandName, { inRange: number; out: number; farOut: number; tallFront: number }>(
+        BAND_ORDER.map((b) => [b, { inRange: 0, out: 0, farOut: 0, tallFront: 0 }]),
+      );
+      for (const p of placed) {
+        const b = bandOf.get(p.plantId);
+        const de = effDepth(p.xM, p.yM);
+        if (b && de - p.radiusM / viewer.span < BAND_EDGES[b][0] - 1e-9) straddling += 1;
+        const hp = infos.get(p.plantId)?.heightCm ?? 0;
+        const at = bandAt(de);
+        const c = perBand.get(at) as { inRange: number; out: number; farOut: number; tallFront: number };
+        if (inRange(hp, at)) c.inRange += 1;
+        else {
+          c.out += 1;
+          const ia = BAND_ORDER.indexOf(at);
+          if (!BAND_ORDER.some((o, io) => Math.abs(io - ia) === 1 && inRange(hp, o))) c.farOut += 1;
+        }
+        if (at === "front" && hp > hb.hBackMin) c.tallFront += 1;
+      }
+      let shareViolations = 0;
+      for (const c of perBand.values()) {
+        const total = c.inRange + c.out;
+        if (total > 0 && c.inRange / total < hb.shareMin - 1e-9) shareViolations += 1;
+        shareViolations += c.farOut + c.tallFront;
+      }
+      diagnostics.push(
+        `layout-v2 measures: tiebreaks=${tiebroken.length}; fallbacks=${modifierFallbacks.size}; straddling=${straddling}; shareViolations=${shareViolations}; asym=${asym.toFixed(3)}`,
+      );
+    }
     // P5 (hard): nothing overlapping a tree canopy unless it takes shade.
     // Enforced during placement (P2 now allows a small overlap); re-checked
     // here on the finished layout.

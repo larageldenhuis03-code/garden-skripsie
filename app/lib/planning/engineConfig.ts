@@ -185,11 +185,11 @@ export const CLIMBERS_NEED_L1_HOST = true;
 export const LAYOUT_V2 = {
   d29: true,
   inBandGradient: true,
-  curve: false,
-  straddle: false,
-  shares: false,
-  order: false,
-  fill: false,
+  curve: true,
+  straddle: true,
+  shares: true,
+  order: true,
+  fill: true,
 };
 
 export const PLACEMENT = {
