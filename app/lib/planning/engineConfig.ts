@@ -183,3 +183,42 @@ export const PLACEMENT = {
   /** IMPLEMENTATION: share of random draws inside the depth band. */
   inBandShare: 0.6,
 } as const;
+
+/**
+ * layout-v2b (owner prompt, 14 Oct 2026). Config flags, one per part, so
+ * each can be measured on its own. Rulebook values (band_edge_front_mid,
+ * band_curve_k, band_curve_asym_max, depth_tol) are read from RULES; the
+ * flags only switch the parts on.
+ *
+ *   d29b        D29b part 1: relative height gradient. Each species'
+ *               target depth is d* = (r - 0.5) / n, r its mean height rank
+ *               among the plan's plants (climbers excluded), n their count.
+ *               Soft, through the existing depth scoring with depth_tol.
+ *               Replaces the layer depth targets and the D28 band fallback.
+ *   treeHard    D29b part 3: no plant typed "tree" centred at a depth
+ *               (d_eff when the curve is on) less than band_edge_front_mid.
+ *               The only hard depth rule.
+ *   curve       D29b part 2: depth compared as d_eff = d + k u^2, with the
+ *               D30 asymmetry (one per plan seed).
+ *   order       D29b part 4: groups placed back -> front by d*, larger
+ *               spread first; each group's first plant takes the earliest
+ *               zone of the sweep back corners -> sides -> back centre ->
+ *               middle -> front centre near its target depth.
+ *   fill        D29b part 5: each group's first plant starts in the
+ *               emptiest of 9 cells near its target depth. All selected
+ *               plants are eligible; nothing is added (H3/H5 unchanged).
+ *   driftSplit  D29b part 6 (config-only test): an H3 group of more than 3
+ *               plants is placed as 2 drifts.
+ *
+ * Defaults are config (o) - parts 1-5 - the configuration that passed the
+ * time box (reports/layout_v2b_comparison.md). driftSplit stays off: it
+ * breaks the 12-case layering test.
+ */
+export const LAYOUT_V2B = {
+  d29b: true,
+  treeHard: true,
+  curve: true,
+  order: true,
+  fill: true,
+  driftSplit: false,
+};

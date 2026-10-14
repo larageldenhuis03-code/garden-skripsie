@@ -9,6 +9,7 @@ import { RULES, type LayerId } from "./rules.ts";
 import type { ViewingEdge } from "./brief.ts";
 import {
   CLIMBERS_NEED_L1_HOST,
+  LAYOUT_V2B,
   P17_BALANCE_WEIGHT,
   P2_OVERLAP_TOLERANCE,
   PLACEMENT,
@@ -177,8 +178,14 @@ export function placeSelection(
   rng: () => number,
 ): PlacementResult {
   let best: PlacementResult | null = null;
+  // D29b part 2 (D30's asymmetry): one a ~ U(-asym_max, asym_max) per plan
+  // seed, drawn only when the curve is on, so the random stream is
+  // untouched otherwise.
+  const asym = LAYOUT_V2B.d29b && LAYOUT_V2B.curve
+    ? (rng() * 2 - 1) * RULES.stage4.heightBands.curveAsymMax
+    : 0;
   for (let attempt = 0; attempt < PLACEMENT.restarts; attempt += 1) {
-    const result = placeOnce(selection, infos, site, rng, attempt * PLACEMENT.noiseStep);
+    const result = placeOnce(selection, infos, site, rng, attempt * PLACEMENT.noiseStep, asym);
     const shrunk = [...selection].some(([id, n]) => (result.realised.get(id) ?? 0) < n);
     if (result.status === "complete" && !shrunk) return result;
     if (
@@ -198,6 +205,7 @@ function placeOnce(
   site: PlacementSite,
   rng: () => number,
   noise: number,
+  asym = 0,
 ): PlacementResult {
   const { widthM: W, depthM: L } = site;
   const profile = windProfile(site);
@@ -212,6 +220,71 @@ function placeOnce(
   const inWindwardBand = (x: number, y: number): boolean =>
     y > L - ROW_PITCH_M || x > W - ROW_PITCH_M;
   const isTree = (plantId: string) => infos.get(plantId)?.types.includes("tree") ?? false;
+
+  // ------------------------------------------------------------ D29b
+  const v2b = LAYOUT_V2B.d29b;
+  const hb = RULES.stage4.heightBands;
+  const viewer = viewingAxis(site.frontEdge, W, L);
+  /** Part 1: d* = (r - 0.5) / n per species. r is the mean height rank of
+   * its plants among all the plan's plants bar climbers (ties share their
+   * mean rank), n the number of those plants. Short plants rank first,
+   * so they are nearest the viewer. */
+  const dStar = new Map<string, number>();
+  if (v2b) {
+    const ranked = [...selection]
+      .map(([id, n]) => ({ info: infos.get(id) as SpeciesInfo, n }))
+      .filter((entry) => entry.info.layer !== "L2" && entry.n > 0)
+      .sort((left, right) => left.info.heightCm - right.info.heightCm);
+    const total = ranked.reduce((sum, entry) => sum + entry.n, 0);
+    let start = 0;
+    for (let i = 0; i < ranked.length; ) {
+      let j = i;
+      let m = 0;
+      while (j < ranked.length && ranked[j].info.heightCm === ranked[i].info.heightCm) {
+        m += ranked[j].n;
+        j += 1;
+      }
+      const meanRank = start + (m + 1) / 2;
+      for (let k = i; k < j; k += 1) dStar.set(ranked[k].info.id, (meanRank - 0.5) / total);
+      start += m;
+      i = j;
+    }
+  }
+  /** Part 2: the curve lift k_s u^2 (a fraction of the depth), with
+   * u = |across - centre| / (across / 2); k_s = k(1 + a) on the left half
+   * and k(1 - a) on the right. Zero when the curve is off. */
+  const curveK = v2b && LAYOUT_V2B.curve ? hb.curveK : 0;
+  const curveLift = (across: number): number => {
+    if (!curveK || viewer.across <= 0) return 0;
+    const c = viewer.across / 2;
+    const u = Math.abs(across - c) / c;
+    return (across < c ? curveK * (1 + asym) : curveK * (1 - asym)) * u * u;
+  };
+  /** Depth from the viewer in metres, as compared with d*: d_eff with the
+   * curve on, the plain depth otherwise. */
+  const effDepthM = (x: number, y: number): number =>
+    viewer.depthOf(x, y) + curveLift(viewer.acrossOf(x, y)) * viewer.span;
+  /** Part 3, the only hard depth rule: no tree centred in front of
+   * band_edge_front_mid. */
+  const treeInFront = (info: SpeciesInfo, x: number, y: number): boolean =>
+    v2b && LAYOUT_V2B.treeHard && info.types.includes("tree") &&
+    effDepthM(x, y) < hb.edgeFrontMid * viewer.span - EPS;
+  /** Parts 4 and 5: zones of the sweep, and the 3 x 3 cells. The band
+   * edges only draw the zones; nothing is held to a band. */
+  const zoneOf = (x: number, y: number): number => {
+    const across = viewer.acrossOf(x, y);
+    const outer = viewer.across > 0 && Math.abs(across - viewer.across / 2) >= viewer.across / 6;
+    const d = effDepthM(x, y) / viewer.span;
+    const back = d >= hb.edgeMidBack;
+    if (outer) return back ? 0 : 1; // back corners, then sides
+    return back ? 2 : d >= hb.edgeFrontMid ? 3 : 4; // back centre, middle, front centre
+  };
+  const cellOf = (x: number, y: number): number => {
+    const col = Math.min(2, Math.floor((viewer.acrossOf(x, y) / viewer.across) * 3));
+    const row = Math.min(2, Math.floor((viewer.depthOf(x, y) / viewer.span) * 3));
+    return row * 3 + col;
+  };
+  let driftSplits = 0;
 
   const fits = (x: number, y: number, r: number, info?: SpeciesInfo): boolean => {
     if (x < r - EPS || x > W - r + EPS || y < r - EPS || y > L - r + EPS) return false; // P1
@@ -315,10 +388,19 @@ function placeOnce(
         }
       }
       let sequence = 0;
+      // D29b part 3: a row place the tree rule removes still counts as
+      // taken, so the plant meant for it joins the structure layer (placed
+      // by height, so at the back) rather than spilling into a stacked row
+      // off the windward edge. Zero unless a tree is in the row.
+      let forgone = 0;
       const edgesUsed = new Set<"south" | "east">();
       for (const spot of spots) {
-        if (sequence >= n) break;
+        if (sequence + forgone >= n) break;
         if (!fits(spot.x, spot.y, d / 2, chosen)) continue;
+        if (treeInFront(chosen, spot.x, spot.y)) {
+          forgone += 1;
+          continue;
+        }
         record(chosen, spot.x, spot.y, sequence, { windbreakRow: true });
         edgesUsed.add(spot.edge);
         sequence += 1;
@@ -454,8 +536,14 @@ function placeOnce(
     // Default: the rulebook's single band, target +- depth_tol. A band
     // override (test seam) supplies its own interval instead; the centre
     // and half-width are read off it so the maths below is identical.
-    const override = targetDepthFraction === null ? undefined : site.bands?.[info.layer];
-    const target = override ? (override.lo + override.hi) / 2 : targetDepthFraction;
+    const override = v2b || targetDepthFraction === null ? undefined : site.bands?.[info.layer];
+    // D29b part 1: the relative target replaces the layer target (climbers
+    // keep following their host).
+    const target = v2b
+      ? info.layer === "L2" ? null : (dStar.get(info.id) ?? null)
+      : override ? (override.lo + override.hi) / 2 : targetDepthFraction;
+    /** Depth as compared with the target: d_eff under D29b, else plain. */
+    const depthM = (x: number, y: number) => (v2b ? effDepthM(x, y) : axis.depthOf(x, y));
     const halfWidth = override ? (override.hi - override.lo) / 2 : RULES.stage4.depthTol;
     const tol = halfWidth * axis.span;
     const l1 = placed.filter((p) => p.layer === "L1");
@@ -487,7 +575,7 @@ function placeOnce(
         const inBand = target !== null && k < PLACEMENT.randomDraws * PLACEMENT.inBandShare;
         const across = r + rng() * Math.max(0, axis.across - 2 * r);
         const depth = inBand
-          ? Math.min(Math.max(target * axis.span + (rng() * 2 - 1) * tol, r), axis.span - r)
+          ? Math.min(Math.max(target * axis.span + (rng() * 2 - 1) * tol - (v2b ? curveLift(across) * axis.span : 0), r), axis.span - r)
           : r + rng() * Math.max(0, axis.span - 2 * r);
         raw.push(axis.pointAt(depth, across));
       }
@@ -509,6 +597,7 @@ function placeOnce(
     // host and band-less layers (L2, L3, L7) are untouched.
     const middle = targetDepth("L4", profile);
     if (
+      !v2b &&
       info.layer === "L1" &&
       target !== null &&
       middle !== null &&
@@ -583,7 +672,7 @@ function placeOnce(
     // contact_bonus.
     const sweep = RULES.stage4.sweepWeight;
     const inDepthBand = (x: number, y: number) =>
-      target === null || Math.abs(axis.depthOf(x, y) - target * axis.span) <= tol + EPS;
+      target === null || Math.abs(depthM(x, y) - target * axis.span) <= tol + EPS;
     let startIndex = 0;
     if (sweep > 0 && Number.isFinite(firstContact)) {
       for (let index = firstContact; index < raw.length; index += 1) {
@@ -594,9 +683,11 @@ function placeOnce(
         }
       }
     }
+    const scored: { x: number; y: number; pref: number }[] = [];
     for (let index = startIndex; index < raw.length; index += 1) {
       const { x, y } = raw[index];
       if (!fits(x, y, r, info) || breaksP4(info, x, y)) continue;
+      if (treeInFront(info, x, y)) continue; // D29b part 3 (hard)
       let pref = rng() * (1e-3 + noise); // seeded tie-break; wider on restarts
       // contact_bonus (D26, rulebook): a snug contact spot packs the bed,
       // but the preference also pulls plants into clumps. It was a bare
@@ -611,7 +702,7 @@ function placeOnce(
         }
       }
       if (target !== null) {
-        const off = Math.abs(axis.depthOf(x, y) - target * axis.span);
+        const off = Math.abs(depthM(x, y) - target * axis.span);
         pref -= off / axis.span + 2 * Math.max(0, off - tol) / axis.span; // depth target +- depth_tol
       }
       if (drift.length > 0) {
@@ -632,8 +723,26 @@ function placeOnce(
       if (site.windSite > 0 && inWindwardBand(x, y)) {
         pref += info.windres ? 0.5 : -0.5; // P13: exposed band takes windres forms
       }
-      if (!best || pref > best.pref) best = { x, y, pref };
+      scored.push({ x, y, pref });
     }
+    let pool = scored;
+    // D29b parts 4 and 5 steer only a group's first plant, and only among
+    // spots near its target depth (all valid spots when none is near).
+    if (v2b && drift.length === 0 && target !== null && (LAYOUT_V2B.order || LAYOUT_V2B.fill)) {
+      const near = pool.filter((s) => inDepthBand(s.x, s.y));
+      if (near.length > 0) pool = near;
+      if (LAYOUT_V2B.order) {
+        const first = Math.min(...pool.map((s) => zoneOf(s.x, s.y)));
+        pool = pool.filter((s) => zoneOf(s.x, s.y) === first);
+      }
+      if (LAYOUT_V2B.fill) {
+        const canopy = new Array<number>(9).fill(0);
+        for (const p of placed) canopy[cellOf(p.xM, p.yM)] += Math.PI * p.radiusM ** 2;
+        const emptiest = Math.min(...pool.map((s) => canopy[cellOf(s.x, s.y)]));
+        pool = pool.filter((s) => canopy[cellOf(s.x, s.y)] === emptiest);
+      }
+    }
+    for (const s of pool) if (!best || s.pref > best.pref) best = s;
     return best;
   };
 
@@ -644,14 +753,38 @@ function placeOnce(
     byLayer.get(info.layer)!.push(info);
   }
 
+  const sequence: SpeciesInfo[] = [];
   for (const layer of LAYER_ORDER) {
-    const species = (byLayer.get(layer) ?? []).sort(
+    sequence.push(
+      ...(byLayer.get(layer) ?? []).sort(
+        (left, right) =>
+          Number(right.feature) - Number(left.feature) || // feature plant first
+          right.diameterM - left.diameterM ||
+          left.id.localeCompare(right.id),
+      ),
+    );
+  }
+  if (v2b && LAYOUT_V2B.order) {
+    // D29b part 4: back to front by target depth class (the zone rows),
+    // the feature plant first, then decreasing spread; climbers last so
+    // their hosts are already in place.
+    const rowOf = (info: SpeciesInfo) => {
+      const d = dStar.get(info.id) ?? 0;
+      return d >= hb.edgeMidBack ? 0 : d >= hb.edgeFrontMid ? 1 : 2;
+    };
+    sequence.sort(
       (left, right) =>
-        Number(right.feature) - Number(left.feature) || // feature plant first
+        Number(left.layer === "L2") - Number(right.layer === "L2") ||
+        rowOf(left) - rowOf(right) ||
+        Number(right.feature) - Number(left.feature) ||
         right.diameterM - left.diameterM ||
         left.id.localeCompare(right.id),
     );
-    for (const info of species) {
+  }
+
+  {
+    for (const info of sequence) {
+      const layer = info.layer;
       const wanted = selection.get(info.id) as number;
       const already = info.id === windbreakId ? (realised.get(info.id) ?? 0) : 0;
       const remaining = wanted - already;
@@ -666,7 +799,13 @@ function placeOnce(
         const start = placed.length;
         const drift: Placement[] = [];
         let ok = true;
+        // D29b part 6: a group of more than 3 may be placed as 2 drifts.
+        const splitAt = v2b && LAYOUT_V2B.driftSplit && size > 3 ? Math.ceil(size / 2) : -1;
         for (let sequence = already; sequence < size; sequence += 1) {
+          if (sequence === splitAt) {
+            drift.length = 0;
+            driftSplits += 1;
+          }
           const spot = choose(info, drift);
           if (!spot) {
             ok = false;
@@ -724,8 +863,28 @@ function placeOnce(
     const p2 = placed.every((p, index) =>
       placed.slice(index + 1).every((q) => Math.hypot(p.xM - q.xM, p.yM - q.yM) >= minCentreDistance(p.radiusM, q.radiusM) - EPS),
     );
+    const v2bChecks: PlacementCheck[] = [];
+    if (v2b) {
+      const edge = hb.edgeFrontMid * viewer.span;
+      const treesFront = placed.filter((p) => isTree(p.plantId) && effDepthM(p.xM, p.yM) < edge - EPS).length;
+      const tallFront = placed.filter(
+        (p) => (infos.get(p.plantId)?.heightCm ?? 0) >= hb.hBackMin && effDepthM(p.xM, p.yM) < edge - EPS,
+      ).length;
+      if (LAYOUT_V2B.treeHard) {
+        v2bChecks.push({
+          id: "D29b-tree",
+          kind: "hard",
+          pass: treesFront === 0,
+          detail: `No tree centred in front of ${hb.edgeFrontMid} of the depth from the viewer (${treesFront} do).`,
+        });
+      }
+      diagnostics.push(
+        `layout-v2b measures: treesFront=${treesFront}; tallFront=${tallFront}; driftSplits=${driftSplits}; asym=${asym.toFixed(3)}`,
+      );
+    }
     const allChecks: PlacementCheck[] = [
       { id: "P1", kind: "hard", pass: p1, detail: "Every plant sits fully inside the bed." },
+      ...v2bChecks,
       { id: "P2", kind: "hard", pass: p2, detail: `Plant circles overlap by no more than ${Math.round(P2_OVERLAP_TOLERANCE * 100)}% of the smaller plant's radius.` },
       ...checks,
       ...(site.windSite > 0

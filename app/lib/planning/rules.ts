@@ -95,6 +95,21 @@ export type EngineRules = {
      * spots are the contact points first, and an in-band contact spot is
      * preferred with this weight in place of contactBonus. */
     sweepWeight: number;
+    /** D29 / D30 (1_Parameters rows 143-153, 14 Oct 2026). Band edges are
+     * fractions of the bed depth from the viewing edge; heights in cm. */
+    heightBands: {
+      edgeFrontMid: number;
+      edgeMidBack: number;
+      hFrontMax: number;
+      hMiddleMin: number;
+      hMiddleMax: number;
+      hBackMin: number;
+      hGrassFrontHalfMax: number;
+      curveK: number;
+      curveAsymMax: number;
+      shareMin: number;
+      canopyOverlapMax: number;
+    };
     hedgeSpacingFormalCm: [number, number];
     hedgeSpacingInformalCm: [number, number];
     windbreakPorosity: { min: number; max: number; target: number };
