@@ -5,7 +5,6 @@ import {
   FAIL_RULE_EXCLUDE_AFTER,
   FAIL_RULE_MAX_RETRIES,
   FAIL_RULE_PACKING_CAP_STEP,
-  D32,
   H7_FOOTPRINT_CAP,
 } from "./engineConfig.ts";
 import { pickedColours } from "./stage1.ts";
@@ -20,7 +19,7 @@ import {
   type Selection,
   type SelectionEvaluation,
 } from "./stage2.ts";
-import { capacityRepair, searchSelection, type SearchTrace } from "./stage3.ts";
+import { searchSelection, type SearchTrace } from "./stage3.ts";
 import { placeSelection, type PlacementResult } from "./stage4.ts";
 
 /**
@@ -117,13 +116,6 @@ export function runEngine(
     }
     lastSearch = result.trace;
     selection = new Map(result.selection);
-    if (D32.capacity) {
-      // D32: make the selection big enough for the bed before placing it.
-      const state = stateFrom(selection, infos, searchSite);
-      const log = capacityRepair(state, available);
-      selection = state.snapshot();
-      diagnostics.push(...log);
-    }
     return true;
   };
 

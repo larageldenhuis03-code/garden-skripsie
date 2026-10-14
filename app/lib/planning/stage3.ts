@@ -1,6 +1,6 @@
 import { shuffle, type SpeciesInfo } from "./engineData.ts";
 import { RULES } from "./rules.ts";
-import { D32, T0_WORSE_FRACTION } from "./engineConfig.ts";
+import { T0_WORSE_FRACTION } from "./engineConfig.ts";
 import {
   canFormWindbreak,
   SelectionState,
@@ -333,80 +333,4 @@ export function searchSelection(
       acceptedWorse,
     },
   };
-}
-
-/**
- * D32 capacity-aware selection (owner prompt, 14 Oct 2026; engineConfig
- * D32). Applied to a finished Stage 3 selection, before placement:
- *
- *   1. selected canopy area sum n_i pi (s_i / 2)^2 >= cover_min x bed area;
- *   2. at least FILLER_SHARE_MIN of that area from plants of spread
- *      <= FILLER_SPREAD_MAX_M (gap fillers).
- *
- * While either is short: raise one group to its next allowed H3 size;
- * only when no raise is possible, add one species at its smallest allowed
- * size. While the filler share is short only fillers are raised or added.
- * Among the possible moves the one with the highest Z is taken. Every move
- * is checked exactly as the search checks its own (withinLimits: H1 or the
- * fail rule's packing cap, the H2 ceiling, H3b, H4, H5, H7, climbers; and
- * complete()), so no hard rule can break. Returns one line per move, and
- * a closing line when a target could not be met.
- */
-export function capacityRepair(state: SelectionState, pool: readonly SpeciesInfo[]): string[] {
-  const log: string[] = [];
-  const target = state.site.style.coverMin * state.site.areaM2;
-  const isFiller = (info: SpeciesInfo) => info.diameterM <= D32.FILLER_SPREAD_MAX_M + 1e-9;
-  const fillerArea = () => {
-    let area = 0;
-    for (const [id, n] of state.counts) {
-      const info = state.info(id);
-      if (isFiller(info)) area += info.areaM2 * n;
-    }
-    return area;
-  };
-  const coverShort = () => state.plantedAreaM2 < target - 1e-9;
-  const fillerShort = () => fillerArea() < D32.FILLER_SHARE_MIN * state.plantedAreaM2 - 1e-9;
-
-  for (let moves = 0; moves < D32.MAX_MOVES; moves += 1) {
-    const needFiller = fillerShort();
-    if (!needFiller && !coverShort()) return log;
-    const eligible = (info: SpeciesInfo) => !needFiller || isFiller(info);
-    let best: { info: SpeciesInfo; n: number; z: number; kind: "raise" | "add" } | null = null;
-    // Raise first: each group to its next allowed size.
-    for (const [id, n] of [...state.counts]) {
-      const info = state.info(id);
-      if (!eligible(info)) continue;
-      const next = info.allowedN.filter((size) => size > n).sort((a, b) => a - b)[0];
-      if (next === undefined) continue;
-      const move = makeSet(state, info, next);
-      const z = tryMove(state, move, true);
-      if (z === null) continue;
-      move.undo();
-      if (!best || z > best.z + 1e-12) best = { info, n: next, z, kind: "raise" };
-    }
-    // Then add: a new species at its smallest allowed size.
-    if (!best) {
-      for (const info of pool) {
-        if (state.has(info.id) || !eligible(info)) continue;
-        const n = Math.min(...info.allowedN);
-        const move = makeSet(state, info, n);
-        const z = tryMove(state, move, true);
-        if (z === null) continue;
-        move.undo();
-        if (!best || z > best.z + 1e-12) best = { info, n, z, kind: "add" };
-      }
-    }
-    if (!best) {
-      log.push(
-        needFiller
-          ? `D32: filler share ${(fillerArea() / Math.max(state.plantedAreaM2, 1e-9)).toFixed(2)} stays below ${D32.FILLER_SHARE_MIN}: no filler can be raised or added within H1-H5.`
-          : `D32: selected area ${(state.plantedAreaM2 / state.site.areaM2).toFixed(2)} x bed stays below cover_min ${state.site.style.coverMin}: nothing can be raised or added within H1-H5.`,
-      );
-      return log;
-    }
-    state.set(best.info, best.n);
-    log.push(`D32: ${best.kind === "raise" ? "raised" : "added"} ${best.info.id} to ${best.n}${needFiller ? " (filler)" : ""}.`);
-  }
-  log.push(`D32: stopped after ${D32.MAX_MOVES} moves.`);
-  return log;
 }

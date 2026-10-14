@@ -119,6 +119,34 @@ The guided fixture moved from 3 plants / 3 species to **5 / 5**, open space
 unchanged at 43%, for the reason above — re-verified by running the
 planner, not assumed.
 
+## layout-v2b: relative height gradient adopted on the branch; D32 reverted (2026-10-14)
+
+Branch `layout-v2b` (from layout-v2 after its revert), rulebook
+713f9bad5bec. The full report is `reports/layout_v2b_comparison.md`.
+
+**D29b, config (o), is the default on this branch.** Flags `LAYOUT_V2B`
+in engineConfig. It has five parts:
+- each species aims for depth d* = (rank − 0.5)/n by height, as a soft
+  target;
+- a curved front edge;
+- a hard rule: no tree centred in the front 0.35 (measured on the curve);
+- a corners-first placement order;
+- each group starts in the emptiest of nine cells.
+
+Against engine-final it holds Z (−0.0018), loses no brief, spreads plants
+more evenly, passes every test, and fixes D24 (b).
+
+Known limitations:
+- Plants ≥ 80 cm still stand in front when a plan is mostly tall,
+  because the gradient is relative.
+- The curve lets trees stand forward at the sides of the bed.
+
+The drift-split flag stays off: it breaks the 12-case test.
+
+**D32 (capacity-aware selection) was built, measured and reverted.** It
+broke two existing tests. It also missed its 25% filler target in most
+plans and raised dominance. It is kept in history as 5d1d175.
+
 ## layout-v2 height bands: built, measured, reverted (2026-10-14)
 
 Branch `layout-v2`, rulebook 713f9bad5bec. D29 (height bands) and D30 (band
