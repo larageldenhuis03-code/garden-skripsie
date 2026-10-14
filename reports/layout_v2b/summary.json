@@ -1,0 +1,582 @@
+{
+ "out": {
+  "ap": {
+   "rulebook": "713f9bad5bec",
+   "briefsFeasible": "94/101",
+   "optionsFeasible": "274/281",
+   "clean": 0.6548042704626335,
+   "medianZ": 0.9008499999999999,
+   "meanA4": 0.6998686131386863,
+   "twelve": "12/12",
+   "d24b": "FAIL",
+   "b12": "behind 4/4, out of front 0/4",
+   "patch": 0.19125,
+   "cv": 0.19675,
+   "nineMin": 0.2222,
+   "nineMed": 0.6905,
+   "tallFront": 584,
+   "treesFront": 9,
+   "treesFrontEff": "-",
+   "hardFail": 0,
+   "lost": 0,
+   "gained": 0,
+   "dropped": 108,
+   "selectedArea": 0.6366499999999999,
+   "fillers": 6,
+   "d32Short": "-",
+   "d32Moves": "-"
+  },
+  "b": {
+   "rulebook": "713f9bad5bec",
+   "briefsFeasible": "92/101",
+   "optionsFeasible": "271/280",
+   "clean": 0.37857142857142856,
+   "medianZ": 0.8865,
+   "meanA4": 0.5440594095940957,
+   "twelve": "9/12",
+   "d24b": "pass",
+   "b12": "behind 4/4, out of front 4/4",
+   "patch": 0.395,
+   "cv": 0.3902,
+   "nineMin": 0.0204,
+   "nineMed": 0.5,
+   "tallFront": 0,
+   "treesFront": 0,
+   "treesFrontEff": "-",
+   "hardFail": 0,
+   "lost": 2,
+   "gained": 0,
+   "dropped": 272,
+   "selectedArea": 0.481,
+   "fillers": 7,
+   "d32Short": "-",
+   "d32Moves": "-"
+  },
+  "m": {
+   "rulebook": "713f9bad5bec",
+   "briefsFeasible": "94/101",
+   "optionsFeasible": "276/283",
+   "clean": 0.607773851590106,
+   "medianZ": 0.90175,
+   "meanA4": 0.705291666666667,
+   "twelve": "12/12",
+   "d24b": "pass",
+   "b12": "behind 4/4, out of front 4/4",
+   "patch": 0.17875,
+   "cv": 0.17485,
+   "nineMin": 0.2857,
+   "nineMed": 0.6700999999999999,
+   "tallFront": 641,
+   "treesFront": 0,
+   "treesFrontEff": 0,
+   "hardFail": 0,
+   "lost": 0,
+   "gained": 0,
+   "dropped": 129,
+   "selectedArea": 0.6467,
+   "fillers": 6,
+   "d32Short": "-",
+   "d32Moves": "-"
+  },
+  "n": {
+   "rulebook": "713f9bad5bec",
+   "briefsFeasible": "94/101",
+   "optionsFeasible": "277/284",
+   "clean": 0.6232394366197183,
+   "medianZ": 0.9063,
+   "meanA4": 0.7124148014440428,
+   "twelve": "11/12",
+   "d24b": "pass",
+   "b12": "behind 4/4, out of front 4/4",
+   "patch": 0.16,
+   "cv": 0.1604,
+   "nineMin": 0.3095,
+   "nineMed": 0.6667,
+   "tallFront": 790,
+   "treesFront": 42,
+   "treesFrontEff": 0,
+   "hardFail": 0,
+   "lost": 0,
+   "gained": 0,
+   "dropped": 120,
+   "selectedArea": 0.6564,
+   "fillers": 6,
+   "d32Short": "-",
+   "d32Moves": "-"
+  },
+  "o": {
+   "rulebook": "713f9bad5bec",
+   "briefsFeasible": "94/101",
+   "optionsFeasible": "273/280",
+   "clean": 0.6392857142857142,
+   "medianZ": 0.899,
+   "meanA4": 0.7102249084249082,
+   "twelve": "12/12",
+   "d24b": "pass",
+   "b12": "behind 4/4, out of front 4/4",
+   "patch": 0.175,
+   "cv": 0.1895,
+   "nineMin": 0.2857,
+   "nineMed": 0.6735,
+   "tallFront": 758,
+   "treesFront": 48,
+   "treesFrontEff": 0,
+   "hardFail": 0,
+   "lost": 0,
+   "gained": 0,
+   "dropped": 117,
+   "selectedArea": 0.6502,
+   "fillers": 6,
+   "d32Short": "-",
+   "d32Moves": "-"
+  },
+  "p": {
+   "rulebook": "713f9bad5bec",
+   "briefsFeasible": "94/101",
+   "optionsFeasible": "277/284",
+   "clean": 0.6338028169014085,
+   "medianZ": 0.8996,
+   "meanA4": 0.705215523465704,
+   "twelve": "10/12",
+   "d24b": "pass",
+   "b12": "behind 4/4, out of front 4/4",
+   "patch": 0.165,
+   "cv": 0.1704,
+   "nineMin": 0.3265,
+   "nineMed": 0.6735,
+   "tallFront": 834,
+   "treesFront": 59,
+   "treesFrontEff": 0,
+   "hardFail": 0,
+   "lost": 0,
+   "gained": 0,
+   "dropped": 119,
+   "selectedArea": 0.662,
+   "fillers": 6,
+   "d32Short": "-",
+   "d32Moves": "-"
+  },
+  "q": {
+   "rulebook": "713f9bad5bec",
+   "briefsFeasible": "94/101",
+   "optionsFeasible": "278/285",
+   "clean": 0.6,
+   "medianZ": 0.89575,
+   "meanA4": 0.7199794964028778,
+   "twelve": "11/12",
+   "d24b": "pass",
+   "b12": "behind 4/4, out of front 4/4",
+   "patch": 0.16125,
+   "cv": 0.17099999999999999,
+   "nineMin": 0.3333,
+   "nineMed": 0.6819999999999999,
+   "tallFront": 804,
+   "treesFront": 56,
+   "treesFrontEff": 0,
+   "hardFail": 0,
+   "lost": 0,
+   "gained": 0,
+   "dropped": 138,
+   "selectedArea": 0.6553,
+   "fillers": 9,
+   "d32Short": "27 cover / 247 filler",
+   "d32Moves": 4021
+  },
+  "qo": {
+   "rulebook": "713f9bad5bec",
+   "briefsFeasible": "94/101",
+   "optionsFeasible": "276/283",
+   "clean": 0.5830388692579506,
+   "medianZ": 0.89525,
+   "meanA4": 0.7216423913043478,
+   "twelve": "11/12",
+   "d24b": "pass",
+   "b12": "behind 4/4, out of front 4/4",
+   "patch": 0.17125,
+   "cv": 0.1669,
+   "nineMin": 0.3061,
+   "nineMed": 0.6939,
+   "tallFront": 760,
+   "treesFront": 53,
+   "treesFrontEff": 0,
+   "hardFail": 0,
+   "lost": 0,
+   "gained": 0,
+   "dropped": 138,
+   "selectedArea": 0.6547,
+   "fillers": 10,
+   "d32Short": "28 cover / 244 filler",
+   "d32Moves": 4115
+  }
+ },
+ "tops": [
+  {
+   "k": "ap",
+   "n": 274,
+   "top": [
+    [
+     "B1604",
+     41
+    ],
+    [
+     "B0772",
+     31
+    ],
+    [
+     "B1712",
+     30
+    ],
+    [
+     "B2697",
+     30
+    ],
+    [
+     "B0376",
+     29
+    ],
+    [
+     "B2715",
+     28
+    ],
+    [
+     "B1125",
+     27
+    ],
+    [
+     "B2501",
+     26
+    ],
+    [
+     "B1005",
+     24
+    ],
+    [
+     "B2481",
+     24
+    ]
+   ]
+  },
+  {
+   "k": "b",
+   "n": 271,
+   "top": [
+    [
+     "B1604",
+     58
+    ],
+    [
+     "B2697",
+     34
+    ],
+    [
+     "B0772",
+     33
+    ],
+    [
+     "B2649",
+     28
+    ],
+    [
+     "B1125",
+     27
+    ],
+    [
+     "B0291",
+     26
+    ],
+    [
+     "B2160",
+     26
+    ],
+    [
+     "B0376",
+     25
+    ],
+    [
+     "B2501",
+     25
+    ],
+    [
+     "B2399",
+     22
+    ]
+   ]
+  },
+  {
+   "k": "m",
+   "n": 276,
+   "top": [
+    [
+     "B1604",
+     39
+    ],
+    [
+     "B0772",
+     38
+    ],
+    [
+     "B2697",
+     35
+    ],
+    [
+     "B1712",
+     31
+    ],
+    [
+     "B2715",
+     27
+    ],
+    [
+     "B0376",
+     26
+    ],
+    [
+     "B2481",
+     25
+    ],
+    [
+     "B2649",
+     25
+    ],
+    [
+     "B2501",
+     24
+    ],
+    [
+     "B1125",
+     23
+    ]
+   ]
+  },
+  {
+   "k": "n",
+   "n": 277,
+   "top": [
+    [
+     "B1604",
+     42
+    ],
+    [
+     "B2697",
+     36
+    ],
+    [
+     "B0772",
+     35
+    ],
+    [
+     "B1712",
+     31
+    ],
+    [
+     "B2715",
+     29
+    ],
+    [
+     "B0376",
+     27
+    ],
+    [
+     "B2649",
+     26
+    ],
+    [
+     "B1125",
+     25
+    ],
+    [
+     "B0291",
+     24
+    ],
+    [
+     "B2501",
+     23
+    ]
+   ]
+  },
+  {
+   "k": "o",
+   "n": 273,
+   "top": [
+    [
+     "B1604",
+     41
+    ],
+    [
+     "B0772",
+     40
+    ],
+    [
+     "B2697",
+     38
+    ],
+    [
+     "B0291",
+     28
+    ],
+    [
+     "B1712",
+     28
+    ],
+    [
+     "B0376",
+     27
+    ],
+    [
+     "B2481",
+     25
+    ],
+    [
+     "B2649",
+     22
+    ],
+    [
+     "B1005",
+     21
+    ],
+    [
+     "B0616",
+     19
+    ]
+   ]
+  },
+  {
+   "k": "p",
+   "n": 277,
+   "top": [
+    [
+     "B1604",
+     44
+    ],
+    [
+     "B2697",
+     36
+    ],
+    [
+     "B0772",
+     34
+    ],
+    [
+     "B1712",
+     32
+    ],
+    [
+     "B2481",
+     28
+    ],
+    [
+     "B2160",
+     25
+    ],
+    [
+     "B0291",
+     24
+    ],
+    [
+     "B0376",
+     24
+    ],
+    [
+     "B2284",
+     24
+    ],
+    [
+     "B2649",
+     24
+    ]
+   ]
+  },
+  {
+   "k": "q",
+   "n": 278,
+   "top": [
+    [
+     "B1604",
+     57
+    ],
+    [
+     "B0772",
+     40
+    ],
+    [
+     "B1005",
+     36
+    ],
+    [
+     "B2697",
+     36
+    ],
+    [
+     "B1712",
+     34
+    ],
+    [
+     "B2649",
+     29
+    ],
+    [
+     "B0291",
+     25
+    ],
+    [
+     "B2481",
+     25
+    ],
+    [
+     "B1125",
+     24
+    ],
+    [
+     "B0376",
+     22
+    ]
+   ]
+  },
+  {
+   "k": "qo",
+   "n": 276,
+   "top": [
+    [
+     "B1604",
+     46
+    ],
+    [
+     "B0772",
+     39
+    ],
+    [
+     "B1005",
+     35
+    ],
+    [
+     "B2697",
+     35
+    ],
+    [
+     "B1712",
+     29
+    ],
+    [
+     "B2481",
+     28
+    ],
+    [
+     "B2160",
+     25
+    ],
+    [
+     "B2284",
+     25
+    ],
+    [
+     "B2649",
+     25
+    ],
+    [
+     "B0291",
+     24
+    ]
+   ]
+  }
+ ]
+}
