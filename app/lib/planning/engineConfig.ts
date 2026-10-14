@@ -222,3 +222,24 @@ export const LAYOUT_V2B = {
   fill: true,
   driftSplit: false,
 };
+
+/**
+ * D33 final relaxation pass (owner prompt, 14 Oct 2026; relax.ts). Config
+ * only, no rulebook value: `on` is the owner's relax_on flag, and
+ * maxIterations (200), minMoveM (1 cm) and sameGroupFactor (0.5) are the
+ * owner's numbers. maxStepFraction caps one iteration's move at that share
+ * of the plant's radius (IMPLEMENTATION: keeps the pass stable); grid is
+ * the 20 x 20 sample the largest empty patch is measured on (the batch
+ * metric's own grid).
+ *
+ * On by default on layout-v2c: with D29b config (o) it is the best
+ * configuration that passes every test (reports/layout_v2c_comparison.md).
+ */
+export const RELAX = {
+  on: true,
+  maxIterations: 200,
+  minMoveM: 0.01,
+  sameGroupFactor: 0.5,
+  maxStepFraction: 0.5,
+  grid: 20,
+};

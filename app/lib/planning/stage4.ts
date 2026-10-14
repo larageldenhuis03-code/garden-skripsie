@@ -13,8 +13,10 @@ import {
   P17_BALANCE_WEIGHT,
   P2_OVERLAP_TOLERANCE,
   PLACEMENT,
+  RELAX,
   ROW_PITCH_M,
 } from "./engineConfig.ts";
+import { relaxLayout, type RelaxPlant } from "./relax.ts";
 import { canFormWindbreak, type Selection } from "./stage2.ts";
 
 /**
@@ -845,7 +847,83 @@ function placeOnce(
   }
   return finish("complete", null);
 
+  /** D33 (engineConfig RELAX): the final relaxation pass on a complete
+   * layout. Moves plants only; kept only if the largest empty patch shrinks
+   * and every check holds (relax.ts). One diagnostic line either way. */
+  function relaxPlaced(): void {
+    const hostOf = (p: Placement): number | null => {
+      if (p.layer !== "L2") return null;
+      let best: number | null = null;
+      let bestGap = Infinity;
+      placed.forEach((h, k) => {
+        if (h.layer !== "L1") return;
+        const d = Math.hypot(h.xM - p.xM, h.yM - p.yM);
+        if (d <= minCentreDistance(h.radiusM, p.radiusM) + 1e-3 && d < bestGap) {
+          best = k;
+          bestGap = d;
+        }
+      });
+      return best;
+    };
+    const plants: RelaxPlant[] = placed.map((p) => {
+      const info = infos.get(p.plantId) as SpeciesInfo;
+      const hostIndex = hostOf(p);
+      const target = v2b
+        ? info.layer === "L2" ? null : (dStar.get(info.id) ?? null)
+        : targetDepth(info.layer, profile);
+      return {
+        x: p.xM,
+        y: p.yM,
+        r: p.radiusM,
+        plantId: p.plantId,
+        // The feature plant and the windbreak row stay put; so does a
+        // climber with no host to follow.
+        fixed: info.feature || Boolean(p.windbreakRow) || (p.layer === "L2" && hostIndex === null),
+        hostIndex,
+        target,
+        tree: info.types.includes("tree"),
+        shade: info.shade,
+      };
+    });
+    const result = relaxLayout(plants, {
+      widthM: W,
+      depthM: L,
+      depthOf: (x, y) => (v2b ? effDepthM(x, y) : viewer.depthOf(x, y)),
+      span: viewer.span,
+      depthTol: RULES.stage4.depthTol,
+      minCentreDistance,
+      hardOk: (index, x, y) => {
+        const info = infos.get(placed[index].plantId) as SpeciesInfo;
+        return !breaksP4(info, x, y) && !treeInFront(info, x, y);
+      },
+    });
+    if (result.accepted) {
+      result.positions.forEach((pos, k) => {
+        placed[k].xM = pos.x;
+        placed[k].yM = pos.y;
+      });
+    }
+    diagnostics.push(
+      `D33 relax: ${result.accepted ? "accepted" : "rejected"}; patch ${result.patchBefore.toFixed(3)} -> ${result.patchAfter.toFixed(3)}; median move ${result.medianMoveCm.toFixed(1)} cm; moved ${result.movedCount} plants, median ${result.medianMovedCm.toFixed(1)} cm; iterations ${result.iterations}; target gap ${(result.targetGapM * 100).toFixed(1)} cm; ${result.reason}`,
+    );
+  }
+
+  /** D33 runs only on a layout that would be output as it stands -
+   * complete, with every hard check passing - so it can never rescue a
+   * layout the fail rule would reject, and the selection, Z and
+   * feasibility are untouched. The checks are then taken again on the
+   * final positions. */
   function finish(status: "complete" | "failed", failedSpeciesId: string | null): PlacementResult {
+    if (status !== "complete" || !RELAX.on) return finishWith(status, failedSpeciesId);
+    const mark = diagnostics.length;
+    const asPlaced = finishWith(status, failedSpeciesId);
+    if (!asPlaced.checks.every((check) => check.kind !== "hard" || check.pass)) return asPlaced;
+    diagnostics.length = mark; // its measures line is taken again below
+    relaxPlaced();
+    return finishWith(status, failedSpeciesId);
+  }
+
+  function finishWith(status: "complete" | "failed", failedSpeciesId: string | null): PlacementResult {
     // P5 (hard): nothing overlapping a tree canopy unless it takes shade.
     // Enforced during placement (P2 now allows a small overlap); re-checked
     // here on the finished layout.
