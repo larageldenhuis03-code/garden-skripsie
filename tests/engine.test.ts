@@ -609,6 +609,32 @@ test("the viewing axis measures depth from the chosen edge", () => {
   }
 });
 
+/**
+ * Owner decision, 14 Oct 2026: a short climber may stand at the back when
+ * it is next to its host (an L1 plant). It follows its host, not the height
+ * bands, so the layering tests leave such a climber out of the short/tall
+ * comparison. Everything else is measured exactly as before.
+ */
+const layeringTiers = computeHeightTiers(plants);
+const layeringSpreads = computeSpreadBands(plants);
+function climberOnHost(
+  p: { plantId: string; xM: number; yM: number; radiusM: number },
+  placements: readonly { plantId: string; xM: number; yM: number; radiusM: number }[],
+  area: number,
+): boolean {
+  const layerOf = (id: string) => {
+    const plant = plants.find((x) => x.id === id);
+    return plant ? speciesInfo(plant, 0, layeringTiers, layeringSpreads, area)?.layer : undefined;
+  };
+  if (layerOf(p.plantId) !== "L2") return false;
+  return placements.some(
+    (host) =>
+      host !== p &&
+      layerOf(host.plantId) === "L1" &&
+      Math.hypot(host.xM - p.xM, host.yM - p.yM) <= minCentreDistance(host.radiusM, p.radiusM) + 1e-3,
+  );
+}
+
 test("every option is laid out from the viewing edge, not only one", () => {
   // Owner decision 12 October 2026, replacing 2026-09-28. Until then only
   // the last option measured depth from the gardener and the other two
@@ -639,6 +665,7 @@ test("every option is laid out from the viewing edge, not only one", () => {
       const meanDepth = (test: (heightCm: number) => boolean) => {
         const picked = layout.placements.filter((p) => {
           const height = byId.get(p.plantId)?.heightCm;
+          if (climberOnHost(p, layout.placements, layout.bedWidthM * layout.bedLengthM)) return false;
           return height !== null && height !== undefined && test(height);
         });
         return picked.length === 0
@@ -720,6 +747,7 @@ test("D24 (b): layering from the viewing edge holds in every option, the windy r
       const meanDepth = (test: (heightCm: number) => boolean) => {
         const picked = layout.placements.filter((p) => {
           const height = byId.get(p.plantId)?.heightCm;
+          if (climberOnHost(p, layout.placements, layout.bedWidthM * layout.bedLengthM)) return false;
           return height !== null && height !== undefined && test(height);
         });
         return picked.length === 0 ? null : picked.reduce((sum, p) => sum + axis.depthOf(p.xM, p.yM), 0) / picked.length;

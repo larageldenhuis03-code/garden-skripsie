@@ -165,6 +165,33 @@ export const P11_ANGLE_TEST = false;
 export const CLIMBERS_NEED_L1_HOST = true;
 
 /** Placement retry budget (6_Stage3_4_Rules step 8). */
+/**
+ * layout-v2 switches (14 Oct 2026). Engine settings, not rulebook numbers:
+ * every number these parts use comes from 1_Parameters rows 143-153
+ * (RULES.stage4.heightBands). Each part can be switched off on its own so
+ * the comparison can measure it (reports/layout_v2_comparison.md).
+ *
+ *   d29             height-led skeleton: bands by height (R3, R4), hard
+ *                   rules R2 / R6 / R14, the front fill pass; replaces D28
+ *   inBandGradient  R5: within a band, target depth rises with height rank
+ *   curve           D30 R8: curved band edges, d_eff = d + k u^2
+ *   straddle        D30 R9: a canopy may reach at most canopy_band_overlap_max
+ *                   bands forward of its centre's band
+ *   shares          D30 R10: band shares by plant count
+ *   order           D30 R11: anchor sweep, back corners -> sides -> back
+ *                   centre -> middle -> front centre
+ *   fill            D30 R12: the fill pass goes to the emptiest of 9 cells first
+ */
+export const LAYOUT_V2 = {
+  d29: true,
+  inBandGradient: true,
+  curve: false,
+  straddle: false,
+  shares: false,
+  order: false,
+  fill: false,
+};
+
 export const PLACEMENT = {
   /**
    * random_draws_per_plant (1_Parameters C91). The number of random
