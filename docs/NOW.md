@@ -119,6 +119,23 @@ The guided fixture moved from 3 plants / 3 species to **5 / 5**, open space
 unchanged at 43%, for the reason above — re-verified by running the
 planner, not assumed.
 
+## layout-v2c: D33 relaxation pass on by default on the branch (2026-10-14)
+
+Branch `layout-v2c`, from `layout-v2b`. The full report is
+`reports/layout_v2c_comparison.md`.
+
+After Stage 4, plants are nudged apart into nearby open ground. Each plant
+stays near its target depth, and the feature plant, the windbreak row and
+climbers keep their places. The result is kept only if the largest empty
+patch shrinks and every check holds.
+
+It runs only on layouts that already pass every hard check, so selection, Z
+and feasibility never change.
+
+With D29b config (o) it is accepted in about half the plans, where about 9
+plants move about 15 cm. The median largest gap falls 0.175 → 0.158. All
+134 tests pass. Setting: `RELAX` in engineConfig, no rulebook change.
+
 ## layout-v2b: relative height gradient adopted on the branch; D32 reverted (2026-10-14)
 
 Branch `layout-v2b` (from layout-v2 after its revert), rulebook
