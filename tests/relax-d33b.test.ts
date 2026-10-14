@@ -1,7 +1,7 @@
 // D33b final adjustments (owner prompt, 14 Oct 2026). Pins its own flags:
-// D29b config (o) with relaxation variant v6 (the layout-v2e default) -
-// power-diagram Lloyd steps, edge guard, size swaps, gap fill and group
-// cohesion; no short-plant clamp (v3), which breaks the B1223/B1172
+// D29b config (o) with relaxation variant v7 (the layout-v2f default) -
+// power-diagram Lloyd steps, edge guard, size swaps, gap fill beside its
+// own group and group cohesion; no short-plant clamp (v3), which breaks the B1223/B1172
 // layering test.
 import assert from "node:assert/strict";
 import test from "node:test";
@@ -12,7 +12,7 @@ import { buildGardenPlanVariants, computeHeightTiers, computeSpreadBands, specie
 import { buildScenarios } from "../scripts/batch-test/scenarios.ts";
 
 Object.assign(LAYOUT_V2B, { d29b: true, treeHard: true, curve: true, order: true, fill: true, driftSplit: false });
-const V4 = { on: true, method: "lloyd" as const, edgeGuard: true, swaps: true, shortClamp: false, gapFill: true, cohesion: true };
+const V4 = { on: true, method: "lloyd" as const, edgeGuard: true, swaps: true, shortClamp: false, gapFill: true, cohesion: true, cohesionFill: true };
 
 const S006 = buildScenarios().find((s) => s.id === "S006")!.brief;
 const BRIEFS: [string, GardenBrief][] = [
@@ -38,7 +38,7 @@ const maxAllowed = (id: string, area: number) => {
   return Math.max(...speciesInfo(plant, 0, tiers, spreads, area)!.allowedN);
 };
 
-test("D33b v6: same selection and Z, nothing outside the bed, nothing removed, every hard check holds", () => {
+test("D33b v7: same selection and Z, nothing outside the bed, nothing removed, every hard check holds", () => {
   let added = 0;
   for (const [label, brief] of BRIEFS) {
     const plain = run(brief, { on: false });
@@ -68,7 +68,7 @@ test("D33b v6: same selection and Z, nothing outside the bed, nothing removed, e
   assert.ok(added > 0, "the gap fill never added a plant on these briefs, so it was not exercised");
 });
 
-test("D33b v6 gap fill: only selected species, within H3 max and the H5 cap, and the planting list matches the drawing", () => {
+test("D33b v7 gap fill: only selected species, within H3 max and the H5 cap, and the planting list matches the drawing", () => {
   for (const [label, brief] of BRIEFS) {
     const area = brief.bedWidthM * brief.bedLengthM;
     const plain = run(brief, { on: false });
@@ -81,6 +81,12 @@ test("D33b v6 gap fill: only selected species, within H3 max and the H5 cap, and
       assert.deepEqual([...listed].sort(), [...drawn].sort(), `${where}: planting list and drawing disagree`);
       const total = [...listed.values()].reduce((s, n) => s + n, 0);
       const h5 = Number(/<= ([\d.]+)/.exec(plan.engine!.hard.find((c) => c.id === "H5")!.limit)?.[1]);
+      // v7: every added plant stands within cohesionMaxGapM of its own species.
+      const ps = plan.layout!.placements;
+      for (const p of ps.filter((q) => (q as { gapFill?: boolean }).gapFill)) {
+        const gap = Math.min(...ps.filter((q) => q !== p && q.plantId === p.plantId).map((q) => Math.hypot(p.xM - q.xM, p.yM - q.yM) - p.radiusM - q.radiusM));
+        assert.ok(gap <= RELAX.cohesionMaxGapM + 1e-6, `${where}: added ${p.instanceId} stands ${(gap * 100).toFixed(1)} cm from its group`);
+      }
       for (const [id, n] of listed) {
         assert.ok(before.has(id), `${where}: ${id} is a new species`);
         if (n === before.get(id)) continue;
@@ -91,7 +97,7 @@ test("D33b v6 gap fill: only selected species, within H3 max and the H5 cap, and
   }
 });
 
-test("D33b v6 cohesion: no grouped plant ends further than max(10 cm, its gap as placed) from its nearest group-mate", () => {
+test("D33b v7 cohesion: no grouped plant ends further than max(10 cm, its gap as placed) from its nearest group-mate", () => {
   const gapToMate = (ps: readonly { plantId: string; xM: number; yM: number; radiusM: number }[], k: number) => {
     let best = Infinity;
     ps.forEach((q, j) => {

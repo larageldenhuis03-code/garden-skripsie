@@ -944,7 +944,8 @@ function placeOnce(
       const spots = cells
         .map((c) => ({ ...c, room: room(c.x, c.y) }))
         .sort((a, b) => b.room - a.room || a.y - b.y || a.x - b.x)
-        .slice(0, 12);
+        // v7 tries every point of the gap, so a spot beside a drift can be found.
+        .slice(0, RELAX.cohesionFill ? undefined : 12);
       for (const spot of spots) {
         for (const info of candidates) {
           const n = counts.get(info.id) ?? 0;
@@ -954,6 +955,11 @@ function placeOnce(
           const x = Math.min(Math.max(spot.x, r), W - r);
           const y = Math.min(Math.max(spot.y, r), L - r);
           if (placed.some((p) => Math.hypot(p.xM - x, p.yM - y) < p.radiusM + r - EPS)) continue; // touches nothing
+          if (RELAX.cohesionFill) {
+            // v7: beside a plant of its own species.
+            const mateGap = Math.min(...placed.filter((p) => p.plantId === info.id).map((p) => Math.hypot(p.xM - x, p.yM - y) - p.radiusM - r));
+            if (!(mateGap <= RELAX.cohesionMaxGapM + EPS)) continue;
+          }
           if (!fits(x, y, r, info) || breaksP4(info, x, y) || treeInFront(info, x, y)) continue;
           const target = v2b ? (dStar.get(info.id) ?? null) : targetDepth(info.layer, profile);
           if (target !== null) {

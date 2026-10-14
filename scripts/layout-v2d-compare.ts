@@ -21,11 +21,12 @@ const ALL_CONFIGS: [string, string][] = [
   ["v4b", "v4′: v2 + gap fill (v4 without the short clamp)"],
   ["v5", "v4 + drift split"],
   ["v6", "v4′ + group cohesion (10 cm)"],
+  ["v7", "v6 + gap fill beside its own group"],
 ];
 /** V2D_CONFIGS="o,d33,v4b,v6" picks and orders the columns. */
 export const CONFIGS: [string, string][] = process.env.V2D_CONFIGS
   ? process.env.V2D_CONFIGS.split(",").map((k) => ALL_CONFIGS.find(([c]) => c === k) as [string, string])
-  : ALL_CONFIGS.filter(([k]) => k !== "v6");
+  : ALL_CONFIGS.filter(([k]) => k !== "v6" && k !== "v7");
 export const label = (k: string) => (k === "o" ? "(o)" : k === "d33" ? "(o)+D33" : k === "v4b" ? "v4′" : k);
 
 type Row = Record<string, string>;

@@ -259,11 +259,12 @@ export const RELAX = {
    *               plant of a species already selected (n + 1 <= its H3
    *               maximum, H5 cap held, no new species)
    * The 20 cm, 0.15, 50 cm and 3 are the owner's numbers; lloydSamples
-   * and maxSwapTries are IMPLEMENTATION bounds. Defaults on layout-v2e:
-   * v6 - Lloyd, edge guard, swaps, gap fill and group cohesion, without
+   * and maxSwapTries are IMPLEMENTATION bounds. Defaults on layout-v2f:
+   * v7 - Lloyd, edge guard, swaps, gap fill beside its own group and group
+   * cohesion, without
    * the short-plant clamp (v3 breaks the B1223/B1172 layering test) or the
    * drift split (breaks the 12-case) - the best variant that passes every
-   * test (reports/layout_v2d_comparison.md, layout_v2e_comparison.md).
+   * test (reports/layout_v2d/e/f_comparison.md).
    */
   method: "lloyd" as "force" | "lloyd",
   edgeGuard: true,
@@ -286,4 +287,9 @@ export const RELAX = {
    */
   cohesion: true,
   cohesionMaxGapM: 0.1,
+  /** v7 (layout-v2f): a gap-fill plant must also stand within
+   * cohesionMaxGapM of a plant of its own species, so it joins a drift
+   * rather than standing alone. Every point of the gap is tried, not only
+   * the roomiest. */
+  cohesionFill: true,
 };
