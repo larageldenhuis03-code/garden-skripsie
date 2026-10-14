@@ -119,6 +119,32 @@ The guided fixture moved from 3 plants / 3 species to **5 / 5**, open space
 unchanged at 43%, for the reason above — re-verified by running the
 planner, not assumed.
 
+## layout-v2d: D33b, v4' on by default on the branch (2026-10-14)
+
+Branch `layout-v2d`, from `layout-v2c`. The full report is
+`reports/layout_v2d_comparison.md`.
+
+The relaxation now runs as v4', the best variant that passes every test:
+- Lloyd steps on a radius-weighted power diagram;
+- a hard edge guard (plants slide along walls, never leave the bed);
+- size swaps that even out 1 m-cell cover;
+- a gap fill that adds one plant of an already-selected species to each of
+  the 3 largest gaps, within H3 max and the H5 cap.
+
+Against D33 it shrinks the median largest gap (0.158 → 0.145) and the
+95th-percentile gap (52 → 41 cm). Z and feasibility are unchanged, no plant
+leaves the bed and none is removed.
+
+Not adopted:
+- v3's ±0.15 clamp for short plants breaks the B1223/B1172 layering test.
+- The drift split breaks the 12-case test.
+
+Known trade-off: drifts loosen on big beds (S006: same-species gap 0 → 44
+cm), because Lloyd has no same-species pull.
+
+Known data issue: 38 tree species have a spread under 1 m, most of them
+imputed and 5 flagged `suspect-low`.
+
 ## layout-v2c: D33 relaxation pass on by default on the branch (2026-10-14)
 
 Branch `layout-v2c`, from `layout-v2b`. The full report is
