@@ -119,6 +119,15 @@ The guided fixture moved from 3 plants / 3 species to **5 / 5**, open space
 unchanged at 43%, for the reason above — re-verified by running the
 planner, not assumed.
 
+## layout-v2f: v7 on by default on the branch (2026-10-14)
+
+Branch `layout-v2f`. The full report is `reports/layout_v2f_comparison.md`.
+
+Gap-fill plants must now stand within 10 cm of their own species
+(`RELAX.cohesionFill`). Drifts are the tightest measured: 0.114 of grouped
+plants are more than 10 cm from a group-mate. The largest gap stays 0.142,
+Z and feasibility are unchanged, and all 137 tests pass.
+
 ## layout-v2e: v6 (v4' + group cohesion) on by default on the branch (2026-10-14)
 
 Branch `layout-v2e`. The full report is `reports/layout_v2e_comparison.md`.
