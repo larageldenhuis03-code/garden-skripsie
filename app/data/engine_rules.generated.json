@@ -302,19 +302,6 @@
     "overlapDelta": 0.15,
     "contactBonus": 0.0,
     "sweepWeight": 0.0,
-    "heightBands": {
-      "edgeFrontMid": 0.35,
-      "edgeMidBack": 0.65,
-      "hFrontMax": 60.0,
-      "hMiddleMin": 30.0,
-      "hMiddleMax": 120.0,
-      "hBackMin": 80.0,
-      "hGrassFrontHalfMax": 120.0,
-      "curveK": 0.15,
-      "curveAsymMax": 0.25,
-      "shareMin": 0.8,
-      "canopyOverlapMax": 1
-    },
     "hedgeSpacingFormalCm": [
       45.0,
       60.0

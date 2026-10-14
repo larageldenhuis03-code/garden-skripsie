@@ -119,6 +119,28 @@ The guided fixture moved from 3 plants / 3 species to **5 / 5**, open space
 unchanged at 43%, for the reason above — re-verified by running the
 planner, not assumed.
 
+## layout-v2 height bands: built, measured, reverted (2026-10-14)
+
+Branch `layout-v2`, rulebook 713f9bad5bec. D29 (height bands) and D30 (band
+shaping) were built and measured over the 100 batch briefs plus a fixed case
+(`reports/layout_v2_comparison.md`).
+
+- **The gain:** D29 removed every tall plant centred in the front band
+  (482 → 0).
+- **The cost:** median Z fell by 0.013–0.019, the largest gap roughly doubled,
+  and fail-rule drops rose 2.5x. Most selections lack enough short plants to
+  fill the front band.
+
+That breached the owner's time box (median Z moves more than 0.01), so Steps
+1–3 were reverted. The engine keeps engine-final's D28 fallback.
+
+Known limitations on this branch:
+- Tall plants can still be centred in front.
+- D24 (b), windy 8 x 6 m east view option 1, fails again (tall 5.33 m vs
+  short 5.35 m from the viewer).
+
+The likely fix is band-aware selection in Stage 2/3.
+
 ## Plant list ordered by spread; sun option re-worded (2026-10-05)
 
 The plan's plant list ran in species-id order, which means nothing to a

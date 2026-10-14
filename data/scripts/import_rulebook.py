@@ -473,20 +473,6 @@ def build(path: Path) -> dict:
             # D27: sweep packing - contact points first, in-band contact
             # spots preferred with this weight (replaces contact_bonus).
             "sweepWeight": num(p, "sweep_weight"),
-            # D29 / D30 (14 Oct 2026): height bands and band shape.
-            "heightBands": {
-                "edgeFrontMid": num(p, "band_edge_front_mid"),
-                "edgeMidBack": num(p, "band_edge_mid_back"),
-                "hFrontMax": num(p, "h_front_max"),
-                "hMiddleMin": num(p, "h_middle_min"),
-                "hMiddleMax": num(p, "h_middle_max"),
-                "hBackMin": num(p, "h_back_min"),
-                "hGrassFrontHalfMax": num(p, "h_grass_front_half_max"),
-                "curveK": num(p, "band_curve_k"),
-                "curveAsymMax": num(p, "band_curve_asym_max"),
-                "shareMin": num(p, "band_share_min"),
-                "canopyOverlapMax": int(num(p, "canopy_band_overlap_max")),
-            },
             "hedgeSpacingFormalCm": [num(p, "hedge_spacing_formal_min"), num(p, "hedge_spacing_formal_max")],
             "hedgeSpacingInformalCm": [num(p, "hedge_spacing_informal_min"), num(p, "hedge_spacing_informal_max")],
             "windbreakPorosity": {
