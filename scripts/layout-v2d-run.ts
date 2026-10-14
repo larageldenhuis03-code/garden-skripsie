@@ -45,7 +45,7 @@ import { buildScenarios } from "./batch-test/scenarios.ts";
 import { GRID, plantedCells, spreadMetrics } from "./batch-test/metrics.ts";
 import { cellCoverVariance } from "../app/lib/planning/relax.ts";
 
-const OUT_DIR = join("reports", "layout_v2d");
+const OUT_DIR = join("reports", process.env.V2D_DIR ?? "layout_v2d");
 const NAME = process.env.V2D_OUT ?? "run";
 const SAMPLES = ["S001", "S006", "FIX"];
 const FILLER_SPREAD_MAX_CM = 50; // D32's gap-filler threshold, for counting only
@@ -198,7 +198,19 @@ function edgeAndGaps(layout: NonNullable<GardenPlan["layout"]>) {
       }
     }
   }
+  // Drift cohesion: each grouped plant's edge gap to its nearest plant of
+  // the same species (cm); the median, and the share more than 10 cm away.
+  const mateGaps: number[] = [];
+  for (const p of ps) {
+    let best = Infinity;
+    for (const q of ps) if (q !== p && q.plantId === p.plantId) best = Math.min(best, Math.hypot(p.xM - q.xM, p.yM - q.yM) - p.radiusM - q.radiusM);
+    if (Number.isFinite(best)) mateGaps.push(Math.max(0, best) * 100);
+  }
+  mateGaps.sort((a, b) => a - b);
+  const mid = mateGaps.length ? (mateGaps.length % 2 ? mateGaps[(mateGaps.length - 1) / 2] : (mateGaps[mateGaps.length / 2 - 1] + mateGaps[mateGaps.length / 2]) / 2) : 0;
   return {
+    drift_gap_cm: Number(mid.toFixed(1)),
+    drift_loose_share: mateGaps.length ? Number((mateGaps.filter((g) => g > 10).length / mateGaps.length).toFixed(4)) : "",
     at_edge: atEdge,
     outside_bed: outside,
     gap_p95_cm: Number(p95.toFixed(1)),

@@ -10,8 +10,8 @@ import { join } from "node:path";
 
 import { plants } from "../app/data/plants.ts";
 
-const DIR = join("reports", "layout_v2d");
-export const CONFIGS: [string, string][] = [
+const DIR = join("reports", process.env.V2D_DIR ?? "layout_v2d");
+const ALL_CONFIGS: [string, string][] = [
   ["o", "(o), no relaxation"],
   ["d33", "(o) + D33 (current)"],
   ["v1", "(o) + v1 power-diagram Lloyd"],
@@ -20,7 +20,12 @@ export const CONFIGS: [string, string][] = [
   ["v4", "v3 + gap fill"],
   ["v4b", "v4′: v2 + gap fill (v4 without the short clamp)"],
   ["v5", "v4 + drift split"],
+  ["v6", "v4′ + group cohesion (10 cm)"],
 ];
+/** V2D_CONFIGS="o,d33,v4b,v6" picks and orders the columns. */
+export const CONFIGS: [string, string][] = process.env.V2D_CONFIGS
+  ? process.env.V2D_CONFIGS.split(",").map((k) => ALL_CONFIGS.find(([c]) => c === k) as [string, string])
+  : ALL_CONFIGS.filter(([k]) => k !== "v6");
 export const label = (k: string) => (k === "o" ? "(o)" : k === "d33" ? "(o)+D33" : k === "v4b" ? "v4′" : k);
 
 type Row = Record<string, string>;
@@ -78,6 +83,8 @@ function main() {
       d24b: meta.d24b.split(" ")[0],
       hardFail: feas.filter((r) => r.hard_failures !== "").length,
       atEdge: median(nums(feas, "at_edge")),
+      driftGap: nums(feas, "drift_gap_cm").length ? median(nums(feas, "drift_gap_cm")) : "-",
+      driftLoose: nums(feas, "drift_loose_share").length ? median(nums(feas, "drift_loose_share")) : "-",
       outside: sum(feas, "outside_bed"),
       removed: nums(feas, "d33_removed").length ? sum(feas, "d33_removed") : "-",
       added: nums(feas, "d33_added").length ? `${sum(feas, "d33_added")} in ${feas.filter((r) => Number(r.d33_added) > 0).length} options` : "-",
@@ -104,6 +111,8 @@ function main() {
     ["D24 (b) east, option 1", "d24b"],
     ["Options with a hard failure", "hardFail", 0],
     ["Plants touching a bed edge (median per option)", "atEdge", 0],
+    ["Drift gap: grouped plant to nearest group-mate, cm (median)", "driftGap", 1],
+    ["Share of grouped plants > 10 cm from any group-mate (median)", "driftLoose"],
     ["**Plants outside the bed (must be 0)**", "outside", 0],
     ["**Plants removed by D33 (must be 0)**", "removed", 0],
     ["Plants added (v4)", "added"],
@@ -128,7 +137,7 @@ function main() {
 
   // Trees with spread under 1 m, and how often each is chosen.
   const chosen = new Map<string, number>();
-  for (const r of data.get("d33")!.filter((x) => x.feasible === "true")) {
+  for (const r of (data.get("d33") ?? data.get(CONFIGS[0][0])!).filter((x) => x.feasible === "true")) {
     for (const id of new Set(r.species.split(" ").filter(Boolean).map((s) => s.split("x")[0]))) chosen.set(id, (chosen.get(id) ?? 0) + 1);
   }
   const small = plants

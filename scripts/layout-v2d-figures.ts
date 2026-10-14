@@ -24,8 +24,8 @@ type Layout = {
 };
 type Dump = { config: string; rulebook: string; bands: { edgeFrontMid: number; edgeMidBack: number }; layouts: Layout[] };
 
-const IN = join("reports", "layout_v2d");
-const OUT = join("reports", "figures", "layout_v2d");
+const IN = join("reports", process.env.V2D_DIR ?? "layout_v2d");
+const OUT = join("reports", "figures", process.env.V2D_DIR ?? "layout_v2d");
 const CHROME = "C:/Program Files/Google/Chrome/Application/chrome.exe";
 mkdirSync(OUT, { recursive: true });
 
@@ -71,7 +71,8 @@ function panel(layout: Layout, ox: number, oy: number, title: string, edges: num
   ].join("\n");
 }
 
-for (const base of ["d33", "v1", "v2", "v3", "v4", "v4b", "v5"]) {
+const BASES = process.env.V2D_BASES?.split(",") ?? ["d33", "v1", "v2", "v3", "v4", "v4b", "v5"];
+for (const base of BASES) {
   const before = JSON.parse(readFileSync(join(IN, "v2d_o.json"), "utf8")) as Dump;
   const after = JSON.parse(readFileSync(join(IN, `v2d_${base}.json`), "utf8")) as Dump;
   const edges = [before.bands.edgeFrontMid, before.bands.edgeMidBack];

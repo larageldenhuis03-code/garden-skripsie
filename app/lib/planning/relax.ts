@@ -159,6 +159,21 @@ export function relaxLayout(plants: readonly RelaxPlant[], env: RelaxEnv): Relax
   const allowedDev = plants.map((p, i) =>
     p.target === null ? Infinity : Math.max(tolOf(p) * env.span, Math.abs(env.depthOf(start[i].x, start[i].y) - p.target * env.span)),
   );
+  // v6: each plant's group-mates and the furthest it may stand from the
+  // nearest of them.
+  const mates = plants.map((p, i) => plants.map((_, j) => j).filter((j) => j !== i && plants[j].plantId === p.plantId));
+  const nearestMateGap = (k: number, at: (j: number) => { x: number; y: number }) =>
+    Math.min(...mates[k].map((j) => Math.hypot(at(k).x - at(j).x, at(k).y - at(j).y) - plants[k].r - plants[j].r));
+  const mateLimit = plants.map((_, k) =>
+    mates[k].length ? Math.max(RELAX.cohesionMaxGapM, nearestMateGap(k, (j) => start[j])) : Infinity,
+  );
+  /** v6: with plant i at (x, y), every member of its group still stands
+   * within its limit of its nearest group-mate. */
+  const cohesive = (i: number, x: number, y: number): boolean => {
+    if (!RELAX.cohesion || mates[i].length === 0) return true;
+    const at = (j: number) => (j === i ? { x, y } : pos[j]);
+    return [i, ...mates[i]].every((k) => nearestMateGap(k, at) <= mateLimit[k] + EPS);
+  };
   /** Edge guard: the nearest point that keeps the whole circle inside. */
   const intoBed = (k: number, x: number, y: number) => ({
     x: Math.min(Math.max(x, plants[k].r), W - plants[k].r),
@@ -172,6 +187,7 @@ export function relaxLayout(plants: readonly RelaxPlant[], env: RelaxEnv): Relax
     if (x < p.r - EPS || x > W - p.r + EPS || y < p.r - EPS || y > L - p.r + EPS) return false; // P1
     if (p.target !== null && Math.abs(env.depthOf(x, y) - p.target * env.span) > allowedDev[i] + EPS) return false;
     if (!env.hardOk(i, x, y)) return false;
+    if (!cohesive(i, x, y)) return false;
     for (let j = 0; j < n; j += 1) {
       if (j === i || moving.has(j)) continue;
       const q = plants[j];
