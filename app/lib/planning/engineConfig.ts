@@ -222,3 +222,22 @@ export const LAYOUT_V2B = {
   fill: true,
   driftSplit: false,
 };
+
+/**
+ * D32 capacity-aware selection (owner prompt, 14 Oct 2026), applied to the
+ * Stage 3 result before placement. Selected canopy area must reach
+ * cover_min x bed area (raise H3 group sizes first, then add species), and
+ * at least FILLER_SHARE_MIN of it must come from plants of spread at most
+ * FILLER_SPREAD_MAX_M (gap fillers). Every move keeps H1-H5 (and H3b, H7)
+ * as the search does; survival filters and the exclude list are upstream
+ * and untouched.
+ *
+ * ASSUMPTION - config only, not rulebook parameters (owner prompt values).
+ */
+export const D32 = {
+  capacity: false,
+  FILLER_SPREAD_MAX_M: 0.5,
+  FILLER_SHARE_MIN: 0.25,
+  /** IMPLEMENTATION: an upper bound on repair moves, so it always ends. */
+  MAX_MOVES: 60,
+};
