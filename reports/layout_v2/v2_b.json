@@ -1,0 +1,623 @@
+{
+ "config": "v2_b",
+ "rulebook": "713f9bad5bec",
+ "dataset": "6c081d3d2f60",
+ "configLine": "flags {\"d29\":true,\"inBandGradient\":true,\"curve\":false,\"straddle\":false,\"shares\":false,\"order\":false,\"fill\":false}; curveK 0.15; contactBonus 0; sweepWeight 0",
+ "twelve": {
+  "pass": 12,
+  "total": 12,
+  "failures": []
+ },
+ "layouts": [
+  {
+   "id": "S001",
+   "style": "fynbos",
+   "wind": "none",
+   "viewingEdge": "north",
+   "widthM": 2,
+   "lengthM": 3,
+   "status": "provisional-plan",
+   "z": 0.9493328123531823,
+   "cover": 0.5551717817668763,
+   "largestEmptyPatch": 0.385,
+   "quadrantCV": 0.3397,
+   "circles": [
+    {
+     "id": "B1746",
+     "x": 0.6331166324601509,
+     "y": 2.3009222945850345,
+     "r": 0.285,
+     "heightCm": 180,
+     "windbreak": false
+    },
+    {
+     "id": "B1746",
+     "x": 1.1724963779305109,
+     "y": 2.4045287355966867,
+     "r": 0.285,
+     "heightCm": 180,
+     "windbreak": false
+    },
+    {
+     "id": "B1746",
+     "x": 1.5986420765827534,
+     "y": 2.715,
+     "r": 0.285,
+     "heightCm": 180,
+     "windbreak": false
+    },
+    {
+     "id": "B1746",
+     "x": 1.6544452293749765,
+     "y": 2.190711367052033,
+     "r": 0.285,
+     "heightCm": 180,
+     "windbreak": false
+    },
+    {
+     "id": "B1746",
+     "x": 0.285,
+     "y": 2.715,
+     "r": 0.285,
+     "heightCm": 180,
+     "windbreak": false
+    },
+    {
+     "id": "B1913",
+     "x": 0.25,
+     "y": 1.9835457108041992,
+     "r": 0.25,
+     "heightCm": 100,
+     "windbreak": false
+    },
+    {
+     "id": "B2054",
+     "x": 0.8036086447909474,
+     "y": 2.871155008627102,
+     "r": 0.12,
+     "heightCm": 200,
+     "windbreak": false
+    },
+    {
+     "id": "B2054",
+     "x": 0.6713651225250707,
+     "y": 2.692841658541601,
+     "r": 0.12,
+     "heightCm": 200,
+     "windbreak": false
+    },
+    {
+     "id": "B2054",
+     "x": 0.9848953008306,
+     "y": 2.7430177839733707,
+     "r": 0.12,
+     "heightCm": 200,
+     "windbreak": false
+    },
+    {
+     "id": "B2054",
+     "x": 1.201775617839072,
+     "y": 2.790419557086881,
+     "r": 0.12,
+     "heightCm": 200,
+     "windbreak": false
+    },
+    {
+     "id": "B2054",
+     "x": 0.9542432047786829,
+     "y": 2.0849437665991473,
+     "r": 0.12,
+     "heightCm": 200,
+     "windbreak": false
+    },
+    {
+     "id": "B2390",
+     "x": 0.8157394857844338,
+     "y": 1.5980938468594104,
+     "r": 0.325,
+     "heightCm": 75,
+     "windbreak": false
+    },
+    {
+     "id": "B2390",
+     "x": 1.4116495049801572,
+     "y": 1.678048906250001,
+     "r": 0.325,
+     "heightCm": 75,
+     "windbreak": false
+    },
+    {
+     "id": "B2390",
+     "x": 1.1829376079756404,
+     "y": 1.1219981615615369,
+     "r": 0.325,
+     "heightCm": 75,
+     "windbreak": false
+    },
+    {
+     "id": "B0027",
+     "x": 0.5089421839360148,
+     "y": 0.6069269626401363,
+     "r": 0.26,
+     "heightCm": 20,
+     "windbreak": false
+    },
+    {
+     "id": "B0027",
+     "x": 0.9899227353221169,
+     "y": 0.6112523745651642,
+     "r": 0.26,
+     "heightCm": 20,
+     "windbreak": false
+    },
+    {
+     "id": "B0027",
+     "x": 1.5413525342103094,
+     "y": 0.5412005854770541,
+     "r": 0.26,
+     "heightCm": 20,
+     "windbreak": false
+    }
+   ]
+  },
+  {
+   "id": "S006",
+   "style": "mediterranean",
+   "wind": "affected",
+   "viewingEdge": "east",
+   "widthM": 12,
+   "lengthM": 8,
+   "status": "provisional-plan",
+   "z": 0.9441568833616947,
+   "cover": 0.41026909311239446,
+   "largestEmptyPatch": 0.4725,
+   "quadrantCV": 0.6394,
+   "circles": [
+    {
+     "id": "B2632",
+     "x": 2,
+     "y": 2.3795415544882417,
+     "r": 2,
+     "heightCm": 1200,
+     "windbreak": false
+    },
+    {
+     "id": "B2318",
+     "x": 1.25,
+     "y": 6.75,
+     "r": 1.25,
+     "heightCm": 300,
+     "windbreak": false
+    },
+    {
+     "id": "B1812",
+     "x": 2.4731231540609473,
+     "y": 7.67,
+     "r": 0.33,
+     "heightCm": 100,
+     "windbreak": false
+    },
+    {
+     "id": "B1812",
+     "x": 2.7354211705200737,
+     "y": 7.11871967152672,
+     "r": 0.33,
+     "heightCm": 100,
+     "windbreak": false
+    },
+    {
+     "id": "B1812",
+     "x": 3.0816949313550013,
+     "y": 7.6215165813792325,
+     "r": 0.33,
+     "heightCm": 100,
+     "windbreak": false
+    },
+    {
+     "id": "B1812",
+     "x": 3.3439929478141277,
+     "y": 7.070236252905952,
+     "r": 0.33,
+     "heightCm": 100,
+     "windbreak": false
+    },
+    {
+     "id": "B1812",
+     "x": 3.690266708649055,
+     "y": 7.573033162758464,
+     "r": 0.33,
+     "heightCm": 100,
+     "windbreak": false
+    },
+    {
+     "id": "B1647",
+     "x": 2.0955996448592025,
+     "y": 7.88,
+     "r": 0.12,
+     "heightCm": 100,
+     "windbreak": false
+    },
+    {
+     "id": "B1647",
+     "x": 0.5077035632579121,
+     "y": 7.88,
+     "r": 0.12,
+     "heightCm": 100,
+     "windbreak": false
+    },
+    {
+     "id": "B1647",
+     "x": 0.3327895337974945,
+     "y": 7.743291981588789,
+     "r": 0.12,
+     "heightCm": 100,
+     "windbreak": false
+    },
+    {
+     "id": "B1172",
+     "x": 5.115510846887316,
+     "y": 5.211127210408449,
+     "r": 2,
+     "heightCm": 100,
+     "windbreak": false
+    },
+    {
+     "id": "B2335",
+     "x": 5.806549340326871,
+     "y": 7.603131778612734,
+     "r": 0.32,
+     "heightCm": 100,
+     "windbreak": false
+    },
+    {
+     "id": "B2335",
+     "x": 5.219561029931546,
+     "y": 7.68,
+     "r": 0.32,
+     "heightCm": 100,
+     "windbreak": false
+    },
+    {
+     "id": "B2335",
+     "x": 4.678114391200645,
+     "y": 7.4406267821852055,
+     "r": 0.32,
+     "heightCm": 100,
+     "windbreak": false
+    },
+    {
+     "id": "B2367",
+     "x": 10.224827164580876,
+     "y": 7.002642819657922,
+     "r": 0.5,
+     "heightCm": 45,
+     "windbreak": false
+    },
+    {
+     "id": "B2367",
+     "x": 11.004737951249568,
+     "y": 7.5,
+     "r": 0.5,
+     "heightCm": 45,
+     "windbreak": false
+    },
+    {
+     "id": "B2367",
+     "x": 11.045506510846062,
+     "y": 6.575898855888368,
+     "r": 0.5,
+     "heightCm": 45,
+     "windbreak": false
+    },
+    {
+     "id": "B2230",
+     "x": 8.991514134341852,
+     "y": 6.931377659142018,
+     "r": 0.32,
+     "heightCm": 50,
+     "windbreak": false
+    },
+    {
+     "id": "B2230",
+     "x": 8.44127467335625,
+     "y": 7.338858420699835,
+     "r": 0.32,
+     "heightCm": 50,
+     "windbreak": false
+    },
+    {
+     "id": "B2230",
+     "x": 9.003825902042081,
+     "y": 7.523249621965141,
+     "r": 0.32,
+     "heightCm": 50,
+     "windbreak": false
+    },
+    {
+     "id": "B2230",
+     "x": 9.590268584099672,
+     "y": 7.442323849425726,
+     "r": 0.32,
+     "heightCm": 50,
+     "windbreak": false
+    },
+    {
+     "id": "B2230",
+     "x": 7.957449888054185,
+     "y": 7.68,
+     "r": 0.32,
+     "heightCm": 50,
+     "windbreak": false
+    },
+    {
+     "id": "B1396",
+     "x": 11.525560617807006,
+     "y": 7.85,
+     "r": 0.15,
+     "heightCm": 5,
+     "windbreak": false
+    },
+    {
+     "id": "B1396",
+     "x": 11.625582091037462,
+     "y": 7.591152641711743,
+     "r": 0.15,
+     "heightCm": 5,
+     "windbreak": false
+    },
+    {
+     "id": "B1396",
+     "x": 11.799739742402357,
+     "y": 7.8071974575973915,
+     "r": 0.15,
+     "heightCm": 5,
+     "windbreak": false
+    },
+    {
+     "id": "B1078",
+     "x": 6.923642782148506,
+     "y": 7.17243840242736,
+     "r": 0.5,
+     "heightCm": 50,
+     "windbreak": false
+    },
+    {
+     "id": "B1078",
+     "x": 7.807160226616474,
+     "y": 6.898537096623989,
+     "r": 0.5,
+     "heightCm": 50,
+     "windbreak": false
+    },
+    {
+     "id": "B1078",
+     "x": 7.380307840538332,
+     "y": 6.077914137830247,
+     "r": 0.5,
+     "heightCm": 50,
+     "windbreak": false
+    }
+   ]
+  },
+  {
+   "id": "FIX",
+   "style": "fynbos",
+   "wind": "none",
+   "viewingEdge": "south",
+   "widthM": 6,
+   "lengthM": 2,
+   "status": "provisional-plan",
+   "z": 0.9654676685492711,
+   "cover": 0.6342090169434396,
+   "largestEmptyPatch": 0.15,
+   "quadrantCV": 0.2464,
+   "circles": [
+    {
+     "id": "B1722",
+     "x": 2.429094841517508,
+     "y": 0.69,
+     "r": 0.69,
+     "heightCm": 400,
+     "windbreak": false
+    },
+    {
+     "id": "B1722",
+     "x": 1.1525948415175082,
+     "y": 0.69,
+     "r": 0.69,
+     "heightCm": 400,
+     "windbreak": false
+    },
+    {
+     "id": "B1722",
+     "x": 4.051887677628547,
+     "y": 0.69,
+     "r": 0.69,
+     "heightCm": 400,
+     "windbreak": false
+    },
+    {
+     "id": "B2305",
+     "x": 5.8269805120769895,
+     "y": 0.30417732113351414,
+     "r": 0.15,
+     "heightCm": 300,
+     "windbreak": false
+    },
+    {
+     "id": "B2305",
+     "x": 5.596252092396853,
+     "y": 0.15,
+     "r": 0.15,
+     "heightCm": 300,
+     "windbreak": false
+    },
+    {
+     "id": "B2305",
+     "x": 5.578094825447867,
+     "y": 0.4269053333847928,
+     "r": 0.15,
+     "heightCm": 300,
+     "windbreak": false
+    },
+    {
+     "id": "B2305",
+     "x": 5.34736640576773,
+     "y": 0.272728012251279,
+     "r": 0.15,
+     "heightCm": 300,
+     "windbreak": false
+    },
+    {
+     "id": "B2305",
+     "x": 5.098480719138607,
+     "y": 0.15,
+     "r": 0.15,
+     "heightCm": 300,
+     "windbreak": false
+    },
+    {
+     "id": "B2305",
+     "x": 5.116637986087593,
+     "y": 0.42690533338479286,
+     "r": 0.15,
+     "heightCm": 300,
+     "windbreak": false
+    },
+    {
+     "id": "B2305",
+     "x": 4.86775229945847,
+     "y": 0.30417732113351387,
+     "r": 0.15,
+     "heightCm": 300,
+     "windbreak": false
+    },
+    {
+     "id": "B1896",
+     "x": 0.26154664054512977,
+     "y": 0.5852862247576316,
+     "r": 0.12,
+     "heightCm": 200,
+     "windbreak": false
+    },
+    {
+     "id": "B1896",
+     "x": 0.4084569930232303,
+     "y": 0.4188490043567842,
+     "r": 0.12,
+     "heightCm": 200,
+     "windbreak": false
+    },
+    {
+     "id": "B1896",
+     "x": 0.12,
+     "y": 0.41426415439714326,
+     "r": 0.12,
+     "heightCm": 200,
+     "windbreak": false
+    },
+    {
+     "id": "B1896",
+     "x": 0.2669103524781006,
+     "y": 0.24782693399629585,
+     "r": 0.12,
+     "heightCm": 200,
+     "windbreak": false
+    },
+    {
+     "id": "B1896",
+     "x": 0.5129446569042294,
+     "y": 0.22297575938266515,
+     "r": 0.12,
+     "heightCm": 200,
+     "windbreak": false
+    },
+    {
+     "id": "B1074",
+     "x": 2.5828794636391104,
+     "y": 1.68,
+     "r": 0.32,
+     "heightCm": 40,
+     "windbreak": false
+    },
+    {
+     "id": "B1074",
+     "x": 1.9908794636391103,
+     "y": 1.68,
+     "r": 0.32,
+     "heightCm": 40,
+     "windbreak": false
+    },
+    {
+     "id": "B1074",
+     "x": 3.1748794636391104,
+     "y": 1.68,
+     "r": 0.32,
+     "heightCm": 40,
+     "windbreak": false
+    },
+    {
+     "id": "B1494",
+     "x": 4.991294683422893,
+     "y": 1.4476739621721209,
+     "r": 0.3,
+     "heightCm": 50,
+     "windbreak": false
+    },
+    {
+     "id": "B1494",
+     "x": 5.562925991183147,
+     "y": 1.5058435066603124,
+     "r": 0.3,
+     "heightCm": 50,
+     "windbreak": false
+    },
+    {
+     "id": "B1494",
+     "x": 4.4456342285832715,
+     "y": 1.5490626598864945,
+     "r": 0.3,
+     "heightCm": 50,
+     "windbreak": false
+    },
+    {
+     "id": "B1419",
+     "x": 0.25,
+     "y": 0.9370967918134288,
+     "r": 0.25,
+     "heightCm": 50,
+     "windbreak": false
+    },
+    {
+     "id": "B1419",
+     "x": 0.5075753122166734,
+     "y": 1.3212337576686861,
+     "r": 0.25,
+     "heightCm": 50,
+     "windbreak": false
+    },
+    {
+     "id": "B1419",
+     "x": 0.9049589958514412,
+     "y": 1.557861013032186,
+     "r": 0.25,
+     "heightCm": 50,
+     "windbreak": false
+    }
+   ]
+  }
+ ],
+ "bands": {
+  "edgeFrontMid": 0.35,
+  "edgeMidBack": 0.65,
+  "hFrontMax": 60,
+  "hMiddleMin": 30,
+  "hMiddleMax": 120,
+  "hBackMin": 80,
+  "hGrassFrontHalfMax": 120,
+  "curveK": 0.15,
+  "curveAsymMax": 0.25,
+  "shareMin": 0.8,
+  "canopyOverlapMax": 1
+ }
+}
