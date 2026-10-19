@@ -235,9 +235,11 @@ into `data/processed/catalogues/`.
 
 ## Data boundary
 
-**The species catalogue comes from one source: the finalised workbook
-`FINAL.DATASET.FINAL.xlsx` (kept beside the repo), imported by
-`data/scripts/import_final_dataset.py`.** 2,843 species, 47 columns.
+**The species catalogue comes from one source: the workbook
+`FINAL.DATASET.FINAL.the correctone.xlsx` (kept beside the repo), imported by
+`data/scripts/import_final_dataset.py`.** Owner, 19 Oct 2026: this is the
+ONLY dataset workbook to use; `FINAL.DATASET.FINAL.xlsx` beside it is no
+longer read. 2,843 species, 52 columns.
 Every measurement field is populated (`spread_cm` and `height_cm` 100%,
 sun/water/soil 83–99%) and each carries its own `*_source` /
 `*_confidence` column recording how the value was obtained. Most spread

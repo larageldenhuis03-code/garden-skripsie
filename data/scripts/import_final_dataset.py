@@ -29,7 +29,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from build_processed_data import xlsx_first_sheet_rows  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_WORKBOOK = REPO_ROOT.parent / "FINAL.DATASET.FINAL.xlsx"
+# Owner, 19 Oct 2026: this is the only dataset workbook to use.
+DEFAULT_WORKBOOK = REPO_ROOT.parent / "FINAL.DATASET.FINAL.the correctone.xlsx"
 OUTPUT_CSV = REPO_ROOT / "data" / "processed" / "plant_database_western_cape.csv"
 
 EXPECTED_SPECIES = 2843

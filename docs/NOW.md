@@ -119,6 +119,32 @@ The guided fixture moved from 3 plants / 3 species to **5 / 5**, open space
 unchanged at 43%, for the reason above — re-verified by running the
 planner, not assumed.
 
+## Dataset switched to `FINAL.DATASET.FINAL.the correctone.xlsx` (2026-10-19)
+
+Owner instruction: this is the only dataset workbook to use from now on.
+The sync and the importer now default to it. Dataset version
+**1e15fe4470f8**, which replaces 6c081d3d2f60. The rulebook stays frozen
+at 713f9bad5bec: the edited `Algorithm_rulebook.xlsx` (b5e2e4c9fee4) is not
+imported.
+
+**What changed:** the same 2,843 species; 46 records differ, with 45 spreads
+and 9 heights corrected as expert estimates. All 5 `suspect-low` trees are
+corrected, e.g. Brachylaena glabra 30 → 400 cm spread and 18 → 6 m tall,
+and Protea laurifolia 30 → 200 cm and 8 → 4.5 m.
+
+**Tests no longer all pass.** 3 layering tests fail on the new data:
+- the 12-case (east option 1: tall 4.05 m vs short 5.08 m from the viewer);
+- D24 (b) (north option 3);
+- D24 (c) (south option 1: windbreak plant B2132 off the windward edge).
+
+The cause is the data, not the code: a clean copy of the last commit fails
+the same 3 tests. Relaxation is not involved. Engine-final behaviour (D29b
+off) fails D24 (b) only.
+
+The new spreads change which plans are chosen, and plans with very wide
+plants (3 m and more) put short plants behind tall ones. The tests are kept
+as they are; the fix belongs in the layout and is still to come.
+
 ## layout-v2f: v7 on by default on the branch (2026-10-14)
 
 Branch `layout-v2f`. The full report is `reports/layout_v2f_comparison.md`.

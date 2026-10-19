@@ -1,7 +1,8 @@
 /**
  * Keeps the app in step with the two workbooks it is built from:
  *
- *   FINAL.DATASET.FINAL.xlsx (the plants)
+ *   FINAL.DATASET.FINAL.the correctone.xlsx (the plants; owner, 19 Oct 2026:
+ *   the only dataset workbook to use)
  *     -> import_final_dataset.py -> data/processed/plant_database_western_cape.csv
  *     -> generate_plants_json.py -> app/data/plant_database.generated.json
  *
@@ -42,7 +43,7 @@ const SOURCES = [
     label: "dataset",
     workbook: resolve(
       process.env.FINAL_DATASET_PATH ??
-        resolve(REPO_ROOT, "..", "FINAL.DATASET.FINAL.xlsx"),
+        resolve(REPO_ROOT, "..", "FINAL.DATASET.FINAL.the correctone.xlsx"),
     ),
     output: resolve(REPO_ROOT, "app/data/plant_database.generated.json"),
     stamp: resolve(REPO_ROOT, "app/data/dataset_version.generated.json"),
