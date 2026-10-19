@@ -338,6 +338,11 @@ test("layout-v2g v11 harmonise: same plants and Z, hard checks pass, no new ORDE
         const tallFront = (ps: readonly P[]) => ps.filter((p) => heightOf(p.plantId) >= hBackMin && axis.depthOf(p.xM, p.yM) < edgeFrontMid * axis.span - 1e-6).length;
         assert.ok(tallFront(b) <= tallFront(a), `${where}: more tall plants in front`);
         if (plan.diagnostics.some((d) => d.startsWith("H11 harmonise: kept"))) kept += 1;
+        // alwaysKeep (owner, 20 Oct): applied to every option.
+        if (HARMONISE.alwaysKeep) {
+          const line = plan.diagnostics.filter((d) => d.startsWith("H11 harmonise:")).at(-1);
+          assert.ok(line?.startsWith("H11 harmonise: kept"), `${where}: harmonise not applied (${line})`);
+        }
       });
     }
   } finally {

@@ -119,6 +119,31 @@ The guided fixture moved from 3 plants / 3 species to **5 / 5**, open space
 unchanged at 43%, for the reason above — re-verified by running the
 planner, not assumed.
 
+## Final algorithm v11o, harmonise always applied (2026-10-20)
+
+`main` holds the final algorithm, **v11o**, with these settings in
+engineConfig:
+- the v9c open-fill limits;
+- added plants allowed to overlap within P2 (A);
+- harmonise on.
+
+Owner, 20 Oct: harmonise is applied to **every** option
+(`HARMONISE.alwaysKeep`). It is no longer applied only when it improves the
+side-gap spread without growing the largest gap. Every move is still held to
+each hard rule, ORDER and GROUP.
+
+Rulebook 713f9bad5bec, dataset 1e15fe4470f8. Everything runs locally; the
+public site still serves an older build, and a later deploy goes to the
+Cloudflare worker.
+
+**Chapter 5 was run just before alwaysKeep.** The results are
+`reports/chapter5_results_final.*`, run 2026-10-19T17:41Z at 9c30d1e, tag
+`layout-final`. The owner keeps those results. alwaysKeep only moves plants,
+so selection, Z, feasibility, sourcing (T3) and the hard checks are
+unaffected; mainly the spacing and gap measures would differ. Unit tests
+with alwaysKeep: only the 2 known dataset failures (12-case east 1,
+D24 (c)).
+
 ## Dataset switched to `FINAL.DATASET.FINAL.the correctone.xlsx` (2026-10-19)
 
 Owner instruction: this is the only dataset workbook to use from now on.

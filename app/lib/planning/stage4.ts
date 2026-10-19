@@ -1084,7 +1084,9 @@ function placeOnce(
     const patchAfter = largestEmptyPatchOf(circles(), W, L);
     const moved = placed.map((p, k) => Math.hypot(p.xM - saved[k].x, p.yM - saved[k].y) > 1e-9);
     const allLegal = placed.every((_, k) => legal(k, new Set([k])) || (!legalBefore[k] && !moved[k]));
-    const kept = spreadAfter < spreadBefore - 1e-9 && patchAfter <= patchBefore + 1e-9 && allLegal;
+    // alwaysKeep (owner, 20 Oct): applied whenever every check holds.
+    const better = spreadAfter < spreadBefore - 1e-9 && patchAfter <= patchBefore + 1e-9;
+    const kept = (HARMONISE.alwaysKeep || better) && allLegal;
     if (!kept) saved.forEach((pos, k) => { placed[k].xM = pos.x; placed[k].yM = pos.y; });
     moves.sort((a, b) => a - b);
     const med = moves.length ? (moves.length % 2 ? moves[(moves.length - 1) / 2] : (moves[moves.length / 2 - 1] + moves[moves.length / 2]) / 2) : 0;

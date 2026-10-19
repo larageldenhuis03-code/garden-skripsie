@@ -386,4 +386,16 @@ export const KEEP_PLACED = { on: false };
  * limits, A: added plants within P2) this is v11o, the final algorithm.
  * IMPLEMENTATION values from the owner's prompt.
  */
-export const HARMONISE = { on: true, iterations: 80, step: 0.5, maxMoveM: 0.5, lateralOrderM: 1.0, cohesionLooseM: 0.3 };
+export const HARMONISE = {
+  on: true,
+  /** Owner, 20 Oct 2026: harmonise is always applied, to every option -
+   * kept whenever every check holds, not only when the side-gap spread
+   * falls and the largest empty patch does not grow. Each move is still
+   * held to every hard rule, ORDER and GROUP. false restores keep-if-better. */
+  alwaysKeep: true,
+  iterations: 80,
+  step: 0.5,
+  maxMoveM: 0.5,
+  lateralOrderM: 1.0,
+  cohesionLooseM: 0.3,
+};
