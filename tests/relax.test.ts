@@ -5,7 +5,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { plants } from "../app/data/plants.ts";
-import { LAYOUT_V2B, RELAX } from "../app/lib/planning/engineConfig.ts";
+import { HARMONISE, LAYOUT_V2B, RELAX } from "../app/lib/planning/engineConfig.ts";
 import { largestEmptyPatchOf } from "../app/lib/planning/relax.ts";
 import { buildGardenPlanVariants, minCentreDistance, type GardenBrief, type GardenPlan } from "../app/lib/planning/index.ts";
 import { largestEmptyPatch, plantedCells } from "../scripts/batch-test/metrics.ts";
@@ -27,11 +27,14 @@ const D33 = { method: "force" as const, edgeGuard: false, swaps: false, shortCla
 
 function run(brief: GardenBrief, relax: boolean): GardenPlan[] {
   const saved = { ...RELAX };
+  const savedHarmonise = HARMONISE.on;
   Object.assign(RELAX, D33, { on: relax });
+  HARMONISE.on = false; // v11 (on by default since 19 Oct) is not part of D33
   try {
     return buildGardenPlanVariants(plants, brief);
   } finally {
     Object.assign(RELAX, saved);
+    HARMONISE.on = savedHarmonise;
   }
 }
 

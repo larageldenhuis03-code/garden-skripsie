@@ -23,13 +23,18 @@ const BRIEFS: [string, GardenBrief][] = [
   ["windy 8 x 2 m, east view", { biomes: ["Fynbos"], bioregion: "Southwest Fynbos Bioregion", soil: "sandy", wind: "affected", viewingEdge: "east", sun: "full", water: "moderate", bedWidthM: 8, bedLengthM: 2, style: "undecided", colour: { mode: "none" }, extras: [] }],
 ];
 
-function run(brief: GardenBrief, relax: Partial<typeof RELAX>): GardenPlan[] {
+// Harmonise (v11, on by default since 19 Oct) is pinned off unless a test
+// asks for it, so each test checks its own variant.
+function run(brief: GardenBrief, relax: Partial<typeof RELAX>, harmonise = false): GardenPlan[] {
   const saved = { ...RELAX };
+  const savedHarmonise = HARMONISE.on;
   Object.assign(RELAX, relax);
+  HARMONISE.on = harmonise;
   try {
     return buildGardenPlanVariants(plants, brief);
   } finally {
     Object.assign(RELAX, saved);
+    HARMONISE.on = savedHarmonise;
   }
 }
 
@@ -318,10 +323,8 @@ test("layout-v2g v11 harmonise: same plants and Z, hard checks pass, no new ORDE
   const saved = HARMONISE.on;
   try {
     for (const [label, brief] of BRIEFS) {
-      HARMONISE.on = false;
-      const plain = run(brief, V9C);
-      HARMONISE.on = true;
-      const harm = run(brief, V9C);
+      const plain = run(brief, V9C, false);
+      const harm = run(brief, V9C, true);
       harm.forEach((plan, i) => {
         const where = `${label} ${plan.character}`;
         const a = plain[i].layout!.placements;

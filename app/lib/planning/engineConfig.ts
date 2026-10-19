@@ -381,7 +381,9 @@ export const KEEP_PLACED = { on: false };
  * of one species splits or leaves a plant more than cohesionLooseM from
  * its group (GROUP); otherwise it is halved up to 3 times, then skipped.
  * The result is kept only if the median side-gap spread falls, the largest
- * empty patch does not grow and every check holds. Off by default.
+ * empty patch does not grow and every check holds.
+ * Owner 19 Oct: final, default on - with the RELAX defaults (v9c fill
+ * limits, A: added plants within P2) this is v11o, the final algorithm.
  * IMPLEMENTATION values from the owner's prompt.
  */
-export const HARMONISE = { on: false, iterations: 80, step: 0.5, maxMoveM: 0.5, lateralOrderM: 1.0, cohesionLooseM: 0.3 };
+export const HARMONISE = { on: true, iterations: 80, step: 0.5, maxMoveM: 0.5, lateralOrderM: 1.0, cohesionLooseM: 0.3 };
