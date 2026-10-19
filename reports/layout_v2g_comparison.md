@@ -289,3 +289,72 @@ open fill's small plants moved the averages those tests compare.
 
 **Figures:** `reports/figures/layout_v2g/{v9c,v10}_{S001,S006,FIX}.png`,
 each with v7 on the left.
+
+## A / B: added plants overlap like every other plant (A), single new-species plants (B)
+
+Owner, 19 Oct 2026. Rulebook **713f9bad5bec**, dataset **1e15fe4470f8**, same
+seeds. One run each, compared with the existing v7 and v9c rows.
+
+**A** (`RELAX.addedOverlap`, now on by default) changes the overlap rule for
+every added plant: the v7 gap fill, the v8 last fill and the v9 open fill.
+These plants keep the same P2 limit as every other plant (overlap up to
+overlap_delta, 15% of the smaller radius) instead of touching nothing. P1,
+P5, the tree rule, the front rule and the depth tolerance still hold.
+**v9o** is v9c with A.
+
+**B** (`RELAX.openFillSingles`, off) lets the open fill plant a new species
+as a single plant when no whole group fits. It stays within H3b's singleton
+limit and the 7-species cap. **v9s** is v9o with B.
+
+| Metric | v7 | v9c | v9o | v9s |
+|---|---:|---:|---:|---:|
+| Dataset of every row | 1e15fe4470f8 | 1e15fe4470f8 | 1e15fe4470f8 | 1e15fe4470f8 |
+| Briefs feasible (of 101) | 94 | 94 | 94 | 94 |
+| Options feasible | 275/282 | 275/282 | 275/282 | 275/282 |
+| Z identical to v7, per option | 282/282 | 282/282 | 282/282 | 282/282 |
+| Median Z | 0.8994 | 0.8994 | 0.8994 | 0.8994 |
+| Cover (median) | 0.678 | 0.697 | 0.706 | 0.706 |
+| Options with cover >= 0.75 / 0.80 | 57 / 19 | 75 / 24 | 88 / 34 | 88 / 34 |
+| Largest gap (median) | 0.130 | 0.100 | 0.095 | 0.095 |
+| **Tall (>= 80 cm) centred in front, sum (<= 797)** | 797 | 790 | 790 | 790 |
+| Trees centred in front, sum | 37 | 37 | 37 | 37 |
+| Options with a hard failure | 0 | 0 | 0 | 0 |
+| Plants outside the bed | 0 | 0 | 0 | 0 |
+| Plants per option: median / max | 20 / 64 | 22 / 88 | 23 / 96 | 23 / 96 |
+| Species per option: median / max | 5 / 19 | 6 / 26 | 6 / 26 | 6 / 26 |
+| v9 new species: total / median / max | - | 320 / 0 / 7 | 472 / 0 / 7 | 460 / 0 / 7 |
+| **v9 added plants narrower than 30 cm (must be 0)** | not recorded | 0 | 0 | 0 |
+| v9 added plants: spread, cm (median of option medians) | not recorded | 30 | 30 | 30 |
+| B: single new-species plants (total / options) | - | - | 0 / 0 | 30 / 26 |
+| Grouped plants > 10 cm from any group-mate (median share) | 0.087 | 0.080 | 0.071 | 0.071 |
+| 12-case / D24 (b) east 1 | 11/12 / pass | 11/12 / pass | 11/12 / pass | 11/12 / pass |
+
+**Reading:**
+- **A opens the slivers, as expected.** Against v9c, median cover rises
+  from 0.697 to 0.706. Options with cover of 0.75 or more go from 75 to 88,
+  and with 0.80 or more from 24 to 34. The largest gap falls from 0.100 to
+  0.095.
+- **A costs nothing measurable.** Z (282/282 identical), feasibility, the
+  front rule (790), trees in front, and hard failures are unchanged, and no
+  plant is outside the bed. Drifts are slightly tighter: 0.071 against 0.080
+  of grouped plants are more than 10 cm from a group-mate, because group-mates
+  may now stand as close as P2 allows. A is on by default.
+- **B buys nothing.** It plants 30 lone single plants across 26 options, but
+  cover, gaps and plant counts are identical to v9o. The lone plants use up
+  some of the 7-species cap (460 against 472 new species). B stays off.
+
+**Tests:** `npm run test:unit` gives 143 tests with 2 failing, both known
+dataset failures (12-case east 1 and D24 (c)), and no others. D24 (b) passes
+here, but only because the added plants shift the averages it compares, as
+noted for v9h.
+
+There are two test changes:
+- The v8 tests now check that added plants stay within P2 rather than touch
+  nothing, since A changes that rule on purpose.
+- A new test checks that added plants may overlap but never beyond P2, that
+  Z and the hard checks are unchanged, and that single new-species plants
+  appear only with B on.
+
+**Figures:** `reports/figures/layout_v2g/{v9o,v9s}_{S001,S006,FIX}.png`, each
+with v9c on the left. In the fixed case, A fits a group of three into the
+sliver between the large back plants.

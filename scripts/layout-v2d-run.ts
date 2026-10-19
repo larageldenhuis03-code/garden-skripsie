@@ -331,6 +331,8 @@ for (const { id, brief } of briefs) {
       // Fail-rule retries, and v10 (KEEP_PLACED) species left out.
       retried: plan.diagnostics.some((d) => d.includes("Retrying at no more than")),
       kp_left_out: plan.diagnostics.filter((d) => d.startsWith("KP: ")).length,
+      // B: new species the open fill planted as a single plant.
+      v9_singles: plan.diagnostics.filter((d) => d.includes("single (B)")).length,
       // v9's own added plants (not v7's gap fill): how many are narrower than
       // 30 cm, and their median spread in cm.
       ...(() => {

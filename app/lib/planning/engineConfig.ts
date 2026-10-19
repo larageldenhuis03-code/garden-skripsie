@@ -343,6 +343,17 @@ export const RELAX = {
   openFillMaxNewSpecies: 7,
   openFillMinSpreadM: 0.3,
   openFillFallback: false,
+  /** A (owner, 19 Oct 2026): added plants (v7 gap fill, v8 last fill, v9
+   * open fill) may overlap their neighbours like every other plant - the
+   * P2 canopy overlap (overlap_delta of the smaller radius) - instead of
+   * touching nothing. Consistent with the rest of the layout, and opens
+   * most slivers. P1, P5 and every other rule still hold. */
+  addedOverlap: true,
+  /** B (owner option, 19 Oct 2026; off): the open fill may plant a new
+   * species as a single plant when no whole group fits (still within H3b's
+   * singleton limit and the new-species cap). Fills small gaps but brings
+   * back lone plants. */
+  openFillSingles: false,
 };
 
 /**

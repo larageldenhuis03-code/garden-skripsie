@@ -350,6 +350,12 @@ function placeOnce(
     });
   };
 
+  /** A (RELAX.addedOverlap): the room an added plant of radius r needs at a
+   * point (distance to the nearest canopy edge or bed edge). With overlap
+   * allowed this is only a pre-filter - P2 can let it come up to
+   * overlap_delta x the smaller radius closer - and fits() then decides. */
+  const roomNeeded = (r: number) => (RELAX.addedOverlap ? r * (1 - RULES.stage4.overlapDelta) : r);
+
   // ---------------------------------------------------------------- P3 row
   let windbreakId: string | null = null;
   if (profile === "windbreak") {
@@ -984,7 +990,7 @@ function placeOnce(
       Math.min(x, W - x, y, L - y, ...placed.map((p) => Math.hypot(p.xM - x, p.yM - y) - p.radiusM));
     const canStand = (info: SpeciesInfo, x: number, y: number): boolean => {
       const r = info.diameterM / 2;
-      if (roomAt(x, y) < r - EPS) return false; // touches nothing, inside the bed
+      if (roomAt(x, y) < roomNeeded(r) - EPS) return false; // inside the bed; touches nothing unless A (P2 overlap)
       if (!fits(x, y, r, info) || breaksP4(info, x, y) || treeInFront(info, x, y)) return false;
       // Owner 19 Oct: no added plant of h_back_min or taller centred in the front band
       // (straight depth from the viewer). Hard, like the tree rule.
@@ -1000,14 +1006,15 @@ function placeOnce(
       const out: { x: number; y: number; room: number }[] = [];
       for (const m of placed) {
         if (m.plantId !== id) continue;
-        const dist = m.radiusM + r + 0.02;
+        // A: as close as P2 lets group-mates stand; else 2 cm apart.
+        const dist = RELAX.addedOverlap ? minCentreDistance(m.radiusM, r) + 0.005 : m.radiusM + r + 0.02;
         for (let a = 0; a < 24; a += 1) {
           const x = m.xM + dist * Math.cos((a * Math.PI) / 12);
           const y = m.yM + dist * Math.sin((a * Math.PI) / 12);
           out.push({ x, y, room: roomAt(x, y) });
         }
       }
-      return out.filter((p) => p.room >= r - EPS).sort((a, b) => b.room - a.room);
+      return out.filter((p) => p.room >= roomNeeded(r) - EPS).sort((a, b) => b.room - a.room);
     };
     const put = (info: SpeciesInfo, x: number, y: number) => {
       const n = counts.get(info.id) ?? 0;
@@ -1045,9 +1052,11 @@ function placeOnce(
         }
         return null;
       }
-      const first = gapPoints.find((g) => g.room >= r - EPS && canStand(info, g.x, g.y));
+      const first = gapPoints.find((g) => g.room >= roomNeeded(r) - EPS && canStand(info, g.x, g.y));
       if (!first) return null;
       const sizes = [...info.allowedN].sort((a, b) => b - a);
+      // B: a single plant as the last resort, even where H3 wants a group.
+      if (RELAX.openFillSingles && !sizes.includes(1)) sizes.push(1);
       for (const size of sizes) {
         put(info, first.x, first.y);
         let k = 1;
@@ -1059,7 +1068,7 @@ function placeOnce(
         }
         if (k === size && ok(counts)) {
           newSpecies += 1;
-          return `${info.id} x${size} [new species]`;
+          return `${info.id} x${size} [new species${size === 1 && !info.allowedN.includes(1) ? ", single (B)" : ""}]`;
         }
         undo(info, k);
       }
@@ -1079,9 +1088,9 @@ function placeOnce(
         const depthOfPoint = (g: { x: number; y: number }) => (v2b ? effDepthM(g.x, g.y) : viewer.depthOf(g.x, g.y));
         const fitting = pool.filter((info) => {
           const r = info.diameterM / 2;
-          if (r > maxRoom + EPS) return false;
+          if (roomNeeded(r) > maxRoom + EPS) return false;
           const t = targetOf(info);
-          return points.some((g) => g.room >= r - EPS && (t === null || Math.abs(depthOfPoint(g) - t * viewer.span) <= RULES.stage4.depthTol * viewer.span + EPS));
+          return points.some((g) => g.room >= roomNeeded(r) - EPS && (t === null || Math.abs(depthOfPoint(g) - t * viewer.span) <= RULES.stage4.depthTol * viewer.span + EPS));
         });
         const well = fitting
           .filter((info) => info.diameterM / 2 >= RELAX.openFillWellFraction * maxRoom)
@@ -1151,13 +1160,13 @@ function placeOnce(
       const spots = emptyGaps(placed.map((p) => ({ x: p.xM, y: p.yM, r: p.radiusM })), W, L)
         .flat()
         .map((c) => ({ ...c, room: room(c.x, c.y) }))
-        .filter((c) => c.room >= minR - EPS)
+        .filter((c) => c.room >= roomNeeded(minR) - EPS)
         .sort((a, b) => b.room - a.room || a.y - b.y || a.x - b.x);
       let done = false;
       for (const spot of spots) {
         for (const info of candidates) {
           const r = info.diameterM / 2;
-          if (spot.room < r - EPS) continue; // touches nothing, inside the bed
+          if (spot.room < roomNeeded(r) - EPS) continue; // inside the bed; touches nothing unless A (P2 overlap)
           const n = counts.get(info.id) ?? 0;
           if (n + 1 > Math.max(...info.allowedN)) continue; // H3 max
           if ((n + 1) / (total + 1) > h5Cap + 1e-9) continue; // H5 cap
@@ -1225,7 +1234,8 @@ function placeOnce(
           const r = info.diameterM / 2;
           const x = Math.min(Math.max(spot.x, r), W - r);
           const y = Math.min(Math.max(spot.y, r), L - r);
-          if (placed.some((p) => Math.hypot(p.xM - x, p.yM - y) < p.radiusM + r - EPS)) continue; // touches nothing
+          // Touches nothing - unless A, where P2's overlap applies (fits() below).
+          if (!RELAX.addedOverlap && placed.some((p) => Math.hypot(p.xM - x, p.yM - y) < p.radiusM + r - EPS)) continue;
           if (RELAX.cohesionFill) {
             // v7: beside a plant of its own species.
             const mateGap = Math.min(...placed.filter((p) => p.plantId === info.id).map((p) => Math.hypot(p.xM - x, p.yM - y) - p.radiusM - r));

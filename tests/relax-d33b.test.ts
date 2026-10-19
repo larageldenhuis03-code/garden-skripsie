@@ -124,7 +124,7 @@ test("D33b v7 cohesion: no grouped plant ends further than max(10 cm, its gap as
 
 // layout-v2g v8 (owner idea, 19 Oct 2026): the last-resort fill only adds.
 for (const pool of [false, true]) {
-  test(`layout-v2g v8${pool ? "b (with pool species)" : ""}: every v7 plant stays exactly where it was, Z unchanged, added plants touch nothing, inside the bed, hard checks hold, cover within cover_max`, () => {
+  test(`layout-v2g v8${pool ? "b (with pool species)" : ""}: every v7 plant stays exactly where it was, Z unchanged, added plants within P2, inside the bed, hard checks hold, cover within cover_max`, () => {
     for (const [label, brief] of BRIEFS) {
       const v7 = run(brief, V4);
       for (const [i, plan] of run(brief, { ...V4, lastFill: true, lastFillPool: pool }).entries()) {
@@ -140,7 +140,9 @@ for (const pool of [false, true]) {
         const L = brief.bedLengthM;
         for (const p of after.slice(before.length)) {
           assert.ok(p.xM >= p.radiusM - 1e-6 && p.xM <= W - p.radiusM + 1e-6 && p.yM >= p.radiusM - 1e-6 && p.yM <= L - p.radiusM + 1e-6, `${label}: ${p.instanceId} outside the bed`);
-          for (const q of after) if (q !== p) assert.ok(Math.hypot(p.xM - q.xM, p.yM - q.yM) >= p.radiusM + q.radiusM - 1e-6, `${label}: ${p.instanceId} touches ${q.instanceId}`);
+          // A (owner, 19 Oct): added plants keep P2 like every other plant
+          // (overlap up to overlap_delta of the smaller radius), not 0%.
+          for (const q of after) if (q !== p) assert.ok(Math.hypot(p.xM - q.xM, p.yM - q.yM) >= minCentreDistance(p.radiusM, q.radiusM) - 1e-6, `${label}: ${p.instanceId} overlaps ${q.instanceId} beyond P2`);
           if (!pool) assert.ok(v7[i].layout!.placements.some((q) => q.plantId === p.plantId), `${label}: ${p.plantId} is a new species without lastFillPool`);
         }
         assert.ok((plan.engine?.placementChecks ?? []).every((c) => c.kind !== "hard" || c.pass), `${label}: a hard check failed`);
@@ -250,4 +252,32 @@ test("layout-v2g v10: a species with no room left is left out and the rest kept 
   } finally {
     KEEP_PLACED.on = saved;
   }
+});
+
+// A and B (owner, 19 Oct 2026).
+test("A: added plants may overlap their neighbours, but never beyond P2; B: single new-species plants only with openFillSingles", () => {
+  const V9C = { ...V4, openFill: true, openFillMaxNewSpecies: 7, openFillMinSpreadM: 0.3, openFillFallback: false, addedOverlap: true };
+  let overlaps = 0;
+  for (const [label, brief] of BRIEFS) {
+    const v7 = run(brief, { ...V4, addedOverlap: true });
+    for (const singles of [false, true]) {
+      for (const [i, plan] of run(brief, { ...V9C, openFillSingles: singles }).entries()) {
+        const where = `${label} ${plan.character} (singles ${singles})`;
+        const ps = plan.layout!.placements;
+        for (const p of ps.filter((q) => (q as { gapFill?: boolean }).gapFill)) {
+          for (const q of ps) {
+            if (q === p) continue;
+            const d = Math.hypot(p.xM - q.xM, p.yM - q.yM);
+            assert.ok(d >= minCentreDistance(p.radiusM, q.radiusM) - 1e-6, `${where}: ${p.instanceId} overlaps ${q.instanceId} beyond P2`);
+            if (d < p.radiusM + q.radiusM - 1e-6) overlaps += 1;
+          }
+        }
+        assert.equal(plan.engine?.z, v7[i].engine?.z, `${where}: Z changed`);
+        assert.ok((plan.engine?.placementChecks ?? []).every((c) => c.kind !== "hard" || c.pass), `${where}: a hard check failed`);
+        const singleLines = plan.diagnostics.filter((d) => d.includes("single (B)"));
+        if (!singles) assert.equal(singleLines.length, 0, `${where}: a single new-species plant without openFillSingles`);
+      }
+    }
+  }
+  assert.ok(overlaps > 0, "no added plant overlapped a neighbour, so A was not exercised");
 });
