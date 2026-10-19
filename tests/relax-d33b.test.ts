@@ -7,8 +7,8 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { plants } from "../app/data/plants.ts";
-import { LAYOUT_V2B, RELAX } from "../app/lib/planning/engineConfig.ts";
-import { buildGardenPlanVariants, computeHeightTiers, computeSpreadBands, RULES, speciesInfo, viewingAxis, type GardenBrief, type GardenPlan } from "../app/lib/planning/index.ts";
+import { KEEP_PLACED, LAYOUT_V2B, RELAX } from "../app/lib/planning/engineConfig.ts";
+import { buildGardenPlanVariants, computeHeightTiers, computeSpreadBands, createRng, minCentreDistance, placeSelection, RULES, scorePlantStage1, speciesInfo, viewingAxis, type GardenBrief, type GardenPlan, type SpeciesInfo } from "../app/lib/planning/index.ts";
 import { buildScenarios } from "../scripts/batch-test/scenarios.ts";
 
 Object.assign(LAYOUT_V2B, { d29b: true, treeHard: true, curve: true, order: true, fill: true, driftSplit: false });
@@ -179,4 +179,75 @@ test("layout-v2g v9: v7's plants stay put, Z unchanged, hard checks hold, and no
     }
   }
   assert.ok(added > 0, "the open fill added nothing on these briefs, so it was not exercised");
+});
+
+// layout-v2g v9c (owner, 19 Oct 2026): limits on what the open fill adds.
+test("layout-v2g v9c: at most 7 new species per layout, and no added plant narrower than 30 cm", () => {
+  const V9C = { ...V4, openFill: true, openFillMaxNewSpecies: 7, openFillMinSpreadM: 0.3, openFillFallback: false };
+  let added = 0;
+  for (const [label, brief] of BRIEFS) {
+    const v7 = run(brief, V4);
+    for (const [i, plan] of run(brief, V9C).entries()) {
+      const where = `${label} ${plan.character}`;
+      const planned = new Set(v7[i].quantities!.quantities.map((q) => q.id));
+      const newSpecies = plan.quantities!.quantities.filter((q) => !planned.has(q.id)).length;
+      assert.ok(newSpecies <= 7, `${where}: ${newSpecies} new species`);
+      for (const p of plan.layout!.placements.slice(v7[i].layout!.placements.length)) {
+        added += 1;
+        assert.ok(2 * p.radiusM >= 0.3 - 1e-9, `${where}: added ${p.instanceId} is ${(200 * p.radiusM).toFixed(0)} cm across`);
+      }
+      assert.equal(plan.engine?.z, v7[i].engine?.z, `${where}: Z changed`);
+    }
+  }
+  assert.ok(added > 0, "the open fill added nothing on these briefs, so v9c was not exercised");
+});
+
+// layout-v2g v10 (owner, 19 Oct 2026): keep what fits.
+test("layout-v2g v10: a species with no room left is left out and the rest kept (KEEP_PLACED); off, the layout fails as before", () => {
+  const tiers = computeHeightTiers(plants);
+  const spreads = computeSpreadBands(plants);
+  const brief: GardenBrief = { ...BRIEFS[1][1], bedWidthM: 8, bedLengthM: 2, viewingEdge: "south" };
+  const info = (id: string) => {
+    const plant = plants.find((p) => p.id === id)!;
+    return speciesInfo(plant, scorePlantStage1(plant, { brief, savedPlantIds: [] }).score, tiers, spreads, 16) as SpeciesInfo;
+  };
+  // Three groups of about 2 m across cannot all fit on an 8 x 2 m bed.
+  const big = plants
+    .filter((p) => p.spreadCm !== null && p.spreadCm >= 180 && p.spreadCm <= 200 && p.heightCm !== null && p.heightCm < 300)
+    .map((p) => info(p.id))
+    .filter((x) => x && !x.feature && x.layer !== "L2" && x.allowedN.includes(3))
+    .slice(0, 3);
+  const small = plants
+    .filter((p) => p.spreadCm !== null && p.spreadCm >= 30 && p.spreadCm <= 50 && p.heightCm !== null && p.heightCm < 40)
+    .map((p) => info(p.id))
+    .filter((x) => x && !x.feature && x.layer !== "L2" && x.allowedN.includes(3))
+    .slice(0, 2);
+  assert.equal(big.length, 3);
+  assert.equal(small.length, 2);
+  const infos = new Map([...big, ...small].map((x) => [x.id, x]));
+  const selection = new Map([...infos.keys()].map((id) => [id, 3]));
+  const site = { widthM: 8, depthM: 2, windSite: 0, rowsAvailable: 1, frontEdge: "south" as const };
+  const saved = KEEP_PLACED.on;
+  try {
+    KEEP_PLACED.on = false;
+    assert.equal(placeSelection(selection, infos, site, createRng("v10")).status, "failed");
+    KEEP_PLACED.on = true;
+    const result = placeSelection(selection, infos, site, createRng("v10"));
+    assert.equal(result.status, "complete");
+    assert.ok((result.skipped ?? []).length > 0, "nothing was left out, so the test bed is not over-full");
+    for (const id of result.skipped ?? []) {
+      assert.ok(!result.realised.has(id), `${id} is still in realised`);
+      assert.ok(result.layout.diagnostics.some((d) => d.startsWith(`KP: ${id} left out`)), `${id}: no KP line`);
+      assert.ok(!result.layout.placements.some((p) => p.plantId === id), `${id} is still drawn`);
+    }
+    const ps = result.layout.placements;
+    for (let i = 0; i < ps.length; i += 1) {
+      for (let j = i + 1; j < ps.length; j += 1) {
+        assert.ok(Math.hypot(ps[i].xM - ps[j].xM, ps[i].yM - ps[j].yM) >= minCentreDistance(ps[i].radiusM, ps[j].radiusM) - 1e-6, `${ps[i].instanceId} overlaps ${ps[j].instanceId}`);
+      }
+    }
+    for (const check of result.checks.filter((c) => c.kind === "hard")) assert.ok(check.pass, `${check.id}: ${check.detail}`);
+  } finally {
+    KEEP_PLACED.on = saved;
+  }
 });

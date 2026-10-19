@@ -215,3 +215,77 @@ test fails.
 
 **Figures:** `reports/figures/layout_v2g/v9h_{S001,S006,FIX}.png`, each with
 v7 on the left and v9h on the right.
+
+## v9c / v10
+
+Owner, 19 Oct 2026. Rulebook **713f9bad5bec**, dataset **1e15fe4470f8**, same
+seeds. One run each, compared with the existing v7 and v9h rows; v7 and v9h
+were not re-run.
+
+**v9c** limits what the open fill may add (`RELAX`, now the defaults):
+- at most 7 species per plan that were not in the plan
+  (`openFillMaxNewSpecies`);
+- no added plant narrower than 30 cm (`openFillMinSpreadM`);
+- no fallback into slivers (`openFillFallback: false`): only plants that
+  fill the gap well are tried, and a gap no such plant fits is left open.
+
+**v10** (`KEEP_PLACED`, off by default) keeps what fits. When a species
+cannot be placed, only that species is left out; the plants already placed
+stay, and it is named in a "KP:" line. A windbreak species or feature plant
+still fails as before. v10 ran on the v9c defaults, so it is v9c plus
+keep-what-fits.
+
+| Metric | v7 | v9h | v9c | v10 |
+|---|---:|---:|---:|---:|
+| Dataset of every row | 1e15fe4470f8 | 1e15fe4470f8 | 1e15fe4470f8 | 1e15fe4470f8 |
+| Briefs feasible (of 101) | 94 | 94 | 94 | 93 |
+| Options feasible | 275/282 | 275/282 | 275/282 | 272/280 |
+| Z identical to v7, per option | 282/282 | 282/282 | 282/282 | 52/280 |
+| Median Z | 0.8994 | 0.8994 | 0.8994 | 0.9031 |
+| Cover (median) | 0.678 | 0.727 | 0.697 | 0.672 |
+| Options with cover >= 0.75 / 0.80 | 57 / 19 | 105 / 50 | 75 / 24 | 73 / 29 |
+| Largest gap (median) | 0.130 | 0.070 | 0.100 | 0.125 |
+| **Tall (>= 80 cm) centred in front, sum (<= 797)** | 797 | 790 | 790 | 749 |
+| Trees centred in front, sum | 37 | 37 | 37 | 35 |
+| Options with a hard failure | 0 | 0 | 0 | 0 |
+| Plants outside the bed | 0 | 0 | 0 | 0 |
+| Plants per option: median / max | 20 / 64 | 34 / 342 | 22 / 88 | 20 / 89 |
+| Species per option: median / max | 5 / 19 | 9 / 72 | 6 / 26 | 6 / 25 |
+| v9 new species: total / median / max | - | 1630 / 3 / 61 | 320 / 0 / 7 | 343 / 0 / 7 |
+| **v9 added plants narrower than 30 cm (must be 0 in v9c, v10)** | not recorded | not recorded | 0 | 0 |
+| v9 added plants: spread, cm (median of option medians) | not recorded | not recorded | 30 | 39 |
+| Options with a fail-rule retry ('Retrying at no more than') | 254 (same path as v9c) | 254 (same path as v9c) | 254 | 136 |
+| Options with a KP line / KP species left out | 0 / 0 (KEEP_PLACED off) | 0 / 0 (KEEP_PLACED off) | 0 / 0 | 160 / 176 |
+| 12-case / D24 (b) east 1 | 11/12 / pass | 12/12 / pass | 11/12 / pass | 12/12 / pass |
+
+v7 and v9h ran before the retry column existed. They take the same engine
+path as v9c, since the fills only run on accepted layouts and Z is identical
+on all 282 options, so they share v9c's retry count. The added-plant spreads
+were not recorded for v7 and v9h.
+
+**Reading:**
+- **v9c's limits hold.** No plan gets more than 7 new species (320 in total
+  against v9h's 1,630), and no added plant is under 30 cm. Cover lands
+  between v7 and v9h (0.697 against 0.678 and 0.727), with the largest gap at
+  0.100. Z, feasibility and the front rule (790 ≤ 797) are unchanged.
+- **v10 halves the fail rule's retries but does not raise cover.** Retries
+  fall from 254 to 136 options. 176 species are left out across 160
+  options, and the median Z rises (0.8994 → 0.9031). But median cover is
+  lower (0.672) and the largest gap larger (0.125) than v9c, and tall plants
+  in front fall to 749.
+- **v10 loses one brief:** S073, the smallest bed (0.5 × 0.5 m). Leaving
+  species out drops the plan below the H2 floor of 3 species. Because the
+  layout is complete, no species is named as the failure, so the fail rule
+  cannot exclude one. It can only lower the cover cap, until no mix fits.
+  KEEP_PLACED stays off.
+
+**Tests:** `npm run test:unit` gives 142 tests with 3 failing, the known
+dataset failures (12-case east 1, D24 (b), D24 (c)), and no others. The new
+v9c test (≤ 7 new species, nothing under 30 cm, Z unchanged) and v10 test
+(off fails as before; on completes, the species is left out and named in a
+KP line, no overlap, hard checks pass) pass. Note the 12-case and D24 (b)
+fail again with v9c as the default. Under v9h they passed only because the
+open fill's small plants moved the averages those tests compare.
+
+**Figures:** `reports/figures/layout_v2g/{v9c,v10}_{S001,S006,FIX}.png`,
+each with v7 on the left.

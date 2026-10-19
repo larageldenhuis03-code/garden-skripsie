@@ -331,4 +331,29 @@ export const RELAX = {
   openFillWellFraction: 0.5,
   openFillTries: 40,
   openFillMax: 300,
+  /** v9c (owner, 19 Oct 2026): limits on what the open fill may add.
+   *   openFillMaxNewSpecies  at most this many species that were not in
+   *                          the plan, per plan (0 = no new species); more
+   *                          plants of species already planted stay allowed
+   *   openFillMinSpreadM     no added plant narrower than this across
+   *   openFillFallback       false: only plants that fill the gap well
+   *                          (openFillWellFraction); no "largest that fits"
+   *                          fallback into slivers - a gap no well-fitting
+   *                          plant fits is left open */
+  openFillMaxNewSpecies: 7,
+  openFillMinSpreadM: 0.3,
+  openFillFallback: false,
 };
+
+/**
+ * v10 (owner, 19 Oct 2026): keep what fits. When a species cannot be
+ * placed, leave out only that species and keep every plant already placed,
+ * instead of the fail rule cutting cover about 10% and re-selecting. The
+ * species is named in a "KP:" diagnostic and in PlacementResult.skipped
+ * (not in unplaced, so no check fails for it); the layout finishes
+ * complete and relaxation and the fills run as usual. A failing windbreak
+ * species or feature plant still fails the layout as before. If the kept
+ * plan then breaks a Stage 2 limit (e.g. the H2 species floor) the
+ * engine's fail rule still applies.
+ */
+export const KEEP_PLACED = { on: false };

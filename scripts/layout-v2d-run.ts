@@ -68,6 +68,7 @@ if (process.env.V2B_D32 === "1") {
   if (!d32) throw new Error("V2B_D32 given, but this engine has no D32");
   d32.capacity = true;
 }
+if (process.env.V2D_KEEP === "1") (config.KEEP_PLACED as { on: boolean }).on = true; // v10
 for (const pair of (process.env.V2D_RELAX ?? "").split(",").filter(Boolean)) {
   const relax = config.RELAX as Record<string, unknown>;
   const [key, value] = pair.split("=");
@@ -91,6 +92,7 @@ const configLine = [
   config.LAYOUT_V2B ? `LAYOUT_V2B ${JSON.stringify(config.LAYOUT_V2B)}` : null,
   config.D32 ? `D32 ${(config.D32 as { capacity: boolean }).capacity ? "on" : "off"}` : null,
   config.RELAX ? `RELAX ${JSON.stringify(config.RELAX)}` : null,
+  config.KEEP_PLACED ? `KEEP_PLACED ${(config.KEEP_PLACED as { on: boolean }).on ? "on" : "off"}` : null,
   `contactBonus ${stage4.contactBonus}; sweepWeight ${stage4.sweepWeight ?? "-"}`,
 ].filter(Boolean).join("; ");
 console.error(`${NAME}: rulebook ${RULES_VERSION} | dataset ${DATASET_VERSION} | ${configLine}`);
@@ -326,6 +328,16 @@ for (const { id, brief } of briefs) {
       ...relaxColumns(plan),
       ...extra,
       d33_removed: countsOf(plan).removed,
+      // Fail-rule retries, and v10 (KEEP_PLACED) species left out.
+      retried: plan.diagnostics.some((d) => d.includes("Retrying at no more than")),
+      kp_left_out: plan.diagnostics.filter((d) => d.startsWith("KP: ")).length,
+      // v9's own added plants (not v7's gap fill): how many are narrower than
+      // 30 cm, and their median spread in cm.
+      ...(() => {
+        const mine = (layout?.placements ?? []).filter((p) => (p as { openFill?: boolean }).openFill).map((p) => 200 * p.radiusM).sort((a, b) => a - b);
+        const mid = mine.length ? (mine.length % 2 ? mine[(mine.length - 1) / 2] : (mine[mine.length / 2 - 1] + mine[mine.length / 2]) / 2) : "";
+        return { v9_added: mine.length, v9_added_narrow: mine.filter((d) => d < 30 - 1e-6).length, v9_added_spread_med_cm: mid === "" ? "" : Number(mid.toFixed(1)) };
+      })(),
       d33_added: countsOf(plan).added,
       v8_added: plan.diagnostics.filter((d) => d.startsWith("v8 last fill")).length,
       v8_pool_added: plan.diagnostics.filter((d) => d.startsWith("v8 last fill") && d.includes("[pool species]")).length,

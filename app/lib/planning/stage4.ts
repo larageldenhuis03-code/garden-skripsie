@@ -9,6 +9,7 @@ import { RULES, type LayerId } from "./rules.ts";
 import type { ViewingEdge } from "./brief.ts";
 import {
   CLIMBERS_NEED_L1_HOST,
+  KEEP_PLACED,
   LAYOUT_V2B,
   P17_BALANCE_WEIGHT,
   P2_OVERLAP_TOLERANCE,
@@ -49,7 +50,7 @@ export type PlacementCheck = {
   detail: string;
 };
 
-export type Placement = CanopyPlacement & { layer: LayerId; windbreakRow?: boolean; gapFill?: boolean };
+export type Placement = CanopyPlacement & { layer: LayerId; windbreakRow?: boolean; gapFill?: boolean; openFill?: boolean };
 
 export type PlacementResult = {
   status: "complete" | "failed";
@@ -64,6 +65,9 @@ export type PlacementResult = {
   /** D33b v4: plants the gap fill added, per species. Not in `realised`,
    * which stays the Stage 2/3 selection that Z and H1-H7 are scored on. */
   added?: Selection;
+  /** v10 (KEEP_PLACED): species left out because no room was left for
+   * them after the plants placed before them; the rest was kept. */
+  skipped?: string[];
 };
 
 export type PlacementSite = {
@@ -235,6 +239,8 @@ function placeOnce(
   const realised: Selection = new Map();
   /** D33b v4: plants added by the gap fill (not in realised). */
   const added: Selection = new Map();
+  /** v10: species KEEP_PLACED left out. */
+  const skipped: string[] = [];
   const checks: PlacementCheck[] = [];
   const diagnostics: string[] = [];
   /** Back-layer species that used the D28 middle-band fallback. */
@@ -856,6 +862,13 @@ function placeOnce(
         if (layer === "L2" && !placed.some((p) => p.layer === "L1")) {
           diagnostics.push(`${info.id}: no structure plant to climb on, so the climber is skipped.`);
         }
+        // v10 (KEEP_PLACED): leave out only this species and keep the rest.
+        if (KEEP_PLACED.on && info.id !== windbreakId && !info.feature) {
+          realised.delete(info.id);
+          skipped.push(info.id);
+          diagnostics.push(`KP: ${info.id} left out - no room after the plants placed before it; the rest is kept`);
+          continue;
+        }
         unplaced.push({
           instanceId: `${info.id}-0`,
           plantId: info.id,
@@ -945,7 +958,10 @@ function placeOnce(
     const excluded = new Set(site.excluded ?? []);
     const usable = (info: SpeciesInfo) =>
       !info.feature && info.layer !== "L2" && info.id !== windbreakId && !excluded.has(info.id);
-    const pool = [...infos.values()].filter(usable);
+    // v9c: nothing narrower than openFillMinSpreadM is added.
+    const pool = [...infos.values()].filter((info) => usable(info) && info.diameterM >= RELAX.openFillMinSpreadM - EPS);
+    let newSpecies = 0;
+    let capNoted = false;
     const ranked = [...dStar].map(([id, d]) => ({ h: (infos.get(id) as SpeciesInfo).heightCm, d })).sort((a, b) => a.h - b.h);
     const targetOf = (info: SpeciesInfo): number | null => {
       if (!v2b) return targetDepth(info.layer, profile);
@@ -995,7 +1011,7 @@ function placeOnce(
     };
     const put = (info: SpeciesInfo, x: number, y: number) => {
       const n = counts.get(info.id) ?? 0;
-      record(info, x, y, n, { gapFill: true });
+      record(info, x, y, n, { gapFill: true, openFill: true }); // openFill marks v9's own plants
       counts.set(info.id, n + 1);
       added.set(info.id, (added.get(info.id) ?? 0) + 1);
     };
@@ -1021,6 +1037,14 @@ function placeOnce(
         undo(info, 1);
         return null;
       }
+      // v9c: at most openFillMaxNewSpecies species that were not in the plan.
+      if (newSpecies >= RELAX.openFillMaxNewSpecies) {
+        if (!capNoted) {
+          capNoted = true;
+          diagnostics.push(`v9 open fill: new-species cap (${RELAX.openFillMaxNewSpecies}) reached`);
+        }
+        return null;
+      }
       const first = gapPoints.find((g) => g.room >= r - EPS && canStand(info, g.x, g.y));
       if (!first) return null;
       const sizes = [...info.allowedN].sort((a, b) => b - a);
@@ -1033,7 +1057,10 @@ function placeOnce(
           put(info, spot.x, spot.y);
           k += 1;
         }
-        if (k === size && ok(counts)) return `${info.id} x${size} [new species]`;
+        if (k === size && ok(counts)) {
+          newSpecies += 1;
+          return `${info.id} x${size} [new species]`;
+        }
         undo(info, k);
       }
       return null;
@@ -1062,7 +1089,8 @@ function placeOnce(
         const rest = fitting
           .filter((info) => info.diameterM / 2 < RELAX.openFillWellFraction * maxRoom)
           .sort((a, b) => b.diameterM - a.diameterM || b.score - a.score || a.id.localeCompare(b.id));
-        for (const info of [...well, ...rest].slice(0, RELAX.openFillTries)) {
+        // v9c: without the fallback, only plants that fill the gap well.
+        for (const info of (RELAX.openFillFallback ? [...well, ...rest] : well).slice(0, RELAX.openFillTries)) {
           const before = placed.length;
           const what = tryPlant(info, points);
           if (what) {
@@ -1316,6 +1344,7 @@ function placeOnce(
       failedSpeciesId,
       realised,
       added: new Map(added),
+      skipped: [...skipped],
       profile,
       checks: allChecks,
       layout: {
