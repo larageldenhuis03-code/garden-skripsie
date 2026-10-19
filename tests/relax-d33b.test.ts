@@ -7,7 +7,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { plants } from "../app/data/plants.ts";
-import { KEEP_PLACED, LAYOUT_V2B, RELAX } from "../app/lib/planning/engineConfig.ts";
+import { HARMONISE, KEEP_PLACED, LAYOUT_V2B, RELAX } from "../app/lib/planning/engineConfig.ts";
 import { buildGardenPlanVariants, computeHeightTiers, computeSpreadBands, createRng, minCentreDistance, placeSelection, RULES, scorePlantStage1, speciesInfo, viewingAxis, type GardenBrief, type GardenPlan, type SpeciesInfo } from "../app/lib/planning/index.ts";
 import { buildScenarios } from "../scripts/batch-test/scenarios.ts";
 
@@ -280,4 +280,65 @@ test("A: added plants may overlap their neighbours, but never beyond P2; B: sing
     }
   }
   assert.ok(overlaps > 0, "no added plant overlapped a neighbour, so A was not exercised");
+});
+
+// layout-v2g v11 harmonise (owner idea, 19 Oct 2026).
+test("layout-v2g v11 harmonise: same plants and Z, hard checks pass, no new ORDER or GROUP breach, tall-in-front not above the run without it", () => {
+  const V9C = { ...V4, openFill: true, openFillMaxNewSpecies: 7, openFillMinSpreadM: 0.3, openFillFallback: false };
+  const { hBackMin, edgeFrontMid } = RULES.stage4.heightBands;
+  const heightOf = (id: string) => plants.find((x) => x.id === id)!.heightCm ?? 0;
+  type P = { plantId: string; instanceId: string; xM: number; yM: number; radiusM: number };
+  const orderBreaches = (ps: readonly P[], axis: ReturnType<typeof viewingAxis>) => {
+    let bad = 0;
+    for (const a of ps) for (const b of ps) {
+      if (a === b || Math.abs(axis.acrossOf(a.xM, a.yM) - axis.acrossOf(b.xM, b.yM)) > HARMONISE.lateralOrderM) continue;
+      if (heightOf(a.plantId) > heightOf(b.plantId) && axis.depthOf(a.xM, a.yM) < axis.depthOf(b.xM, b.yM) - 1e-6) bad += 1;
+    }
+    return bad;
+  };
+  const pieces = (ps: readonly P[]) => {
+    let total = 0;
+    for (const id of new Set(ps.map((p) => p.plantId))) {
+      const group = ps.filter((p) => p.plantId === id);
+      const seen = new Set<P>();
+      for (const s of group) {
+        if (seen.has(s)) continue;
+        total += 1;
+        const stack = [s];
+        seen.add(s);
+        while (stack.length) {
+          const a = stack.pop()!;
+          for (const b of group) if (!seen.has(b) && Math.hypot(a.xM - b.xM, a.yM - b.yM) - a.radiusM - b.radiusM <= HARMONISE.cohesionLooseM + 1e-9) { seen.add(b); stack.push(b); }
+        }
+      }
+    }
+    return total;
+  };
+  let kept = 0;
+  const saved = HARMONISE.on;
+  try {
+    for (const [label, brief] of BRIEFS) {
+      HARMONISE.on = false;
+      const plain = run(brief, V9C);
+      HARMONISE.on = true;
+      const harm = run(brief, V9C);
+      harm.forEach((plan, i) => {
+        const where = `${label} ${plan.character}`;
+        const a = plain[i].layout!.placements;
+        const b = plan.layout!.placements;
+        assert.equal(plan.engine?.z, plain[i].engine?.z, `${where}: Z changed`);
+        assert.deepEqual(b.map((p) => p.instanceId), a.map((p) => p.instanceId), `${where}: plants changed`);
+        assert.ok((plan.engine?.placementChecks ?? []).every((c) => c.kind !== "hard" || c.pass), `${where}: a hard check failed`);
+        const axis = viewingAxis(brief.viewingEdge, plan.layout!.bedWidthM, plan.layout!.bedLengthM);
+        assert.ok(orderBreaches(b, axis) <= orderBreaches(a, axis), `${where}: ORDER breached`);
+        assert.ok(pieces(b) <= pieces(a), `${where}: a group split`);
+        const tallFront = (ps: readonly P[]) => ps.filter((p) => heightOf(p.plantId) >= hBackMin && axis.depthOf(p.xM, p.yM) < edgeFrontMid * axis.span - 1e-6).length;
+        assert.ok(tallFront(b) <= tallFront(a), `${where}: more tall plants in front`);
+        if (plan.diagnostics.some((d) => d.startsWith("H11 harmonise: kept"))) kept += 1;
+      });
+    }
+  } finally {
+    HARMONISE.on = saved;
+  }
+  assert.ok(kept > 0, "harmonise was never kept on these briefs, so it was not exercised");
 });

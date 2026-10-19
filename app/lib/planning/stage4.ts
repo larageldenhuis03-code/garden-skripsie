@@ -9,6 +9,7 @@ import { RULES, type LayerId } from "./rules.ts";
 import type { ViewingEdge } from "./brief.ts";
 import {
   CLIMBERS_NEED_L1_HOST,
+  HARMONISE,
   KEEP_PLACED,
   LAYOUT_V2B,
   P17_BALANCE_WEIGHT,
@@ -17,7 +18,7 @@ import {
   RELAX,
   ROW_PITCH_M,
 } from "./engineConfig.ts";
-import { emptyGaps, relaxLayout, type RelaxPlant } from "./relax.ts";
+import { emptyGaps, largestEmptyPatchOf, relaxLayout, sideDistances, sideGapSpread, type RelaxPlant } from "./relax.ts";
 import { canFormWindbreak, type Selection } from "./stage2.ts";
 
 /**
@@ -951,6 +952,145 @@ function placeOnce(
     if (RELAX.gapFill && site.h5Cap !== undefined) gapFill(site.h5Cap);
     if (RELAX.lastFill && site.h5Cap !== undefined && site.coverCapM2 !== undefined) lastFill(site.h5Cap, site.coverCapM2);
     if (RELAX.openFill && site.openFillOk) openFill(site.openFillOk);
+    if (HARMONISE.on) harmonise();
+  }
+
+  /** v11 (engineConfig HARMONISE): the final harmonise pass - see engineConfig. */
+  function harmonise(): void {
+    const n = placed.length;
+    const circles = () => placed.map((p) => ({ x: p.xM, y: p.yM, r: p.radiusM }));
+    const saved = placed.map((p) => ({ x: p.xM, y: p.yM }));
+    const spreadBefore = sideGapSpread(circles(), W, L);
+    const patchBefore = largestEmptyPatchOf(circles(), W, L);
+    const infoOf = (k: number) => infos.get(placed[k].plantId) as SpeciesInfo;
+    const depthOf = (k: number) => viewer.depthOf(placed[k].xM, placed[k].yM);
+    const acrossOf = (k: number) => viewer.acrossOf(placed[k].xM, placed[k].yM);
+    // Climbers follow their host; the windbreak row stays.
+    const hostOf = placed.map((p) => {
+      if (p.layer !== "L2") return -1;
+      return placed.findIndex((h) => h.layer === "L1" && Math.hypot(h.xM - p.xM, h.yM - p.yM) <= minCentreDistance(h.radiusM, p.radiusM) + 1e-3);
+    });
+    const riders = new Map<number, number[]>();
+    hostOf.forEach((h, k) => { if (h >= 0) riders.set(h, [...(riders.get(h) ?? []), k]); });
+    const movable = placed.map((p) => !p.windbreakRow && p.layer !== "L2");
+
+    /** ORDER: shorter plants within lateralOrderM across that stand behind k. */
+    const orderViolations = (k: number): number => {
+      const hk = infoOf(k).heightCm;
+      let bad = 0;
+      for (let j = 0; j < n; j += 1) {
+        if (j === k || Math.abs(acrossOf(j) - acrossOf(k)) > HARMONISE.lateralOrderM) continue;
+        const hj = infoOf(j).heightCm;
+        if (hj < hk && depthOf(k) < depthOf(j) - EPS) bad += 1; // k is taller but nearer
+        if (hj > hk && depthOf(j) < depthOf(k) - EPS) bad += 1; // a taller j is nearer than k
+      }
+      return bad;
+    };
+    /** GROUP: pieces of k's species group (plants within cohesionLooseM edge
+     * to edge are linked), and k's gap to its nearest group-mate. */
+    const groupPieces = (k: number): number => {
+      const ids = placed.map((_, j) => j).filter((j) => placed[j].plantId === placed[k].plantId);
+      const seen = new Set<number>();
+      let pieces = 0;
+      for (const s of ids) {
+        if (seen.has(s)) continue;
+        pieces += 1;
+        const stack = [s];
+        seen.add(s);
+        while (stack.length) {
+          const a = stack.pop() as number;
+          for (const b of ids) {
+            if (seen.has(b)) continue;
+            const gap = Math.hypot(placed[a].xM - placed[b].xM, placed[a].yM - placed[b].yM) - placed[a].radiusM - placed[b].radiusM;
+            if (gap <= HARMONISE.cohesionLooseM + EPS) { seen.add(b); stack.push(b); }
+          }
+        }
+      }
+      return pieces;
+    };
+    const mateGap = (k: number): number => {
+      let best = Infinity;
+      for (let j = 0; j < n; j += 1) {
+        if (j === k || placed[j].plantId !== placed[k].plantId) continue;
+        best = Math.min(best, Math.hypot(placed[k].xM - placed[j].xM, placed[k].yM - placed[j].yM) - placed[k].radiusM - placed[j].radiusM);
+      }
+      return best;
+    };
+    /** Every hard rule for plant k where it now stands, against the rest. */
+    const legal = (k: number, moving: ReadonlySet<number>): boolean => {
+      const p = placed[k];
+      const info = infoOf(k);
+      const r = p.radiusM;
+      if (p.xM < r - EPS || p.xM > W - r + EPS || p.yM < r - EPS || p.yM > L - r + EPS) return false; // P1
+      if (breaksP4(info, p.xM, p.yM) || treeInFront(info, p.xM, p.yM)) return false; // P4, tree rule
+      if (info.heightCm >= hb.hBackMin && viewer.depthOf(p.xM, p.yM) < hb.edgeFrontMid * viewer.span - EPS) return false; // front rule
+      for (let j = 0; j < n; j += 1) {
+        if (j === k || moving.has(j)) continue;
+        const q = placed[j];
+        const d = Math.hypot(q.xM - p.xM, q.yM - p.yM);
+        if (d < minCentreDistance(q.radiusM, r) - EPS) return false; // P2
+        const qi = infoOf(j);
+        // P5, both ways round: no canopy over a plant that does not take shade.
+        if (q.plantId !== p.plantId && d < q.radiusM + r - EPS && ((isTree(q.plantId) && !info.shade) || (isTree(p.plantId) && !qi.shade))) return false;
+      }
+      return true;
+    };
+
+    // Stage 4 may already have left a plant where a move could not put it
+    // (e.g. a tall plant in front): such a plant is judged as it stood, and
+    // only a plant that moves must pass every rule. The pair rules (P2, P5)
+    // are checked both ways round, so a move cannot make a still plant illegal.
+    const legalBefore = placed.map((_, k) => legal(k, new Set([k])));
+    const bandOfSpread = (k: number) => (2 * placed[k].radiusM >= 1 ? 0 : 2 * placed[k].radiusM >= 0.5 ? 1 : 2);
+    const movedIn = [0, 0, 0];
+    const moves: number[] = [];
+    for (const pass of [0, 1, 2]) {
+      for (let it = 0; it < HARMONISE.iterations; it += 1) {
+        let maxMove = 0;
+        for (let k = 0; k < n; k += 1) {
+          if (!movable[k] || bandOfSpread(k) !== pass) continue;
+          const d = sideDistances(circles(), W, L)[k];
+          const cap = (v: number) => Math.max(-HARMONISE.maxMoveM, Math.min(HARMONISE.maxMoveM, v));
+          const dx0 = cap((HARMONISE.step * (d.px - d.nx)) / 2);
+          const dy0 = cap((HARMONISE.step * (d.py - d.ny)) / 2);
+          if (Math.hypot(dx0, dy0) < 1e-4) continue;
+          const group = [k, ...(riders.get(k) ?? [])];
+          const moving = new Set(group);
+          const orderBefore = group.reduce((s, g) => s + orderViolations(g), 0);
+          const piecesBefore = groupPieces(k);
+          const mateBefore = mateGap(k);
+          for (const scale of [1, 0.5, 0.25, 0.125]) {
+            const dx = dx0 * scale;
+            const dy = dy0 * scale;
+            for (const g of group) { placed[g].xM += dx; placed[g].yM += dy; }
+            const ok =
+              group.every((g) => legal(g, moving)) &&
+              group.reduce((s, g) => s + orderViolations(g), 0) <= orderBefore && // ORDER: never worse
+              groupPieces(k) <= piecesBefore && // GROUP: never splits
+              mateGap(k) <= Math.max(HARMONISE.cohesionLooseM, mateBefore) + EPS; // GROUP: never left alone
+            if (ok) {
+              const m = Math.hypot(dx, dy);
+              maxMove = Math.max(maxMove, m);
+              if (m > 0.01) { movedIn[pass] += 1; moves.push(m); }
+              break;
+            }
+            for (const g of group) { placed[g].xM -= dx; placed[g].yM -= dy; }
+          }
+        }
+        if (maxMove <= 0.01) break;
+      }
+    }
+    const spreadAfter = sideGapSpread(circles(), W, L);
+    const patchAfter = largestEmptyPatchOf(circles(), W, L);
+    const moved = placed.map((p, k) => Math.hypot(p.xM - saved[k].x, p.yM - saved[k].y) > 1e-9);
+    const allLegal = placed.every((_, k) => legal(k, new Set([k])) || (!legalBefore[k] && !moved[k]));
+    const kept = spreadAfter < spreadBefore - 1e-9 && patchAfter <= patchBefore + 1e-9 && allLegal;
+    if (!kept) saved.forEach((pos, k) => { placed[k].xM = pos.x; placed[k].yM = pos.y; });
+    moves.sort((a, b) => a - b);
+    const med = moves.length ? (moves.length % 2 ? moves[(moves.length - 1) / 2] : (moves[moves.length / 2 - 1] + moves[moves.length / 2]) / 2) : 0;
+    diagnostics.push(
+      `H11 harmonise: ${kept ? "kept" : "reverted"}; moved ${movedIn[0]}/${movedIn[1]}/${movedIn[2]}; median move ${(med * 100).toFixed(1)} cm; side-gap spread ${(spreadBefore * 100).toFixed(1)} -> ${((kept ? spreadAfter : spreadBefore) * 100).toFixed(1)} cm${kept ? "" : ` (would be ${(spreadAfter * 100).toFixed(1)} cm; patch ${patchBefore.toFixed(3)} -> ${patchAfter.toFixed(3)}${allLegal ? "" : "; a check failed"})`}`,
+    );
   }
 
   /** v9 (engineConfig RELAX.openFill): the open fill - see engineConfig. */

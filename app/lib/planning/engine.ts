@@ -187,7 +187,9 @@ export function runEngine(
     const failedFraction = stateFrom(current, infos, site).plantedAreaM2 / site.areaM2;
     searchSite = {
       ...site,
-      packingCap: FAIL_RULE_PACKING_CAP_STEP * Math.min(failedFraction, searchSite.packingCap ?? 1),
+      // Read at run time, not the load-time constant, so an in-memory
+      // override of RULES.failRule.retryCoverFactor (a study) takes effect.
+      packingCap: (RULES.failRule.retryCoverFactor ?? FAIL_RULE_PACKING_CAP_STEP) * Math.min(failedFraction, searchSite.packingCap ?? 1),
     };
     diagnostics.push(
       `Retrying at no more than ${Math.round(searchSite.packingCap! * 100)}% cover.`,

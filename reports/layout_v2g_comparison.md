@@ -358,3 +358,93 @@ There are two test changes:
 **Figures:** `reports/figures/layout_v2g/{v9o,v9s}_{S001,S006,FIX}.png`, each
 with v9c on the left. In the fixed case, A fits a group of three into the
 sliver between the large back plants.
+
+## v9c / v10 / v11
+
+Owner, 19 Oct 2026: the last layout test before the final algorithm is
+deployed. Rulebook **713f9bad5bec**, dataset **1e15fe4470f8**, same seeds.
+v7 and v9h were not re-run.
+
+**Configs:**
+- **v9c and v10** were already built (40fbf2b). They were re-run once, with
+  A off to match the spec, for the new side-gap and H11 columns. Every other
+  column matches their earlier runs exactly (0 differing rows).
+- **v11** is v10 plus harmonise (`HARMONISE.on`). It is a final pass after
+  relaxation and the fills. Plants move largest first, towards the middle of
+  their open space, under every hard rule plus two of its own:
+  - **ORDER:** a move may never leave a plant nearer the viewer than a shorter
+    plant within 1 m across.
+  - **GROUP:** a move may never split a group, nor leave a plant more than
+    30 cm from its group.
+
+  The pass is kept only if the side-gap spread falls and the largest gap does
+  not grow.
+- **Two extra runs.** **v9e** is v9c with A and the fail-rule retry factor at
+  0.97 instead of 0.9 (`V2_SET="failRule.retryCoverFactor=0.97"`; the exact
+  rulebook path is `RULES.failRule.retryCoverFactor`). **v11o** is v9o (the
+  current default, v9c with A) plus harmonise, without keep-what-fits.
+- **v9o** is the current default, from 3a7ea55.
+
+**Fix needed for v9e:** the engine copied the retry factor into a constant
+when it loaded, so an in-memory override was silently ignored. The fail rule
+now reads `RULES.failRule.retryCoverFactor` when it fires. The default (0.9)
+is unchanged.
+
+| Metric | v7 | v9h | v9c | v9o | v10 | v11 | v9e | v11o |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Dataset of every row | 1e15fe4470f8 | 1e15fe4470f8 | 1e15fe4470f8 | 1e15fe4470f8 | 1e15fe4470f8 | 1e15fe4470f8 | 1e15fe4470f8 | 1e15fe4470f8 |
+| Briefs feasible (of 101) | 94 | 94 | 94 | 94 | 93 | 93 | 92 | 94 |
+| Options feasible | 275/282 | 275/282 | 275/282 | 275/282 | 272/280 | 272/280 | 270/279 | 275/282 |
+| Z identical to v7, per option | 282/282 | 282/282 | 282/282 | 282/282 | 52/280 | 52/280 | 36/279 | 282/282 |
+| Median Z | 0.8994 | 0.8994 | 0.8994 | 0.8994 | 0.9031 | 0.9031 | 0.9095 | 0.8994 |
+| Cover (median) | 0.678 | 0.727 | 0.697 | 0.706 | 0.672 | 0.672 | 0.744 | 0.706 |
+| Options with cover >= 0.75 / 0.80 | 57 / 19 | 105 / 50 | 75 / 24 | 88 / 34 | 73 / 29 | 73 / 29 | 129 / 59 | 88 / 34 |
+| Largest gap (median) | 0.130 | 0.070 | 0.100 | 0.095 | 0.125 | 0.116 | 0.068 | 0.087 |
+| Side-gap spread, cm (median) | not recorded | not recorded | 52.4 | not recorded | 52.7 | 47.3 | 50.8 | 46.7 |
+| **Tall (>= 80 cm) centred in front, sum (<= 797)** | 797 | 790 | 790 | 790 | 749 | 747 | 966 | 786 |
+| Trees centred in front, sum | 37 | 37 | 37 | 37 | 35 | 35 | 48 | 36 |
+| Options with a hard failure | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| Plants outside the bed | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| Plants per option: median / max | 20 / 64 | 34 / 342 | 22 / 88 | 23 / 96 | 20 / 89 | 20 / 89 | 22 / 113 | 23 / 96 |
+| Species per option: median / max | 5 / 19 | 9 / 72 | 6 / 26 | 6 / 26 | 6 / 25 | 6 / 25 | 6 / 27 | 6 / 26 |
+| v9 new species: total / median / max | - | 1630 / 3 / 61 | 320 / 0 / 7 | 472 / 0 / 7 | 343 / 0 / 7 | 343 / 0 / 7 | 407 / 0 / 7 | 472 / 0 / 7 |
+| **v9 added plants narrower than 30 cm (must be 0 from v9c on)** | not recorded | not recorded | 0 | 0 | 0 | 0 | 0 | 0 |
+| v9 added plants: spread, cm (median of option medians) | not recorded | not recorded | 30 | 30 | 39 | 39 | 30 | 30 |
+| Options with a fail-rule retry ('Retrying at no more than') | 254 (same path as v9c) | 254 (same path as v9c) | 254 | 254 | 136 | 136 | 251 | 254 |
+| Options with a KP line / KP species left out | 0 / 0 (KEEP_PLACED off) | 0 / 0 (KEEP_PLACED off) | 0 / 0 | 0 / 0 | 160 / 176 | 160 / 176 | 0 / 0 | 0 / 0 |
+| Options where H11 was kept | - | - | 0 / 0 | - | 0 / 0 | 115 / 272 | 0 / 0 | 114 / 275 |
+| 12-case / D24 (b) east 1 | 11/12 / pass | 12/12 / pass | 11/12 / pass | 11/12 / pass | 12/12 / pass | 12/12 / pass | 12/12 / pass | 11/12 / pass |
+
+Harmonise needed one interpretation. Some plans break ORDER and GROUP before
+it runs, because the depth gradient is soft and groups can be split. So it
+treats both as "a move may never make them worse", and a plant Stage 4 left
+in breach is judged as it stood.
+
+**Reading:**
+- **Harmonise works and costs nothing; v11o is the best balanced result.**
+  It is kept in about 115 of 275 options, and in v11o it brings the median
+  side-gap spread to 46.7 cm (v9c 52.4) and the largest gap from 0.095 to
+  0.087. Plants, Z (282/282 identical to v7), feasibility (94 briefs) and
+  hard checks are unchanged, and tall plants in front fall from 790 to 786.
+- **Keep-what-fits (v10, v11) is not worth it.** It halves the fail-rule
+  retries (254 → 136) but lowers cover (0.672) and loses brief S073, the
+  0.5 × 0.5 m bed.
+- **v9e fills the most but breaks two limits.** It has the highest cover
+  (0.744, with 129 options at 0.75 or more) and the smallest gap (0.068).
+  But tall plants in front rise to 966, above the 797 limit, and trees in
+  front to 48, mostly in denser plans such as S042. It also loses two briefs:
+  S076 (30 × 30 m) and S083 (15 × 2 m).
+
+**Recommendation for the final algorithm: v11o** - v9o plus harmonise. It
+meets every limit and gives the most even spacing. Nothing has been switched
+on: the defaults stay as they were (v9c limits and A on; keep-what-fits,
+harmonise and B off; retry factor 0.9) until the owner decides.
+
+**Tests:** `npm run test:unit` gives 144 tests with 2 failing. Both are
+dataset failures known since the switch to 1e15fe4470f8: D24 (c) and the
+12-case east 1. There are no others. The new v11 test checks against the run
+without harmonise: same plants and Z, hard checks pass, no new ORDER breach,
+no group split, and no more tall plants in front.
+
+**Figures:** `reports/figures/layout_v2g/{v9c,v10,v11,v9e,v11o}_{S001,S006,FIX}.png`,
+each with v7 on the left.

@@ -368,3 +368,20 @@ export const RELAX = {
  * engine's fail rule still applies.
  */
 export const KEEP_PLACED = { on: false };
+
+/**
+ * v11 harmonise (owner idea, 19 Oct 2026): a final pass after relaxation
+ * and the fills, only on a layout that passes every hard check. Each plant
+ * (largest spreads first: >= 1 m, then 0.5-1 m, then < 0.5 m) moves towards
+ * the middle of its open space: dx = step x (d+x - d-x) / 2, the same in y,
+ * from the open distance on each side (to the nearest plant in that
+ * direction or the bed edge), each capped at maxMoveM. A move stands only
+ * if every hard rule holds, no plant is moved closer to the viewer than a
+ * shorter plant within lateralOrderM across the bed (ORDER), and no group
+ * of one species splits or leaves a plant more than cohesionLooseM from
+ * its group (GROUP); otherwise it is halved up to 3 times, then skipped.
+ * The result is kept only if the median side-gap spread falls, the largest
+ * empty patch does not grow and every check holds. Off by default.
+ * IMPLEMENTATION values from the owner's prompt.
+ */
+export const HARMONISE = { on: false, iterations: 80, step: 0.5, maxMoveM: 0.5, lateralOrderM: 1.0, cohesionLooseM: 0.3 };

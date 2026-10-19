@@ -451,3 +451,46 @@ export function emptyGaps(
   }
   return gaps.sort((a, b) => b.length - a.length);
 }
+
+/** v11: each plant's open distance to the +x, -x, +y and -y sides - edge to
+ * edge to the nearest plant whose span overlaps it on the other axis, or to
+ * the bed edge (negative where canopies overlap). */
+export function sideDistances(
+  circles: readonly { x: number; y: number; r: number }[],
+  widthM: number,
+  lengthM: number,
+): { px: number; nx: number; py: number; ny: number }[] {
+  return circles.map((p, i) => {
+    let px = widthM - (p.x + p.r);
+    let nx = p.x - p.r;
+    let py = lengthM - (p.y + p.r);
+    let ny = p.y - p.r;
+    circles.forEach((q, j) => {
+      if (j === i) return;
+      if (Math.abs(q.y - p.y) < p.r + q.r) {
+        if (q.x > p.x) px = Math.min(px, q.x - q.r - (p.x + p.r));
+        else if (q.x < p.x) nx = Math.min(nx, p.x - p.r - (q.x + q.r));
+      }
+      if (Math.abs(q.x - p.x) < p.r + q.r) {
+        if (q.y > p.y) py = Math.min(py, q.y - q.r - (p.y + p.r));
+        else if (q.y < p.y) ny = Math.min(ny, p.y - p.r - (q.y + q.r));
+      }
+    });
+    return { px, nx, py, ny };
+  });
+}
+
+/** v11: the median over plants of (largest side distance - smallest), in m.
+ * Small when every plant has about the same open space on all four sides. */
+export function sideGapSpread(
+  circles: readonly { x: number; y: number; r: number }[],
+  widthM: number,
+  lengthM: number,
+): number {
+  const spreads = sideDistances(circles, widthM, lengthM)
+    .map((d) => Math.max(d.px, d.nx, d.py, d.ny) - Math.min(d.px, d.nx, d.py, d.ny))
+    .sort((a, b) => a - b);
+  if (!spreads.length) return 0;
+  const n = spreads.length;
+  return n % 2 ? spreads[(n - 1) / 2] : (spreads[n / 2 - 1] + spreads[n / 2]) / 2;
+}

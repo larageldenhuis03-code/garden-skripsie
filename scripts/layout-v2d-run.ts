@@ -43,7 +43,7 @@ import {
 } from "../app/lib/planning/index.ts";
 import { buildScenarios } from "./batch-test/scenarios.ts";
 import { GRID, plantedCells, spreadMetrics } from "./batch-test/metrics.ts";
-import { cellCoverVariance } from "../app/lib/planning/relax.ts";
+import { cellCoverVariance, sideGapSpread } from "../app/lib/planning/relax.ts";
 
 const OUT_DIR = join("reports", process.env.V2D_DIR ?? "layout_v2d");
 const NAME = process.env.V2D_OUT ?? "run";
@@ -69,6 +69,7 @@ if (process.env.V2B_D32 === "1") {
   d32.capacity = true;
 }
 if (process.env.V2D_KEEP === "1") (config.KEEP_PLACED as { on: boolean }).on = true; // v10
+if (process.env.V2D_HARMONISE === "1") (config.HARMONISE as { on: boolean }).on = true; // v11
 for (const pair of (process.env.V2D_RELAX ?? "").split(",").filter(Boolean)) {
   const relax = config.RELAX as Record<string, unknown>;
   const [key, value] = pair.split("=");
@@ -333,6 +334,13 @@ for (const { id, brief } of briefs) {
       kp_left_out: plan.diagnostics.filter((d) => d.startsWith("KP: ")).length,
       // B: new species the open fill planted as a single plant.
       v9_singles: plan.diagnostics.filter((d) => d.includes("single (B)")).length,
+      // v11: median side-gap spread of the final layout (cm), and whether
+      // the harmonise pass was kept.
+      side_gap_spread_cm: layout ? Number((100 * sideGapSpread(layout.placements.map((p) => ({ x: p.xM, y: p.yM, r: p.radiusM })), layout.bedWidthM, layout.bedLengthM)).toFixed(1)) : "",
+      h11: (() => {
+        const line = [...plan.diagnostics].reverse().find((d) => d.startsWith("H11 harmonise:"));
+        return line ? (line.includes(": kept") ? "kept" : "reverted") : "";
+      })(),
       // v9's own added plants (not v7's gap fill): how many are narrower than
       // 30 cm, and their median spread in cm.
       ...(() => {
