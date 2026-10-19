@@ -970,6 +970,9 @@ function placeOnce(
       const r = info.diameterM / 2;
       if (roomAt(x, y) < r - EPS) return false; // touches nothing, inside the bed
       if (!fits(x, y, r, info) || breaksP4(info, x, y) || treeInFront(info, x, y)) return false;
+      // Owner 19 Oct: no added plant of h_back_min or taller centred in the front band
+      // (straight depth from the viewer). Hard, like the tree rule.
+      if (info.heightCm >= hb.hBackMin && viewer.depthOf(x, y) < hb.edgeFrontMid * viewer.span - EPS) return false;
       const target = targetOf(info);
       if (target === null) return true;
       const depth = v2b ? effDepthM(x, y) : viewer.depthOf(x, y);
@@ -1138,6 +1141,9 @@ function placeOnce(
             if (!(mateGap <= RELAX.cohesionMaxGapM + EPS)) continue;
           }
           if (!fits(x, y, r, info) || breaksP4(info, x, y) || treeInFront(info, x, y)) continue;
+          // Owner 19 Oct: no added plant of h_back_min or taller centred in the front band
+          // (straight depth from the viewer). Hard, like the tree rule.
+          if (info.heightCm >= hb.hBackMin && viewer.depthOf(x, y) < hb.edgeFrontMid * viewer.span - EPS) continue;
           const target = targetOf(info);
           if (target !== null) {
             const depth = v2b ? effDepthM(x, y) : viewer.depthOf(x, y);
@@ -1198,6 +1204,9 @@ function placeOnce(
             if (!(mateGap <= RELAX.cohesionMaxGapM + EPS)) continue;
           }
           if (!fits(x, y, r, info) || breaksP4(info, x, y) || treeInFront(info, x, y)) continue;
+          // Owner 19 Oct: no added plant of h_back_min or taller centred in the front band
+          // (straight depth from the viewer). Hard, like the tree rule.
+          if (info.heightCm >= hb.hBackMin && viewer.depthOf(x, y) < hb.edgeFrontMid * viewer.span - EPS) continue;
           const target = v2b ? (dStar.get(info.id) ?? null) : targetDepth(info.layer, profile);
           if (target !== null) {
             const tol = RELAX.shortClamp && info.heightCm < RELAX.shortHeightCm ? RELAX.shortDepthTol : RULES.stage4.depthTol;

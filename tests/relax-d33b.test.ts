@@ -8,11 +8,13 @@ import test from "node:test";
 
 import { plants } from "../app/data/plants.ts";
 import { LAYOUT_V2B, RELAX } from "../app/lib/planning/engineConfig.ts";
-import { buildGardenPlanVariants, computeHeightTiers, computeSpreadBands, speciesInfo, type GardenBrief, type GardenPlan } from "../app/lib/planning/index.ts";
+import { buildGardenPlanVariants, computeHeightTiers, computeSpreadBands, RULES, speciesInfo, viewingAxis, type GardenBrief, type GardenPlan } from "../app/lib/planning/index.ts";
 import { buildScenarios } from "../scripts/batch-test/scenarios.ts";
 
 Object.assign(LAYOUT_V2B, { d29b: true, treeHard: true, curve: true, order: true, fill: true, driftSplit: false });
-const V4 = { on: true, method: "lloyd" as const, edgeGuard: true, swaps: true, shortClamp: false, gapFill: true, cohesion: true, cohesionFill: true };
+// v7 exactly: the later fills (v8 lastFill, v9 openFill - on by default
+// since 19 Oct) are pinned off so these tests keep testing v7.
+const V4 = { on: true, method: "lloyd" as const, edgeGuard: true, swaps: true, shortClamp: false, gapFill: true, cohesion: true, cohesionFill: true, lastFill: false, lastFillPool: false, openFill: false };
 
 const S006 = buildScenarios().find((s) => s.id === "S006")!.brief;
 const BRIEFS: [string, GardenBrief][] = [
@@ -147,3 +149,34 @@ for (const pool of [false, true]) {
     }
   });
 }
+
+// layout-v2g v9h (owner, 19 Oct 2026): the open fill is on by default, and
+// no plant it adds of h_back_min or taller may be centred in the front band.
+test("layout-v2g v9: v7's plants stay put, Z unchanged, hard checks hold, and no added tall plant is centred in the front band", () => {
+  const { hBackMin, edgeFrontMid } = RULES.stage4.heightBands;
+  let added = 0;
+  for (const [label, brief] of BRIEFS) {
+    const v7 = run(brief, V4);
+    for (const [i, plan] of run(brief, { ...V4, openFill: true }).entries()) {
+      const where = `${label} ${plan.character}`;
+      const before = v7[i].layout!.placements;
+      const after = plan.layout!.placements;
+      assert.equal(plan.engine?.z, v7[i].engine?.z, `${where}: Z changed`);
+      assert.ok(after.length >= before.length, `${where}: a plant was removed`);
+      before.forEach((p, k) => {
+        assert.equal(after[k].instanceId, p.instanceId, `${where}: order changed`);
+        assert.ok(Math.hypot(after[k].xM - p.xM, after[k].yM - p.yM) < 1e-9, `${where}: ${p.instanceId} moved`);
+      });
+      const axis = viewingAxis(brief.viewingEdge, plan.layout!.bedWidthM, plan.layout!.bedLengthM);
+      for (const p of after.slice(before.length)) {
+        added += 1;
+        const h = plants.find((x) => x.id === p.plantId)!.heightCm ?? 0;
+        if (h >= hBackMin) {
+          assert.ok(axis.depthOf(p.xM, p.yM) >= edgeFrontMid * axis.span - 1e-6, `${where}: added ${p.instanceId} (${h} cm) is centred in the front band`);
+        }
+      }
+      assert.ok((plan.engine?.placementChecks ?? []).every((c) => c.kind !== "hard" || c.pass), `${where}: a hard check failed`);
+    }
+  }
+  assert.ok(added > 0, "the open fill added nothing on these briefs, so it was not exercised");
+});

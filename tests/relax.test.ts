@@ -23,7 +23,7 @@ const CONFIGS: [string, Partial<typeof LAYOUT_V2B>][] = [
 
 // The D33 force pass exactly as it was built; D33b's variants have their
 // own test (relax-d33b.test.ts).
-const D33 = { method: "force" as const, edgeGuard: false, swaps: false, shortClamp: false, gapFill: false };
+const D33 = { method: "force" as const, edgeGuard: false, swaps: false, shortClamp: false, gapFill: false, cohesion: false, cohesionFill: false, lastFill: false, lastFillPool: false, openFill: false };
 
 function run(brief: GardenBrief, relax: boolean): GardenPlan[] {
   const saved = { ...RELAX };

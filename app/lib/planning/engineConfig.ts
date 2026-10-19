@@ -319,10 +319,15 @@ export const RELAX = {
    * a whole group of an allowed H3 size, members within cohesionMaxGapM of
    * each other; a single plant only where H3 allows 1. After each addition
    * H1, H3b, H4, H5 and H7 must still hold. Every plant touches nothing,
-   * keeps P1/P2/P4/P5, the tree rule and its depth tolerance. Z stays the
-   * Stage 2/3 selection's. openFillWellFraction, openFillTries and
-   * openFillMax are IMPLEMENTATION choices, not rulebook values. */
-  openFill: false,
+   * keeps P1/P2/P4/P5, the tree rule and its depth tolerance, and (owner
+   * 19 Oct, hard, also in v7 and v8) no added plant of h_back_min or taller
+   * is centred in the front band. Z stays the Stage 2/3 selection's.
+   * openFillWellFraction, openFillTries and openFillMax are IMPLEMENTATION
+   * choices, not rulebook values.
+   *
+   * On by default (owner, 19 Oct 2026); lastFill and lastFillPool stay off.
+   * There is no cap on new species: openFillMax is only a runaway guard. */
+  openFill: true,
   openFillWellFraction: 0.5,
   openFillTries: 40,
   openFillMax: 300,

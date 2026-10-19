@@ -145,3 +145,73 @@ How v9 fills:
 The 12/12 is again a measurement effect, as in v8b: the added short plants
 change the mean depths. The largest-option cases reach the 300-plant
 implementation bound (openFillMax).
+
+## v9h: open fill + hard front rule
+
+Owner, 19 Oct 2026. Rulebook **713f9bad5bec**, dataset **1e15fe4470f8**, same
+seeds. One full run (`V2D_OUT=v9h`), compared with the existing v7 and v9 rows.
+v7 was not re-run.
+
+**What changed:**
+- **Front rule.** No plant the open fill (v9), the last fill (v8) or the gap
+  fill (v7) adds may be h_back_min (80 cm) or taller and centred in the front
+  band. The test uses straight depth from the viewer, below 0.35 of the span.
+  It is hard, like the tree rule. Plants Stage 4 placed are not affected.
+- **Defaults.** `openFill` is on by default; `lastFill` and `lastFillPool`
+  stay off. There is no cap on new species: `openFillMax` (300) is only a
+  runaway guard.
+- **Tests.** `tests/relax-d33b.test.ts` gains a v9 test: no added plant of
+  80 cm or more centred in the front band, nothing v7 placed moved, Z
+  unchanged, hard checks pass. The v7, v8 and D33 tests now pin
+  `openFill`/`lastFill` off, so they keep testing the variant they were
+  written for.
+
+| Metric | v7 | v9 (old) | v9h |
+|---|---:|---:|---:|
+| Dataset of every row | 1e15fe4470f8 | 1e15fe4470f8 | 1e15fe4470f8 |
+| Briefs feasible (of 101) | 94 | 94 | 94 |
+| Options feasible | 275/282 | 275/282 | 275/282 |
+| Z identical to v7, per option | 282/282 | 282/282 | 282/282 |
+| Cover (median) | 0.678 | 0.727 | 0.727 |
+| Options with cover >= 0.75 | 57 | 108 | 105 |
+| Options with cover >= 0.80 | 19 | 52 | 50 |
+| Largest gap (median) | 0.130 | 0.070 | 0.070 |
+| 95th-pct gap, cm (median) | 46.2 | 32.5 | 32.7 |
+| 9-cell cover, min (median) | 0.357 | 0.490 | 0.490 |
+| **Tall (>= 80 cm) centred in front (sum)** | 797 | 1122 | 790 |
+| Trees centred in front (sum) | 37 | 37 | 37 |
+| Options with a hard failure | 0 | 0 | 0 |
+| Plants outside the bed (sum) | 0 | 0 | 0 |
+| v9 plants added: total / median / max | – | 8384 / 12 / 301 | 8201 / 12 / 302 |
+| v9 new species: total / median / max | – | 1666 / 3 / 60 | 1630 / 3 / 61 |
+| Species per option (median) | 5 | 9 | 9 |
+| 12-case layering test | 11/12 | 12/12 | 12/12 |
+| D24 (b) east, option 1 | pass | pass | pass |
+
+The v7 and v9 rows are the existing files, unchanged.
+
+**What the run shows:**
+- **The front rule works.** Tall plants centred in front fall from 1,122 in
+  the old v9 to 790, below v7's 797. v9h is lower than v7 because the rule
+  now also applies to v7's own gap fill, so this count includes only plants
+  Stage 4 placed. Trees in front are unchanged (37).
+- **The front rule costs almost nothing in fill.** Cover is unchanged (median
+  0.727), with 3 fewer options at 0.75 or more (105 vs 108). The largest gap
+  (0.070) and the emptiest-ninth cover (0.490) match v9; the 95th-percentile
+  gap is 32.7 vs 32.5 cm.
+- **Unchanged against v7:** Z on every option (282/282), feasibility (94
+  briefs), no hard failure, no plant outside the bed.
+- **The open fill adds a lot of variety.** It adds a median of 12 plants and
+  3 new species per option; species per option rise from 5 to 9 (median).
+  The largest single option gains 302 plants and 61 new species. 302 is above
+  the 300 guard because the last group is placed whole.
+
+**Tests:** `npm run test:unit` gives 139 of 140 passing. The one failure is
+D24 (c), a known dataset failure. Of the three tests the new dataset broke,
+the 12-case and D24 (b) now pass. That is because the open fill adds plants,
+mostly short ones near the front, which shifts the tall-versus-short averages
+those tests compare. v7's own plants are not placed differently. No other
+test fails.
+
+**Figures:** `reports/figures/layout_v2g/v9h_{S001,S006,FIX}.png`, each with
+v7 on the left and v9h on the right.
