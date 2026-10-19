@@ -5,7 +5,8 @@ import tseslint from "typescript-eslint";
 
 export default tseslint.config(
   {
-    ignores: ["dist/**", "node_modules/**", "work/**", "data/scripts/retired/**"],
+    // .claude/ is Claude Code's local folder (settings, scratch), never source.
+    ignores: ["dist/**", "node_modules/**", "work/**", "data/scripts/retired/**", ".claude/**"],
   },
   {
     languageOptions: {
