@@ -119,3 +119,31 @@ test("D33b v7 cohesion: no grouped plant ends further than max(10 cm, its gap as
     }
   }
 });
+
+// layout-v2g v8 (owner idea, 19 Oct 2026): the last-resort fill only adds.
+for (const pool of [false, true]) {
+  test(`layout-v2g v8${pool ? "b (with pool species)" : ""}: every v7 plant stays exactly where it was, Z unchanged, added plants touch nothing, inside the bed, hard checks hold, cover within cover_max`, () => {
+    for (const [label, brief] of BRIEFS) {
+      const v7 = run(brief, V4);
+      for (const [i, plan] of run(brief, { ...V4, lastFill: true, lastFillPool: pool }).entries()) {
+        const before = v7[i].layout!.placements;
+        const after = plan.layout!.placements;
+        assert.equal(plan.engine?.z, v7[i].engine?.z, `${label}: Z changed`);
+        assert.ok(after.length >= before.length);
+        before.forEach((p, k) => {
+          assert.equal(after[k].instanceId, p.instanceId);
+          assert.ok(Math.hypot(after[k].xM - p.xM, after[k].yM - p.yM) < 1e-9, `${label}: ${p.instanceId} moved`);
+        });
+        const W = brief.bedWidthM;
+        const L = brief.bedLengthM;
+        for (const p of after.slice(before.length)) {
+          assert.ok(p.xM >= p.radiusM - 1e-6 && p.xM <= W - p.radiusM + 1e-6 && p.yM >= p.radiusM - 1e-6 && p.yM <= L - p.radiusM + 1e-6, `${label}: ${p.instanceId} outside the bed`);
+          for (const q of after) if (q !== p) assert.ok(Math.hypot(p.xM - q.xM, p.yM - q.yM) >= p.radiusM + q.radiusM - 1e-6, `${label}: ${p.instanceId} touches ${q.instanceId}`);
+          if (!pool) assert.ok(v7[i].layout!.placements.some((q) => q.plantId === p.plantId), `${label}: ${p.plantId} is a new species without lastFillPool`);
+        }
+        assert.ok((plan.engine?.placementChecks ?? []).every((c) => c.kind !== "hard" || c.pass), `${label}: a hard check failed`);
+        assert.ok(plan.quantities!.usedCanopyAreaM2 <= plan.quantities!.usableCanopyAreaM2 + 1e-6, `${label}: over cover_max`);
+      }
+    }
+  });
+}

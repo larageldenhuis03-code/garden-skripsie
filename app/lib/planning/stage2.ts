@@ -346,6 +346,20 @@ export class SelectionState {
     );
   }
 
+  /** layout-v2g v9 (owner, 19 Oct 2026): withinLimits() without the H2
+   * species ceiling, and H1 against the rulebook's cover_max rather than
+   * the search-only packing cap. Used only by Stage 4's open fill. */
+  withinLimitsExceptH2(): boolean {
+    return (
+      this.plantedAreaM2 <= this.rulebookCoverCapM2() + 1e-9 &&
+      this.featureSpecies <= 1 &&
+      this.largestCappedShare() <= this.rMaxEffective() + 1e-9 &&
+      this.singletonSpecies <= this.singletonLimit() &&
+      this.oversizedL1Species === 0 &&
+      (this.l2Species === 0 || this.l1Species > 0)
+    );
+  }
+
   /** Conditions only a finished selection must meet: the H2 floor, and a
    * windward-row species when P3 applies. */
   complete(): boolean {

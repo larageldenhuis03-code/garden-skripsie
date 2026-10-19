@@ -292,4 +292,38 @@ export const RELAX = {
    * rather than standing alone. Every point of the gap is tried, not only
    * the roomiest. */
   cohesionFill: true,
+  /** v8 (layout-v2g, owner idea 19 Oct 2026): last-resort fill. After the
+   * v7 gap fill, keep adding plants into whatever empty ground is left
+   * until a full pass adds none. Nothing already placed moves. Candidates
+   * go in Stage 1 score order: the plan's own species first (H3 maximum,
+   * H5 cap, beside their own group, as v7); with lastFillPool also the
+   * lastFillPoolTop best-scoring pool species the plan did not select
+   * (H2 ceiling kept; a new species enters as one plant and any more of
+   * it must join that one). Total planted area stays within cover_max
+   * (H1). Every added plant touches nothing and keeps P1/P2/P4/P5, the
+   * tree rule and its depth tolerance. Z and H1-H7 stay those of the
+   * Stage 2/3 selection. lastFillMax is an IMPLEMENTATION bound. */
+  lastFill: false,
+  lastFillPool: false,
+  lastFillPoolTop: 20,
+  lastFillMax: 200,
+  /** v9 (layout-v2g, owner 19 Oct 2026): open fill. Like v8 it only adds
+   * after v7 and moves nothing, but it ignores the H2 species ceiling (and
+   * only that rule) so species not yet in the layout can fill large empty
+   * areas. Biggest gap first. Candidates are every pool species (Stage 0
+   * survivors, bar feature plants, climbers, the windbreak species and
+   * fail-rule drops) plus one more plant of a species already planted.
+   * Among the plants that fill the gap well (spread radius at least
+   * openFillWellFraction of the gap's largest free radius) the best Stage 1
+   * score wins; if none, the largest that fits. A new species is planted as
+   * a whole group of an allowed H3 size, members within cohesionMaxGapM of
+   * each other; a single plant only where H3 allows 1. After each addition
+   * H1, H3b, H4, H5 and H7 must still hold. Every plant touches nothing,
+   * keeps P1/P2/P4/P5, the tree rule and its depth tolerance. Z stays the
+   * Stage 2/3 selection's. openFillWellFraction, openFillTries and
+   * openFillMax are IMPLEMENTATION choices, not rulebook values. */
+  openFill: false,
+  openFillWellFraction: 0.5,
+  openFillTries: 40,
+  openFillMax: 300,
 };

@@ -84,6 +84,15 @@ export type PlacementSite = {
   /** D33b v4: the H5 cap (r_max_effective) the gap fill must keep; the
    * engine passes it. Without it the gap fill does not run. */
   h5Cap?: number;
+  /** v8 last fill (layout-v2g): H1 cover cap in m2 (cover_max x bed), the
+   * H2 species ceiling, and the species the fail rule left out. The
+   * engine passes them; without coverCapM2 the last fill does not run. */
+  coverCapM2?: number;
+  sMax?: number;
+  excluded?: readonly string[];
+  /** v9 open fill: the engine's check of every Stage 2 limit except the
+   * H2 species ceiling, on the planted counts. Without it v9 does not run. */
+  openFillOk?: (counts: Selection) => boolean;
   /** Which edge the gardener looks from, and therefore which way the
    * layers step up in height. The rulebook assumes north, so that stays
    * the default. It moves ONLY the height ordering: the windward row and
@@ -921,6 +930,234 @@ function placeOnce(
       `D33 relax: ${result.accepted ? "accepted" : "rejected"}; patch ${result.patchBefore.toFixed(3)} -> ${result.patchAfter.toFixed(3)}; median move ${result.medianMoveCm.toFixed(1)} cm; moved ${result.movedCount} plants, median ${result.medianMovedCm.toFixed(1)} cm; swaps ${result.swaps ?? 0}; iterations ${result.iterations}; target gap ${(result.targetGapM * 100).toFixed(1)} cm; ${result.reason}`,
     );
     if (RELAX.gapFill && site.h5Cap !== undefined) gapFill(site.h5Cap);
+    if (RELAX.lastFill && site.h5Cap !== undefined && site.coverCapM2 !== undefined) lastFill(site.h5Cap, site.coverCapM2);
+    if (RELAX.openFill && site.openFillOk) openFill(site.openFillOk);
+  }
+
+  /** v9 (engineConfig RELAX.openFill): the open fill - see engineConfig. */
+  function openFill(ok: (counts: Selection) => boolean): void {
+    const counts = new Map(realised);
+    for (const [id, n] of added) counts.set(id, (counts.get(id) ?? 0) + n);
+    if (!ok(counts)) {
+      diagnostics.push("v9 open fill: skipped - the planting as it stands already breaks a limit other than H2.");
+      return;
+    }
+    const excluded = new Set(site.excluded ?? []);
+    const usable = (info: SpeciesInfo) =>
+      !info.feature && info.layer !== "L2" && info.id !== windbreakId && !excluded.has(info.id);
+    const pool = [...infos.values()].filter(usable);
+    const ranked = [...dStar].map(([id, d]) => ({ h: (infos.get(id) as SpeciesInfo).heightCm, d })).sort((a, b) => a.h - b.h);
+    const targetOf = (info: SpeciesInfo): number | null => {
+      if (!v2b) return targetDepth(info.layer, profile);
+      const known = dStar.get(info.id);
+      if (known !== undefined) return known;
+      if (!ranked.length) return null;
+      // Height-led: interpolate d* linearly between the planted species
+      // just shorter and just taller, so a mid-height newcomer stands in
+      // the middle even when no planted species is mid-height.
+      const h = info.heightCm;
+      if (h <= ranked[0].h) return ranked[0].d;
+      const last = ranked[ranked.length - 1];
+      if (h >= last.h) return last.d;
+      const k = ranked.findIndex((e) => e.h >= h);
+      const lo = ranked[k - 1];
+      const hi = ranked[k];
+      return hi.h === lo.h ? hi.d : lo.d + ((h - lo.h) / (hi.h - lo.h)) * (hi.d - lo.d);
+    };
+    const roomAt = (x: number, y: number) =>
+      Math.min(x, W - x, y, L - y, ...placed.map((p) => Math.hypot(p.xM - x, p.yM - y) - p.radiusM));
+    const canStand = (info: SpeciesInfo, x: number, y: number): boolean => {
+      const r = info.diameterM / 2;
+      if (roomAt(x, y) < r - EPS) return false; // touches nothing, inside the bed
+      if (!fits(x, y, r, info) || breaksP4(info, x, y) || treeInFront(info, x, y)) return false;
+      const target = targetOf(info);
+      if (target === null) return true;
+      const depth = v2b ? effDepthM(x, y) : viewer.depthOf(x, y);
+      return Math.abs(depth - target * viewer.span) <= RULES.stage4.depthTol * viewer.span + EPS;
+    };
+    /** Points just outside each plant of `id` (gap 2 cm, every 15 degrees),
+     * roomiest first: where a group-mate can stand. */
+    const besideMates = (id: string, r: number) => {
+      const out: { x: number; y: number; room: number }[] = [];
+      for (const m of placed) {
+        if (m.plantId !== id) continue;
+        const dist = m.radiusM + r + 0.02;
+        for (let a = 0; a < 24; a += 1) {
+          const x = m.xM + dist * Math.cos((a * Math.PI) / 12);
+          const y = m.yM + dist * Math.sin((a * Math.PI) / 12);
+          out.push({ x, y, room: roomAt(x, y) });
+        }
+      }
+      return out.filter((p) => p.room >= r - EPS).sort((a, b) => b.room - a.room);
+    };
+    const put = (info: SpeciesInfo, x: number, y: number) => {
+      const n = counts.get(info.id) ?? 0;
+      record(info, x, y, n, { gapFill: true });
+      counts.set(info.id, n + 1);
+      added.set(info.id, (added.get(info.id) ?? 0) + 1);
+    };
+    const undo = (info: SpeciesInfo, k: number) => {
+      placed.length -= k;
+      counts.set(info.id, (counts.get(info.id) ?? 0) - k);
+      if (counts.get(info.id) === 0) counts.delete(info.id);
+      const a = (added.get(info.id) ?? 0) - k;
+      if (a > 0) added.set(info.id, a);
+      else added.delete(info.id);
+    };
+    /** Try to plant `info` with its first plant in this gap: one more of a
+     * planted species (beside its group), or a whole new group. */
+    const tryPlant = (info: SpeciesInfo, gapPoints: { x: number; y: number; room: number }[]): string | null => {
+      const r = info.diameterM / 2;
+      const n = counts.get(info.id) ?? 0;
+      if (n > 0) {
+        if (n + 1 > Math.max(...info.allowedN)) return null; // H3 max
+        const spot = besideMates(info.id, r).find((p) => gapPoints.some((g) => Math.hypot(g.x - p.x, g.y - p.y) < r) && canStand(info, p.x, p.y));
+        if (!spot) return null;
+        put(info, spot.x, spot.y);
+        if (ok(counts)) return `${info.id} (${n} -> ${n + 1})`;
+        undo(info, 1);
+        return null;
+      }
+      const first = gapPoints.find((g) => g.room >= r - EPS && canStand(info, g.x, g.y));
+      if (!first) return null;
+      const sizes = [...info.allowedN].sort((a, b) => b - a);
+      for (const size of sizes) {
+        put(info, first.x, first.y);
+        let k = 1;
+        while (k < size) {
+          const spot = besideMates(info.id, r).find((p) => canStand(info, p.x, p.y));
+          if (!spot) break;
+          put(info, spot.x, spot.y);
+          k += 1;
+        }
+        if (k === size && ok(counts)) return `${info.id} x${size} [new species]`;
+        undo(info, k);
+      }
+      return null;
+    };
+    let total = 0;
+    while (total < RELAX.openFillMax) {
+      const gaps = emptyGaps(placed.map((p) => ({ x: p.xM, y: p.yM, r: p.radiusM })), W, L)
+        .sort((a, b) => b.length - a.length)
+        .map((cells) => cells.map((c) => ({ ...c, room: roomAt(c.x, c.y) })).sort((a, b) => b.room - a.room));
+      let done = false;
+      for (const points of gaps) {
+        const maxRoom = points[0]?.room ?? 0;
+        if (maxRoom <= EPS) continue;
+        // Only species that could stand somewhere in this gap: room for
+        // their spread at a point within their depth tolerance.
+        const depthOfPoint = (g: { x: number; y: number }) => (v2b ? effDepthM(g.x, g.y) : viewer.depthOf(g.x, g.y));
+        const fitting = pool.filter((info) => {
+          const r = info.diameterM / 2;
+          if (r > maxRoom + EPS) return false;
+          const t = targetOf(info);
+          return points.some((g) => g.room >= r - EPS && (t === null || Math.abs(depthOfPoint(g) - t * viewer.span) <= RULES.stage4.depthTol * viewer.span + EPS));
+        });
+        const well = fitting
+          .filter((info) => info.diameterM / 2 >= RELAX.openFillWellFraction * maxRoom)
+          .sort((a, b) => b.score - a.score || a.id.localeCompare(b.id));
+        const rest = fitting
+          .filter((info) => info.diameterM / 2 < RELAX.openFillWellFraction * maxRoom)
+          .sort((a, b) => b.diameterM - a.diameterM || b.score - a.score || a.id.localeCompare(b.id));
+        for (const info of [...well, ...rest].slice(0, RELAX.openFillTries)) {
+          const before = placed.length;
+          const what = tryPlant(info, points);
+          if (what) {
+            total += placed.length - before;
+            diagnostics.push(`v9 open fill: added ${what}.`);
+            done = true;
+            break;
+          }
+        }
+        if (done) break;
+      }
+      if (!done) break;
+    }
+  }
+
+  /** v8 (engineConfig RELAX.lastFill): the last-resort fill. Runs after
+   * relaxation and the v7 gap fill, moves nothing, and only adds. Each
+   * round finds every empty gap left, then tries its points from the
+   * roomiest down against the candidates in Stage 1 score order; the first
+   * plant that fits is added and the gaps are found again. It stops when a
+   * round adds nothing (or at lastFillMax plants). */
+  function lastFill(h5Cap: number, coverCapM2: number): void {
+    const counts = new Map(realised);
+    for (const [id, n] of added) counts.set(id, (counts.get(id) ?? 0) + n);
+    let total = [...counts.values()].reduce((s, n) => s + n, 0);
+    let area = placed.reduce((s, p) => s + Math.PI * p.radiusM * p.radiusM, 0);
+    const excluded = new Set(site.excluded ?? []);
+    const usable = (info: SpeciesInfo) =>
+      !info.feature && info.layer !== "L2" && info.id !== windbreakId && !excluded.has(info.id);
+    const own = [...realised.keys()]
+      .map((id) => infos.get(id) as SpeciesInfo)
+      .filter(usable)
+      .sort((a, b) => b.score - a.score || a.id.localeCompare(b.id));
+    const pool = RELAX.lastFillPool
+      ? [...infos.values()]
+          .filter((info) => !realised.has(info.id) && usable(info))
+          .sort((a, b) => b.score - a.score || a.id.localeCompare(b.id))
+          .slice(0, RELAX.lastFillPoolTop)
+      : [];
+    const candidates = [...own, ...pool];
+    if (!candidates.length) return;
+    // Depth target for a species the plan did not select: d* of the
+    // selected species nearest in height (v2b), else its layer's target.
+    const ranked = [...dStar].map(([id, d]) => ({ h: (infos.get(id) as SpeciesInfo).heightCm, d })).sort((a, b) => a.h - b.h);
+    const targetOf = (info: SpeciesInfo): number | null => {
+      if (!v2b) return targetDepth(info.layer, profile);
+      const known = dStar.get(info.id);
+      if (known !== undefined) return known;
+      if (!ranked.length) return null;
+      return ranked.reduce((best, e) => (Math.abs(e.h - info.heightCm) < Math.abs(best.h - info.heightCm) ? e : best)).d;
+    };
+    const room = (x: number, y: number) =>
+      Math.min(x, W - x, y, L - y, ...placed.map((p) => Math.hypot(p.xM - x, p.yM - y) - p.radiusM));
+    const minR = Math.min(...candidates.map((c) => c.diameterM / 2));
+    let speciesCount = counts.size;
+    let addedHere = 0;
+    while (addedHere < RELAX.lastFillMax) {
+      const spots = emptyGaps(placed.map((p) => ({ x: p.xM, y: p.yM, r: p.radiusM })), W, L)
+        .flat()
+        .map((c) => ({ ...c, room: room(c.x, c.y) }))
+        .filter((c) => c.room >= minR - EPS)
+        .sort((a, b) => b.room - a.room || a.y - b.y || a.x - b.x);
+      let done = false;
+      for (const spot of spots) {
+        for (const info of candidates) {
+          const r = info.diameterM / 2;
+          if (spot.room < r - EPS) continue; // touches nothing, inside the bed
+          const n = counts.get(info.id) ?? 0;
+          if (n + 1 > Math.max(...info.allowedN)) continue; // H3 max
+          if ((n + 1) / (total + 1) > h5Cap + 1e-9) continue; // H5 cap
+          if (n === 0 && site.sMax !== undefined && speciesCount + 1 > site.sMax) continue; // H2 ceiling
+          if (area + info.areaM2 > coverCapM2 + 1e-9) continue; // H1
+          const { x, y } = spot;
+          if (n > 0 && RELAX.cohesionFill) {
+            const mateGap = Math.min(...placed.filter((p) => p.plantId === info.id).map((p) => Math.hypot(p.xM - x, p.yM - y) - p.radiusM - r));
+            if (!(mateGap <= RELAX.cohesionMaxGapM + EPS)) continue;
+          }
+          if (!fits(x, y, r, info) || breaksP4(info, x, y) || treeInFront(info, x, y)) continue;
+          const target = targetOf(info);
+          if (target !== null) {
+            const depth = v2b ? effDepthM(x, y) : viewer.depthOf(x, y);
+            if (Math.abs(depth - target * viewer.span) > RULES.stage4.depthTol * viewer.span + EPS) continue;
+          }
+          record(info, x, y, n, { gapFill: true });
+          if (n === 0) speciesCount += 1;
+          counts.set(info.id, n + 1);
+          total += 1;
+          area += info.areaM2;
+          addedHere += 1;
+          added.set(info.id, (added.get(info.id) ?? 0) + 1);
+          diagnostics.push(`v8 last fill: added ${info.id} (${n} -> ${n + 1})${realised.has(info.id) ? "" : " [pool species]"}.`);
+          done = true;
+          break;
+        }
+        if (done) break;
+      }
+      if (!done) break;
+    }
   }
 
   /** D33b v4: in each of the gapFillCount largest gaps, one more plant of a

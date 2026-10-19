@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1070" height="430" viewBox="0 0 1070 430" font-family="Helvetica, Arial, sans-serif">
+<rect width="100%" height="100%" fill="#fbf8ef"/>
+<text x="50" y="22" font-size="14" font-weight="bold">v8b · S001: fynbos, 2 x 3 m, wind none, view north · no plant moved · 3 added · rulebook 713f9bad5bec</text>
+<text x="50" y="40" font-size="11">Option 1, same brief and seed (v4 onwards may add plants; v8 never moves a placed plant). North at the top, 1 m grid. Dashed brown lines: straight band edges (0.35 / 0.65 of the depth from the viewer).</text>
+<text x="50" y="55" font-size="11">Ring weight = height (thin &lt; 50 cm, medium &lt; 1 m, thick ≥ 1 m); dashed ring = windbreak; T = tree.</text>
+<text x="50" y="82" font-size="13" font-weight="bold">Before: v7</text>
+<text x="50" y="98" font-size="11">cover 0.65 · largest gap 0.147 · CV 0.092 · Z 0.9478 · 7 plants</text>
+<rect x="50" y="122" width="165.33333333333334" height="248" fill="#efe6cf" stroke="#2f3a1e"/>
+<g stroke="#d9d2bd" stroke-width="0.6"><line x1="132.66666666666669" y1="122" x2="132.66666666666669" y2="370"/><line x1="50" y1="204.66666666666669" x2="215.33333333333334" y2="204.66666666666669"/><line x1="50" y1="287.33333333333337" x2="215.33333333333334" y2="287.33333333333337"/></g>
+<g stroke="#8a6d3b" stroke-width="1" stroke-dasharray="5 3"><line x1="50" y1="208.8" x2="215.33333333333334" y2="208.8"/><line x1="50" y1="283.20000000000005" x2="215.33333333333334" y2="283.20000000000005"/></g>
+<circle cx="172.9" cy="311.4" r="41.3" fill="#7b6aa8" fill-opacity="0.72" stroke="#2f3a1e" stroke-width="3"/>
+<circle cx="91.3" cy="272.5" r="41.3" fill="#7b6aa8" fill-opacity="0.72" stroke="#2f3a1e" stroke-width="3"/>
+<circle cx="150.5" cy="220.1" r="41.3" fill="#7b6aa8" fill-opacity="0.72" stroke="#2f3a1e" stroke-width="3"/>
+<circle cx="92.8" cy="337.5" r="20.7" fill="#b08d2c" fill-opacity="0.72" stroke="#2f3a1e" stroke-width="3"/>
+<circle cx="184.3" cy="161.5" r="31.0" fill="#4f7a8a" fill-opacity="0.72" stroke="#2f3a1e" stroke-width="1.8"/>
+<circle cx="127.2" cy="156.5" r="31.0" fill="#4f7a8a" fill-opacity="0.72" stroke="#2f3a1e" stroke-width="1.8"/>
+<circle cx="81.0" cy="190.5" r="31.0" fill="#4f7a8a" fill-opacity="0.72" stroke="#2f3a1e" stroke-width="1.8"/>
+<text x="132.66666666666669" y="116" font-size="10" text-anchor="middle" font-weight="bold">viewer</text>
+<text x="560" y="82" font-size="13" font-weight="bold">After: v8b</text>
+<text x="560" y="98" font-size="11">cover 0.66 · largest gap 0.147 · CV 0.098 · Z 0.9478 · 10 plants</text>
+<rect x="560" y="122" width="165.33333333333334" height="248" fill="#efe6cf" stroke="#2f3a1e"/>
+<g stroke="#d9d2bd" stroke-width="0.6"><line x1="642.6666666666666" y1="122" x2="642.6666666666666" y2="370"/><line x1="560" y1="204.66666666666669" x2="725.3333333333334" y2="204.66666666666669"/><line x1="560" y1="287.33333333333337" x2="725.3333333333334" y2="287.33333333333337"/></g>
+<g stroke="#8a6d3b" stroke-width="1" stroke-dasharray="5 3"><line x1="560" y1="208.8" x2="725.3333333333334" y2="208.8"/><line x1="560" y1="283.20000000000005" x2="725.3333333333334" y2="283.20000000000005"/></g>
+<circle cx="682.9" cy="311.4" r="41.3" fill="#7b6aa8" fill-opacity="0.72" stroke="#2f3a1e" stroke-width="3"/>
+<circle cx="601.3" cy="272.5" r="41.3" fill="#7b6aa8" fill-opacity="0.72" stroke="#2f3a1e" stroke-width="3"/>
+<circle cx="660.5" cy="220.1" r="41.3" fill="#7b6aa8" fill-opacity="0.72" stroke="#2f3a1e" stroke-width="3"/>
+<circle cx="602.8" cy="337.5" r="20.7" fill="#b08d2c" fill-opacity="0.72" stroke="#2f3a1e" stroke-width="3"/>
+<circle cx="694.3" cy="161.5" r="31.0" fill="#4f7a8a" fill-opacity="0.72" stroke="#2f3a1e" stroke-width="1.8"/>
+<circle cx="637.2" cy="156.5" r="31.0" fill="#4f7a8a" fill-opacity="0.72" stroke="#2f3a1e" stroke-width="1.8"/>
+<circle cx="591.0" cy="190.5" r="31.0" fill="#4f7a8a" fill-opacity="0.72" stroke="#2f3a1e" stroke-width="1.8"/>
+<circle cx="578.6" cy="143.7" r="10.3" fill="#6d7f3a" fill-opacity="0.72" stroke="#2f3a1e" stroke-width="0.8"/>
+<circle cx="599.3" cy="143.7" r="8.3" fill="#9c6b3f" fill-opacity="0.72" stroke="#2f3a1e" stroke-width="0.8"/>
+<circle cx="566.2" cy="131.3" r="6.2" fill="#a2496b" fill-opacity="0.72" stroke="#2f3a1e" stroke-width="0.8"/>
+<text x="642.6666666666666" y="116" font-size="10" text-anchor="middle" font-weight="bold">viewer</text>
+</svg>

@@ -1,0 +1,27 @@
+{
+ "config": "v9_p2a",
+ "rulebook": "713f9bad5bec",
+ "dataset": "1e15fe4470f8",
+ "configLine": "LAYOUT_V2B {\"d29b\":true,\"treeHard\":true,\"curve\":true,\"order\":true,\"fill\":true,\"driftSplit\":false}; RELAX {\"on\":true,\"maxIterations\":200,\"minMoveM\":0.01,\"sameGroupFactor\":0.5,\"maxStepFraction\":0.5,\"grid\":20,\"method\":\"lloyd\",\"edgeGuard\":true,\"lloydSamples\":3000,\"swaps\":true,\"swapHeightCm\":20,\"maxSwapTries\":60,\"shortClamp\":false,\"shortHeightCm\":50,\"shortDepthTol\":0.15,\"gapFill\":true,\"gapFillCount\":3,\"cohesion\":true,\"cohesionMaxGapM\":0.1,\"cohesionFill\":true,\"lastFill\":false,\"lastFillPool\":false,\"lastFillPoolTop\":20,\"lastFillMax\":200,\"openFill\":true,\"openFillWellFraction\":0.5,\"openFillTries\":40,\"openFillMax\":300}; contactBonus 0; sweepWeight 0",
+ "bands": {
+  "edgeFrontMid": 0.35,
+  "edgeMidBack": 0.65,
+  "hFrontMax": 60,
+  "hMiddleMin": 30,
+  "hMiddleMax": 120,
+  "hBackMin": 80,
+  "hGrassFrontHalfMax": 120,
+  "curveK": 0.15,
+  "curveAsymMax": 0.25,
+  "shareMin": 0.8,
+  "canopyOverlapMax": 1
+ },
+ "twelve": {
+  "pass": 0,
+  "total": 0,
+  "failures": []
+ },
+ "d24b": "skipped",
+ "b1223b1172": [],
+ "layouts": []
+}

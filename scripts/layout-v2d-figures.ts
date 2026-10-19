@@ -73,10 +73,12 @@ function panel(layout: Layout, ox: number, oy: number, title: string, edges: num
 
 const BASES = process.env.V2D_BASES?.split(",") ?? ["d33", "v1", "v2", "v3", "v4", "v4b", "v5"];
 for (const base of BASES) {
-  const before = JSON.parse(readFileSync(join(IN, "v2d_o.json"), "utf8")) as Dump;
+  // layout-v2g: V2D_BEFORE picks the left-hand config (default (o) as placed).
+  const BEFORE = process.env.V2D_BEFORE ?? "o";
+  const before = JSON.parse(readFileSync(join(IN, `v2d_${BEFORE}.json`), "utf8")) as Dump;
   const after = JSON.parse(readFileSync(join(IN, `v2d_${base}.json`), "utf8")) as Dump;
   const edges = [before.bands.edgeFrontMid, before.bands.edgeMidBack];
-  for (const id of ["S001", "S006", "FIX"]) {
+  for (const id of (process.env.V2D_SAMPLES?.split(",") ?? ["S001", "S006", "FIX"])) {
     const b = before.layouts.find((l) => l.id === id);
     const a = after.layouts.find((l) => l.id === id);
     if (!b || !a) continue;
@@ -89,15 +91,16 @@ for (const base of BASES) {
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" font-family="Helvetica, Arial, sans-serif">
 <rect width="100%" height="100%" fill="#fbf8ef"/>
 <text x="${gap}" y="22" font-size="14" font-weight="bold">${label(base)} · ${id}: ${b.style}, ${b.widthM} x ${b.lengthM} m, wind ${b.wind}, view ${b.viewingEdge} · ${moved ? "plants moved" : "no plant moved"}${a.circles.length > b.circles.length ? ` · ${a.circles.length - b.circles.length} added` : ""} · rulebook ${before.rulebook}</text>
-<text x="${gap}" y="40" font-size="11">Option 1, same brief and seed (v4/v4′/v5 may add plants; v5 also re-places). North at the top, 1 m grid. Dashed brown lines: straight band edges (${edges.join(" / ")} of the depth from the viewer).</text>
+<text x="${gap}" y="40" font-size="11">Option 1, same brief and seed (v4 onwards may add plants; v8 never moves a placed plant). North at the top, 1 m grid. Dashed brown lines: straight band edges (${edges.join(" / ")} of the depth from the viewer).</text>
 <text x="${gap}" y="55" font-size="11">Ring weight = height (thin &lt; 50 cm, medium &lt; 1 m, thick ≥ 1 m); dashed ring = windbreak; T = tree.</text>
-${panel(b, gap, 70, "(o) as placed, before relaxation", edges, colour)}
+${panel(b, gap, 70, BEFORE === "o" ? "(o) as placed, before relaxation" : `Before: ${label(BEFORE)}`, edges, colour)}
 ${panel(a, 2 * gap + PANEL_W, 70, `After: ${label(base)}`, edges, colour)}
 </svg>
 `;
     const name = `${base}_${id}`;
     const svgPath = join(OUT, `${name}.svg`);
     writeFileSync(svgPath, svg, "utf8");
+    if (process.env.V2D_NOPNG === "1") { console.log(`wrote ${name}.svg`); continue; }
     execFileSync(CHROME, [
       "--headless=new", "--disable-gpu", "--hide-scrollbars", "--force-device-scale-factor=2",
       `--window-size=${width},${height}`, `--screenshot=${resolve(OUT, `${name}.png`)}`,

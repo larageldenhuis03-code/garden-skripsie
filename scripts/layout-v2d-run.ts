@@ -47,7 +47,7 @@ import { cellCoverVariance } from "../app/lib/planning/relax.ts";
 
 const OUT_DIR = join("reports", process.env.V2D_DIR ?? "layout_v2d");
 const NAME = process.env.V2D_OUT ?? "run";
-const SAMPLES = ["S001", "S006", "FIX"];
+const SAMPLES = process.env.V2D_SAMPLES?.split(",") ?? ["S001", "S006", "FIX"];
 const FILLER_SPREAD_MAX_CM = 50; // D32's gap-filler threshold, for counting only
 
 // --- configuration, in memory only -----------------------------------------
@@ -241,7 +241,12 @@ const FIXED: GardenBrief = {
   viewingEdge: "south", sun: "part", water: "moist", bedWidthM: 6, bedLengthM: 2,
   style: "fynbos", colour: { mode: "none" }, extras: [],
 };
-const briefs = [...buildScenarios().map((s) => ({ id: s.id, brief: s.brief })), { id: "FIX", brief: FIXED }];
+const allBriefs = [...buildScenarios().map((s) => ({ id: s.id, brief: s.brief })), { id: "FIX", brief: FIXED }];
+// layout-v2g: V2D_SLICE="from:to" runs part of the briefs (the device shell
+// has a time limit); V2D_SKIPCHECKS=1 skips the layering checks for a part.
+const [sliceFrom, sliceTo] = (process.env.V2D_SLICE ?? "0:").split(":").map((v) => (v === "" ? undefined : Number(v)));
+const briefs = allBriefs.slice(sliceFrom, sliceTo);
+const SKIP = process.env.V2D_SKIPCHECKS === "1";
 
 type Row = Record<string, string | number | boolean>;
 const rows: Row[] = [];
@@ -322,6 +327,13 @@ for (const { id, brief } of briefs) {
       ...extra,
       d33_removed: countsOf(plan).removed,
       d33_added: countsOf(plan).added,
+      v8_added: plan.diagnostics.filter((d) => d.startsWith("v8 last fill")).length,
+      v8_pool_added: plan.diagnostics.filter((d) => d.startsWith("v8 last fill") && d.includes("[pool species]")).length,
+      v9_plants: plan.diagnostics.filter((d) => d.startsWith("v9 open fill: added")).reduce((sum, d) => sum + (/ x(\d+) \[new species\]/.exec(d) ? Number(/ x(\d+) \[/.exec(d)![1]) : 1), 0),
+      v9_new_species: plan.diagnostics.filter((d) => d.startsWith("v9 open fill: added") && d.includes("[new species]")).length,
+      v9_new_plants: plan.diagnostics.filter((d) => d.startsWith("v9 open fill: added") && d.includes("[new species]")).reduce((sum, d) => sum + Number(/ x(\d+) \[/.exec(d)![1]), 0),
+      v9_skipped: plan.diagnostics.some((d) => d.startsWith("v9 open fill: skipped")) ? 1 : 0,
+      v8_new_species: new Set(plan.diagnostics.filter((d) => d.startsWith("v8 last fill") && d.includes("[pool species]")).map((d) => d.split(" ")[4])).size,
       tiebreaks: v2?.tiebreaks ?? "",
       fallbacks: v2?.fallbacks ?? "",
       straddling: v2?.straddling ?? "",
@@ -374,7 +386,7 @@ function tallBehindShort(plan: GardenPlan, edge: GardenBrief["viewingEdge"]): { 
 const twelve: string[] = [];
 let twelvePass = 0;
 let twelveTotal = 0;
-for (const edge of ["north", "east", "south", "west"] as const) {
+for (const edge of SKIP ? [] : (["north", "east", "south", "west"] as const)) {
   buildGardenPlanVariants(plants, { ...base, wind: "none", viewingEdge: edge }).forEach((plan, i) => {
     twelveTotal += 1;
     const check = tallBehindShort(plan, edge);
@@ -382,7 +394,7 @@ for (const edge of ["north", "east", "south", "west"] as const) {
     else twelve.push(`${edge} ${i + 1}: ${check.note}`);
   });
 }
-const d24b = (() => {
+const d24b = SKIP ? "skipped" : (() => {
   const plan = buildGardenPlanVariants(plants, { ...base, wind: "affected", viewingEdge: "east" })[0];
   const check = tallBehindShort(plan, "east");
   return `${check.ok ? "pass" : "FAIL"} (${check.note})`;
@@ -394,7 +406,7 @@ const b12: string[] = [];
     .filter((p) => p.heightCm !== null && p.heightCm < 30 && p.spreadCm !== null && p.spreadCm >= 30 && p.spreadCm <= 60)
     .slice(0, 2)
     .map((p) => p.id);
-  for (const edge of ["north", "east", "south", "west"] as const) {
+  for (const edge of SKIP ? [] : (["north", "east", "south", "west"] as const)) {
     const brief: GardenBrief = { ...base, viewingEdge: edge, wind: "none", water: "moist", style: "undecided" };
     const infos = new Map<string, SpeciesInfo>();
     for (const pid of ["B1223", "B1172", ...shortIds]) {

@@ -127,7 +127,20 @@ export function runEngine(
     const current: Selection = selection;
     // D33b v4 needs the H5 cap of this selection for its gap fill.
     const h5Cap = stateFrom(current, infos, site).rMaxEffective();
-    const placement = placeSelection(current, infos, { ...site, h5Cap }, rng);
+    const placement = placeSelection(
+      current,
+      infos,
+      {
+        ...site,
+        h5Cap,
+        coverCapM2: site.style.coverMax * site.widthM * site.depthM,
+        sMax: site.sMax,
+        excluded: dropped,
+        // v9 open fill: every Stage 2 limit except the H2 species ceiling.
+        openFillOk: (counts: Selection) => stateFrom(counts, infos, { ...site, packingCap: undefined }).withinLimitsExceptH2(),
+      },
+      rng,
+    );
     lastPlacement = placement;
 
     const state = stateFrom(placement.realised, infos, site);
