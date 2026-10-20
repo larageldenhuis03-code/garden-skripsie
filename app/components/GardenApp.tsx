@@ -667,7 +667,7 @@ function stepNotes(step: number, brief: GardenBrief, survivors: number | null): 
     out.push({
       label: "These answers are optional",
       detail:
-        "Style, colour and the extras change the order plants rank in. They never remove a plant, so leaving them unanswered is fine.",
+        "Style, colour and the extras change the order plants rank in. They never remove a plant.",
     });
   }
   return out;
@@ -731,12 +731,13 @@ function BedPreview({
     for (let y = y0 + step; y < y0 + h - 0.5; y += step) lines.push({ x1: x0, y1: y, x2: x0 + w, y2: y });
   }
 
-  // Where the gardener stands, and which way they face from there.
-  // Kept clear of the dimension lines (14-18px out) and the compass
-  // letters, so the figure never sits on top of a measurement.
+  // Where the gardener stands, and which way they face from there: always
+  // the middle of the side they view from (owner, 20 Oct). The dimension
+  // on that side moves to the opposite side instead, and the compass sits
+  // in the corners, so nothing is under the figure.
   const figure = {
-    north: { x: x0 + w / 2 + 34, y: y0 - 34, dx: 0, dy: 1 },
-    south: { x: x0 + w / 2 + 34, y: y0 + h + 34, dx: 0, dy: -1 },
+    north: { x: x0 + w / 2, y: y0 - 34, dx: 0, dy: 1 },
+    south: { x: x0 + w / 2, y: y0 + h + 34, dx: 0, dy: -1 },
     east: { x: x0 + w + 36, y: y0 + h / 2, dx: -1, dy: 0 },
     west: { x: x0 - 36, y: y0 + h / 2, dx: 1, dy: 0 },
   }[viewingEdge];
@@ -754,11 +755,12 @@ function BedPreview({
           role="img"
           aria-label={`${widthM} by ${lengthM} metre bed, north at the top, viewed from the ${viewingEdge} side`}
         >
-          {/* Compass: north is always the top edge of the drawing. */}
-          <text className="bed-compass" x={total / 2} y={16} textAnchor="middle">N</text>
-          <path className="bed-compass-mark" d={`M${total / 2},20 l-4,7 h8 z`} />
-          <path className="bed-compass-mark" d={`M${total / 2},${total - 20} l-4,-7 h8 z`} />
-          <text className="bed-compass" x={total / 2} y={total - 6} textAnchor="middle">S</text>
+          {/* Compass: north is always the top edge of the drawing. In the
+              left corners, so the middle of each side is free for the figure. */}
+          <text className="bed-compass" x={18} y={16} textAnchor="middle">N</text>
+          <path className="bed-compass-mark" d="M18,20 l-4,7 h8 z" />
+          <path className="bed-compass-mark" d={`M18,${total - 20} l-4,-7 h8 z`} />
+          <text className="bed-compass" x={18} y={total - 6} textAnchor="middle">S</text>
 
           {/* The bed, with a metre grid for scale. */}
           <rect className="bed-rect" x={x0} y={y0} width={w} height={h} />
@@ -766,23 +768,43 @@ function BedPreview({
             <line key={index} className="bed-grid-line" {...line} />
           ))}
 
-          {/* Dimension lines, drawn outside the bed like a plan drawing. */}
+          {/* Dimension lines, drawn outside the bed like a plan drawing:
+              the width along the top and the length down the left, each
+              moved to the opposite side when the figure stands there. */}
           <g className="bed-dimension">
-            <line x1={x0} y1={y0 - 14} x2={x0 + w} y2={y0 - 14} />
-            <line x1={x0} y1={y0 - 18} x2={x0} y2={y0 - 10} />
-            <line x1={x0 + w} y1={y0 - 18} x2={x0 + w} y2={y0 - 10} />
-            <text x={x0 + w / 2} y={y0 - 18} textAnchor="middle">{widthM} m</text>
-            <line x1={x0 - 14} y1={y0} x2={x0 - 14} y2={y0 + h} />
-            <line x1={x0 - 18} y1={y0} x2={x0 - 10} y2={y0} />
-            <line x1={x0 - 18} y1={y0 + h} x2={x0 - 10} y2={y0 + h} />
-            <text
-              x={x0 - 18}
-              y={y0 + h / 2}
-              textAnchor="middle"
-              transform={`rotate(-90 ${x0 - 18} ${y0 + h / 2})`}
-            >
-              {lengthM} m
-            </text>
+            {(() => {
+              const below = viewingEdge === "north";
+              const yLine = below ? y0 + h + 14 : y0 - 14;
+              const yText = below ? y0 + h + 28 : y0 - 18;
+              return (
+                <>
+                  <line x1={x0} y1={yLine} x2={x0 + w} y2={yLine} />
+                  <line x1={x0} y1={yLine - 4} x2={x0} y2={yLine + 4} />
+                  <line x1={x0 + w} y1={yLine - 4} x2={x0 + w} y2={yLine + 4} />
+                  <text x={x0 + w / 2} y={yText} textAnchor="middle">{widthM} m</text>
+                </>
+              );
+            })()}
+            {(() => {
+              const right = viewingEdge === "west";
+              const xLine = right ? x0 + w + 14 : x0 - 14;
+              const xText = right ? x0 + w + 22 : x0 - 18;
+              return (
+                <>
+                  <line x1={xLine} y1={y0} x2={xLine} y2={y0 + h} />
+                  <line x1={xLine - 4} y1={y0} x2={xLine + 4} y2={y0} />
+                  <line x1={xLine - 4} y1={y0 + h} x2={xLine + 4} y2={y0 + h} />
+                  <text
+                    x={xText}
+                    y={y0 + h / 2}
+                    textAnchor="middle"
+                    transform={`rotate(-90 ${xText} ${y0 + h / 2})`}
+                  >
+                    {lengthM} m
+                  </text>
+                </>
+              );
+            })()}
           </g>
 
           {/* Where you stand, and the way you look into the bed. */}
@@ -1292,6 +1314,10 @@ function FinderView({
   openExcluded: () => void;
 }) {
   const [step, setStep] = useState(0);
+  // Every step opens at the top of the page.
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "auto" });
+  }, [step]);
 
   const dimensionsValid =
     Number.isFinite(brief.bedWidthM) &&
@@ -1342,13 +1368,6 @@ function FinderView({
             <p className="field-help">
               How many hours of direct sunlight does your bed receive?
             </p>
-            <details className="field-more">
-              <summary>How do I tell?</summary>
-              <p>
-                Choose what applies to most of the bed. This is the one answer
-                we will not stretch later.
-              </p>
-            </details>
             <div className="choice-grid">
               {(Object.keys(sunLabels) as Sun[]).map((sun) => (
                 <ChoiceButton
@@ -1373,10 +1392,6 @@ function FinderView({
             <p className="field-help">
               How often can you realistically water your garden?
             </p>
-            <details className="field-more">
-              <summary>How do I tell?</summary>
-              <p>Answer for the habit you will keep, not the one you intend.</p>
-            </details>
             {/* A per-place note from the reviewed place list. It informs the
                 answer and never sets it - the question is about what the
                 gardener will actually do. Only some places carry it. */}
@@ -1434,13 +1449,6 @@ function FinderView({
           <fieldset>
             <legend>Wind exposure</legend>
             <p className="field-help">How exposed is your bed to wind?</p>
-            <details className="field-more">
-              <summary>Does this remove plants?</summary>
-              <p>
-                No. Wind never removes a plant from your list. It shapes how
-                the bed is arranged.
-              </p>
-            </details>
             <div className="choice-grid">
               {(Object.keys(windLabels) as Wind[]).map((wind) => (
                 <ChoiceButton
@@ -1493,11 +1501,7 @@ function FinderView({
             <section>
               <h3>2. Choose your orientation</h3>
               <p className="field-help">
-                Pick the side you stand on and the taller plants go at the
-                back of that view - except in a windy bed deep enough for
-                several rows, where they step up away from the wind
-                instead. If you usually come at the bed from a corner, pick
-                the side you face most.
+                Pick the side you usually view the bed from; the taller plants go at the back of that view.
               </p>
               <div
                 className="viewing-edge-grid"
@@ -1568,7 +1572,7 @@ function FinderView({
     },
     {
       title: "Anything else matter to you?",
-      note: "All optional, and all soft — pick as many as you like, or none.",
+      note: "Pick as many as you like, or none.",
       content: (
         <ExtraPreferencesPicker
           brief={brief}
@@ -1731,8 +1735,9 @@ function PlantCard({
       </button>
       <div className="plant-card-head">
         <div>
-          <p>{plant.commonName}</p>
+          <p>{shortName(plant)}</p>
           <h3>{plant.scientificName}</h3>
+          {otherNamesLine(plant) ? <small className="plant-other-names">{otherNamesLine(plant)}</small> : null}
         </div>
         <div className="plant-card-buttons">
           <button
@@ -1864,9 +1869,41 @@ function markerBackground(plant: Plant): string {
   return `linear-gradient(135deg, ${stops})`;
 }
 
-/** Trim a common-name field down to something that fits on a marker. */
+/** A common-name field such as "peacock moraea (Eng.); uiltjie (Afr.) Two
+ * subspecies are recognized: ..." read for display only (the data is not
+ * changed): the English name as the title, every other name with its
+ * language, and any trailing sentence as a note. */
+const NAME_LANGUAGES: Record<string, string> = { "Eng.": "English", "Afr.": "Afrikaans" };
+function plantNames(plant: Plant): { title: string; others: string[]; note: string | null } {
+  const raw = (plant.commonName ?? "").trim();
+  if (!raw) return { title: plant.scientificName, others: [], note: null };
+  const parts = raw.split(";").map((part) => part.trim()).filter(Boolean);
+  let note: string | null = null;
+  const names = parts.map((part, index) => {
+    const tagged = /^(.*?)\s*\(([^)]+)\)\s*(.*)$/.exec(part);
+    if (!tagged) return { name: part.replace(/\.$/, ""), lang: null as string | null };
+    const rest = tagged[3].trim();
+    if (rest && !/^[.,;:]+$/.test(rest) && index === parts.length - 1) note = rest;
+    return { name: tagged[1].trim(), lang: tagged[2].trim() };
+  });
+  const english = names.find((n) => n.lang === "Eng.") ?? names[0];
+  const title = english.name.charAt(0).toUpperCase() + english.name.slice(1);
+  const others = names
+    .filter((n) => n !== english && n.name)
+    .map((n) => (n.lang ? `${n.name} (${NAME_LANGUAGES[n.lang] ?? n.lang})` : n.name));
+  return { title, others, note };
+}
+
+/** The display title of a plant (its English common name). */
 function shortName(plant: Plant): string {
-  return plant.commonName.split(";")[0].split("(")[0].trim();
+  return plantNames(plant).title;
+}
+
+/** The other common names and any note, as one line under the title. */
+function otherNamesLine(plant: Plant): string | null {
+  const { others, note } = plantNames(plant);
+  const line = [others.join(" · "), note].filter(Boolean).join(" — ");
+  return line || null;
 }
 
 /** Care instructions grouped and de-duplicated rather than repeated per
@@ -1890,7 +1927,7 @@ function groupedCareInstructions(
     for (const sentence of sentences) {
       const text = sentence.endsWith(".") ? sentence : `${sentence}.`;
       const existing = byInstruction.get(text) ?? [];
-      if (!existing.includes(plant.commonName)) existing.push(plant.commonName);
+      if (!existing.includes(shortName(plant))) existing.push(shortName(plant));
       byInstruction.set(text, existing);
     }
   }
@@ -2451,9 +2488,12 @@ function BedDiagram({
         <span>1 m</span>
       </div>
       {/* As on the bed-size preview: width along the top, length down the
-          left side. */}
-      <div className="plan-measure plan-measure-width">{widthM} m</div>
-      <div className="plan-measure plan-measure-length">{lengthM} m</div>
+          left side - each moved to the opposite side when the viewer stands
+          there. They hang off an overlay exactly the size of the bed. */}
+      <div className="plan-bed-measures">
+        <div className="plan-measure plan-measure-width">{widthM} m</div>
+        <div className="plan-measure plan-measure-length">{lengthM} m</div>
+      </div>
       </div>
       {view === "sketchbook" && symbolTypes.length > 0 ? (
         <ul className="symbol-key" aria-label="Plant type symbols">
@@ -2773,13 +2813,6 @@ function PlanSummary({
             ))}
             </div>
           </div>
-          <p className="plan-view-note">
-            Shown at mature size. Mulch open ground, and fill gaps with annuals while plants grow (2–3 years).
-          </p>
-          {windNote(plan.brief) ? <p className="plan-view-note">{windNote(plan.brief)}</p> : null}
-          {layeringNote(layout, plan.brief) ? (
-            <p className="plan-view-note">{layeringNote(layout, plan.brief)}</p>
-          ) : null}
         </div>
       </div>
 
@@ -2845,9 +2878,18 @@ function PlanSummary({
         </p>
       </div>
 
-      {(careLines.length > 0 || care.length > 0) && (
-        <div className="plan-care">
+      <div className="plan-care">
           <h3>Care</h3>
+          {/* Moved here from under the drawing (owner, 20 Oct): the layout
+              notes are part of looking after the bed. The wind and
+              layering notes differ for each layout. */}
+          <p className="care-summary">
+            Shown at mature size. Mulch open ground, and fill gaps with annuals while plants grow (2–3 years).
+          </p>
+          {windNote(plan.brief) ? <p className="care-summary">{windNote(plan.brief)}</p> : null}
+          {layeringNote(layout, plan.brief) ? (
+            <p className="care-summary">{layeringNote(layout, plan.brief)}</p>
+          ) : null}
           {careLines.length > 0 && (
             <p className="care-summary">{careLines.join(" ")}</p>
           )}
@@ -2868,7 +2910,6 @@ function PlanSummary({
             </details>
           )}
         </div>
-      )}
       </div>
 
       <div className="plan-plants">
@@ -2877,7 +2918,7 @@ function PlanSummary({
           {species.map(({ plant, quantity }) => (
             <article key={plant.id} className="plan-plant-card">
               <PlantPhoto plant={plant} />
-              <h4>{plant.commonName}</h4>
+              <h4>{shortName(plant)}</h4>
               <em>{plant.scientificName}</em>
               <dl>
                 <div>
@@ -3427,7 +3468,7 @@ function SavedLayoutsList({
                 return (
                   <li key={item.plantId}>
                     <button className="text-link" onClick={() => openPlant(plant)}>
-                      {plant.commonName}
+                      {shortName(plant)}
                     </button>{" "}
                     × {item.quantity}
                   </li>
@@ -3887,8 +3928,9 @@ function DetailDrawer({
         </div>
         <PlantPortrait plant={plant} hero />
         <div className="detail-copy">
-          <p className="plant-common-name">{plant.commonName}</p>
-          <h2 id="detail-title">{plant.scientificName}</h2>
+          <h2 id="detail-title" className="detail-title">{shortName(plant)}</h2>
+          <p className="detail-scientific">{plant.scientificName}</p>
+          {otherNamesLine(plant) ? <p className="plant-other-names detail-other-names">{otherNamesLine(plant)}</p> : null}
           <p className="detail-note">{plant.note}</p>
           <div className="detail-actions">
             <button
@@ -4052,8 +4094,16 @@ export function GardenApp() {
   const navigate = (nextView: View) => {
     setView(nextView);
     setSelectedPlant(null);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    // Opens at the top straight away, not scrolling up from where you were.
+    window.scrollTo({ top: 0, behavior: "auto" });
   };
+
+  // The app always opens at the top: the browser is not allowed to restore
+  // an old scroll position on reload.
+  useEffect(() => {
+    if ("scrollRestoration" in window.history) window.history.scrollRestoration = "manual";
+    window.scrollTo({ top: 0, behavior: "auto" });
+  }, []);
 
   const saveLayout = (plan: GardenPlan, budget: SavedBudget | null) => {
     if (!plan.quantities) return;

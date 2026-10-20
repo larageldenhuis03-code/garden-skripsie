@@ -1,5 +1,5 @@
 {
- "version": "2026-10-13T17:34:43.311Z",
+ "version": "2026-10-20T06:36:11.304Z",
  "spec": {
   "sources": [
    {
@@ -192,8 +192,8 @@
     "platformText": "PDF",
     "role": "availability",
     "roleText": "Availability only (wholesale)",
-    "region": "TO CONFIRM",
-    "deliversTo": "TO CONFIRM",
+    "region": "Paarl, Western Cape",
+    "deliversTo": "Collect",
     "enabled": true,
     "notes": "Landscape-size trees; low relevance to garden beds",
     "row": 17

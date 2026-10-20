@@ -4077,8 +4077,10 @@ button:disabled {
   top: 50%;
   left: 50%;
   z-index: 0;
-  width: min(80%, 42px);
-  height: min(80%, 42px);
+  /* Owner, 20 Oct: the symbol scales with the plant's spread - always 70%
+     of its circle, so it is small on a small plant and large on a big one. */
+  width: 70%;
+  height: 70%;
   transform: translate(-50%, -50%);
   color: var(--ink-dark);
   opacity: 0.5;
@@ -6712,4 +6714,93 @@ details.brief-strip[open] .brief-strip-hint { visibility: hidden; }
 
 .plan-bed-wrap.viewer-south .plan-bed-frame {
   margin-bottom: 36px;
+}
+
+/* ---------------------------------------------------------------------
+   Interface fixes (owner, 20 Oct 2026)
+   --------------------------------------------------------------------- */
+
+/* Front page: the three actions one size above the introduction text. */
+.home-actions .button,
+.home-actions .text-link {
+  font-size: clamp(1.15rem, 1.35vw, 1.35rem);
+}
+
+/* Plant names: the English name is the title; the other names and any
+   note sit below the scientific name. */
+.plant-other-names {
+  display: block;
+  margin-top: 3px;
+  color: var(--ink-soft);
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+.detail-copy h2.detail-title {
+  font-style: normal;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+.detail-scientific {
+  margin: 10px 0 0;
+  color: var(--ink-soft);
+  font-family: var(--serif);
+  font-size: 1.35rem;
+  font-style: italic;
+}
+.detail-other-names {
+  margin-top: 6px;
+  font-size: 0.92rem;
+}
+
+/* Plan drawing: the viewer always stands in the middle of the side they
+   view from. The dimension labels hang off an overlay exactly the size of
+   the bed and move to the opposite side when the viewer stands on theirs. */
+.plan-bed-measures {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  aspect-ratio: var(--bed-aspect, 1);
+  pointer-events: none;
+}
+.plan-bed-measures .plan-measure-width {
+  top: 0;
+  right: 0;
+  bottom: auto;
+  left: 0;
+  text-align: center;
+  transform: translateY(calc(-100% - 4px));
+}
+.plan-bed-measures .plan-measure-length {
+  top: 50%;
+  right: auto;
+  bottom: auto;
+  left: 0;
+  writing-mode: vertical-rl;
+  transform-origin: center;
+  transform: translate(calc(-100% - 6px), -50%) rotate(180deg);
+}
+.plan-viewer.is-north,
+.plan-viewer.is-south {
+  left: 50%;
+}
+.plan-viewer.is-west,
+.plan-viewer.is-east {
+  top: 50%;
+}
+.plan-bed-wrap.viewer-north .plan-bed-measures .plan-measure-width {
+  top: auto;
+  bottom: 0;
+  transform: translateY(calc(100% + 4px));
+}
+.plan-bed-wrap.viewer-north .plan-scale {
+  margin-top: 24px;
+}
+.plan-bed-wrap.viewer-west .plan-bed-measures .plan-measure-length {
+  right: 0;
+  left: auto;
+  transform: translate(calc(100% + 6px), -50%) rotate(180deg);
+}
+.plan-bed-wrap.viewer-west {
+  padding-right: 28px;
 }

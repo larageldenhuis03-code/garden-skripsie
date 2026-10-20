@@ -19,8 +19,7 @@ export const gardenStyleLabels: Record<GardenStyle, string> = {
 };
 
 export const gardenStyleDescriptions: Record<GardenStyle, string> = {
-  mediterranean:
-    "Silvery, drought-hardy, structured planting with aromatic shrubs.",
+  mediterranean: "Hardy, structured planting with shrubs and succulents.",
   cottage: "Soft, informal, densely mixed flowering plants.",
   fynbos:
     "Locally native species that support local wildlife and need little intervention.",
