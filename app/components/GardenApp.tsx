@@ -2,6 +2,7 @@
 
 import {
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -125,6 +126,13 @@ const PLANT_TYPE_OPTIONS: { value: string; label: string; count: number }[] = ((
     .sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))
     .map(([value, count]) => ({ value, label: value, count }));
 })();
+
+/** Jumps to the top of the page at once. "instant", not "auto": the page sets
+ * `scroll-behavior: smooth`, which "auto" follows, so each new step used to
+ * open where the last one was scrolled to and then slide up. */
+function scrollToTop() {
+  window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+}
 
 function formatDimension(value: number | null) {
   if (value === null) return "Not measured";
@@ -1314,9 +1322,9 @@ function FinderView({
   openExcluded: () => void;
 }) {
   const [step, setStep] = useState(0);
-  // Every step opens at the top of the page.
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "auto" });
+  // Every step opens at the top of the page, before it is painted.
+  useLayoutEffect(() => {
+    scrollToTop();
   }, [step]);
 
   const dimensionsValid =
@@ -4094,15 +4102,19 @@ export function GardenApp() {
   const navigate = (nextView: View) => {
     setView(nextView);
     setSelectedPlant(null);
-    // Opens at the top straight away, not scrolling up from where you were.
-    window.scrollTo({ top: 0, behavior: "auto" });
   };
+
+  // Every page opens at the top, once the new page is in place and before it
+  // is painted.
+  useLayoutEffect(() => {
+    scrollToTop();
+  }, [view]);
 
   // The app always opens at the top: the browser is not allowed to restore
   // an old scroll position on reload.
   useEffect(() => {
     if ("scrollRestoration" in window.history) window.history.scrollRestoration = "manual";
-    window.scrollTo({ top: 0, behavior: "auto" });
+    scrollToTop();
   }, []);
 
   const saveLayout = (plan: GardenPlan, budget: SavedBudget | null) => {
