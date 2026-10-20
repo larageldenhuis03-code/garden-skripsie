@@ -343,6 +343,15 @@ export const RELAX = {
   openFillMaxNewSpecies: 7,
   openFillMinSpreadM: 0.3,
   openFillFallback: false,
+  /** v9g (owner, 20 Oct 2026): a drift fills a gap, not its single plant.
+   * "Fills the gap well" (openFillWellFraction) is judged on the group: n
+   * plants of spread radius r count as one circle of the same area, radius
+   * r * sqrt(n). A new species qualifies by its largest H3 size and is then
+   * planted only at a size that still qualifies; one more plant of a
+   * species already planted counts with its whole group (n + 1). The 0.3 m
+   * floor (openFillMinSpreadM) still applies to each plant. false: the
+   * single plant's radius, as before. */
+  openFillWellByGroup: true,
   /** A (owner, 19 Oct 2026): added plants (v7 gap fill, v8 last fill, v9
    * open fill) may overlap their neighbours like every other plant - the
    * P2 canopy overlap (overlap_delta of the smaller radius) - instead of

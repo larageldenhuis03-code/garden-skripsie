@@ -1172,9 +1172,19 @@ function placeOnce(
       if (a > 0) added.set(info.id, a);
       else added.delete(info.id);
     };
+    /** v9g: the radius that counts for "fills the gap well" - the group's
+     * (one circle of the same area as n plants) or, off, the plant's. */
+    const wellRadius = (info: SpeciesInfo, n: number) => (info.diameterM / 2) * (RELAX.openFillWellByGroup ? Math.sqrt(n) : 1);
+    /** The group size judged by the well test: the planted group plus one,
+     * or a new species' largest H3 size. */
+    const wellSize = (info: SpeciesInfo) => {
+      const n = counts.get(info.id) ?? 0;
+      return n > 0 ? n + 1 : Math.max(...info.allowedN);
+    };
     /** Try to plant `info` with its first plant in this gap: one more of a
-     * planted species (beside its group), or a whole new group. */
-    const tryPlant = (info: SpeciesInfo, gapPoints: { x: number; y: number; room: number }[]): string | null => {
+     * planted species (beside its group), or a whole new group. `wellR` is
+     * the radius a new group must reach (0 = any size). */
+    const tryPlant = (info: SpeciesInfo, gapPoints: { x: number; y: number; room: number }[], wellR: number): string | null => {
       const r = info.diameterM / 2;
       const n = counts.get(info.id) ?? 0;
       if (n > 0) {
@@ -1196,7 +1206,8 @@ function placeOnce(
       }
       const first = gapPoints.find((g) => g.room >= roomNeeded(r) - EPS && canStand(info, g.x, g.y));
       if (!first) return null;
-      const sizes = [...info.allowedN].sort((a, b) => b - a);
+      // v9g: only group sizes that still fill the gap well.
+      const sizes = [...info.allowedN].filter((size) => wellRadius(info, size) >= wellR - EPS).sort((a, b) => b - a);
       // B: a single plant as the last resort, even where H3 wants a group.
       if (RELAX.openFillSingles && !sizes.includes(1)) sizes.push(1);
       for (const size of sizes) {
@@ -1234,16 +1245,18 @@ function placeOnce(
           const t = targetOf(info);
           return points.some((g) => g.room >= roomNeeded(r) - EPS && (t === null || Math.abs(depthOfPoint(g) - t * viewer.span) <= RULES.stage4.depthTol * viewer.span + EPS));
         });
+        const wellR = RELAX.openFillWellFraction * maxRoom;
+        const isWell = (info: SpeciesInfo) => wellRadius(info, wellSize(info)) >= wellR - EPS;
         const well = fitting
-          .filter((info) => info.diameterM / 2 >= RELAX.openFillWellFraction * maxRoom)
+          .filter(isWell)
           .sort((a, b) => b.score - a.score || a.id.localeCompare(b.id));
         const rest = fitting
-          .filter((info) => info.diameterM / 2 < RELAX.openFillWellFraction * maxRoom)
+          .filter((info) => !isWell(info))
           .sort((a, b) => b.diameterM - a.diameterM || b.score - a.score || a.id.localeCompare(b.id));
         // v9c: without the fallback, only plants that fill the gap well.
         for (const info of (RELAX.openFillFallback ? [...well, ...rest] : well).slice(0, RELAX.openFillTries)) {
           const before = placed.length;
-          const what = tryPlant(info, points);
+          const what = tryPlant(info, points, isWell(info) ? wellR : 0);
           if (what) {
             total += placed.length - before;
             diagnostics.push(`v9 open fill: added ${what}.`);

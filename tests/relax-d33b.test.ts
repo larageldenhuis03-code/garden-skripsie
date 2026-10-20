@@ -209,6 +209,30 @@ test("layout-v2g v9c: at most 7 new species per layout, and no added plant narro
   assert.ok(added > 0, "the open fill added nothing on these briefs, so v9c was not exercised");
 });
 
+// layout-v2g v9g (owner, 20 Oct 2026): "fills the gap well" is judged on
+// the drift (radius r * sqrt(n)), not on its single plant.
+test("layout-v2g v9g: judged by the group, the open fill keeps Z and every hard check, stays within H3, and fills more of a sparse 10 x 10 m bed", () => {
+  const V9C = { ...V4, openFill: true, openFillMaxNewSpecies: 7, openFillMinSpreadM: 0.3, openFillFallback: false };
+  const wide: GardenBrief = { ...BRIEFS[1][1], style: "mediterranean", sun: "sheltered", bedWidthM: 10, bedLengthM: 10, viewingEdge: "west" };
+  const cover = (plans: GardenPlan[]) => plans.reduce((s, p) => s + 1 - p.openSpaceRatio, 0);
+  let gained = 0;
+  for (const [label, brief] of [...BRIEFS, ["mediterranean 10 x 10 m, west view", wide] as [string, GardenBrief]]) {
+    const area = brief.bedWidthM * brief.bedLengthM;
+    const single = run(brief, { ...V9C, openFillWellByGroup: false });
+    const group = run(brief, { ...V9C, openFillWellByGroup: true });
+    for (const [i, plan] of group.entries()) {
+      const where = `${label} ${plan.character}`;
+      assert.equal(plan.engine?.z, single[i].engine?.z, `${where}: Z changed`);
+      assert.ok((plan.engine?.placementChecks ?? []).every((c) => c.kind !== "hard" || c.pass), `${where}: a hard check failed`);
+      for (const q of plan.quantities!.quantities) {
+        assert.ok(q.quantity <= maxAllowed(q.id, area), `${where}: ${q.id} x${q.quantity} is over its H3 maximum`);
+      }
+    }
+    if (brief === wide) gained = cover(group) - cover(single);
+  }
+  assert.ok(gained > 0, `the group rule filled no more of the 10 x 10 m bed (${gained.toFixed(3)})`);
+});
+
 // layout-v2g v10 (owner, 19 Oct 2026): keep what fits.
 test("layout-v2g v10: a species with no room left is left out and the rest kept (KEEP_PLACED); off, the layout fails as before", () => {
   const tiers = computeHeightTiers(plants);
