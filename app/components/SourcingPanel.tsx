@@ -198,7 +198,8 @@ export function SourcingPanel({
         {report.budget.notFoundSpecies > 0 ? ` · ${report.budget.notFoundSpecies} not found` : ""}
         {report.budget.outdatedPrices > 0 ? ` · ${report.budget.outdatedPrices} prices may be outdated` : ""}
       </p>
-      {report.basket && (
+      {/* Only when one nursery stocks most of the plan (usability review). */}
+      {report.basket && report.basket.speciesStocked * 2 >= report.basket.speciesTotal && (
         <p>
           One-stop option: {report.basket.nursery} stocks {report.basket.speciesStocked} of{" "}
           {report.basket.speciesTotal} species, about {rand(report.basket.total)}.

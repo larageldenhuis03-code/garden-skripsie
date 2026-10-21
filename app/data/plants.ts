@@ -207,7 +207,7 @@ export const bioregionLabels: Record<Bioregion, string> = {
 export const sunLabels: Record<Sun, string> = {
   full: "Full",
   part: "Part",
-  sheltered: "Sheltered",
+  sheltered: "Shade",
 };
 
 export const waterLabels: Record<Water, string> = {

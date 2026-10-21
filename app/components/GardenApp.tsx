@@ -86,11 +86,14 @@ type View = "home" | "finder" | "results" | "browse" | "saved" | "method";
 const defaultBrief: GardenBrief = {
   biomes: [],
   bioregion: "Southwest Fynbos Bioregion",
-  soil: "sandy",
-  wind: "none",
+  // Owner, 21 Oct 2026 (usability review): sun, water and soil remove
+  // plants, so they start blank - a pre-ticked answer is taken without
+  // being read. Continue asks for all four.
+  soil: "" as GardenBrief["soil"],
+  wind: "" as GardenBrief["wind"],
   viewingEdge: "north",
-  sun: "part",
-  water: "moderate",
+  sun: "" as GardenBrief["sun"],
+  water: "" as GardenBrief["water"],
   bedWidthM: 2,
   bedLengthM: 3,
   style: "undecided",
@@ -106,8 +109,7 @@ const SOIL_DESCRIPTIONS: Record<string, string> = {
   sandy: "Loose and free-draining",
   loam: "Balanced, crumbly soil",
   clay: "Heavy soil that holds water",
-  "not-sure":
-    "We will accept any of the three. Plants with no soil recorded are still left out.",
+  "not-sure": "We will accept any of the three.",
 };
 
 /** Every plant type in the catalogue, with how many carry it. A plant
@@ -127,6 +129,35 @@ const PLANT_TYPE_OPTIONS: { value: string; label: string; count: number }[] = ((
     .sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))
     .map(([value, count]) => ({ value, label: value, count }));
 })();
+
+/** The five steps, named so people know what is coming. */
+const STEP_NAMES = ["Location", "Conditions", "Size", "Style", "Extras"];
+
+/** Each page has its own address, so the browser's Back button works. */
+const VIEW_PATHS = {
+  home: "#/",
+  finder: "#/plan-a-garden",
+  results: "#/garden-plan",
+  browse: "#/plant-library",
+  method: "#/how-it-works",
+  saved: "#/my-gardens",
+} as const;
+const stepPath = (step: number) => `${VIEW_PATHS.finder}/step-${step + 1}`;
+
+/** Letters to change to turn a into b, for forgiving town search. */
+function editDistance(a: string, b: string): number {
+  const row = Array.from({ length: b.length + 1 }, (_, j) => j);
+  for (let i = 1; i <= a.length; i += 1) {
+    let prev = row[0];
+    row[0] = i;
+    for (let j = 1; j <= b.length; j += 1) {
+      const next = Math.min(row[j] + 1, row[j - 1] + 1, prev + (a[i - 1] === b[j - 1] ? 0 : 1));
+      prev = row[j];
+      row[j] = next;
+    }
+  }
+  return row[b.length];
+}
 
 /** Jumps to the top of the page at once. "instant", not "auto": the page sets
  * `scroll-behavior: smooth`, which "auto" follows, so each new step used to
@@ -248,7 +279,8 @@ function Header({
   navigate,
 }: {
   view: View;
-  savedCount: number;
+  /** null until the device store has loaded, so no "0" flashes first. */
+  savedCount: number | null;
   navigate: (view: View) => void;
 }) {
   return (
@@ -259,13 +291,13 @@ function Header({
       </button>
       <nav aria-label="Primary navigation">
         <button
-          className={view === "finder" ? "is-active" : ""}
+          className={view === "finder" || view === "results" ? "is-active" : ""}
           onClick={() => navigate("finder")}
         >
-          Layout tool
+          Plan a garden
         </button>
         <button
-          className={view === "browse" || view === "results" ? "is-active" : ""}
+          className={view === "browse" ? "is-active" : ""}
           onClick={() => navigate("browse")}
         >
           Plant library
@@ -278,10 +310,8 @@ function Header({
         </button>
       </nav>
       <button className="saved-link" onClick={() => navigate("saved")}>
-        <span className="saved-label">Saved gardens</span>
-        <span className="saved-count">
-          {String(savedCount).padStart(2, "0")}
-        </span>
+        <span className="saved-label">My gardens</span>
+        <span className="saved-count">{savedCount ?? ""}</span>
       </button>
     </header>
   );
@@ -401,6 +431,7 @@ function ExtraPreferencesPicker({
         {(Object.keys(extraPreferenceLabels) as ExtraPreference[]).map((extra) => (
           <ChoiceButton
             key={extra}
+            multi
             selected={brief.extras.includes(extra)}
             title={extraPreferenceLabels[extra]}
             copy={extraPreferenceDescriptions[extra]}
@@ -441,7 +472,13 @@ function ColourPreferencePicker({
   }, [brief]);
 
   const toggleCustom = (colour: string) => {
-    const current = value.mode === "custom" ? value.colours : [];
+    // Picking a chip after a palette starts from that palette's colours.
+    const current =
+      value.mode === "custom"
+        ? value.colours
+        : value.mode === "scheme"
+          ? [...colourSchemes[value.scheme]]
+          : [];
     const next = current.includes(colour)
       ? current.filter((item) => item !== colour)
       : [...current, colour];
@@ -490,8 +527,10 @@ function ColourPreferencePicker({
       <details className="colour-custom">
         <summary>Or pick exact colours</summary>
         <div className="colour-chips">
-          {offered.map(({ colour, count }) => {
-            const selected = value.mode === "custom" && value.colours.includes(colour);
+          {offered.map(({ colour }) => {
+            const selected =
+              (value.mode === "custom" && value.colours.includes(colour)) ||
+              (value.mode === "scheme" && (colourSchemes[value.scheme] as readonly string[]).includes(colour));
             return (
               <button
                 key={colour}
@@ -500,7 +539,12 @@ function ColourPreferencePicker({
                 onClick={() => toggleCustom(colour)}
                 aria-pressed={selected}
               >
-                {colour} <span>{count}</span>
+                <i
+                  className="chip-swatch"
+                  aria-hidden="true"
+                  style={{ background: flowerColourInk[colour] ?? UNKNOWN_COLOUR_INK }}
+                />
+                {colour[0].toUpperCase() + colour.slice(1)}
               </button>
             );
           })}
@@ -531,10 +575,19 @@ function SurvivingCount({
   excluded?: string[];
   openExcluded?: () => void;
 }) {
+  const answered = brief.sun in sunLabels && brief.water in waterLabels && brief.soil in soilLabels;
   const outcome = useMemo(
-    () => evaluateHardFilters(plants, brief, excluded),
-    [brief, excluded],
+    () => (answered ? evaluateHardFilters(plants, brief, excluded) : null),
+    [answered, brief, excluded],
   );
+
+  if (!outcome) {
+    return (
+      <p className="filter-count">
+        Answer sun, water and soil to see how many plants can grow here.
+      </p>
+    );
+  }
 
   if (!outcome.belowMinimum) {
     return (
@@ -608,7 +661,7 @@ function SurvivingCount({
           There is nothing left to widen safely. Vegetation type is never
           relaxed, and full sun and sheltered shade are never bridged. Change an
           answer above
-          {outcome.excludedHere > 0 ? ", put back some excluded plants," : ""} or
+          {outcome.excludedHere > 0 ? ", show some hidden plants again," : ""} or
           come back later: the catalogue only records light, water and soil for
           some species yet, and this combination will have more plants to choose
           from as that evidence is filled in.
@@ -671,11 +724,24 @@ function stepBlockers(
       });
     }
   }
+  if (step === 1) {
+    if (!(brief.sun in sunLabels)) out.push({ label: "Sunlight", detail: "Choose one of the three." });
+    if (!(brief.water in waterLabels)) out.push({ label: "Water", detail: "Choose one of the three." });
+    if (!(brief.soil in soilLabels)) out.push({ label: "Soil", detail: "Choose one, or “I’m not sure”." });
+    if (!(brief.wind in windLabels)) out.push({ label: "Wind exposure", detail: "Choose one of the three." });
+  }
   if (step === 2 && !dimensionsValid) {
-    out.push({
-      label: "A width and a length",
-      detail: `Each side must be between ${MIN_BED_DIMENSION_M} m and ${MAX_BED_DIMENSION_M} m so the plants can be laid out to scale.`,
-    });
+    for (const [label, value] of [["Width", brief.bedWidthM], ["Length", brief.bedLengthM]] as const) {
+      if (Number.isFinite(value) && value >= MIN_BED_DIMENSION_M && value <= MAX_BED_DIMENSION_M) continue;
+      out.push({
+        label,
+        detail: !Number.isFinite(value)
+          ? "Enter a number in metres."
+          : value > MAX_BED_DIMENSION_M
+            ? `${value} m is too big — the most is ${MAX_BED_DIMENSION_M} m.`
+            : `${value} m is too small — the least is ${MIN_BED_DIMENSION_M} m.`,
+      });
+    }
   }
   return out;
 }
@@ -684,13 +750,6 @@ function stepBlockers(
 function stepNotes(step: number, brief: GardenBrief, survivors: number | null): StepCheck[] {
   const out: StepCheck[] = [];
   if (step === 1) {
-    if (brief.soil === "not-sure") {
-      out.push({
-        label: "Soil: not sure",
-        detail:
-          "We will keep plants suited to any soil type rather than filtering on it, so the list is wider and less certain. Answering it narrows the plan.",
-      });
-    }
     if (survivors !== null && survivors > 0 && survivors < 40) {
       out.push({
         label: `Only ${survivors} plants survive these conditions`,
@@ -860,7 +919,9 @@ function BedPreview({
           </defs>
         </svg>
       ) : (
-        <p className="bed-preview-empty">Enter a width and length to see your bed</p>
+        <p className="bed-preview-empty">
+          Each side must be between {MIN_BED_DIMENSION_M} m and {MAX_BED_DIMENSION_M} m. Fix the size to see your bed.
+        </p>
       )}
       {valid && (
         <div className="bed-preview-legend">
@@ -1035,11 +1096,14 @@ function ChoiceButton({
   title,
   copy,
   onClick,
+  multi = false,
 }: {
   selected: boolean;
   title: string;
   copy?: string;
   onClick: () => void;
+  /** Several can be chosen: drawn as tick boxes, not radio dots. */
+  multi?: boolean;
 }) {
   return (
     <button
@@ -1048,7 +1112,7 @@ function ChoiceButton({
       onClick={onClick}
       aria-pressed={selected}
     >
-      <span>{selected ? "●" : "○"}</span>
+      <span>{multi ? (selected ? "☑" : "☐") : selected ? "●" : "○"}</span>
       <strong>{title}</strong>
       {copy && <small>{copy}</small>}
     </button>
@@ -1099,12 +1163,23 @@ function PlaceCombobox({
   }, [open]);
 
   const trimmed = query.trim().toLowerCase();
-  const filtered =
+  const exact =
     trimmed.length > 0
-      ? places
-          .filter((place) => place.name.toLowerCase().includes(trimmed))
-          .slice(0, 20)
+      ? places.filter((place) => place.name.toLowerCase().includes(trimmed)).slice(0, 20)
       : [];
+  // Small spelling slips ("stellenbosh") still find the town.
+  const filtered =
+    exact.length > 0 || trimmed.length < 4
+      ? exact
+      : places
+          .map((place) => {
+            const name = place.name.toLowerCase();
+            return { place, d: Math.min(editDistance(trimmed, name), editDistance(trimmed, name.slice(0, trimmed.length))) };
+          })
+          .filter(({ d }) => d <= 2)
+          .sort((a, b) => a.d - b.d)
+          .slice(0, 10)
+          .map(({ place }) => place);
 
   return (
     <div className="place-combobox" ref={containerRef}>
@@ -1153,7 +1228,6 @@ function PlaceCombobox({
                   <span className="place-combobox-category">
                     {place.category}
                   </span>
-                  <small>{bioregionLabels[place.bioregion]}</small>
                 </button>
               </li>
             ))
@@ -1303,18 +1377,22 @@ function BioregionMap({
         {nurseries ? (
           <>
             <p>
-              <span className="nursery-key-dot" aria-hidden="true" /> {nurseries.pins.length} nursery
-              locations used for plant sourcing
-              {nurseries.pins.some((pin) => pin.approximate)
-                ? ` (${nurseries.pins.filter((pin) => pin.approximate).length} shown at their town centre - street address not found)`
-                : ""}
+              <span className="nursery-key-dot" aria-hidden="true" /> Dots: the
+              nurseries we check prices at.
             </p>
-            {nurseries.notMapped.length > 0 && (
-              <p className="nursery-not-mapped">
-                Also used, but not on the map:{" "}
-                {nurseries.notMapped.map((n) => `${n.nursery} (${n.reason})`).join("; ")}.
+            <details className="nursery-not-mapped">
+              <summary>Which nurseries?</summary>
+              <p>
+                {nurseries.pins.length} on the map
+                {nurseries.pins.some((pin) => pin.approximate)
+                  ? `, ${nurseries.pins.filter((pin) => pin.approximate).length} shown at their town centre`
+                  : ""}
+                .
+                {nurseries.notMapped.length > 0
+                  ? ` Also checked: ${nurseries.notMapped.map((n) => n.nursery).join(", ")}.`
+                  : ""}
               </p>
-            )}
+            </details>
           </>
         ) : (
           <p>Loading nursery locations…</p>
@@ -1349,7 +1427,32 @@ function FinderView({
   excluded: string[];
   openExcluded: () => void;
 }) {
-  const [step, setStep] = useState(0);
+  // Each step is its own browser history entry (usability review, 21 Oct),
+  // so the Back button goes to the previous step instead of leaving.
+  const [step, setStep] = useState(() => {
+    if (typeof window === "undefined") return 0;
+    const state = window.history.state as { view?: string; step?: number } | null;
+    return state?.view === "finder" && Number.isInteger(state.step)
+      ? Math.min(Math.max(state.step as number, 0), STEP_NAMES.length - 1)
+      : 0;
+  });
+  const [attempted, setAttempted] = useState(false);
+  const goToStep = (next: number) => {
+    setStep(next);
+    setAttempted(false);
+    window.history.pushState({ view: "finder", step: next }, "", stepPath(next));
+  };
+  useEffect(() => {
+    const onPop = (event: PopStateEvent) => {
+      const state = event.state as { view?: string; step?: number } | null;
+      if (state?.view === "finder") {
+        setStep(Number.isInteger(state.step) ? (state.step as number) : 0);
+        setAttempted(false);
+      }
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
   // Every step opens at the top of the page, before it is painted.
   useLayoutEffect(() => {
     scrollToTop();
@@ -1374,22 +1477,26 @@ function FinderView({
               // The area's vegetation types become the options; nothing is
               // pre-selected, so the user picks what to include.
               setAvailableBiomes([...place.biomes]);
-              setBrief({ ...brief, biomes: [], bioregion: place.bioregion });
+              // Only one type: ticked for you (usability review, 21 Oct).
+              setBrief({ ...brief, biomes: place.biomes.length === 1 ? [...place.biomes] : [], bioregion: place.bioregion });
             }}
           />
-          <BioregionMap
-            value={brief.bioregion}
-            onChange={(bioregion) => {
-              setSelectedPlace(null);
-              setAvailableBiomes(biomesForBioregion(bioregion));
-              setBrief({ ...brief, bioregion, biomes: [] });
-            }}
-          />
+          {/* Right under the town, so the confirmation sits where the
+              answer was given (usability review, 21 Oct). */}
           <BiomeSelection
             available={availableBiomes}
             biomes={brief.biomes}
             bioregionSource={selectedPlace?.bioregionSource ?? null}
             onChange={(biomes) => setBrief({ ...brief, biomes })}
+          />
+          <BioregionMap
+            value={brief.bioregion}
+            onChange={(bioregion) => {
+              setSelectedPlace(null);
+              const found = biomesForBioregion(bioregion);
+              setAvailableBiomes(found);
+              setBrief({ ...brief, bioregion, biomes: found.length === 1 ? found : [] });
+            }}
           />
         </div>
       ),
@@ -1409,7 +1516,7 @@ function FinderView({
                 <ChoiceButton
                   key={sun}
                   selected={brief.sun === sun}
-                  title={sunLabels[sun]}
+                  title={sun === "full" ? "Full sun" : sun === "part" ? "Part sun" : "Shade"}
                   copy={
                     sun === "full"
                       ? "Six or more hours"
@@ -1426,7 +1533,7 @@ function FinderView({
           <fieldset>
             <legend>Water</legend>
             <p className="field-help">
-              How often can you realistically water your garden?
+              How much water will the bed get, from rain and your watering?
             </p>
             {/* A per-place note from the reviewed place list. It informs the
                 answer and never sets it - the question is about what the
@@ -1442,13 +1549,13 @@ function FinderView({
                 <ChoiceButton
                   key={water}
                   selected={brief.water === water}
-                  title={waterLabels[water]}
+                  title={water === "low" ? "Little" : water === "moderate" ? "Some" : "Plenty"}
                   copy={
                     water === "low"
-                      ? "Dry once settled in"
+                      ? "Dry once plants are settled"
                       : water === "moderate"
                         ? "A good soak now and then"
-                        : "Often damp or watered"
+                        : "Often damp, or watered often"
                   }
                   onClick={() => setBrief({ ...brief, water })}
                 />
@@ -1538,6 +1645,10 @@ function FinderView({
               <h3>2. Choose your orientation</h3>
               <p className="field-help">
                 Pick the side you usually view the bed from; the taller plants go at the back of that view.
+              </p>
+              <p className="field-note">
+                Not sure where north is? A phone compass app shows it, or just
+                pick the side you look from most.
               </p>
               <div
                 className="viewing-edge-grid"
@@ -1643,13 +1754,14 @@ function FinderView({
   const blockers = stepBlockers(step, brief, selectedPlace, dimensionsValid);
   const notes = stepNotes(step, brief, survivors);
 
+  // The same conditions as the blockers, so the two can never disagree.
+  // Step 1 needs the area the user lives in (it drives the plants and the
+  // nursery distances), not just a biome ticked on the map.
+  void locationStep;
+  void dimensionsStep;
   const canContinue =
-    // Step 1 needs the area the user lives in (it drives the plants and
-    // the nursery distances), not just a biome ticked on the map.
-    (step !== locationStep || (selectedPlace !== null && brief.biomes.length > 0)) &&
-    (step !== dimensionsStep || dimensionsValid) &&
-    (step !== finalStep ||
-      (validateGardenBrief(brief).valid && planIsReady));
+    blockers.length === 0 &&
+    (step !== finalStep || (validateGardenBrief(brief).valid && planIsReady));
 
   return (
     <main className="finder-shell">
@@ -1658,13 +1770,18 @@ function FinderView({
         aria-label={`Step ${step + 1} of ${steps.length}`}
       >
         <span>
-          Step {step + 1} of {steps.length}
+          Step {step + 1} of {steps.length}: {STEP_NAMES[step]}
         </span>
         <div>
           {steps.map((_, index) => (
-            <i key={index} className={index <= step ? "is-complete" : ""} />
+            <i key={index} className={index <= step ? "is-complete" : ""} title={STEP_NAMES[index]} />
           ))}
         </div>
+        <ol className="finder-step-names" aria-hidden="true">
+          {STEP_NAMES.map((name, index) => (
+            <li key={name} className={index === step ? "is-current" : index < step ? "is-done" : ""}>{name}</li>
+          ))}
+        </ol>
       </div>
       {step === finalStep && !planIsReady && (
         <aside className="finder-example is-warning" aria-live="polite">
@@ -1694,7 +1811,7 @@ function FinderView({
         </div>
         <div className="finder-choices">
           {current.content}
-          {blockers.length > 0 && (
+          {attempted && blockers.length > 0 && (
             <aside className="finder-alert is-blocking" role="status" aria-live="polite">
               <strong>
                 {blockers.length === 1
@@ -1726,19 +1843,26 @@ function FinderView({
       <div className="finder-footer">
         <button
           className="text-link"
-          onClick={step === 0 ? cancel : () => setStep(step - 1)}
+          onClick={step === 0 ? cancel : () => goToStep(step - 1)}
         >
           ← {step === 0 ? "Back home" : "Previous"}
         </button>
+        {/* Usability review (21 Oct): never greyed out. Clicking it with an
+            answer missing shows what is missing; nothing shows before. */}
         <button
-          className="button button-dark"
-          disabled={!canContinue}
-          // Screen readers and hover both get the reason, not just a
-          // greyed-out button.
+          className={`button button-dark${canContinue ? "" : " is-waiting"}`}
+          aria-disabled={!canContinue}
           title={canContinue ? undefined : blockers.map((item) => item.label).join("; ") || undefined}
-          onClick={step === finalStep ? finish : () => setStep(step + 1)}
+          onClick={() => {
+            if (!canContinue) {
+              setAttempted(true);
+              return;
+            }
+            if (step === finalStep) finish();
+            else goToStep(step + 1);
+          }}
         >
-          {step === finalStep ? "Build my plan" : "Continue"} <span aria-hidden="true">→</span>
+          {step === finalStep ? "Build my garden plan" : "Continue"} <span aria-hidden="true">→</span>
         </button>
       </div>
     </main>
@@ -1794,14 +1918,14 @@ function PlantCard({
             className={`exclude-button${excluded ? " is-excluded" : ""}`}
             onClick={toggleExcluded}
             aria-pressed={excluded}
-            aria-label={`${excluded ? "Put back" : "Exclude"} ${plant.commonName}`}
+            aria-label={`${excluded ? "Show again" : "Hide"} ${plant.commonName}`}
             title={
               excluded
-                ? "Put this plant back into your plans"
-                : "Never use this plant in my plans"
+                ? "Show this plant in my plans again"
+                : "Hide this plant from my plans"
             }
           >
-            {excluded ? "Put back" : "Exclude"}{" "}
+            {excluded ? "Show again" : "Hide"}{" "}
             <span aria-hidden="true">{excluded ? "↺" : "⃠"}</span>
           </button>
         </div>
@@ -2343,10 +2467,10 @@ function LayoutViewSwitch({
   return (
     <div className="layout-views" role="group" aria-label="Layout view">
       <button type="button" aria-pressed={view === "sketchbook"} onClick={() => onChange("sketchbook")}>
-        Sketchbook
+        Drawing
       </button>
       <button type="button" aria-pressed={view === "real-life"} onClick={() => onChange("real-life")}>
-        Real-life
+        Photos
       </button>
     </div>
   );
@@ -2537,6 +2661,12 @@ function BedDiagram({
         <div className="plan-measure plan-measure-length">{lengthM} m</div>
       </div>
       </div>
+      {/* Owner, 21 Oct: a tester was unsure whether the symbols were
+          buttons, so the legend sits in a labelled box. */}
+      <div className="plan-key" role="note" aria-label="Key to the drawing">
+      <p className="plan-key-title">
+        Key <span>· explains the drawing</span>
+      </p>
       {view === "sketchbook" && symbolTypes.length > 0 ? (
         <ul className="symbol-key" aria-label="Plant type symbols">
           {symbolTypes.map((type) => (
@@ -2573,6 +2703,7 @@ function BedDiagram({
           <span className="legend-saved" aria-hidden="true"><SavedHeart /></span> also one of your favourites
         </p>
       ) : null}
+      </div>
     </div>
   );
 }
@@ -2617,8 +2748,12 @@ function describeOption(plan: GardenPlan, all: GardenPlan[]): string {
  * budget panel beside the calculation, where there is room for it. */
 function guidePrice(budget: SavedBudget | null | undefined): string {
   if (!budget) return "Checking…";
-  const range = budget.text.match(/R[\d\s.,]+(?:\s*[-–]\s*R[\d\s.,]+)?/);
-  return range ? range[0].trim() : "Not priced yet";
+  // "About R405 for 8 of 21 plants", not a bare range that hides how much
+  // of the bed it covers (usability review, 21 Oct).
+  const typical = budget.text.match(/typical (R[\d\s.,]+?)\)/)?.[1]?.trim();
+  if (!typical) return "Not priced yet";
+  const part = budget.text.match(/for (\d+) of (\d+) plants/);
+  return part ? `About ${typical} for ${part[1]} of ${part[2]} plants` : `About ${typical}`;
 }
 
 function PlanSummary({
@@ -2725,6 +2860,17 @@ function PlanSummary({
 
   return (
     <section className="plan-output">
+      {!readOnly && (
+        <div className="plan-ready">
+          <p>
+            <strong>Your garden plan is ready.</strong>{" "}
+            {isSaved ? "Saved — find it under My gardens." : "Save it to keep it under My gardens."}
+          </p>
+          <button className="button button-dark" onClick={onSave} disabled={isSaved}>
+            {isSaved ? "Saved ✓" : "Save this garden plan"}
+          </button>
+        </div>
+      )}
       {/* Every answer the plan was built from, folded into one clean line
           across the page; open it to read them all. */}
       <details className="brief-strip">
@@ -2844,10 +2990,10 @@ function PlanSummary({
                       type="button"
                       className="legend-exclude"
                       onClick={() => onExclude(plant.id)}
-                      title={`Never use ${plant.commonName} in my plans`}
-                      aria-label={`Exclude ${plant.commonName} and rebuild the layouts`}
+                      title={`Hide ${plant.commonName} from my plans`}
+                      aria-label={`Hide ${plant.commonName} and rebuild the plans`}
                     >
-                      Exclude
+                      Hide
                     </button>
                   )}
                 </p>
@@ -2904,10 +3050,10 @@ function PlanSummary({
         <h3>Why these plants</h3>
         <p>
           This is <strong>{plan.character.toLowerCase()}</strong> of three.
-          Every plant here survives{" "}
-          {sunLabels[plan.brief.sun].toLowerCase()},{" "}
-          {waterLabels[plan.brief.water].toLowerCase()} and{" "}
-          {soilLabels[plan.brief.soil].toLowerCase()}, and grows in{" "}
+          Every plant here can take{" "}
+          {{ full: "full sun", part: "part sun", sheltered: "shade" }[plan.brief.sun]},{" "}
+          {{ low: "little water", moderate: "some water", moist: "plenty of water" }[plan.brief.water]} and{" "}
+          {plan.brief.soil === "not-sure" ? "any of the three soils" : `${soilLabels[plan.brief.soil].toLowerCase()} soil`}, and grows in{" "}
           {plan.brief.biomes.map((biome) => biomeLabels[biome]).join(" or ")}.
           {plan.brief.style !== "undecided"
             ? ` We favoured a ${gardenStyleLabels[plan.brief.style].toLowerCase()} character.`
@@ -2997,10 +3143,14 @@ function PlanSummary({
 
       <div className="plan-actions" hidden={readOnly}>
         <button className="button button-dark" onClick={onSave} disabled={isSaved}>
-          {isSaved ? "Saved ✓" : "Save this layout"}
+          {isSaved ? "Saved ✓" : "Save this garden plan"}
         </button>
-        <button className="text-link" onClick={onRegenerate}>
-          Regenerate
+        <button
+          className="text-link"
+          onClick={onRegenerate}
+          title="Replaces these three options. Save one first to keep it."
+        >
+          Show 3 new options
         </button>
       </div>
 
@@ -3163,7 +3313,7 @@ function CollectionView({
           <h1>
             {mode === "results" ? (
               <>
-                Your <em>{brief.bedWidthM} × {brief.bedLengthM} m</em> planting plan.
+                Your <em>{brief.bedWidthM} × {brief.bedLengthM} m</em> garden plan.
               </>
             ) : (
               <>
@@ -3260,10 +3410,14 @@ function CollectionView({
           {/* Twenty-one types is too many to show as buttons, so this is
               a list. Each one carries its count, which saves choosing a
               type and finding three plants behind it. */}
-          <label className="filter-row">
-            <span>Plant type</span>
+          <div className="filter-row">
+            <span id="plant-type-label">Plant type</span>
+            {/* Owner, 21 Oct: favourite or exclude the chosen type right
+                beside the list. */}
+            <div className="type-filter-line">
             <select
               className="plant-type-select"
+              aria-labelledby="plant-type-label"
               value={form}
               onChange={(event) => {
                 setForm(event.target.value);
@@ -3277,37 +3431,36 @@ function CollectionView({
                 </option>
               ))}
             </select>
-          </label>
+            {categoryIds.length > 0 && (
+              <>
+                <button
+                  type="button"
+                  className={allSaved ? "is-active" : ""}
+                  aria-pressed={allSaved}
+                  title={`${categoryIds.length} ${form.toLowerCase()} plants that can be planted`}
+                  onClick={() => setCategory(categoryIds, "saved", !allSaved)}
+                >
+                  {allSaved ? "Unfavourite all" : `Favourite all ${categoryIds.length}`}{" "}
+                  <span aria-hidden="true">{allSaved ? "♥" : "♡"}</span>
+                </button>
+                <button
+                  type="button"
+                  className={allExcluded ? "is-active" : ""}
+                  aria-pressed={allExcluded}
+                  title={`${categoryIds.length} ${form.toLowerCase()} plants that can be planted`}
+                  onClick={() => setCategory(categoryIds, "excluded", !allExcluded)}
+                >
+                  {allExcluded ? "Show all again" : `Hide all ${categoryIds.length}`}{" "}
+                  <span aria-hidden="true">{allExcluded ? "↺" : "⃠"}</span>
+                </button>
+              </>
+            )}
+            </div>
+          </div>
         </section>
 
-        {categoryIds.length > 0 && (
-          <div className="category-actions">
-            <span>
-              All {categoryIds.length.toLocaleString("en-ZA")} {form.toLowerCase()} plants that can be planted
-            </span>
-            <button
-              type="button"
-              className={`save-button${allSaved ? " is-saved" : ""}`}
-              aria-pressed={allSaved}
-              onClick={() => setCategory(categoryIds, "saved", !allSaved)}
-            >
-              {allSaved ? "Remove all from favourites" : "Favourite all"}{" "}
-              <span aria-hidden="true">{allSaved ? "♥" : "♡"}</span>
-            </button>
-            <button
-              type="button"
-              className={`exclude-button${allExcluded ? " is-excluded" : ""}`}
-              aria-pressed={allExcluded}
-              onClick={() => setCategory(categoryIds, "excluded", !allExcluded)}
-            >
-              {allExcluded ? "Put all back" : "Exclude all"}{" "}
-              <span aria-hidden="true">{allExcluded ? "↺" : "⃠"}</span>
-            </button>
-          </div>
-        )}
-
         <div className="results-count">
-          <span>{String(filtered.length).padStart(2, "0")} plants</span>
+          <span>{filtered.length.toLocaleString("en-ZA")} plants</span>
           <span className="results-label">Plant library</span>
         </div>
 
@@ -3648,10 +3801,10 @@ function SavedView({
           your <em>choices.</em>
         </h1>
         <p>
-          Everything is stored on your device. Saved gardens keep your
-          complete garden layouts, favourite plants are the individual species
-          you love, and excluded plants are never selected for your garden
-          plans. Favourites are only used if they suit your bed.
+          Saved in this browser only: clearing your browser data or
+          switching device loses them. My gardens keeps your garden plans,
+          favourites are the plants you love (used only if they suit your
+          bed), and hidden plants are never used in your plans.
         </p>
       </section>
 
@@ -3662,7 +3815,7 @@ function SavedView({
           className={`saved-tab${tab === "gardens" ? " is-selected" : ""}`}
           onClick={() => setTab("gardens")}
         >
-          Saved gardens <span>{savedLayouts.length}</span>
+          My gardens <span>{savedLayouts.length}</span>
         </button>
         <button
           role="tab"
@@ -3678,7 +3831,7 @@ function SavedView({
           className={`saved-tab${tab === "excluded" ? " is-selected" : ""}`}
           onClick={() => setTab("excluded")}
         >
-          Excluded plants <span>{excludedPlants.length}</span>
+          Hidden plants <span>{excludedPlants.length}</span>
         </button>
       </div>
 
@@ -3695,8 +3848,8 @@ function SavedView({
         ) : (
           <section className="saved-empty">
             <p>
-              No saved gardens yet. Build a plan and use{" "}
-              <strong>Save this layout</strong> to keep it here.
+              No saved gardens yet. Make a garden plan and use{" "}
+              <strong>Save this garden plan</strong> to keep it here.
             </p>
           </section>
         ))}
@@ -3764,12 +3917,12 @@ function SavedView({
             </>
           ) : (
             <section className="empty-state saved-empty">
-              <h2>You haven’t excluded any plants.</h2>
+              <h2>You haven’t hidden any plants.</h2>
               <p>
                 If a plan suggests something you do not want — a plant you
                 dislike, or one you already have too much of — use{" "}
-                <strong>Exclude</strong> on it. It will be left out of every new
-                plan until you put it back here.
+                <strong>Hide</strong> on it. It will be left out of every new
+                plan until you show it again here.
               </p>
               <button className="button button-dark" onClick={browse}>
                 Browse the plant library <span aria-hidden="true">→</span>
@@ -3863,8 +4016,8 @@ const METHOD_STEPS: { icon: "sun" | "filter" | "heart" | "plan"; title: string; 
  * they sit on the page itself rather than inside a disclosure. */
 const METHOD_NOTES: { icon: "phone" | "ruler" | "clock"; lead: string; copy: string }[] = [
   { icon: "phone", lead: "Prices are a guide.", copy: "Phone the nursery before you go." },
-  { icon: "ruler", lead: "Plant sizes are estimates.", copy: "Most are based on similar plants." },
-  { icon: "clock", lead: "Experts are still checking.", copy: "Use the plan as a starting point." },
+  { icon: "ruler", lead: "Plant sizes are a guide.", copy: "Check the details with your nursery." },
+  { icon: "clock", lead: "A starting point.", copy: "Adjust the plan to what you see in your garden." },
 ];
 
 function MethodView({ start }: { start: () => void }) {
@@ -3879,7 +4032,7 @@ function MethodView({ start }: { start: () => void }) {
           plant list and estimated costs.
         </p>
         <button className="button button-dark" onClick={start}>
-          Start planning <span aria-hidden="true">→</span>
+          Create my garden <span aria-hidden="true">→</span>
         </button>
       </section>
 
@@ -3960,7 +4113,7 @@ function MethodView({ start }: { start: () => void }) {
         <div className="method-cta-inner">
           <h2>Ready to plan your bed?</h2>
           <button className="button button-on-dark" onClick={start}>
-            Start planning <span aria-hidden="true">→</span>
+            Create my garden <span aria-hidden="true">→</span>
           </button>
         </div>
       </section>
@@ -4011,7 +4164,7 @@ function DetailDrawer({
       >
         <div className="drawer-toolbar">
           <span>
-            Plant {plant.id} · {plant.family}
+            {plant.family} family
           </span>
           <button onClick={close}>Close ×</button>
         </div>
@@ -4043,7 +4196,7 @@ function DetailDrawer({
               onClick={toggleExcluded}
               aria-pressed={excluded}
             >
-              {excluded ? "Put back in my plans" : "Never plan this plant"}
+              {excluded ? "Show in my plans again" : "Hide from my plans"}
             </button>
           </div>
           )}
@@ -4190,7 +4343,37 @@ export function GardenApp() {
   const navigate = (nextView: View) => {
     setView(nextView);
     setSelectedPlant(null);
+    window.history.pushState(
+      { view: nextView, step: 0 },
+      "",
+      nextView === "finder" ? stepPath(0) : VIEW_PATHS[nextView],
+    );
   };
+
+  // The address names the page, so reloading keeps it and the browser's
+  // Back button goes to the previous page or step instead of leaving the
+  // app (usability review, 21 Oct).
+  useEffect(() => {
+    const hash = window.location.hash;
+    const match = (Object.entries(VIEW_PATHS) as [View, string][]).find(
+      ([name, path]) => name !== "home" && hash.startsWith(path),
+    );
+    const initial: View = match ? match[0] : "home";
+    const stepMatch = /step-(\d+)/.exec(hash);
+    window.history.replaceState(
+      { view: initial, step: stepMatch ? Number(stepMatch[1]) - 1 : 0 },
+      "",
+      hash || VIEW_PATHS.home,
+    );
+    if (initial !== "home") queueMicrotask(() => setView(initial));
+    const onPop = (event: PopStateEvent) => {
+      const state = event.state as { view?: View } | null;
+      setView(state?.view ?? "home");
+      setSelectedPlant(null);
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
 
   // Every page opens at the top, once the new page is in place and before it
   // is painted.
@@ -4212,7 +4395,8 @@ export function GardenApp() {
       {
         id: createLayoutId(),
         character: plan.character,
-        label: null,
+        // "Stellenbosch, 2 × 3 m (option 1)" rather than three "Option 1"s.
+        label: `${selectedPlace ? `${selectedPlace.name}, ` : ""}${plan.brief.bedWidthM} × ${plan.brief.bedLengthM} m (${plan.character.toLowerCase()})`,
         createdAt: new Date().toISOString(),
         brief: plan.brief,
         species: plan.quantities!.quantities.map((quantity) => ({
@@ -4311,7 +4495,7 @@ export function GardenApp() {
 
   return (
     <div className="site-shell">
-      <Header view={view} savedCount={savedLayouts.length} navigate={navigate} />
+      <Header view={view} savedCount={savedReady ? savedLayouts.length : null} navigate={navigate} />
       {view === "home" && (
         <HomeView
           start={() => navigate("finder")}

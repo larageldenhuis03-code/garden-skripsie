@@ -6766,16 +6766,106 @@ details.brief-strip[open] .brief-strip-hint { visibility: hidden; }
   }
 }
 
-/* Favourite or exclude a whole plant type (owner, 21 Oct). */
-.category-actions {
+/* Usability review (21 Oct). */
+/* Step 1: the vegetation tick sits in the town field's column. */
+.place-step .biome-selection {
+  width: 100%;
+  max-width: 560px;
+  margin-inline: auto;
+}
+/* The closed Plants panel waits off to the right; clip it so the plan
+   page never scrolls sideways (it did by about 100-270 px). */
+.plan-bed-area {
+  overflow-x: clip;
+}
+.finder-step-names {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--sans);
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+.finder-step-names .is-current {
+  color: var(--ink);
+  font-weight: 650;
+}
+.finder-step-names .is-done::before {
+  content: "\2713  ";
+}
+.button.is-waiting {
+  opacity: 0.6;
+}
+.plan-ready {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 10px 16px;
-  padding: 14px clamp(16px, 3vw, 48px);
-  border-bottom: 1px solid var(--line);
+  justify-content: space-between;
+  gap: 12px 20px;
+  margin: 0 0 18px;
+  padding: 14px 18px;
+  border: 1px solid var(--olive);
+  background: color-mix(in srgb, var(--olive) 10%, transparent);
+}
+.plan-ready p {
+  margin: 0;
   font-family: var(--sans);
-  font-size: 0.95rem;
+}
+.rename-button {
+  opacity: 1;
+}
+.portrait-index {
+  display: none;
+}
+.chip-swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 6px;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  vertical-align: -1px;
+}
+
+/* The legend under the plan, boxed and titled (owner, 21 Oct). */
+.plan-key {
+  margin-top: 14px;
+  padding: 12px 16px 14px;
+  border: 1px solid var(--line-strong);
+  background: color-mix(in srgb, var(--paper-deep) 45%, transparent);
+}
+.plan-key-title {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: var(--text-sm);
+  font-weight: 650;
+}
+.plan-key-title span {
+  font-weight: 400;
+  color: var(--ink-soft);
+}
+.plan-key > :nth-child(2) {
+  margin-top: 8px;
+}
+
+/* Favourite or exclude a whole plant type, beside the list (owner, 21
+   Oct). */
+.type-filter-line {
+  align-items: center;
+  gap: 10px;
+}
+.type-filter-line .plant-type-select {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+.type-filter-line button {
+  padding: 9px 16px;
+  font-family: var(--sans);
+  font-size: 0.9rem;
+  white-space: nowrap;
 }
 
 /* Plants that are never planted (owner, 21 Oct): a note in place of the
