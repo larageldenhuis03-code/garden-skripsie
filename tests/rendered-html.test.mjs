@@ -33,8 +33,8 @@ test("server-renders the Silly Goose product surface", async () => {
     html,
     /<title>Silly Goose MVP — Garden planning for the Western Cape<\/title>/i,
   );
-  assert.match(html, /Describe your <em>garden\.<\/em>/);
-  assert.match(html, /suggest plants that fit/i);
+  assert.match(html, /Let’s grow your <em>garden\.<\/em>/);
+  assert.match(html, /estimate what your planting could cost/i);
   assert.match(html, /flowers-sketch\.png/);
   // Entry-point labels are specified copy (spec 1), not incidental.
   assert.match(html, /Create my garden/);

@@ -26,7 +26,7 @@ export const metadata = {
   openGraph: {
     title: "Silly Goose MVP",
     description:
-      "Describe your garden. Discover the plants that fit.",
+      "Let’s grow your garden. Tell us about your space and we’ll find suitable plants, lay them out and estimate the cost.",
     type: "website",
   },
 };

@@ -75,13 +75,16 @@ history.
 - The useful outcome is a plant group, quantities and placement, not merely a
   quiz result or ranked list.
 
-Exact home hero copy:
+Exact home copy (owner, 20 Oct 2026):
 
-> Describe your *garden.*  
-> Discover the plants that *fit.*
+> Let’s grow your *garden.*
+>
+> Tell us about your space, its sun and soil, and what you love. We’ll find
+> suitable plants, arrange them into a garden layout, and estimate what your
+> planting could cost.
 
-Keep it on two lines at desktop sizes. `garden` and `fit` use the olive italic
-treatment.
+`garden.` uses the olive italic treatment. The three actions below it sit two
+sizes under the heading.
 
 ## Regression test briefs
 

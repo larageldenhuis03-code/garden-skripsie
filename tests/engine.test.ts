@@ -37,6 +37,7 @@ import {
   stage1RawMax,
   stateFrom,
   survivesHardFilters,
+  neverPlantedReason,
   targetDepth,
   depthAxisFor,
   viewingAxis,
@@ -1301,4 +1302,24 @@ test("H7 applies to L1 only, and matches the rulebook's 2.76 m on a 6 x 4 m bed"
 
   close(footprintCapSpreadM(site.areaM2)!, 2.76, 5e-3);
   close(footprintCapM2(site.areaM2)!, 0.25 * 24, 1e-9);
+});
+
+// Owner, 21 Oct 2026: plants Stage 0 removes whatever the brief stay in the
+// library for educational purposes, labelled, and cannot be favourited or
+// excluded. The label must agree with the engine.
+test("never-planted plants fail Stage 0 on every brief, and each rule is represented", () => {
+  const marked = plants.filter((plant) => neverPlantedReason(plant) !== null);
+  const briefs: GardenBrief[] = (["full", "part", "sheltered"] as const).flatMap((sun) =>
+    (["low", "moderate", "moist"] as const).map((water) => ({ ...baseBrief, sun, water })),
+  );
+  for (const plant of marked) {
+    for (const brief of briefs) {
+      assert.equal(survivesHardFilters(plant, brief), false, `${plant.id} ${plant.scientificName} is marked never planted but survives ${brief.sun}/${brief.water}`);
+    }
+  }
+  const reasons = new Set(marked.map((plant) => neverPlantedReason(plant)!.split(" ").slice(0, 4).join(" ")));
+  // No "indoor" kind: that tag stopped excluding plants on 21 Oct 2026.
+  for (const kind of ["it is recorded as", "it is parasitic and", "it is aquatic and"]) {
+    assert.ok([...reasons].some((r) => r.startsWith(kind)), `no plant is marked "${kind}..."`);
+  }
 });

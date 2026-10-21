@@ -186,6 +186,22 @@ function circleAreaFromDiameterCm(diameterCm: number): number {
   return Math.PI * (diameterCm / 200) ** 2;
 }
 
+/** The Stage 0 rules that remove a plant whatever the brief - so the plant
+ * can never reach a plan. Read from the same predicates as the constraints
+ * below, so the library's label and the engine cannot disagree. The plant
+ * stays in the catalogue (owner, 21 Oct 2026: kept for educational
+ * purposes) but cannot be favourited or excluded. null = can be planted. */
+export function neverPlantedReason(plant: Plant): string | null {
+  const types = plant.plantType ?? [];
+  if (plant.excludedFromLayout === "poisonous") return "it is recorded as poisonous";
+  if (plant.excludedFromLayout === "indoor") return "it is an indoor plant";
+  if (onExclusionList(plant.scientificName, F4_NEMBA_SPECIES)) return "it is a listed invasive species (NEMBA)";
+  if (types.some((type) => F9_EXCLUDED_PLANT_TYPES.includes(type))) return "it is parasitic and needs a host plant a garden bed cannot guarantee";
+  if (types.some((type) => AQUATIC_PLANT_TYPES.includes(type))) return "it is aquatic and needs standing water";
+  if (onExclusionList(plant.scientificName, F6_NAMED_EXCLUSIONS)) return "it needs a habitat a garden bed cannot give";
+  return null;
+}
+
 function feasibilityConstraints(
   excludedPlantIds: readonly string[] = [],
 ): HardConstraint<Plant, GardenBrief>[] {
@@ -223,8 +239,9 @@ function feasibilityConstraints(
         ]
       : []),
     {
-      // Safety exclusion, applied before anything else: 119 poisonous and
-      // 144 indoor-only species are in the catalogue and must never be
+      // Safety exclusion, applied before anything else: poisonous species
+      // are in the catalogue and must never be (the "indoor" tag is no
+      // longer set - owner, 21 Oct 2026 - but is still honoured if it is)
       // recommended for an outdoor bed. They stay browsable in the plant
       // library, labelled.
       id: "safe-for-beds",
@@ -257,7 +274,7 @@ function feasibilityConstraints(
         }
         return {
           status: "pass",
-          reason: "Not recorded as poisonous or indoor-only.",
+          reason: "Not recorded as poisonous.",
           evidence: {
             source: "PlantZAfrica special features",
             observedValue: plant.specialFeatures,
@@ -875,7 +892,7 @@ function assumptionsFor(prepared: Prepared): string[] {
   const measuredSpread = prepared.measuredSpreadCount;
   return [
     `Built from ${groupDigits(prepared.plantCount)} Western Cape plants (dataset ${DATASET_VERSION}), using the rules in the algorithm rulebook (version ${RULES_VERSION}).`,
-    "Legally listed invasive species are removed before anything is chosen, as are plants recorded as poisonous, indoor-only or parasitic.",
+    "Legally listed invasive species are removed before anything is chosen, as are plants recorded as poisonous, parasitic or aquatic.",
     `Your biome, light, water and soil decide which plants are eligible: a plant that fails one is left out. ${
       relaxed.length > 0
         ? `You widened ${relaxed.join(" and ")}, so plants matching the next value along were allowed in.`

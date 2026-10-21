@@ -84,7 +84,12 @@ MINOR_SOIL_TYPES = {"brack/saline", "gravelly", "metal-rich", "peaty", "chalky"}
 # Tags that bar a species from outdoor bed recommendations (spec 0.3).
 # They stay browsable in the plant library, flagged - they are simply
 # never recommended.
-EXCLUSION_TAGS = {"poisonous": "poisonous", "indoor plant": "indoor"}
+# Owner, 21 Oct 2026: "Indoor plant" is no longer one of them. In
+# PlantZAfrica it means the plant CAN be grown indoors (beside "Good
+# potplant"), not that it is indoor-only; a specialist confirmed this for
+# the succulents, and the rest (Clivia, Streptocarpus, Plectranthus...)
+# are ordinary outdoor garden plants.
+EXCLUSION_TAGS = {"poisonous": "poisonous"}
 
 # spread_source -> the three confidence levels the layout view needs
 # (spec 8.5). Only "original" is a real measurement.

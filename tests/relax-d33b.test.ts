@@ -98,7 +98,9 @@ test("D33b v7 gap fill: only selected species, within H3 max and the H5 cap, and
         assert.ok(before.has(id), `${where}: ${id} is a new species`);
         if (n === before.get(id)) continue;
         assert.ok(n <= maxAllowed(id, area), `${where}: ${id} x${n} is over its H3 maximum`);
-        assert.ok(n / total <= h5 + 1e-9, `${where}: ${id} share ${(n / total).toFixed(3)} is over the H5 cap ${h5}`);
+        // The cap is read from the H5 label, printed to 3 decimals, so the
+        // tolerance is that rounding (a share of exactly 1/3 against "0.333").
+        assert.ok(n / total <= h5 + 5e-4, `${where}: ${id} share ${(n / total).toFixed(3)} is over the H5 cap ${h5}`);
       }
     }
   }

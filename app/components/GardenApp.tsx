@@ -28,6 +28,7 @@ import {
   bedShapeLabels,
   buildGardenPlan,
   buildGardenPlanVariants,
+  neverPlantedReason,
   MINIMUM_SCREENING_SPECIES,
   availableColours,
   colourSchemeLabels,
@@ -132,6 +133,37 @@ const PLANT_TYPE_OPTIONS: { value: string; label: string; count: number }[] = ((
  * open where the last one was scrolled to and then slide up. */
 function scrollToTop() {
   window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+}
+
+/** Where this plant's values come from, read from its own source fields
+ * so the note is true for this plant, not for the catalogue in general. */
+function provenanceText(plant: Plant): string {
+  const parts: string[] = [];
+  const from = [
+    plant.dataSource.includes("plantzafrica") ? "a PlantZAfrica (SANBI) profile" : null,
+    plant.dataSource.includes("bioscape")
+      ? `${plant.occurrenceCount} BioSCape occurrence record${plant.occurrenceCount === 1 ? "" : "s"} in the Western Cape`
+      : null,
+  ].filter(Boolean);
+  if (from.length) parts.push(`This plant comes from ${from.join(" and ")}.`);
+  const size = (source: string | null, measured: string) =>
+    source === "original" ? measured
+      : source === "web-research" ? "taken from published sources"
+      : source === "expert-estimate" ? "an expert estimate"
+      : "estimated from similar plants, not measured";
+  parts.push(`Its height is ${size(plant.heightSource, "a recorded value")}; its spread is ${size(plant.spreadSource, "a measured value")}.`);
+  const inferred: string[] = [];
+  const unknown: string[] = [];
+  for (const [name, source] of [["light", plant.sunSource], ["water", plant.waterSource], ["soil", plant.soilTypeSource]] as const) {
+    const s = (source ?? "").toUpperCase();
+    if (s === "GENUS") inferred.push(`${name} from its genus`);
+    else if (s === "BIOME") inferred.push(`${name} from its vegetation type`);
+    else if (s === "UNRESOLVED" || s === "") unknown.push(name);
+  }
+  if (!inferred.length && !unknown.length) parts.push("Its light, water and soil needs are recorded.");
+  if (inferred.length) parts.push(`Inferred, not recorded: ${inferred.join("; ")}.`);
+  if (unknown.length) parts.push(`Not known: ${unknown.join(", ")}.`);
+  return parts.join(" ");
 }
 
 function formatDimension(value: number | null) {
@@ -271,11 +303,12 @@ function HomeView({
       <section className="home-page">
         <div className="home-copy">
           <h1>
-            Describe your <em>garden.</em>
+            Let’s grow your <em>garden.</em>
           </h1>
           <p className="home-intro">
-            Tell us where your garden is, how much sun and water it gets, and
-            the size of your bed. We’ll suggest plants that fit.
+            Tell us about your space, its sun and soil, and what you love.
+            We’ll find suitable plants, arrange them into a garden layout, and
+            estimate what your planting could cost.
           </p>
           <div className="home-actions">
             <button className="button button-dark" onClick={start}>
@@ -383,11 +416,6 @@ function ExtraPreferencesPicker({
           put {screeningCount === 1 ? "it" : "them"} first.
         </p>
       )}
-      <p className="filter-reason">
-        Roughly a third of plants carry no recorded features at all. A
-        preference lifts the plants known to match it — it never pushes the
-        rest down.
-      </p>
     </div>
   );
 }
@@ -1710,7 +1738,7 @@ function FinderView({
           title={canContinue ? undefined : blockers.map((item) => item.label).join("; ") || undefined}
           onClick={step === finalStep ? finish : () => setStep(step + 1)}
         >
-          {step === finalStep ? "Build my plan" : "Continue"} <span>↗</span>
+          {step === finalStep ? "Build my plan" : "Continue"} <span aria-hidden="true">→</span>
         </button>
       </div>
     </main>
@@ -1747,6 +1775,11 @@ function PlantCard({
           <h3>{plant.scientificName}</h3>
           {otherNamesLine(plant) ? <small className="plant-other-names">{otherNamesLine(plant)}</small> : null}
         </div>
+        {neverPlantedReason(plant) ? (
+          <span className="educational-badge" title={`Never planted: ${neverPlantedReason(plant)}.`}>
+            For educational purposes
+          </span>
+        ) : (
         <div className="plant-card-buttons">
           <button
             className={`save-button${saved ? " is-saved" : ""}`}
@@ -1772,6 +1805,7 @@ function PlantCard({
             <span aria-hidden="true">{excluded ? "↺" : "⃠"}</span>
           </button>
         </div>
+        )}
       </div>
       <div className="plant-card-meta">
         <span>{plant.form}</span>
@@ -1823,7 +1857,7 @@ function PlantCard({
         </div>
       )}
       <button className="card-link" onClick={open}>
-        View plant <span>↗</span>
+        View plant <span aria-hidden="true">→</span>
       </button>
     </article>
   );
@@ -3012,6 +3046,7 @@ function CollectionView({
   openPlant,
   toggleSaved,
   toggleExcluded,
+  setCategory,
   restart,
   onSaveLayout,
   isLayoutSaved,
@@ -3025,6 +3060,7 @@ function CollectionView({
   openPlant: (plant: Plant) => void;
   toggleSaved: (id: string) => void;
   toggleExcluded: (id: string) => void;
+  setCategory: (ids: string[], list: "saved" | "excluded", on: boolean) => void;
   restart: () => void;
   onSaveLayout: (plan: GardenPlan, budget: SavedBudget | null) => void;
   isLayoutSaved: (plan: GardenPlan) => boolean;
@@ -3102,6 +3138,24 @@ function CollectionView({
     return queryMatches && formMatches;
   });
 
+  // Owner, 21 Oct 2026: favourite or exclude a whole plant type at once.
+  // The whole type, not just the plants the search shows, and never the
+  // educational-only plants (they cannot be favourited or excluded).
+  const categoryIds =
+    form === "All"
+      ? []
+      : plants
+          .filter(
+            (plant) =>
+              neverPlantedReason(plant) === null &&
+              plant.form.split(",").map((part) => part.trim().toLowerCase()).includes(form.toLowerCase()),
+          )
+          .map((plant) => plant.id);
+  const savedSet = new Set(saved);
+  const excludedSet = new Set(excluded);
+  const allSaved = categoryIds.length > 0 && categoryIds.every((id) => savedSet.has(id));
+  const allExcluded = categoryIds.length > 0 && categoryIds.every((id) => excludedSet.has(id));
+
   return (
     <main className="collection-shell">
       <section className={`collection-intro${mode === "results" ? " is-compact" : ""}`}>
@@ -3123,11 +3177,11 @@ function CollectionView({
           <p>
             {mode === "results"
               ? "Checked against your answers. Anything we’re unsure about is marked."
-              : "Our plant library brings together BioSCape occurrence records and PlantZAfrica horticultural profiles to help you explore plants for your garden. Some plants are still missing information on sunlight, water needs or specific bioregions. Where information is unavailable, we make this clear rather than guess."}
+              : "Plants from PlantZAfrica (SANBI) profiles and BioSCape field records. Where a value is estimated or unknown, the plant says so — we never guess."}
           </p>
           {mode === "results" && (
             <button className="text-link" onClick={restart}>
-              Change my answers ↗
+              ← Change my answers
             </button>
           )}
         </div>
@@ -3225,6 +3279,32 @@ function CollectionView({
             </select>
           </label>
         </section>
+
+        {categoryIds.length > 0 && (
+          <div className="category-actions">
+            <span>
+              All {categoryIds.length.toLocaleString("en-ZA")} {form.toLowerCase()} plants that can be planted
+            </span>
+            <button
+              type="button"
+              className={`save-button${allSaved ? " is-saved" : ""}`}
+              aria-pressed={allSaved}
+              onClick={() => setCategory(categoryIds, "saved", !allSaved)}
+            >
+              {allSaved ? "Remove all from favourites" : "Favourite all"}{" "}
+              <span aria-hidden="true">{allSaved ? "♥" : "♡"}</span>
+            </button>
+            <button
+              type="button"
+              className={`exclude-button${allExcluded ? " is-excluded" : ""}`}
+              aria-pressed={allExcluded}
+              onClick={() => setCategory(categoryIds, "excluded", !allExcluded)}
+            >
+              {allExcluded ? "Put all back" : "Exclude all"}{" "}
+              <span aria-hidden="true">{allExcluded ? "↺" : "⃠"}</span>
+            </button>
+          </div>
+        )}
 
         <div className="results-count">
           <span>{String(filtered.length).padStart(2, "0")} plants</span>
@@ -3653,7 +3733,7 @@ function SavedView({
             Favourites are only used if they suit your bed.
           </p>
           <button className="button button-dark" onClick={browse}>
-            Browse the plant library <span>↗</span>
+            Browse the plant library <span aria-hidden="true">→</span>
           </button>
         </section>
       )}
@@ -3692,7 +3772,7 @@ function SavedView({
                 plan until you put it back here.
               </p>
               <button className="button button-dark" onClick={browse}>
-                Browse the plant library <span>↗</span>
+                Browse the plant library <span aria-hidden="true">→</span>
               </button>
             </section>
           )}
@@ -3839,19 +3919,19 @@ function MethodView({ start }: { start: () => void }) {
           <summary>Where does the plant information come from?</summary>
           <ul>
             <li>
-              Plant heights, spreads and flowering months come from{" "}
-              <strong>BioSCape</strong> field records —{" "}
-              {plants.length.toLocaleString("en-ZA")} Western Cape species.
+              {plants.length.toLocaleString("en-ZA")} Western Cape species,
+              from <strong>PlantZAfrica (SANBI)</strong> plant profiles and{" "}
+              <strong>BioSCape</strong> field records.
             </li>
             <li>
-              Sun, water and soil needs come from{" "}
-              <strong>PlantZAfrica (SANBI)</strong>, and your area’s
-              vegetation type from SANBI’s 2018 national vegetation map.
+              Sun, water and soil needs are <strong>recorded</strong> for most
+              plants. Where one is not, it is inferred from the plant’s genus
+              or, for water and soil, its vegetation type. Your area’s
+              vegetation type comes from SANBI’s 2018 national vegetation map.
             </li>
             <li>
               Invasive plants on the <strong>NEMBA list</strong> are removed
-              first, along with poisonous, indoor-only, parasitic and water
-              plants.
+              first, along with poisonous, parasitic and water plants.
             </li>
             <li>
               A plant with <strong>no record</strong> for your sun, water or
@@ -3863,9 +3943,10 @@ function MethodView({ start }: { start: () => void }) {
               you which.
             </li>
             <li>
-              Most plant spreads are{" "}
-              <strong>estimated from similar species</strong>, not measured,
-              so the circles show likely size rather than nursery spacing.
+              Most plant spreads (about 9 in 10) are{" "}
+              <strong>estimated</strong> from the plant’s height or from
+              similar plants, not measured, so the circles show likely size
+              rather than nursery spacing.
             </li>
             <li>
               Nursery prices are checked live from each nursery’s own site
@@ -3940,6 +4021,14 @@ function DetailDrawer({
           <p className="detail-scientific">{plant.scientificName}</p>
           {otherNamesLine(plant) ? <p className="plant-other-names detail-other-names">{otherNamesLine(plant)}</p> : null}
           <p className="detail-note">{plant.note}</p>
+          {neverPlantedReason(plant) ? (
+            <p className="detail-note detail-educational">
+              <strong>For educational purposes.</strong> This plant is never
+              planted, because {neverPlantedReason(plant)} — a limit of the
+              plant itself or of the tool at this point. It cannot be
+              favourited or excluded.
+            </p>
+          ) : (
           <div className="detail-actions">
             <button
               className={`button ${saved ? "button-outline" : "button-dark"}`}
@@ -3957,6 +4046,7 @@ function DetailDrawer({
               {excluded ? "Put back in my plans" : "Never plan this plant"}
             </button>
           </div>
+          )}
           {excluded && (
             <p className="detail-note detail-excluded">
               Excluded by you, so it is left out of every new plan. Its record
@@ -4001,15 +4091,7 @@ function DetailDrawer({
               someone opens a plant to read. */}
           <details className="detail-evidence">
             <summary>About this information</summary>
-            <p>
-              We found {plant.occurrenceCount} Western Cape occurrence records
-              for this plant in BioSCape, which is also where its height, plant
-              type and flowering time come from. Light, water, soil and the
-              garden notes come from its PlantZAfrica profile.{" "}
-              {plant.spreadSource === "original"
-                ? "Its spread is a measured value."
-                : "Its spread is estimated from similar plants, not measured."}
-            </p>
+            <p>{provenanceText(plant)}</p>
           </details>
 
           <SourcingPanel
@@ -4042,7 +4124,7 @@ function Footer({ method }: { method: () => void }) {
         PlantZAfrica (SANBI) profiles and SANBI’s 2018 vegetation map.
       </p>
       <button className="text-link" onClick={method}>
-        How the planner works ↗
+        How the planner works →
       </button>
       {/* The MVP is being tested: the form is how a tester reports what the
           planner got wrong. Opens in a new tab so a half-finished garden is
@@ -4053,7 +4135,7 @@ function Footer({ method }: { method: () => void }) {
         target="_blank"
         rel="noreferrer"
       >
-        Tell us what you think ↗
+        Tell us what you think ↗︎
       </a>
       <span className="footer-version">MVP · 2026</span>
     </footer>
@@ -4079,8 +4161,14 @@ export function GardenApp() {
   useEffect(() => {
     queueMicrotask(() => {
       const store = loadStore();
-      setSaved(store.savedPlantIds);
-      setExcluded(store.excludedPlantIds);
+      // Plants that are never planted cannot be favourited or excluded, so
+      // any left from before that rule are dropped.
+      const plantable = (id: string) => {
+        const plant = plants.find((p) => p.id === id);
+        return !plant || neverPlantedReason(plant) === null;
+      };
+      setSaved(store.savedPlantIds.filter(plantable));
+      setExcluded(store.excludedPlantIds.filter(plantable));
       setSavedLayouts(store.savedLayouts);
       if (store.brief) setBrief(store.brief);
       setSavedReady(true);
@@ -4178,7 +4266,14 @@ export function GardenApp() {
     );
   };
 
+  /** A never-planted plant has no Favourite or Exclude (owner, 21 Oct). */
+  const isNeverPlanted = (id: string) => {
+    const plant = plants.find((p) => p.id === id);
+    return plant !== undefined && neverPlantedReason(plant) !== null;
+  };
+
   const toggleSaved = (id: string) => {
+    if (isNeverPlanted(id)) return;
     setSaved((current) => {
       if (current.includes(id)) return current.filter((item) => item !== id);
       // Hearting a plant you had excluded is a change of mind, so it comes
@@ -4188,7 +4283,23 @@ export function GardenApp() {
     });
   };
 
+  /** A whole plant type at once (owner, 21 Oct). Same rule as the single
+   * buttons: favouriting clears an exclusion and excluding clears a heart. */
+  const setCategory = (ids: string[], list: "saved" | "excluded", on: boolean) => {
+    const group = new Set(ids.filter((id) => !isNeverPlanted(id)));
+    const add = (current: string[]) => [...current, ...[...group].filter((id) => !current.includes(id))];
+    const remove = (current: string[]) => current.filter((id) => !group.has(id));
+    if (list === "saved") {
+      setSaved(on ? add : remove);
+      if (on) setExcluded(remove);
+    } else {
+      setExcluded(on ? add : remove);
+      if (on) setSaved(remove);
+    }
+  };
+
   const toggleExcluded = (id: string) => {
+    if (isNeverPlanted(id)) return;
     setExcluded((current) => {
       if (current.includes(id)) return current.filter((item) => item !== id);
       // Excluding and hearting the same plant contradict each other, and the
@@ -4236,6 +4347,7 @@ export function GardenApp() {
           isLayoutSaved={isLayoutSaved}
           toggleSaved={toggleSaved}
           toggleExcluded={toggleExcluded}
+          setCategory={setCategory}
           restart={() => navigate("finder")}
         />
       )}
