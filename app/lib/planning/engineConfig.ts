@@ -102,6 +102,13 @@ export const FAIL_RULE_MAX_RETRIES = 12;
 /** IMPLEMENTATION (owner: top 3 distinct results by Z): seeded runs tried. */
 export const MAX_RESULT_SEEDS = 6;
 
+/** Owner, 26 Oct 2026 (not a rulebook value): a garden plan whose plants
+ * cover less than this share of the bed is not offered - hiding plants
+ * could otherwise leave a mostly bare bed. Checked on the finished layout
+ * (canopy after placement and the fills); a run below it is dropped like a
+ * failed run, and if every run is below it the plan fails with a reason. */
+export const MIN_PLAN_COVER = 0.5;
+
 // ---------------------------------------------------------------------------
 // Stage 4 - 6_Stage3_4_Rules rows 13-66
 // ---------------------------------------------------------------------------

@@ -26,7 +26,6 @@ import {
   MIN_BED_DIMENSION_M,
   bedShapeFor,
   bedShapeLabels,
-  buildGardenPlan,
   buildGardenPlanVariants,
   neverPlantedReason,
   MINIMUM_SCREENING_SPECIES,
@@ -130,13 +129,30 @@ const PLANT_TYPE_OPTIONS: { value: string; label: string; count: number }[] = ((
     .map(([value, count]) => ({ value, label: value, count }));
 })();
 
+/** A plant's types as listed in the library ("Ground Cover, Perennial"). */
+function formsOf(plant: Plant): string[] {
+  return plant.form.split(",").map((part) => part.trim().toLowerCase()).filter(Boolean);
+}
+
+/** Hidden plants counted by library type, most first. A plant with two
+ * types counts under both, as the type list does. */
+function hiddenByType(hidden: readonly Plant[]): [string, number][] {
+  const counts = new Map<string, number>();
+  for (const plant of hidden) {
+    for (const type of plant.form.split(",").map((part) => part.trim()).filter(Boolean)) {
+      counts.set(type, (counts.get(type) ?? 0) + 1);
+    }
+  }
+  return [...counts].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+}
+
 /** The five steps, named so people know what is coming. */
 const STEP_NAMES = ["Location", "Conditions", "Size", "Style", "Extras"];
 
 /** Each page has its own address, so the browser's Back button works. */
 const VIEW_PATHS = {
   home: "#/",
-  finder: "#/plan-a-garden",
+  finder: "#/create-my-garden",
   results: "#/garden-plan",
   browse: "#/plant-library",
   method: "#/how-it-works",
@@ -294,7 +310,7 @@ function Header({
           className={view === "finder" || view === "results" ? "is-active" : ""}
           onClick={() => navigate("finder")}
         >
-          Plan a garden
+          Create my garden
         </button>
         <button
           className={view === "browse" ? "is-active" : ""}
@@ -350,7 +366,7 @@ function HomeView({
             {/* Only offered once there is something to open. */}
             {savedLayoutCount > 0 && (
               <button className="text-link" onClick={openSavedGardens}>
-                My saved gardens ({savedLayoutCount})
+                My gardens ({savedLayoutCount})
               </button>
             )}
           </div>
@@ -850,12 +866,11 @@ function BedPreview({
           role="img"
           aria-label={`${widthM} by ${lengthM} metre bed, north at the top, viewed from the ${viewingEdge} side`}
         >
-          {/* Compass: north is always the top edge of the drawing. In the
-              left corners, so the middle of each side is free for the figure. */}
+          {/* Compass: north is always the top edge of the drawing, in the
+              top left corner. The south mark went (owner, 23 Oct): north
+              alone is enough. */}
           <text className="bed-compass" x={18} y={16} textAnchor="middle">N</text>
           <path className="bed-compass-mark" d="M18,20 l-4,7 h8 z" />
-          <path className="bed-compass-mark" d={`M18,${total - 20} l-4,-7 h8 z`} />
-          <text className="bed-compass" x={18} y={total - 6} textAnchor="middle">S</text>
 
           {/* The bed, with a metre grid for scale. */}
           <rect className="bed-rect" x={x0} y={y0} width={w} height={h} />
@@ -1647,8 +1662,7 @@ function FinderView({
                 Pick the side you usually view the bed from; the taller plants go at the back of that view.
               </p>
               <p className="field-note">
-                Not sure where north is? A phone compass app shows it, or just
-                pick the side you look from most.
+                Not sure where north is? A phone compass app shows it.
               </p>
               <div
                 className="viewing-edge-grid"
@@ -1731,10 +1745,13 @@ function FinderView({
 
   const current = steps[step];
   const finalStep = steps.length - 1;
+  // Only on the last step, and with the same search as the plan page (up to
+  // six runs, each held to MIN_PLAN_COVER), so this check and the plan page
+  // can never disagree.
   const previewPlan = useMemo(() => {
-    if (!validateGardenBrief(brief).valid) return null;
-    return buildGardenPlan(plants, brief, { excludedPlantIds: excluded });
-  }, [brief, excluded]);
+    if (step !== finalStep || !validateGardenBrief(brief).valid) return null;
+    return buildGardenPlanVariants(plants, brief, { excludedPlantIds: excluded })[0] ?? null;
+  }, [brief, excluded, step, finalStep]);
   const planIsReady =
     previewPlan?.status === "provisional-plan" &&
     Boolean(previewPlan.layout?.placements.length);
@@ -1786,11 +1803,12 @@ function FinderView({
       {step === finalStep && !planIsReady && (
         <aside className="finder-example is-warning" aria-live="polite">
           <div>
-            <strong>These answers don’t produce a complete plan yet.</strong>
+            <strong>⚠ The planner can’t create a garden for these answers yet.</strong>
             <p>
-              Check your measurements and answers. If they’re accurate, keep
-              them—the current library may not have a suitable mix for this
-              bed.
+              {previewPlan?.diagnostics[0] ?? "No plan could be laid out for this bed."}{" "}
+              This is a limit of the tool at present, not of your garden. You
+              could show hidden plants again (My gardens → Hidden plants), try a
+              different bed size, or change an answer.
             </p>
           </div>
         </aside>
@@ -2420,7 +2438,7 @@ function windNote(brief: GardenBrief): string | null {
     return `Wind: you look at this bed from the ${edge}, which is also a side the wind comes from. To keep your view open there is no windbreak along that edge, so the plants nearest you may take the most wind.`;
   }
   if (rowsAvailable(brief.bedLengthM) >= 3) {
-    return "Wind: this layout puts your view first, so the tallest plants stand at the back, which here is the windward south or east side. They may take more wind than a layout built around the wind would give them.";
+    return "Wind: this plan puts your view first, so the tallest plants stand at the back, which here is the windward south or east side. They may take more wind than a layout built around the wind would give them.";
   }
   return null;
 }
@@ -2448,7 +2466,7 @@ function layeringNote(
     return `The taller plants sit towards the back of this bed, away from the ${edge} side where you stand.`;
   }
   if (share < 0.45) {
-    return `The taller plants in this layout ended up nearer the ${edge} side, where you stand. Regenerate for one that banks them at the back.`;
+    return `The taller plants in this plan ended up nearer the ${edge} side, where you stand. Show 3 new options for one that banks them at the back.`;
   }
   return "The taller plants are spread through this bed rather than banked at the back.";
 }
@@ -2467,12 +2485,91 @@ function LayoutViewSwitch({
   return (
     <div className="layout-views" role="group" aria-label="Layout view">
       <button type="button" aria-pressed={view === "sketchbook"} onClick={() => onChange("sketchbook")}>
-        Drawing
+        Sketchbook
       </button>
       <button type="button" aria-pressed={view === "real-life"} onClick={() => onChange("real-life")}>
-        Photos
+        Real-life
       </button>
     </div>
+  );
+}
+
+/** The key to the plan drawing: plant-type symbols, height rings and the
+ * favourite heart. Its own component so the plan page can show it full
+ * width under the plan (owner, 22 Oct) while saved cards keep it under
+ * their drawing. */
+function PlanKey({
+  placements,
+  savedIds = [],
+  view,
+}: {
+  placements: { plantId: string }[];
+  savedIds?: readonly string[];
+  view: BedView;
+}) {
+  const plantsById = new Map(plants.map((plant) => [plant.id, plant]));
+  const anySaved = placements.some((p) => savedIds.includes(p.plantId));
+  const symbolTypes = [
+    ...new Set(
+      placements.flatMap((p) => {
+        const plant = plantsById.get(p.plantId);
+        const type = plant ? roleTypeOf(plant, isFeaturePlant(plant)) : null;
+        return type ? [type] : [];
+      }),
+    ),
+  ];
+  return (
+    <>
+    {/* Owner, 21 Oct: a tester was unsure whether the symbols were
+        buttons, so the legend sits in a labelled box. */}
+    <div className="plan-key" role="note" aria-label="Key to the drawing">
+    <p className="plan-key-title">
+      Key <span>· explains the drawing</span>
+    </p>
+    {view === "sketchbook" && symbolTypes.length > 0 ? (
+      <ul className="symbol-key" aria-label="Plant type symbols">
+        {symbolTypes.map((type) => (
+          <li key={type}>
+            <span className="symbol-key-mark">
+              <PlantTypeSymbol type={type} />
+            </span>
+            {type === "bi/annual" ? "Bi/annual" : type[0].toUpperCase() + type.slice(1)}
+          </li>
+        ))}
+      </ul>
+    ) : null}
+    {/* The circles show how WIDE a plant grows, which says nothing about
+        how tall it is - an 8 m tree can draw a smaller circle than a
+        15 cm ground cover. The ring weight carries height, so a bed that
+        is layered tall-at-the-back can also be seen to be. */}
+    {/* The fill and its stripes are flower colour (usability review). */}
+    {view === "sketchbook" ? (
+      <p className="height-key">
+        Fill shows flower colour; stripes mean the plant flowers in several colours, and green means its colour is not recorded.
+      </p>
+    ) : null}
+    <p className="height-key">
+      <span>Ring shows height:</span>
+      <span className="height-key-item">
+        <i className="height-key-ring is-h-short" aria-hidden="true" /> under{" "}
+        {formatDimension(HEIGHT_TIERS.p30)}
+      </span>
+      <span className="height-key-item">
+        <i className="height-key-ring is-h-medium" aria-hidden="true" />{" "}
+        {formatDimension(HEIGHT_TIERS.p30)} to {formatDimension(HEIGHT_TIERS.p60)}
+      </span>
+      <span className="height-key-item">
+        <i className="height-key-ring is-h-tall" aria-hidden="true" />{" "}
+        {formatDimension(HEIGHT_TIERS.p60)} or taller
+      </span>
+    </p>
+    {anySaved ? (
+      <p className="saved-key">
+        <span className="legend-saved" aria-hidden="true"><SavedHeart /></span> also one of your favourites
+      </p>
+    ) : null}
+    </div>
+    </>
   );
 }
 
@@ -2485,7 +2582,10 @@ function BedDiagram({
   viewingEdge,
   view: controlledView,
   onViewChange,
+  hideKey = false,
 }: {
+  /** The plan page shows the key full width under the plan instead. */
+  hideKey?: boolean;
   widthM: number;
   lengthM: number;
   placements: { plantId: string; xM: number; yM: number; radiusM: number; instanceId?: string; sequence?: number }[];
@@ -2508,18 +2608,8 @@ function BedDiagram({
   const view = controlledView ?? ownView;
   const setView = onViewChange ?? setOwnView;
   const [brokenPhotos, setBrokenPhotos] = useState<ReadonlySet<string>>(new Set());
-  const anySaved = placements.some((p) => savedIds.includes(p.plantId));
   // Sketchbook symbol per species: the plant type it was placed for.
   const roleType = (plant: Plant) => roleTypeOf(plant, isFeaturePlant(plant));
-  const symbolTypes = [
-    ...new Set(
-      placements.flatMap((p) => {
-        const plant = plantsById.get(p.plantId);
-        const type = plant ? roleType(plant) : null;
-        return type ? [type] : [];
-      }),
-    ),
-  ];
   // Always north-up, in Stage 4's own coordinates (x west -> east, y north
   // -> south): a long bed is drawn tall rather than turned on its side, so
   // the compass, the viewer figure and the labels never need translating.
@@ -2661,49 +2751,7 @@ function BedDiagram({
         <div className="plan-measure plan-measure-length">{lengthM} m</div>
       </div>
       </div>
-      {/* Owner, 21 Oct: a tester was unsure whether the symbols were
-          buttons, so the legend sits in a labelled box. */}
-      <div className="plan-key" role="note" aria-label="Key to the drawing">
-      <p className="plan-key-title">
-        Key <span>· explains the drawing</span>
-      </p>
-      {view === "sketchbook" && symbolTypes.length > 0 ? (
-        <ul className="symbol-key" aria-label="Plant type symbols">
-          {symbolTypes.map((type) => (
-            <li key={type}>
-              <span className="symbol-key-mark">
-                <PlantTypeSymbol type={type} />
-              </span>
-              {type === "bi/annual" ? "Bi/annual" : type[0].toUpperCase() + type.slice(1)}
-            </li>
-          ))}
-        </ul>
-      ) : null}
-      {/* The circles show how WIDE a plant grows, which says nothing about
-          how tall it is - an 8 m tree can draw a smaller circle than a
-          15 cm ground cover. The ring weight carries height, so a bed that
-          is layered tall-at-the-back can also be seen to be. */}
-      <p className="height-key">
-        <span>Ring shows height:</span>
-        <span className="height-key-item">
-          <i className="height-key-ring is-h-short" aria-hidden="true" /> under{" "}
-          {formatDimension(HEIGHT_TIERS.p30)}
-        </span>
-        <span className="height-key-item">
-          <i className="height-key-ring is-h-medium" aria-hidden="true" />{" "}
-          {formatDimension(HEIGHT_TIERS.p30)} to {formatDimension(HEIGHT_TIERS.p60)}
-        </span>
-        <span className="height-key-item">
-          <i className="height-key-ring is-h-tall" aria-hidden="true" />{" "}
-          {formatDimension(HEIGHT_TIERS.p60)} or taller
-        </span>
-      </p>
-      {anySaved ? (
-        <p className="saved-key">
-          <span className="legend-saved" aria-hidden="true"><SavedHeart /></span> also one of your favourites
-        </p>
-      ) : null}
-      </div>
+      {hideKey ? null : <PlanKey placements={placements} savedIds={savedIds} view={view} />}
     </div>
   );
 }
@@ -2812,7 +2860,7 @@ function PlanSummary({
       <section className="plan-output plan-unavailable">
         <div>
           <span>Plan failed</span>
-          <h2>We couldn’t build a layout for this bed.</h2>
+          <h2>We couldn’t create a garden plan for this bed.</h2>
         </div>
         <p>
           Try a larger bed or change one of your answers. We’ll keep the plant
@@ -2929,6 +2977,7 @@ function PlanSummary({
               viewingEdge={plan.brief.viewingEdge}
               view={bedView}
               onViewChange={setBedView}
+              hideKey
             />
 
           <button
@@ -3004,6 +3053,8 @@ function PlanSummary({
         </div>
       </div>
 
+      <PlanKey placements={layout.placements} savedIds={savedIds} view={bedView} />
+
       {/* The plain summary, under the drawing. Each figure carries its
           unit, and the price says plainly that it is a guide. */}
       <dl className="plan-summary-row">
@@ -3022,7 +3073,7 @@ function PlanSummary({
           </dd>
         </div>
         <div>
-          <dt>Open space</dt>
+          <dt>Unplanted ground</dt>
           <dd>{Math.round(layout.realisedOpenSpaceRatio * 100)}%</dd>
         </div>
         <div>
@@ -3084,7 +3135,7 @@ function PlanSummary({
           {care.length > 0 && (
             <details className="care-detail">
               <summary>
-                What each plant&apos;s profile records
+                Care notes for each plant
                 <small>{care.length} notes across {species.length} species</small>
               </summary>
               <ul>
@@ -3101,7 +3152,7 @@ function PlanSummary({
       </div>
 
       <div className="plan-plants">
-        <h3>The plants in this layout</h3>
+        <h3>The plants in this garden plan</h3>
         <div className="plan-plant-grid">
           {species.map(({ plant, quantity }) => (
             <article key={plant.id} className="plan-plant-card">
@@ -3121,7 +3172,7 @@ function PlanSummary({
                   <dt>Spread</dt>
                   <dd>
                     {formatDimension(plant.spreadCm)}
-                    {plant.spreadConfidence !== "original" ? " (est.)" : ""}
+                    {plant.spreadConfidence !== "original" ? " (estimate)" : ""}
                   </dd>
                 </div>
               </dl>
@@ -3304,7 +3355,10 @@ function CollectionView({
   const savedSet = new Set(saved);
   const excludedSet = new Set(excluded);
   const allSaved = categoryIds.length > 0 && categoryIds.every((id) => savedSet.has(id));
-  const allExcluded = categoryIds.length > 0 && categoryIds.every((id) => excludedSet.has(id));
+  // Favourites are never hidden by a whole-type hide, so they count as done.
+  const allExcluded =
+    categoryIds.some((id) => excludedSet.has(id)) &&
+    categoryIds.every((id) => excludedSet.has(id) || savedSet.has(id));
 
   return (
     <main className="collection-shell">
@@ -3431,6 +3485,13 @@ function CollectionView({
                 </option>
               ))}
             </select>
+            {/* With no type chosen, say what choosing one allows, so people
+                find the whole-type buttons (owner, 22 Oct). */}
+            {form === "All" && (
+              <span className="type-filter-hint">
+                Pick a type to favourite or hide all of them at once.
+              </span>
+            )}
             {categoryIds.length > 0 && (
               <>
                 <button
@@ -3458,6 +3519,27 @@ function CollectionView({
             </div>
           </div>
         </section>
+
+        {excluded.length > 0 && (
+          <div className="hidden-actions is-library">
+            <p>
+              {excluded.length.toLocaleString("en-ZA")} plant{excluded.length === 1 ? " is" : "s are"} hidden from your plans
+              {" "}— types among them:{" "}
+              {hiddenByType(plants.filter((plant) => excludedSet.has(plant.id)))
+                .map(([type, count]) => `${count} ${type.toLowerCase()}`)
+                .join(", ")}.
+            </p>
+            <div>
+              <button
+                type="button"
+                className="is-active"
+                onClick={() => setCategory([...excluded], "excluded", false)}
+              >
+                Show all again
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className="results-count">
           <span>{filtered.length.toLocaleString("en-ZA")} plants</span>
@@ -3718,7 +3800,7 @@ function SavedLayoutsList({
             </ul>
             <footer>
               <button className="text-link" onClick={() => onOpen(layout.id)}>
-                Open full layout →
+                Open garden plan →
               </button>
               {/* Printing from the list would put every saved garden on
                   the page, so this opens the one you picked first and
@@ -3734,7 +3816,7 @@ function SavedLayoutsList({
               >
                 Print / Save as PDF
               </button>
-              <button className="text-link" onClick={() => onRemove(layout.id)}>
+              <button className="text-link saved-remove" onClick={() => onRemove(layout.id)}>
                 Remove
               </button>
             </footer>
@@ -3755,7 +3837,10 @@ function SavedView({
   toggleSaved,
   toggleExcluded,
   browse,
+  setCategory,
 }: {
+  /** Shows plants again, or hides them, many at once. */
+  setCategory: (ids: string[], list: "saved" | "excluded", on: boolean) => void;
   saved: string[];
   excluded: string[];
   savedLayouts: SavedLayout[];
@@ -3848,7 +3933,7 @@ function SavedView({
         ) : (
           <section className="saved-empty">
             <p>
-              No saved gardens yet. Make a garden plan and use{" "}
+              No saved gardens yet. Use Create my garden, then{" "}
               <strong>Save this garden plan</strong> to keep it here.
             </p>
           </section>
@@ -3898,8 +3983,42 @@ function SavedView({
           {excludedPlants.length ? (
             <>
               <div className="saved-summary">
-                <span>{excludedPlants.length} excluded</span>
-                <span>Left out of every new plan until you put it back</span>
+                <span>{excludedPlants.length} hidden</span>
+                <span>Left out of every new plan until you show it again</span>
+              </div>
+              {/* Owner, 26 Oct: what is hidden, by type, and a way to undo
+                  it all at once - hiding a whole type is easy to forget. */}
+              <div className="hidden-actions">
+                <p>
+                  Types among them (a plant can count under more than one):{" "}
+                  {hiddenByType(excludedPlants)
+                    .map(([type, count]) => `${count} ${type.toLowerCase()}`)
+                    .join(" · ")}
+                </p>
+                <div>
+                  {hiddenByType(excludedPlants).map(([type]) => (
+                    <button
+                      key={type}
+                      type="button"
+                      onClick={() =>
+                        setCategory(
+                          excludedPlants.filter((plant) => formsOf(plant).includes(type.toLowerCase())).map((plant) => plant.id),
+                          "excluded",
+                          false,
+                        )
+                      }
+                    >
+                      Show {type.toLowerCase()} again
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    className="is-active"
+                    onClick={() => setCategory(excludedPlants.map((plant) => plant.id), "excluded", false)}
+                  >
+                    Show all {excludedPlants.length} again
+                  </button>
+                </div>
               </div>
               <section className="plant-grid saved-grid">
                 {excludedPlants.map((plant) => (
@@ -4467,8 +4586,11 @@ export function GardenApp() {
     });
   };
 
-  /** A whole plant type at once (owner, 21 Oct). Same rule as the single
-   * buttons: favouriting clears an exclusion and excluding clears a heart. */
+  /** A whole plant type at once (owner, 21 Oct). Favouriting clears a
+   * hide. Hiding never touches a favourite (owner, 22 Oct): a plant in two
+   * types - a succulent shrub, say - stays favourited when one of its types
+   * is hidden, whichever was done first. The single buttons still do
+   * exactly what they say. */
   const setCategory = (ids: string[], list: "saved" | "excluded", on: boolean) => {
     const group = new Set(ids.filter((id) => !isNeverPlanted(id)));
     const add = (current: string[]) => [...current, ...[...group].filter((id) => !current.includes(id))];
@@ -4477,8 +4599,9 @@ export function GardenApp() {
       setSaved(on ? add : remove);
       if (on) setExcluded(remove);
     } else {
+      const favourites = new Set(saved);
+      for (const id of [...group]) if (on && favourites.has(id)) group.delete(id);
       setExcluded(on ? add : remove);
-      if (on) setSaved(remove);
     }
   };
 
@@ -4545,6 +4668,7 @@ export function GardenApp() {
           openPlant={setSelectedPlant}
           toggleSaved={toggleSaved}
           toggleExcluded={toggleExcluded}
+          setCategory={setCategory}
           browse={() => navigate("browse")}
         />
       )}

@@ -53,6 +53,7 @@ import type { SearchTrace } from "./stage3.ts";
 import type { PlacementCheck, WindProfile } from "./stage4.ts";
 import {
   MAX_RESULT_SEEDS,
+  MIN_PLAN_COVER,
   MIN_LAYOUT_CANOPY_DIAMETER_M,
   MINIMUM_VIABLE_POOL,
 } from "./engineConfig.ts";
@@ -905,6 +906,17 @@ function assumptionsFor(prepared: Prepared): string[] {
   ];
 }
 
+/** Share of the bed the finished layout covers, or null without one. */
+function runCover(run: EngineRun | null): number | null {
+  const layout = run?.status === "plan" ? run.placement?.layout : null;
+  return layout ? 1 - layout.realisedOpenSpaceRatio : null;
+}
+
+/** The plan-cover floor (MIN_PLAN_COVER), as a reason a user can act on. */
+function lowCoverReason(cover: number): string {
+  return `The plants that fit these answers would cover only ${Math.round(cover * 100)}% of the bed, and a garden plan must cover at least ${Math.round(MIN_PLAN_COVER * 100)}%.`;
+}
+
 function planFromRun(
   prepared: Prepared,
   run: EngineRun | null,
@@ -925,7 +937,9 @@ function planFromRun(
     seed,
     variationCounter: prepared.variationCounter,
   };
-  if (!run || run.status !== "plan" || !run.placement || !run.evaluation) {
+  const cover = runCover(run);
+  const tooSparse = cover !== null && cover < MIN_PLAN_COVER;
+  if (!run || run.status !== "plan" || !run.placement || !run.evaluation || tooSparse) {
     return {
       ...base,
       status: "no-plan",
@@ -945,6 +959,7 @@ function planFromRun(
               `${prepared.excludedInPool === 1 ? "One plant" : `${prepared.excludedInPool} plants`} that suit these conditions ${prepared.excludedInPool === 1 ? "is" : "are"} excluded by you. Putting ${prepared.excludedInPool === 1 ? "it" : "some"} back would give the planner more to work with; otherwise change an answer, or come back once more light, water and soil evidence has been recorded for this combination.`,
             ]
           : []),
+        ...(tooSparse ? [lowCoverReason(cover)] : []),
         ...(run?.diagnostics ?? []),
         ...extraDiagnostics,
       ],
@@ -1202,6 +1217,7 @@ export function buildGardenPlanVariants(
   const found: { run: EngineRun; seed: string }[] = [];
   const seen = new Set<string>();
   let lastRun: EngineRun | null = null;
+  let sparsest: EngineRun | null = null;
   for (
     let index = 0;
     index < MAX_RESULT_SEEDS && found.length < RESULT_LABELS.length && prepared.pool.length > 0;
@@ -1209,8 +1225,19 @@ export function buildGardenPlanVariants(
   ) {
     const seed = `${prepared.seed}-${index}`;
     const run = runEngine(prepared.pool, site, seed);
+    if (run.status !== "plan") {
+      if (!sparsest) lastRun = run;
+      continue;
+    }
+    // MIN_PLAN_COVER: a mostly bare bed is not offered as an option. The
+    // fullest of these is kept so a failure can say how close it came.
+    const cover = runCover(run) ?? 0;
+    if (cover < MIN_PLAN_COVER) {
+      if (!sparsest || cover > (runCover(sparsest) ?? 0)) sparsest = run;
+      lastRun = sparsest;
+      continue;
+    }
     lastRun = run;
-    if (run.status !== "plan") continue;
     const signature = [...run.selection]
       .sort(([left], [right]) => left.localeCompare(right))
       .map(([id, n]) => `${id}x${n}`)

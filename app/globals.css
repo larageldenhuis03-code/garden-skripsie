@@ -6766,6 +6766,75 @@ details.brief-strip[open] .brief-strip-hint { visibility: hidden; }
   }
 }
 
+/* The favourite heart on a plan circle scales with the circle (owner, 23
+   Oct): a quarter of the marker's width, so a big shrub gets a big heart
+   and a small ground cover a small one. The key's heart is unchanged. */
+.plan-marker .saved-badge {
+  width: clamp(8px, 24%, 72px);
+  height: auto;
+  aspect-ratio: 1;
+  padding: 5%;
+}
+
+/* Saved cards (usability review): the buttons sit at the foot of every
+   card at the same height, and Remove stands apart from Print. */
+.saved-layout-card {
+  display: flex;
+  flex-direction: column;
+}
+.saved-layout-card > footer {
+  margin-top: auto;
+  justify-content: flex-start;
+  gap: 18px;
+}
+.saved-layout-card .saved-remove {
+  margin-left: auto;
+  color: #8b2c2c;
+}
+
+/* Hidden plants: what is hidden, and one click to show it again (owner,
+   26 Oct). */
+.hidden-actions {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 16px;
+  padding: 14px 18px;
+  border: 1px dashed var(--line-strong);
+  font-family: var(--sans);
+  font-size: 0.92rem;
+}
+.hidden-actions.is-library {
+  margin: 0;
+  border-width: 0 0 1px;
+  border-style: solid;
+  border-color: var(--line);
+  padding: 12px 3.2vw;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+}
+.hidden-actions p {
+  margin: 0;
+}
+.hidden-actions > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.hidden-actions button {
+  padding: 7px 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: 100px;
+  background: transparent;
+  font-size: 0.85rem;
+}
+.hidden-actions button.is-active {
+  border-color: var(--olive);
+  background: var(--olive);
+  color: var(--paper);
+}
+
 /* Usability review (21 Oct). */
 /* Step 1: the vegetation tick sits in the town field's column. */
 .place-step .biome-selection {
@@ -6860,6 +6929,12 @@ details.brief-strip[open] .brief-strip-hint { visibility: hidden; }
 .type-filter-line .plant-type-select {
   flex: 1 1 220px;
   min-width: 0;
+}
+.type-filter-hint {
+  flex: 1 1 200px;
+  font-family: var(--sans);
+  font-size: 0.9rem;
+  color: var(--ink-soft);
 }
 .type-filter-line button {
   padding: 9px 16px;

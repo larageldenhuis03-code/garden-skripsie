@@ -96,7 +96,7 @@ function SpeciesBlock({ species, label, fields }: { species: SpeciesReport; labe
       )}
       {species.offers.length > 4 && (
         <button className="text-link" onClick={() => setShowAll(!showAll)}>
-          {showAll ? "Show fewer" : `Show all ${species.offers.length} listings`}
+          {showAll ? "Show fewer" : `Show all ${species.offers.length} prices`}
         </button>
       )}
       {species.availability.map((a) => (
@@ -134,8 +134,6 @@ export function SourcingPanel({
     | { key: string; status: "done"; report: SourcingReport; specWarning: string | null }
     | null
   >(null);
-  // "Checked 3 of 5 nurseries…" while a run is under way.
-  const [progress, setProgress] = useState<{ key: string; checked: number; total: number } | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -153,7 +151,6 @@ export function SourcingPanel({
         });
         return response.json();
       },
-      { onProgress: ({ checked, total }) => !cancelled && setProgress({ key, checked, total }) },
     )
       .then((response) => {
         if (cancelled) return;
@@ -209,7 +206,7 @@ export function SourcingPanel({
   );
   const walkIn = report && report.walkIn.length > 0 && (
     <div className="sourcing-walkin" key="walkin">
-      <h4>Walk-in only nurseries</h4>
+      <h4>Nurseries to visit in person (no online shop)</h4>
       <ul>
         {report.walkIn.map((w) => (
           <li key={w.branch}>
@@ -243,10 +240,9 @@ export function SourcingPanel({
       {(state.status !== "loading" && state.specWarning) && <p className="sourcing-warning">{state.specWarning}</p>}
       {state.status === "loading" && (
         <p className="sourcing-loading">
-          {progress && progress.key === requestKey && progress.total > 0
-            ? `Checked ${progress.checked} of ${progress.total} nurseries…`
-            : "Checking nurseries live…"}{" "}
-          the first check can take up to a minute.
+          {/* Owner, 21 Oct: no "5 of 5" count - it only counted the live
+              websites, so it undersold the sources used. */}
+          Checking nurseries… the first check can take up to a minute.
         </p>
       )}
       {state.status === "error" && <p className="sourcing-warning">{state.message}</p>}
@@ -268,9 +264,9 @@ export function SourcingPanel({
                   {report.species.length} species ·{" "}
                   {(() => {
                     const listings = report.species.reduce((n, s) => n + s.offers.length, 0);
-                    return `${listings} ${listings === 1 ? "listing" : "listings"}`;
+                    return `${listings} ${listings === 1 ? "price found" : "prices found"}`;
                   })()}
-                  {report.walkIn.length > 0 ? ` · ${report.walkIn.length} walk-in only` : ""}
+                  {report.walkIn.length > 0 ? ` · ${report.walkIn.length} to visit in person` : ""}
                 </small>
               </summary>
               {report.species.map((s) => (
